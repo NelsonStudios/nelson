@@ -1,0 +1,87 @@
+version: "3"
+
+services:
+  app:
+    image: markoshust/magento-nginx:1.13
+    ports:
+      - 8020:8000
+    depends_on:
+      - cron
+    links:
+      - db
+      - phpfpm
+      - redis
+    volumes: &appvolumes
+      - ./:/var/www/html
+      - ~/.composer:/var/www/html/var/composer_home
+      - sockdata:/sock
+
+  phpfpm:
+    image: markoshust/magento-php:7.1-fpm
+    links:
+      - phpmyadmin
+    volumes: *appvolumes
+    networks:
+      default:
+        aliases:
+          - phpfpm
+
+  cron:
+    image: markoshust/magento-php:7.1-fpm
+    depends_on:
+      - redis
+    user: root
+    command: /usr/local/bin/cronstart
+    links:
+      - phpfpm
+    tty: true
+    links:
+      - db
+    volumes: *appvolumes
+
+  db:
+    image: mysql:5.7
+    depends_on:
+      - mailcatcher
+    ports:
+      - 800:3306
+    env_file: env/db.env
+    volumes:
+      - dbdata:/var/lib/mysql
+  varnish:
+    image: million12/varnish
+    links:
+      - app
+      - phpfpm
+    depends_on:
+      - app
+    ports:
+      - 8030:80
+    volumes:
+      - ./varnish.vcl:/etc/varnish/default.vcl
+    environment:
+      - VLC_CONFIG=/etc/varnish/default.vcl
+    networks:
+      default:
+        aliases:
+          - varnish
+  mailcatcher:
+    image: tophfr/mailcatcher
+    ports:
+        - 8040:80
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - db
+      - mailcatcher
+    links:
+        - db
+    ports:
+        - 8050:80
+  redis:
+    image: redis:alpine
+    depends_on:
+      - db
+volumes:
+  dbdata:
+  sockdata:

@@ -67,3 +67,10 @@ atlassian*
 /generated/*
 !/generated/.htaccess
 .DS_Store
+
+
+### IGNORE DATABASE FILES ###
+/dbdata
+
+### IGNORE DOCKER COMPOSE OVERRIDE ###
+/docker-composer.override.yml
