@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <cardconnect>
+                <active>0</active>
+                <model>\Brsw\CardConnect\Model\CardConnect</model>
+                <order_status>pending</order_status>
+                <title>Credit Card (CardConnect)</title>
+                <allowspecific>0</allowspecific>
+                <cctypes>AE,VI,MC,DI</cctypes>
+                <useccv>1</useccv>
+                <payment_action>authorize</payment_action>
+                <gateway_uri>https://fts.cardconnect.com:6443/cardconnect/rest</gateway_uri>
+            </cardconnect>
+        </payment>
+    </default>
+</config>
