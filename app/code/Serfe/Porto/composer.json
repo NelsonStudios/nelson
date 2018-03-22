@@ -1,0 +1,25 @@
+{
+    "name": "serfe/module-porto",
+    "description": "Modifications to Smartwave_Porto module",
+    "require": {
+      "smartwave/module-porto": "2.2.1"
+    },
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Serfe\\Porto\\": ""
+        }
+    }
+}
