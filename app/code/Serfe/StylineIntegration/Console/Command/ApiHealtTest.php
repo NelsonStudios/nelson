@@ -21,8 +21,14 @@ class ApiHealtTest extends Command
     
     protected $client;
     
+    /**
+     * Constructor
+     *
+     * @param \Serfe\StylineIntegration\Helper\SoapClient $client
+     * @param mixed $name
+     */
     public function __construct(
-        \Serfe\StylineIntegration\Helper\SoapClient $client,
+        \Serfe\StylineIntegration\Helper\ApiHelper $client,
         $name = null
     ) {
         parent::__construct($name);
@@ -37,10 +43,17 @@ class ApiHealtTest extends Command
         OutputInterface $output
     ) {
         $name = $input->getArgument(self::NAME_ARGUMENT);
-        $option = $input->getOption(self::NAME_OPTION);
-        $output->writeln("Hello " . $name);
-        $testData = $this->getPartInfoTestData();
-        var_dump($this->client->getPartInfo($testData["PartNumber"], $testData["Quantity"], $testData["CustomerId"]));
+        if ($name == 'types') {
+            $outputData = $this->client->getSoapTypes();
+        } else {
+//            $testData = $this->getPartInfoTestData();
+//            $response = $this->client->getPartInfo($testData["PartNumber"], $testData["Quantity"], $testData["CustomerId"]);
+            $testData = $this->getCartTestData();
+            $response = $this->client->getCart($testData);
+            $outputData = print_r($response, true);
+        }
+        
+        $output->writeln($outputData);
     }
 
     /**
@@ -57,12 +70,56 @@ class ApiHealtTest extends Command
         parent::configure();
     }
     
+    /**
+     * Get test data for the SOAP call
+     *
+     * @return array
+     */
     protected function getPartInfoTestData()
     {
         return [
             "PartNumber" => "B10M-1.520SF-8.8",
             "Quantity" => "1",
             "CustomerId" => "C000037"
+        ];
+    }
+    
+    /**
+     * Get test data for the SOAP call
+     *
+     * @return array
+     */
+    protected function getCartTestData()
+    {
+        return [
+            "address" => [
+                "CustomerId" => "C000037",
+                "Line1" => "240 Hookhi St",
+                "Line2" => "",
+                "Line3" => "",
+                "City" => "Wailuku",
+                "State" => "HI",
+                "Zipcode" => "96793",
+                "Country" => "United States"
+            ],
+            "cartLine" => [
+                "PartNumber" => "B10M-1.520SF-8.8",
+                "Quantity" => "1",
+                "UOM" => "EA",
+                "Line" => "0"
+            ],
+            "request" => [
+                "Comments" => "Test order",
+                "EmailAddress" => "daniel@digabit.com",
+                "AccountNumber" => "123456",
+                "ShipVia" => "BEST",
+                "OrderCustomerName" => "Daniel",
+                "CollectAccountNumber" => "123456",
+                "OrderStock" => "Yes",
+                "OrderPhoneNumber" => "3031234567",
+                "DigabitERPTransactionType" => "Order",
+                "DigabitERPTransactionStatus" => "SUBMITTED"
+            ]
         ];
     }
 }
