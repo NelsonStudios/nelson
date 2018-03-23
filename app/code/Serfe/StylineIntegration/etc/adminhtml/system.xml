@@ -4,24 +4,29 @@
         <tab id="serfe" sortOrder="30" translate="label">
             <label>Serfe</label>
         </tab>
-        <section id="styline_integration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+        <section id="styline_integration" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
             <label>Styline Integration</label>
             <tab>serfe</tab>
             <resource>Serfe_StylineIntegration::config_serfe_stylineintegration</resource>
-            <group id="setting" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+            <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
                 <label>Settings</label>
-                <field id="test_mode" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select"  canRestore="1">
+                <field id="test_mode" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select"  canRestore="1">
                     <label>Test Mode</label>
                     <comment/>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="wsdl_url_production" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text" canRestore="1">
-                    <label>WSDL URL PRODUCTION</label>
+                <field id="wsdl_url_production" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="40" translate="label" type="text" canRestore="1">
+                    <label>WSDL Url Production</label>
                     <comment/>
                 </field>
-                <field id="wsdl_url_test" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text" canRestore="1">
-                    <label>WSDL URL TEST</label>
+                <field id="wsdl_url_test" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="40" translate="label" type="text" canRestore="1">
+                    <label>WSDL Url Test</label>
                     <comment/>
+                </field>
+                <field id="soap_version" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select" canRestore="1">
+                    <label>SOAP Version</label>
+                    <comment/>
+                    <source_model>Serfe\StylineIntegration\Model\Config\Source\SoapVersion</source_model>
                 </field>
             </group>
         </section>
