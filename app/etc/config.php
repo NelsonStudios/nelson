@@ -121,6 +121,7 @@ return array (
     'Magento_WishlistAnalytics' => 1,
     'Mageplaza_Core' => 1,
     'Mageplaza_LayeredNavigation' => 1,
+    'Serfe_FlatRateMinimumAmount' => 1,
     'Smartwave_Porto' => 1,
     'Shopial_Facebook' => 1,
     'Smartwave_Core' => 1,
