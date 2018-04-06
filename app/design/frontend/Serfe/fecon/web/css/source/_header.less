@@ -18,6 +18,29 @@
     }
     .header.content {
         background-color: #2A2A2A;
+        .block.block-search {
+            .block.block-content {
+                .minisearch {
+                    .field.search {
+                        .control {
+                            input#search {
+                                background-color: #2E2E2E;
+                                color: #fff;
+                            }
+                            ._keyfocus *:focus,
+                            input:not([disabled]):focus,
+                            textarea:not([disabled]):focus,
+                            select:not([disabled]):focus {
+                                box-shadow: 0 0 3px 1px #fff;
+                            }
+                        }
+                    }
+                }
+            }
+            .action.search:before {
+                color: #fff;
+            }
+        }
     }
     .sections.nav-sections {
         margin-bottom: 0;
