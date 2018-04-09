@@ -6,7 +6,7 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Serfe_FlatRateMinimumAmount::config_serfe_flatrateminimumamount" title="flat_rate"/>
+                            <resource id="Serfe_FlatRateMinimumAmount::config_serfe_flatrateminimumamount" title="serfe_flat_rate"/>
                         </resource>
                     </resource>
                 </resource>
