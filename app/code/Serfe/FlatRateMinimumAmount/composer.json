@@ -3,14 +3,17 @@
     "description": "Enable Flat Rate when minimum amount",
     "type": "magento2-module",
     "license": "proprietary",
+    "version": "1.0.0",
     "authors": [
         {
-            "email": "info@mage2gen.com",
-            "name": "Mage2Gen"
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "serfe/module-backendconfig": "1.0.0"
+    },
     "autoload": {
         "files": [
             "registration.php"
