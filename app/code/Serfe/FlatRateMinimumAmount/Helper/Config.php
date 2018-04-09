@@ -7,8 +7,11 @@ namespace Serfe\FlatRateMinimumAmount\Helper;
  *
  * @author Xuan Villagran <xuan@serfe.com>
  */
-class Helper extends \Magento\Framework\App\Helper\AbstractHelper
+class Config extends \Magento\Framework\App\Helper\AbstractHelper
 {
+
+    const FLAT_RATE_MIN_AMOUNT = 'serfe_flat_rate/settings/minimum_amount';
+
     /**
      * Constructor
      *
@@ -34,5 +37,17 @@ class Helper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $websiteCode = $this->storeManager->getWebsite()->getCode();
         return $this->scopeConfig->getValue($configPath, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $websiteCode);
+    }
+
+    /**
+     * Get Flat Rate Minimum Amount
+     *
+     * @return int
+     */
+    public function getFlatRateMinAmount()
+    {
+        $minAmount = (int) $this->getConfigValue($this::FLAT_RATE_MIN_AMOUNT);
+
+        return $minAmount;
     }
 }
