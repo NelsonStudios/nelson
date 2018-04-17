@@ -3,7 +3,7 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="ApiHealtTest" xsi:type="object">Serfe\SytelineIntegration\Console\Command\ApiHealtTest</item>
+                <item name="ApiTest" xsi:type="object">Serfe\SytelineIntegration\Console\Command\ApiTest</item>
             </argument>
         </arguments>
     </type>
