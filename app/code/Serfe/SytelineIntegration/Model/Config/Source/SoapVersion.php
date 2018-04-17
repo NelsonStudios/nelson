@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\StylineIntegration\Model\Config\Source;
+namespace Serfe\SytelineIntegration\Model\Config\Source;
 
 /**
  * Source Model for SOAP version configuration

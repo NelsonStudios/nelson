@@ -7,7 +7,7 @@
         <section id="styline_integration" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
             <label>Styline Integration</label>
             <tab>serfe</tab>
-            <resource>Serfe_StylineIntegration::config_serfe_stylineintegration</resource>
+            <resource>Serfe_SytelineIntegration::config_serfe_stylineintegration</resource>
             <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
                 <label>Settings</label>
                 <field id="test_mode" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select"  canRestore="1">
@@ -26,7 +26,7 @@
                 <field id="soap_version" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select" canRestore="1">
                     <label>SOAP Version</label>
                     <comment/>
-                    <source_model>Serfe\StylineIntegration\Model\Config\Source\SoapVersion</source_model>
+                    <source_model>Serfe\SytelineIntegration\Model\Config\Source\SoapVersion</source_model>
                 </field>
             </group>
         </section>

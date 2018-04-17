@@ -1,9 +1,9 @@
 <?php
 
-namespace Serfe\StylineIntegration\Helper;
+namespace Serfe\SytelineIntegration\Helper;
 
 /**
- * Description of ApiHelper
+ * Wrapper for SoapClient Helper
  *
  * @author Xuan Villagran <xuan@serfe.com>
  */
@@ -26,6 +26,29 @@ class ApiHelper extends SoapClient
         $partInfo->ErpGetPartInfoRequest->CustomerId = $customerId;
 
         return $this->execRequest("GetPartInfo", $partInfo);
+    }
+    
+    protected function parsePartData($data)
+    {
+        
+    }
+    
+    protected function validatePartData($data)
+    {
+        
+    }
+    
+    protected function isValidField($data, $field1, $field2 = null)
+    {
+        if (isset($data[$field1])) {
+            $field = $data[$field1];
+        }
+        if (isset($data[$field1][$field2]) && $field2) {
+            $field = $data[$field1][$field2];
+        }
+        $isValid = !empty($field);
+        
+        return $isValid;
     }
     
     /**

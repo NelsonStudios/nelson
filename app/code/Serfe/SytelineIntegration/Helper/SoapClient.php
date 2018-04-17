@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\StylineIntegration\Helper;
+namespace Serfe\SytelineIntegration\Helper;
 
 /**
  * Helper to make SOAP API calls

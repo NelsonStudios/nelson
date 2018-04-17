@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\StylineIntegration\Console\Command;
+namespace Serfe\SytelineIntegration\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,11 +24,11 @@ class ApiHealtTest extends Command
     /**
      * Constructor
      *
-     * @param \Serfe\StylineIntegration\Helper\SoapClient $client
+     * @param \Serfe\SytelineIntegration\Helper\SoapClient $client
      * @param mixed $name
      */
     public function __construct(
-        \Serfe\StylineIntegration\Helper\ApiHelper $client,
+        \Serfe\SytelineIntegration\Helper\ApiHelper $client,
         $name = null
     ) {
         parent::__construct($name);
