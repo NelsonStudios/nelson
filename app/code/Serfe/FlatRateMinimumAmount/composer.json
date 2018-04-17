@@ -1,11 +1,9 @@
 {
-    "name": "serfe/module-porto",
-    "description": "Modifications to Smartwave_Porto module",
-    "require": {
-      "smartwave/module-porto": "2.2.1"
-    },
+    "name": "serfe/module-flatrateminimumamount",
+    "description": "Enable Flat Rate when minimum amount",
     "type": "magento2-module",
     "license": "proprietary",
+    "version": "1.0.0",
     "authors": [
         {
             "email": "xuan@serfe.com",
@@ -13,12 +11,15 @@
         }
     ],
     "minimum-stability": "dev",
+    "require": {
+        "serfe/module-backendconfig": "1.0.0"
+    },
     "autoload": {
         "files": [
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\Porto\\": ""
+            "Serfe\\FlatRateMinimumAmount\\": ""
         }
     }
 }

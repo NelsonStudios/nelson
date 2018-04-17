@@ -1,11 +1,9 @@
 {
-    "name": "serfe/module-porto",
-    "description": "Modifications to Smartwave_Porto module",
-    "require": {
-      "smartwave/module-porto": "2.2.1"
-    },
+    "name": "serfe/module-backendconfig",
+    "description": "Add backend config tab",
     "type": "magento2-module",
     "license": "proprietary",
+    "version": "1.0.0",
     "authors": [
         {
             "email": "xuan@serfe.com",
@@ -13,12 +11,13 @@
         }
     ],
     "minimum-stability": "dev",
+    "require": {},
     "autoload": {
         "files": [
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\Porto\\": ""
+            "Serfe\\BackendConfig\\": ""
         }
     }
 }
