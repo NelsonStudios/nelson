@@ -1,13 +1,10 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="serfe" sortOrder="30" translate="label">
-            <label>Serfe</label>
-        </tab>
-        <section id="styline_integration" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
-            <label>Styline Integration</label>
+        <section id="syteline_integration" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
+            <label>Syteline Integration</label>
             <tab>serfe</tab>
-            <resource>Serfe_SytelineIntegration::config_serfe_stylineintegration</resource>
+            <resource>Serfe_SytelineIntegration::config_serfe_sytelineintegration</resource>
             <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
                 <label>Settings</label>
                 <field id="test_mode" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select"  canRestore="1">
