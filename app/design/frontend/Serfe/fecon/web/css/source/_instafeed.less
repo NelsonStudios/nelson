@@ -1,0 +1,126 @@
+/**
+ *
+ * @author Xuan Villagran
+ */
+
+.ig-overlay-text {
+    max-height: 30px;
+    line-height: 30px;
+    color: @color-white;
+    text-overflow: ellipsis;
+    width: 94%;
+    overflow: hidden;
+    text-align: center;
+    white-space: pre;
+    margin: 5px auto;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+}
+
+.ig-overlay {
+    opacity: 0;
+    background: @theme-color;
+    .transition(all 0.4s ease 0s);
+    bottom: 0%;
+    float: left;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+    color: @color-white;
+}
+
+.ig-btn:hover .ig-overlay {
+    opacity: .8;
+    bottom: 0%;
+}
+
+.ig-prev {
+    float: left
+}
+
+.porto-icon-instagram {
+    font-size: 5rem;
+}
+
+.ig-template {
+    margin-top: 28%;
+}
+
+#instafeed {
+    margin-bottom: 40px;
+
+    .owl-item {
+        img {
+            object-fit: cover;
+            width: 100%;
+        }
+    }
+}
+
+.ig-magento-modal {
+    header.modal-header {
+        padding-bottom: 1.2rem;
+        padding-top: 1.2rem;
+    }
+    .info {
+        font-size: 1.6rem;
+
+        .ig-likes {
+            font-size: 2.2rem;
+        }
+    }
+    .modal-title {
+        line-height: 2;
+        text-transform: uppercase;
+    }
+    .ig-header-profile {
+        border-radius: 50%;
+        float: left;
+        height: 40px;
+        margin-right: 8px;
+        margin-top: 5px;
+        overflow: hidden;
+        width: 40px;
+        img {
+            height: 40px;
+        }
+    }
+}
+
+//
+//    Desktop
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    #instafeed {
+        .owl-item {
+            img {
+                height: 250px;
+            }
+        }
+    }
+}
+
+//
+//    Mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
+    aside.ig-magento-modal {
+        .modal-title {
+            padding-bottom: 15px;
+        }
+        .ig-header-profile {
+            margin-top: -2px;
+        }
+    }
+    #instafeed {
+        .owl-item {
+            img {
+                height: 150px;
+            }
+        }
+    }
+}
