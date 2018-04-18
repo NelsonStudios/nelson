@@ -9,11 +9,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Check API healt
+ * Test Syteline API
  *
  * @author Xuan Villagran <xuan@serfe.com>
  */
-class ApiHealtTest extends Command
+class ApiTest extends Command
 {
 
     const NAME_ARGUMENT = "name";
@@ -45,11 +45,13 @@ class ApiHealtTest extends Command
         $name = $input->getArgument(self::NAME_ARGUMENT);
         if ($name == 'types') {
             $outputData = $this->client->getSoapTypes();
-        } else {
-//            $testData = $this->getPartInfoTestData();
-//            $response = $this->client->getPartInfo($testData["PartNumber"], $testData["Quantity"], $testData["CustomerId"]);
+        } elseif ($name == 'GetCart') {
             $testData = $this->getCartTestData();
             $response = $this->client->getCart($testData);
+            $outputData = print_r($response, true);
+        } else {
+            $testData = $this->getPartInfoTestData();
+            $response = $this->client->getPartInfo($testData);
             $outputData = print_r($response, true);
         }
         
@@ -61,7 +63,7 @@ class ApiHealtTest extends Command
      */
     protected function configure()
     {
-        $this->setName("serfe_stylineintegration:apihealttest");
+        $this->setName("serfe:syteline:test");
         $this->setDescription("Test the configured API its working properly");
         $this->setDefinition([
             new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),
@@ -79,7 +81,7 @@ class ApiHealtTest extends Command
     {
         return [
             "PartNumber" => "B10M-1.520SF-8.8",
-            "Quantity" => "1",
+            "Quantity" => '1',
             "CustomerId" => "C000037"
         ];
     }
@@ -93,7 +95,7 @@ class ApiHealtTest extends Command
     {
         return [
             "address" => [
-                "CustomerId" => "C000037",
+                "CustomerId" => "",
                 "Line1" => "240 Hookhi St",
                 "Line2" => "",
                 "Line3" => "",
