@@ -10,6 +10,40 @@ namespace Serfe\SytelineIntegration\Helper;
 class ApiHelper extends SoapClient
 {
     /**
+     * Data Handler
+     *
+     * @var \Serfe\SytelineIntegration\Helper\DataHandler 
+     */
+    protected $dataHandler;
+
+    /**
+     * Logger
+     *
+     * @var \Serfe\SytelineIntegration\Logger\Handler 
+     */
+    protected $logger;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeMaganger
+     * @param \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
+     * @param \Serfe\SytelineIntegration\Logger\Handler $logger
+     */
+    public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeMaganger,
+        \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler,
+        \Serfe\SytelineIntegration\Logger\Logger $logger
+    ) {
+        $this->dataHandler = $dataHandler;
+        $this->logger = $logger;
+
+        parent::__construct($context, $storeMaganger);
+    }
+
+    /**
      * Get Part Info
      *
      * @param string $partNumber
@@ -17,91 +51,19 @@ class ApiHelper extends SoapClient
      * @param string $customerId
      * @return mixed
      */
-    public function getPartInfo($partNumber, $qty, $customerId)
+    public function getPartInfo($data)
     {
-        $partInfo = new \stdClass();
-        $partInfo->ErpGetPartInfoRequest = new \stdClass();
-        $partInfo->ErpGetPartInfoRequest->PartNumber = $partNumber;
-        $partInfo->ErpGetPartInfoRequest->Quantity = $qty;
-        $partInfo->ErpGetPartInfoRequest->CustomerId = $customerId;
-
-        return $this->execRequest("GetPartInfo", $partInfo);
-    }
-    
-    protected function parsePartData($data)
-    {
-        
-    }
-    
-    protected function validatePartData($data)
-    {
-        
-    }
-    
-    protected function isValidField($data, $field1, $field2 = null)
-    {
-        if (isset($data[$field1])) {
-            $field = $data[$field1];
+        if ($this->dataHandler->isValidPartData($data, $errors)) {
+            $partInfo = $this->dataHandler->parsePartData($data);
+            $response = $this->execRequest("GetPartInfo", $partInfo);
+        } else {
+            $response = ['error'];
         }
-        if (isset($data[$field1][$field2]) && $field2) {
-            $field = $data[$field1][$field2];
-        }
-        $isValid = !empty($field);
         
-        return $isValid;
+
+        return $response;
     }
-    
-    /**
-     * Format cart data to pass it to the Web Service
-     *
-     * @param array $data
-     * @return \stdClass
-     */
-    protected function parseCartData($data)
-    {
-        $GetCartErpSendShoppingCartRequestSiteAddress             = new \stdClass();
-        $GetCartErpSendShoppingCartRequestSiteAddress->CustomerId = $data["address"]["CustomerId"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->Line1      = $data["address"]["Line1"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->Line2      = $data["address"]["Line2"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->Line3      = $data["address"]["Line3"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->City       = $data["address"]["City"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->State      = $data["address"]["State"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->Zipcode    = $data["address"]["Zipcode"];
-        $GetCartErpSendShoppingCartRequestSiteAddress->Country    = $data["address"]["Country"];
 
-        $GetCartErpSendShoppingCartRequestShipTo                  = new \stdClass();
-        $GetCartErpSendShoppingCartRequestShipTo->SiteAddress     = $GetCartErpSendShoppingCartRequestSiteAddress;
-        
-        $ShoppingCartLine                                         = new \stdClass();
-        $ShoppingCartLine->PartNumber                             = $data["cartLine"]["PartNumber"];
-        $ShoppingCartLine->Quantity                               = $data["cartLine"]["Quantity"];
-        $ShoppingCartLine->UOM                                    = $data["cartLine"]["UOM"];
-        $ShoppingCartLine->Line                                   = $data["cartLine"]["Line"];
-        
-        
-        $ArrayOfShoppingCartLine                                  = new \stdClass();
-        $ArrayOfShoppingCartLine->ShoppingCartLine                = $ShoppingCartLine;
-
-        $ErpSendShoppingCartRequest                               = new \stdClass();
-        $ErpSendShoppingCartRequest->ShipTo                       = $GetCartErpSendShoppingCartRequestShipTo;
-        $ErpSendShoppingCartRequest->ShoppingCartLines            = $ShoppingCartLine;
-        $ErpSendShoppingCartRequest->Comments                     = $data["request"]["Comments"];
-        $ErpSendShoppingCartRequest->EmailAddress                 = $data["request"]["EmailAddress"];
-        $ErpSendShoppingCartRequest->AccountNumber                = $data["request"]["AccountNumber"];
-        $ErpSendShoppingCartRequest->ShipVia                      = $data["request"]["ShipVia"];
-        $ErpSendShoppingCartRequest->OrderCustomerName            = $data["request"]["OrderCustomerName"];
-        $ErpSendShoppingCartRequest->CollectAccountNumber         = $data["request"]["CollectAccountNumber"];
-        $ErpSendShoppingCartRequest->OrderStock                   = $data["request"]["OrderStock"];
-        $ErpSendShoppingCartRequest->OrderPhoneNumber             = $data["request"]["OrderPhoneNumber"];
-        $ErpSendShoppingCartRequest->DigabitERPTransactionType    = $data["request"]["DigabitERPTransactionType"];
-        $ErpSendShoppingCartRequest->DigabitERPTransactionStatus  = $data["request"]["DigabitERPTransactionStatus"];
-
-        $cartData                                                 = new \stdClass();
-        $cartData->ErpSendShoppingCartRequest                     = $ErpSendShoppingCartRequest;
-        
-        return $cartData;
-    }
-    
     /**
      * Call the GetCart Web Service
      *
@@ -110,11 +72,19 @@ class ApiHelper extends SoapClient
      */
     public function getCart($data)
     {
-        $cardData = $this->parseCartData($data);
+        if ($this->dataHandler->isValidGetCartData($data, $errors)) {
+            $cardData = $this->dataHandler->parseCartData($data);
+            $response = $this->execRequest("GetCart", $cardData);
+        } else {
+            $response = ['errors' => $errors];
+            foreach ($errors as $error) {
+                $this->logger->err($error);
+            }
+        }
 
-        return $this->execRequest("GetCart", $cardData);
+        return $response;
     }
-    
+
     /**
      * Returns the 
      *
@@ -125,7 +95,7 @@ class ApiHelper extends SoapClient
         $wsdl = $this->getWsdl();
         $options = $this->getOptions();
         $client = new \Zend\Soap\Client($wsdl, $options);
-        
+
         return $client->getTypes();
     }
 }
