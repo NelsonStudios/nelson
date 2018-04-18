@@ -9,11 +9,16 @@ namespace Serfe\SytelineIntegration\Helper;
  */
 class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const PRODUCTION_WSDL_CONFIG_PATH = "styline_integration/setting/wsdl_url_production";
-    const TEST_WSDL_CONFIG_PATH = "styline_integration/setting/wsdl_url_test";
-    const TEST_MODE_CONFIG_PATH = "styline_integration/setting/test_mode";
-    const SOAP_VERSION = "styline_integration/setting/soap_version";
+    const PRODUCTION_WSDL_CONFIG_PATH = "syteline_integration/setting/wsdl_url_production";
+    const TEST_WSDL_CONFIG_PATH = "syteline_integration/setting/wsdl_url_test";
+    const TEST_MODE_CONFIG_PATH = "syteline_integration/setting/test_mode";
+    const SOAP_VERSION = "syteline_integration/setting/soap_version";
     
+    /**
+     * Store Manager
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface 
+     */
     protected $storeManager;
     
     /**
