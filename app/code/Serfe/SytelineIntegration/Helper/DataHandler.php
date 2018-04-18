@@ -19,24 +19,6 @@ class DataHandler
      */
     protected function isValidField($data, $field1, $field2 = null, &$errors = [])
     {
-//        if (isset($data[$field1])) {
-//            $field = $data[$field1];
-//        } else {
-//            $errors[] = '[' . $field1 . '] is not set';
-//        }
-//        if (isset($data[$field1][$field2]) && $field2) {
-//            $field = $data[$field1][$field2];
-//        } else {
-//            unset($field);
-//            $errors[] = '[' . $field1 . '][' . $field2 . '] is not set';
-//        }
-//        if (empty($field) && $field !== '0') {
-//            $errors[] = '[' . $field1 . '][' . $field2 . '] is empty';
-//        }
-//        $isValid = isset($field) && (!empty($field) || $field === '0');
-//
-//        return $isValid;
-        
         $isValid = false;
         if ($field2) {
             if (!isset($data[$field1][$field2])) {
