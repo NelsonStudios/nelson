@@ -95,7 +95,7 @@ class ApiTest extends Command
     {
         return [
             "address" => [
-                "CustomerId" => "",
+                "CustomerId" => "C000037",
                 "Line1" => "240 Hookhi St",
                 "Line2" => "",
                 "Line3" => "",
