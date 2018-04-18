@@ -17,28 +17,18 @@ class ApiHelper extends SoapClient
     protected $dataHandler;
 
     /**
-     * Logger
-     *
-     * @var \Serfe\SytelineIntegration\Logger\Handler 
-     */
-    protected $logger;
-
-    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeMaganger
      * @param \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
-     * @param \Serfe\SytelineIntegration\Logger\Handler $logger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeMaganger,
-        \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler,
-        \Serfe\SytelineIntegration\Logger\Logger $logger
+        \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
     ) {
         $this->dataHandler = $dataHandler;
-        $this->logger = $logger;
 
         parent::__construct($context, $storeMaganger);
     }
@@ -77,9 +67,6 @@ class ApiHelper extends SoapClient
             $response = $this->execRequest("GetCart", $cardData);
         } else {
             $response = ['errors' => $errors];
-            foreach ($errors as $error) {
-                $this->logger->err($error);
-            }
         }
 
         return $response;
