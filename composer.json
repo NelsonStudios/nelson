@@ -9,7 +9,8 @@
     ],
     "require": {
         "magento/product-community-edition": "2.2.3",
-        "composer/composer": "@alpha"
+        "composer/composer": "@alpha",
+        "amasty/aminvisiblecaptcha": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",
@@ -50,12 +51,16 @@
         }
     },
     "minimum-stability": "stable",
-    "repositories": [
-        {
+    "repositories": {
+        "0": {
             "type": "composer",
             "url": "https://repo.magento.com/"
+        },
+        "amasty": {
+            "type": "composer",
+            "url": "https://composer.amasty.com/community/"
         }
-    ],
+    },
     "extra": {
         "magento-force": "override"
     }
