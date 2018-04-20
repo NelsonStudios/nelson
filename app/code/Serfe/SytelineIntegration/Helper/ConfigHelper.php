@@ -68,7 +68,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getSoapVersion()
+    public function getSoapVersion()
     {
         $soapVersion = $this->getConfigValue($this::SOAP_VERSION) == 'SOAP_1_1'? SOAP_1_1 : SOAP_1_2;
 
