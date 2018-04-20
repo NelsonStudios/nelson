@@ -9,33 +9,28 @@ namespace Serfe\SytelineIntegration\Helper;
  */
 class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const PRODUCTION_WSDL_CONFIG_PATH = "syteline_integration/setting/wsdl_url_production";
-    const TEST_WSDL_CONFIG_PATH = "syteline_integration/setting/wsdl_url_test";
-    const TEST_MODE_CONFIG_PATH = "syteline_integration/setting/test_mode";
-    const SOAP_VERSION = "syteline_integration/setting/soap_version";
-    
     /**
-     * Store Manager
+     * Config Helper
      *
-     * @var \Magento\Store\Model\StoreManagerInterface 
+     * @var \Serfe\SytelineIntegration\Helper\ConfigHelper
      */
-    protected $storeManager;
-    
+    protected $configHelper;
+
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Store\Model\StoreManagerInterface $storeMaganger
+     * @param \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeMaganger
+        \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
     ) {
-        $this->storeManager = $storeMaganger;
+        $this->configHelper = $configHelper;
         
         parent::__construct($context);
     }
-    
+
     /**
      * Executes a request to the SOAP API
      *
@@ -45,45 +40,39 @@ class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function execRequest($callable, $data)
     {
-        $wsdl = $this->getWsdl();
+        $wsdl = $this->configHelper->getWsdl();
         $options = $this->getOptions();
         $client = new \Zend\Soap\Client($wsdl, $options);
-        
+
         try {
             $response = $client->$callable($data);
-        } catch (Exception $exc) {
-            $response = $exc->getTraceAsString();
+        } catch (\SoapFault $exc) {
+            $response = $this->processSoapFault($exc);
         }
-            
+
         return $response;
     }
-    
+
     /**
-     * Get configured value for current website
+     * Process SoapFault attributes
      *
-     * @param string $configPath
-     * @return mixed
+     * @param \SoapFault $soapFault
+     * @return array
      */
-    protected function getConfigValue($configPath)
+    protected function processSoapFault($soapFault)
     {
-        $websiteCode = $this->storeManager->getWebsite()->getCode();
-        return $this->scopeConfig->getValue($configPath, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE, $websiteCode);
+        $error = [
+            'errors' => [
+                'type' => 'SoapFault',
+                'code' => $soapFault->faultcode,
+                'message' => $soapFault->getMessage()
+            ]
+        ];
+        
+        return $error;
     }
+
     
-    /**
-     * Get WSDL URL
-     *
-     * @return string
-     */
-    protected function getWsdl()
-    {
-        $testMode = $this->getConfigValue($this::TEST_MODE_CONFIG_PATH);
-        $wsdlConfig = $this::PRODUCTION_WSDL_CONFIG_PATH;
-        if ($testMode) {
-            $wsdlConfig = $this::TEST_WSDL_CONFIG_PATH;
-        }
-        return $this->getConfigValue($wsdlConfig);
-    }
     
     /**
      * Get options for the SOAP Client
@@ -92,7 +81,7 @@ class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getOptions()
     {
-        $soapVersion = $this->getConfigValue($this::SOAP_VERSION) == 'SOAP_1_1'? SOAP_1_1 : SOAP_1_2;
+        $soapVersion = $this->configHelper->getSoapVersion();
 
         return [
             'soap_version' => $soapVersion
