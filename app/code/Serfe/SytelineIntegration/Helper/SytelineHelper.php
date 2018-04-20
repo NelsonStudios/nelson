@@ -13,6 +13,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const SYTELINE_AVAIALABLE_STATUS = 'Available';
 
     /**
+     * Api Helper
      *
      * @var \Serfe\SytelineIntegration\Helper\ApiHelper 
      */
@@ -25,6 +26,13 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $logger;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Serfe\SytelineIntegration\Helper\ApiHelper $apiHelper
+     * @param \Serfe\SytelineIntegration\Logger\Logger $logger
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Serfe\SytelineIntegration\Helper\ApiHelper $apiHelper,
@@ -62,7 +70,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected function productToArray(\Magento\Catalog\Model\Product $product, $qty)
     {
         return [
-            "PartNumber" => $product->getSku(), //**IMPORTANT**: Change getSku for getPartNumber
+            "PartNumber" => $product->getPartNumber(),
             "Quantity" => $qty,
             "CustomerId" => $this::SYTELINE_CUSTOMER_ID
         ];
@@ -122,5 +130,10 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         foreach ($response['errors'] as $error) {
             $this->logger->err($error);
         }
+    }
+
+    public function submitCartToSyteline($order)
+    {
+        return $this->apiHelper->getCart($order);
     }
 }
