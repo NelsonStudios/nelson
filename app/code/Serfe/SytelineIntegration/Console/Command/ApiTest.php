@@ -21,6 +21,8 @@ class ApiTest extends Command
     
     protected $client;
     
+    protected $testHelper;
+    
     /**
      * Constructor
      *
@@ -29,10 +31,14 @@ class ApiTest extends Command
      */
     public function __construct(
         \Serfe\SytelineIntegration\Helper\ApiHelper $client,
+        \Serfe\SytelineIntegration\Helper\TestGetCart $testHelper,
+        \Magento\Framework\App\State $state,
         $name = null
     ) {
+        $state->setAreaCode('frontend');
         parent::__construct($name);
         $this->client = $client;
+        $this->testHelper = $testHelper;
     }
 
     /**
@@ -49,6 +55,8 @@ class ApiTest extends Command
             $testData = $this->getCartTestData();
             $response = $this->client->getCart($testData);
             $outputData = print_r($response, true);
+        } elseif ($name == 'TestGetCart') {
+            $this->testHelper->submitCart();
         } else {
             $testData = $this->getPartInfoTestData();
             $response = $this->client->getPartInfo($testData);
@@ -104,11 +112,13 @@ class ApiTest extends Command
                 "Zipcode" => "96793",
                 "Country" => "United States"
             ],
-            "cartLine" => [
-                "PartNumber" => "B10M-1.520SF-8.8",
-                "Quantity" => "1",
-                "UOM" => "EA",
-                "Line" => "0"
+            "cartLines" => [
+                [
+                    "PartNumber" => "B10M-1.520SF-8.8",
+                    "Quantity" => "1",
+                    "UOM" => "EA",
+                    "Line" => "0"
+                ]
             ],
             "request" => [
                 "Comments" => "Test order",
