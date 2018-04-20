@@ -20,4 +20,20 @@
             </argument>
         </arguments>
     </type>
+    <preference for="Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface" type="Serfe\SytelineIntegration\Model\SubmissionRepository"/>
+    <preference for="Serfe\SytelineIntegration\Api\Data\SubmissionInterface" type="Serfe\SytelineIntegration\Model\Submission"/>
+    <preference for="Serfe\SytelineIntegration\Api\Data\SubmissionSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Serfe\SytelineIntegration\Model\ResourceModel\Submission\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">serfe_sytelineintegration_submission</argument>
+            <argument name="resourceModel" xsi:type="string">Serfe\SytelineIntegration\Model\ResourceModel\Submission\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="serfe_sytelineintegration_submission_grid_data_source" xsi:type="string">Serfe\SytelineIntegration\Model\ResourceModel\Submission\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
