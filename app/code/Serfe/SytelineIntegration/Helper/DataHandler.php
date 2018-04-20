@@ -10,38 +10,6 @@ namespace Serfe\SytelineIntegration\Helper;
 class DataHandler
 {
     /**
-     * Validate field
-     *
-     * @param array $data
-     * @param string $field1
-     * @param string $field2
-     * @return boolean
-     */
-    protected function isValidField($data, $field1, $field2 = null, &$errors = [])
-    {
-        $isValid = false;
-        if ($field2) {
-            if (!isset($data[$field1][$field2])) {
-                $errors[] = '[' . $field1 . '][' . $field2 . '] is not set';
-            } elseif (empty($data[$field1][$field2]) && $data[$field1][$field2] !== '0') {
-                $errors[] = '[' . $field1 . '][' . $field2 . '] is empty';
-            } else {
-                $isValid = true;
-            }
-        } else {
-            if (!isset($data[$field1])) {
-                $errors[] = '[' . $field1 . '] is not set';
-            } elseif (empty($data[$field1]) && $data[$field1] !== '0') {
-                $errors[] = '[' . $field1 . '] is empty';
-            } else {
-                $isValid = true;
-            }
-        }
-        
-        return $isValid;
-    }
-
-    /**
      * Validate the data for GetPartInfo Web Service
      *
      * @param array $data
@@ -51,12 +19,7 @@ class DataHandler
     public function isValidPartData($data, &$errors = [])
     {
         $requiredFields = $this->getPartRequiredFields();
-        $validFields = true;
-        foreach ($requiredFields as $requiredField) {
-            if (!$this->isValidField($data, $requiredField, null, $errors)) {
-                $validFields = false;
-            }
-        }
+        $validFields = $this->validField($data, $requiredFields, $errors);
         $isValidData = $validFields && is_numeric($data['Quantity']);
         
         return $isValidData;
@@ -72,14 +35,7 @@ class DataHandler
     public function isValidGetCartData($data, &$errors = [])
     {
         $requiredFields = $this->getCartRequiredFields();
-        $validFields = true;
-        foreach ($requiredFields as $mainField => $requiredField) {
-            foreach ($requiredField as $field) {
-                if (!$this->isValidField($data, $mainField, $field, $errors)) {
-                    $validFields = false;
-                }
-            }
-        }
+        $validFields = $this->validField($data, $requiredFields, $errors);
 
         return $validFields;
     }
@@ -121,20 +77,13 @@ class DataHandler
 
         $GetCartErpSendShoppingCartRequestShipTo                  = new \stdClass();
         $GetCartErpSendShoppingCartRequestShipTo->SiteAddress     = $GetCartErpSendShoppingCartRequestSiteAddress;
-        
-        $ShoppingCartLine                                         = new \stdClass();
-        $ShoppingCartLine->PartNumber                             = $data["cartLine"]["PartNumber"];
-        $ShoppingCartLine->Quantity                               = $data["cartLine"]["Quantity"];
-        $ShoppingCartLine->UOM                                    = $data["cartLine"]["UOM"];
-        $ShoppingCartLine->Line                                   = $data["cartLine"]["Line"];
-        
-        
-        $ArrayOfShoppingCartLine                                  = new \stdClass();
-        $ArrayOfShoppingCartLine->ShoppingCartLine                = $ShoppingCartLine;
+
+
+        $ArrayOfShoppingCartLine                                  = $this->getCartLines($data['cartLines']);
 
         $ErpSendShoppingCartRequest                               = new \stdClass();
         $ErpSendShoppingCartRequest->ShipTo                       = $GetCartErpSendShoppingCartRequestShipTo;
-        $ErpSendShoppingCartRequest->ShoppingCartLines            = $ShoppingCartLine;
+        $ErpSendShoppingCartRequest->ShoppingCartLines            = $ArrayOfShoppingCartLine;
         $ErpSendShoppingCartRequest->Comments                     = $data["request"]["Comments"];
         $ErpSendShoppingCartRequest->EmailAddress                 = $data["request"]["EmailAddress"];
         $ErpSendShoppingCartRequest->AccountNumber                = $data["request"]["AccountNumber"];
@@ -150,6 +99,26 @@ class DataHandler
         $cartData->ErpSendShoppingCartRequest                     = $ErpSendShoppingCartRequest;
         
         return $cartData;
+    }
+
+    /**
+     * 
+     * @param array $data
+     * @return \stdClass[]
+     */
+    protected function getCartLines($data)
+    {
+        $cartLines = [];
+        foreach ($data as $cartLine) {
+            $ShoppingCartLine                                         = new \stdClass();
+            $ShoppingCartLine->PartNumber                             = $cartLine["PartNumber"];
+            $ShoppingCartLine->Quantity                               = $cartLine["Quantity"];
+            $ShoppingCartLine->UOM                                    = $cartLine["UOM"];
+            $ShoppingCartLine->Line                                   = $cartLine["Line"];
+            $cartLines[] = $ShoppingCartLine;
+        }
+
+        return $cartLines;
     }
 
     /**
@@ -182,24 +151,91 @@ class DataHandler
                 "Zipcode",
                 "Country"
             ],
-            "cartLine" => [
+            "cartLines" => [[
                 "PartNumber",
                 "Quantity", 
                 "UOM",
                 "Line"
-            ],
+            ]],
             "request" => [
-                "Comments",
                 "EmailAddress",
-                "AccountNumber",
                 "ShipVia",
                 "OrderCustomerName",
-                "CollectAccountNumber",
                 "OrderStock",
                 "OrderPhoneNumber",
                 "DigabitERPTransactionType",
                 "DigabitERPTransactionStatus"
             ]
         ];
+    }
+
+    /**
+     * Recursive validation of a field
+     *
+     * @param string|array $data
+     * @param string|array $field
+     * @param array $errors
+     * @return boolean
+     */
+    protected function validField($data, $field, &$errors = [])
+    {
+        if (is_array($data)) {
+            $isValid = $this->validArrayField($data, $field, $errors);
+            
+        } else {
+            $isValid = $this->validStringField($data, $field, $errors);
+        }
+        
+        return $isValid;
+    }
+
+    /**
+     * Validate array Field
+     *
+     * @param array $data
+     * @param array $field
+     * @param array $errors
+     * @return boolean
+     */
+    protected function validArrayField($data, $field, &$errors)
+    {
+        $isValid = true;
+        if (is_array($field)) {
+            $dataKeys = array_keys($data);
+            foreach ($field as $key => $value) {
+                $nextKey = is_array($value) ? $key : $value;
+                if (!in_array($nextKey, $dataKeys)) {
+                    $errors[] = '[' . $nextKey . '] is not set';
+                    $isValid = false;
+                } else {
+                    $valueIsValid = $this->validField($data[$nextKey], $value, $errors);
+                    $isValid = $isValid && $valueIsValid;
+                }
+            }
+        } else {
+            $errors[] = '[' . $field . '] is array when it should be an string';
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Validate string Field
+     *
+     * @param string $data
+     * @param string $field
+     * @param array $errors
+     * @return boolean
+     */
+    protected function validStringField($data, $field, &$errors)
+    {
+        $isValid = true;
+        if (empty($data) && $data !== '0') {
+            $errors[] = '[' . $field . '] is empty';
+            $isValid = false;
+        }
+
+        return $isValid;
     }
 }
