@@ -20,17 +20,17 @@ class ApiHelper extends SoapClient
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Store\Model\StoreManagerInterface $storeMaganger
+     * @param \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
      * @param \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeMaganger,
+        \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper,
         \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
     ) {
         $this->dataHandler = $dataHandler;
 
-        parent::__construct($context, $storeMaganger);
+        parent::__construct($context, $configHelper);
     }
 
     /**
