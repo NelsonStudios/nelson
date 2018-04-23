@@ -17,18 +17,14 @@ class Product
     protected $sytelineHelper;
 
     /**
-     * Product Repository
+     * Constructor
      *
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface 
+     * @param \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
      */
-    protected $productRepository;
-
     public function __construct(
-        \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
     ) {
         $this->sytelineHelper = $sytelineHelper;
-        $this->productRepository = $productRepository;
     }
 
     /**
@@ -43,28 +39,10 @@ class Product
         $result
     ) {
         $returnValue = $result;
-        if ($this->existsInSyteline($subject)) {
+        if ($this->sytelineHelper->existsInSyteline($subject)) {
             $returnValue = $this->sytelineHelper->isProductAvailable($subject);
         }
 
         return $returnValue;
-    }
-
-    /**
-     * Check if $product exists in Syteline
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return boolean
-     */
-    protected function existsInSyteline($product)
-    {
-        try {
-            $loadedProduct = $this->productRepository->getById($product->getId());
-            $exists = (bool) $loadedProduct->getExistsInSyteline();
-        } catch (Exception $ex) {
-            $exists = false;
-        }
-
-        return $exists;
     }
 }
