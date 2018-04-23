@@ -72,8 +72,6 @@ class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
         return $error;
     }
 
-    
-    
     /**
      * Get options for the SOAP Client
      *
