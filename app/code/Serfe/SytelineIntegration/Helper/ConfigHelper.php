@@ -55,9 +55,8 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getWsdl()
     {
-        $testMode = $this->getConfigValue($this::TEST_MODE_CONFIG_PATH);
         $wsdlConfig = $this::PRODUCTION_WSDL_CONFIG_PATH;
-        if ($testMode) {
+        if ($this->isTestModeEnabled()) {
             $wsdlConfig = $this::TEST_WSDL_CONFIG_PATH;
         }
         return $this->getConfigValue($wsdlConfig);
@@ -73,5 +72,15 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $soapVersion = $this->getConfigValue($this::SOAP_VERSION) == 'SOAP_1_1'? SOAP_1_1 : SOAP_1_2;
 
         return $soapVersion;
+    }
+
+    /**
+     * Returns true if testing mode configuration is enabled
+     *
+     * @return bool
+     */
+    public function isTestModeEnabled()
+    {
+        return (bool) $this->getConfigValue($this::TEST_MODE_CONFIG_PATH);
     }
 }
