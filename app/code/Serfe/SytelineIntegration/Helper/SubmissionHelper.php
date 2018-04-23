@@ -43,27 +43,25 @@ class SubmissionHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->configHelper = $configHelper;
     }
 
-    public function createSubmission($data)
+    public function createSubmission($request, $response, $successfullRequest, $errors = null)
     {
-        $success = true;
         $submission = $this->submissionFactory->create();
-//        $date = $this->dateFactory->create()->gmtDate();
-//        $submission->setCreationAt($date);
-//        $submission->setUpdatedAt($date);
-        $submission->setSuccess($data['success']);
-        $submission->setTesting($data['testing']);
-        $submission->setRequest($data['request']);
-//        $submission->setAttempts($data['attempts']);
-        $submission->setResponse($data['response']);
-        $submission->setErrors($data['errors']);
+        $testingMode = $this->configHelper->isTestModeEnabled();
+        $requestStr = print_r($request, true);
+        $responseStr = print_r($response, true);
+        $submission->setSuccess($successfullRequest);
+        $submission->setTesting($testingMode);
+        $submission->setRequest($requestStr);
+        $submission->setResponse($responseStr);
+        $submission->setErrors($errors);
 
         try {
             $this->submissionRepository->save($submission);
+            $success = true;
         } catch (\Magento\Framework\Exception\LocalizedException $ex) {
-            var_dump($ex->getMessage());
             $success = false;
         }
-        
+
         return $success;
     }
 }
