@@ -10,7 +10,37 @@ namespace Serfe\SytelineIntegration\Helper;
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const SYTELINE_CUSTOMER_ID = 'C000037';
-    
+
+    /**
+     *
+     * @var \Magento\Directory\Model\RegionFactory 
+     */
+    protected $regionFactory;
+
+    /**
+     *
+     * @var \Magento\Directory\Model\CountryFactory 
+     */
+    protected $countryFactory;
+
+    /**
+     *
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface 
+     */
+    protected $productRepository;
+
+    public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Directory\Model\RegionFactory $regionFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Directory\Model\CountryFactory $countryFactory
+    ) {
+        parent::__construct($context);
+
+        $this->regionFactory = $regionFactory;
+        $this->countryFactory = $countryFactory;
+        $this->productRepository = $productRepository;
+    }
     /**
      * Transform Magento order to array
      *
@@ -26,7 +56,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return [
             "address" => [
-                "CustomerId" => "C000037",
+                "CustomerId" => $this::SYTELINE_CUSTOMER_ID,
                 "Line1" => $this->getShippingAddress($shippingAddress),
                 "Line2" => "",
                 "Line3" => "",
