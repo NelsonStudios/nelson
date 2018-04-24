@@ -155,7 +155,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         try {
             $orderData = $this->dataTransformHelper->orderToArray($order);
-            $apiResponse = $this->apiHelper->getCart($orderData, $errors);
+            $apiResponse = $this->apiHelper->getCart($orderData);
             $errors = (is_array($apiResponse) && isset($apiResponse['errors'])) ? $apiResponse : false;
         } catch (\Exception $exc) {
             $errors = [
