@@ -29,6 +29,14 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $productRepository;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Directory\Model\RegionFactory $regionFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Directory\Model\RegionFactory $regionFactory,
