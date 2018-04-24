@@ -57,7 +57,7 @@ class ApiHelper extends SoapClient
     /**
      * Call the GetCart Web Service
      *
-     * @param arrau $data
+     * @param array $data
      * @return mixed
      */
     public function getCart($data)
@@ -73,7 +73,7 @@ class ApiHelper extends SoapClient
     }
 
     /**
-     * Returns the 
+     * Returns the Soap Types
      *
      * @return mixed
      */
