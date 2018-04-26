@@ -16,11 +16,6 @@
                     <img class="ig-article-image" />
                 </div>
                 <div class="info col-md-6">
-                    <!-- <div class="ig-header">
-                        <a class="ig-header-profile ig-link"><img /></a>
-                        <a class="ig-username ig-link"></a>
-                        <div class="ig-follow"></div>
-                    </div> -->
                     <span class="ig-like-btn"></span>
                     <div class="ig-likes"></div>
                     <div class="description">
@@ -60,20 +55,9 @@ require(
             userId: userId,
             accessToken: token,
             resolution: 'standard_resolution',
-            //filter: function(image) {
-            //    if( image.type === 'video')
-            //    {
-            //        console.log(image);
-            //    }
-            //    return true;
-            //},
             template: '<div class="item clear"><a href="" data-type="{{type}}" data-link="{{link}}" class="ig-btn" data-desc="{{caption}}" data-likes="{{likes}}" data-comments="{{comments}}" data-links="{{link}}"><img src="{{image}}" />' +
             '<div class="ig-overlay"><div class="ig-template"><i class="porto-icon-instagram {{type}}"> </i><div class="ig-overlay-text">{{caption}}</div></div></div>' + '</a></div>',
             after: function () {
-                // disable button if no more results to load
-                //if (!this.hasNext()) {
-                //    btnInstafeedLoad.setAttribute('disabled', 'disabled');
-                //}
 
                 var owl = $("#instafeed"),
                     owlSlideSpeed = 300;
