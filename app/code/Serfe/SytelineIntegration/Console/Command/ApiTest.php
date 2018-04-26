@@ -15,23 +15,28 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ApiTest extends Command
 {
-
     const NAME_ARGUMENT = "name";
     const NAME_OPTION = "option";
     
     protected $client;
-    
+
     protected $testHelper;
+
+    protected $orderRepository;
     
     /**
      * Constructor
      *
-     * @param \Serfe\SytelineIntegration\Helper\SoapClient $client
+     * @param \Serfe\SytelineIntegration\Helper\ApiHelper $client
+     * @param \Serfe\SytelineIntegration\Helper\SytelineHelper $testHelper
+     * @param \Magento\Sales\Model\OrderRepository $orderRepository
+     * @param \Magento\Framework\App\State $state
      * @param mixed $name
      */
     public function __construct(
         \Serfe\SytelineIntegration\Helper\ApiHelper $client,
-        \Serfe\SytelineIntegration\Helper\TestGetCart $testHelper,
+        \Serfe\SytelineIntegration\Helper\SytelineHelper $testHelper,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
         \Magento\Framework\App\State $state,
         $name = null
     ) {
@@ -39,6 +44,7 @@ class ApiTest extends Command
         parent::__construct($name);
         $this->client = $client;
         $this->testHelper = $testHelper;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -56,7 +62,8 @@ class ApiTest extends Command
             $response = $this->client->getCart($testData);
             $outputData = print_r($response, true);
         } elseif ($name == 'TestGetCart') {
-            $this->testHelper->submitCart();
+            $order = $this->getOrder();
+            $this->testHelper->submitCartToSyteline($order);
         } else {
             $testData = $this->getPartInfoTestData();
             $response = $this->client->getPartInfo($testData);
@@ -79,7 +86,7 @@ class ApiTest extends Command
         ]);
         parent::configure();
     }
-    
+
     /**
      * Get test data for the SOAP call
      *
@@ -133,5 +140,12 @@ class ApiTest extends Command
                 "DigabitERPTransactionStatus" => "SUBMITTED"
             ]
         ];
+    }
+
+    protected function getOrder()
+    {
+        $order = $this->orderRepository->get('1');
+        
+        return $order;
     }
 }
