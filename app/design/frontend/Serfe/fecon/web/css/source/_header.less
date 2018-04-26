@@ -2,16 +2,16 @@
     border-top: 0;
     background-color: #1E1E1E;
     .panel.wrapper {
-        border-bottom: 1px solid #ffffff;
+        border-bottom: 1px solid @color-white;
         background-color: #393939;
         .panel.header {
-            background-color: #494949;
+            background-color: @color-gray-darken4;
             ul.header.links {
                 li {
                     a {
-                        color: #FFFFFF;
+                        color: @color-white;
                     }
-                    color: #FFFFFF;
+                    color: @color-white;
                 }
             }
         }
@@ -25,20 +25,20 @@
                         .control {
                             input#search {
                                 background-color: #2E2E2E;
-                                color: #fff;
+                                color: @color-white;
                             }
                             ._keyfocus *:focus,
                             input:not([disabled]):focus,
                             textarea:not([disabled]):focus,
                             select:not([disabled]):focus {
-                                box-shadow: 0 0 3px 1px #fff;
+                                box-shadow: 0 0 3px 1px @color-white;
                             }
                         }
                     }
                 }
             }
             .action.search:before {
-                color: #fff;
+                color: @color-white;
             }
         }
     }
@@ -51,25 +51,25 @@
                     background-color: #2A2A2A;
                     li:hover {
                         a {
-                            background-color: #494949;
+                            background-color: @color-gray-darken4;
                         }
                     }
                     li {
                         a {
-                            color: #FFFFFF;
+                            color: @color-white;
                         }
                         a:hover {
-                            background-color: #494949;
+                            background-color: @color-gray-darken4;
                         }
                         .submenu {
-                            background-color: #494949;
+                            background-color: @color-gray-darken4;
                             .container {
                                 .row {
                                     .subchildmenu {
-                                        background-color: #494949;
+                                        background-color: @color-gray-darken4;
                                         li.ui-menu-item {
                                             a {
-                                                color: #FFFFFF;
+                                                color: @color-white;
                                             }
                                         }
                                     }
