@@ -1,11 +1,19 @@
 <?php
 
-
 namespace Serfe\SytelineIntegration\Controller\Adminhtml\Submission;
 
+/**
+ * Controller to list submissions
+ *
+ * @author Xuan Villagran <xuan@serfe.com>
+ */
 class Index extends \Magento\Backend\App\Action
 {
-
+    /**
+     * Result Page Factory
+     *
+     * @var \Magento\Framework\View\Result\PageFactory 
+     */
     protected $resultPageFactory;
 
     /**
@@ -30,7 +38,7 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
         $resultPage = $this->resultPageFactory->create();
-            $resultPage->getConfig()->getTitle()->prepend(__("Submission"));
+            $resultPage->getConfig()->getTitle()->prepend(__("Syteline Cart Submissions"));
             return $resultPage;
     }
 }
