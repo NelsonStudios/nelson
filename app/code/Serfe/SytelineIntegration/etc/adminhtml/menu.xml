@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-	<menu>
-		<add id="Serfe::top_level" module="Serfe_SytelineIntegration" resource="Magento_Backend::content" sortOrder="9999" title="Serfe"/>
-		<add action="serfe_sytelineintegration/submission/index" id="Serfe::serfe_sytelineintegration_submission" module="Serfe_SytelineIntegration" parent="Serfe::top_level" resource="Magento_Backend::content" sortOrder="9999" title="Submission"/>
-	</menu>
+    <menu>
+        <add id="Serfe_SytelineIntegration::syteline_integration" title="Syteline Integration" module="Serfe_SytelineIntegration" sortOrder="0" resource="Serfe_SytelineIntegration::config_serfe_sytelineintegration" parent="Serfe::serfe_top_level"/>
+        <add id="Serfe_SytelineIntegration::syteline_submissions" title="Cart Submissions" module="Serfe_SytelineIntegration" sortOrder="10" action="serfe_sytelineintegration/submission/index" resource="Serfe_SytelineIntegration::config_serfe_sytelineintegration" parent="Serfe_SytelineIntegration::syteline_integration"/>
+        <add id="Serfe_SytelineIntegration::syteline_configuration" title="Configuration" module="Serfe_SytelineIntegration" sortOrder="20" action="adminhtml/system_config/edit/section/syteline_integration" resource="Serfe_SytelineIntegration::config_serfe_sytelineintegration" parent="Serfe_SytelineIntegration::syteline_integration"/>
+    </menu>
 </config>
