@@ -54,6 +54,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Serfe\SytelineIntegration\Logger\Logger $logger
      * @param \Serfe\SytelineIntegration\Helper\TransformData $dataTransformHelper
      * @param \Serfe\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -83,7 +84,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $productData = $this->dataTransformHelper->productToArray($product, $qty);
         $apiResponse = $this->apiHelper->getPartInfo($productData);
-        $available = $this->getAvailability($apiResponse);
+        $available = $this->getAvailability($apiResponse, $product->getId());
 
         return $available;
     }
@@ -92,17 +93,21 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Get availability attribute from API Response
      *
      * @param array|\stdClass $response
+     * @param string $productId
      * @return boolean
      */
-    protected function getAvailability($response)
+    protected function getAvailability($response, $productId)
     {
         $available = false;
         if (is_array($response)) {
-            // DO LOGGING
+            $errors = $response;
         } else {
-            if (!$this->responseHasErrors($response)) {
+            if (!$this->responseHasErrors($response, $errors)) {
                 $available = ($response->ErpGetPartInfoResponse->Availability == $this::SYTELINE_AVAIALABLE_STATUS);
             }
+        }
+        if (isset($errors) && !empty($errors)) {
+            $this->logDataErrors($errors, null, $productId);
         }
 
         return $available;
@@ -137,11 +142,16 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Log data errors
      *
      * @param array $errors
+     * @param null|string $orderId
+     * @param null|string $productId
+     * @return void
      */
-    protected function logDataErrors($errors)
+    protected function logDataErrors($errors, $orderId = null, $productId = null)
     {
         foreach ($errors['errors'] as $error) {
-            $this->logger->err($error);
+            $entity = $orderId ? 'Order' . ' Id: ' . $orderId : 'Product' . ' Id: ' . $productId;
+
+            $this->logger->err($entity . ' - Error: ' . $error);
         }
     }
 
@@ -154,6 +164,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function submitCartToSyteline($order)
     {
         try {
+            $orderId = $order->getId();
             $orderData = $this->dataTransformHelper->orderToArray($order);
             $apiResponse = $this->apiHelper->getCart($orderData);
             $errors = (is_array($apiResponse) && isset($apiResponse['errors'])) ? $apiResponse : false;
@@ -164,16 +175,16 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
         if (empty($errors) && !$this->responseHasErrors($apiResponse, $errors)) {
             $successfullRequest = true;
-            $this->submissionHelper->createSubmission($orderData, $apiResponse, $successfullRequest);
+            $this->submissionHelper->createSubmission($orderId, $orderData, $apiResponse, $successfullRequest);
         } else {
             $successfullRequest = false;
-            $this->logDataErrors($errors);
-            $this->submissionHelper->createSubmission($orderData, null, $successfullRequest, $errors);
+            $this->logDataErrors($errors, $orderId);
+            $this->submissionHelper->createSubmission($orderId, $orderData, null, $successfullRequest, $errors);
         }
 
         return $successfullRequest;
     }
-    
+
     /**
      * Check if $product exists in Syteline
      *
