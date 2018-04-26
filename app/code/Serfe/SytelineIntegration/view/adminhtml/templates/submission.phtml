@@ -1,0 +1,50 @@
+<?php
+/**
+ *
+ * @var $block \Serfe\SytelineIntegration\Block\Adminhtml\Submission\View
+ */
+$submission = $block->getSubmission();
+?>
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Order ID: ') . $submission->getId()) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title">General Data</span>
+            </div>
+            <ul>
+                <li><?= $block->escapeHtml(__('Created At: ') . $submission->getCreatedAt()) ?></li>
+            </ul>
+        </div>
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title">Request Data</span>
+            </div>
+            <pre>
+                <?= $block->escapeHtml($submission->getRequest()) ?>
+            </pre>
+        </div>
+        <?php if ($submission->getResponse()): ?>
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title">Response</span>
+            </div>
+            <pre>
+                <?= $block->escapeHtml($submission->getResponse()) ?>
+            </pre>
+        </div>
+        <?php endif; ?>
+        <?php if ($submission->getErrors()): ?>
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title">Errors</span>
+            </div>
+            <pre>
+                <?= $block->escapeHtml($submission->getErrors()) ?>
+            </pre>
+        </div>
+        <?php endif; ?>
+    </div>
+</section>
