@@ -29,163 +29,163 @@
 
 <script>
 require(
-    ['Instafeed', 'jquery', 'owl.carousel/owl.carousel.min', 'Magento_Ui/js/modal/modal'],
-    function(Instafeed, $, modal) {
-        var userId = 573020768;
-        var token = '573020768.547f12f.d4522e618297412ca3cd7c146d891d80';
-        var igUsername;
-        var profile_picture;
+  ['Instafeed', 'jquery', 'owl.carousel/owl.carousel.min', 'Magento_Ui/js/modal/modal'],
+  function(Instafeed, $, modal) {
+    var userId = 573020768;
+    var token = '573020768.547f12f.d4522e618297412ca3cd7c146d891d80';
+    var igUsername;
+    var profile_picture;
 
-        $.ajax({
-            url: 'https://api.instagram.com/v1/users/' + userId + '/?access_token=' + token,
-            success: function (data) {
-                profile_picture = data.data.profile_picture;
-                $('.ig-magento-modal .ig-header-profile').find('img').attr("src", profile_picture);
-                igUsername = data.data.username;
+    $.ajax({
+      url: 'https://api.instagram.com/v1/users/' + userId + '/?access_token=' + token,
+      success: function (data) {
+        profile_picture = data.data.profile_picture;
+        $('.ig-magento-modal .ig-header-profile').find('img').attr("src", profile_picture);
+        igUsername = data.data.username;
 
-                $('.ig-magento-modal .ig-username').html(igUsername);
-                $('.ig-magento-modal .ig-link').attr("href", 'https://www.instagram.com/' + igUsername);
-            }
+        $('.ig-magento-modal .ig-username').html(igUsername);
+        $('.ig-magento-modal .ig-link').attr("href", 'https://www.instagram.com/' + igUsername);
+      }
+    });
+
+
+
+    var feed = new Instafeed({
+      get: 'user',
+      userId: userId,
+      accessToken: token,
+      resolution: 'standard_resolution',
+      template: '<div class="item clear"><a href="" data-type="{{type}}" data-link="{{link}}" class="ig-btn" data-desc="{{caption}}" data-likes="{{likes}}" data-comments="{{comments}}" data-links="{{link}}"><img src="{{image}}" />' +
+      '<div class="ig-overlay"><div class="ig-template"><i class="porto-icon-instagram {{type}}"> </i><div class="ig-overlay-text">{{caption}}</div></div></div>' + '</a></div>',
+      after: function () {
+
+        var owl = $("#instafeed"),
+        owlSlideSpeed = 300;
+
+        // init owl    
+        $(document).ready(function () {
+          owl.owlCarousel({
+            responsive: {
+              0: {
+                items: 2
+              },
+              479: {
+                items: 3
+              }
+            },
+            pagination: false,
+            responsiveRefreshRate: 100,
+            lazyLoad: true,
+            loop: true,
+            margin: 10,
+            nav: false
+          });
         });
+      }
+    });
+    feed.run();
+    var options = {
+      type: 'popup',
+      title: '<a class="ig-header-profile ig-link"><img /></a><a class="ig-username ig-link"></a>',
+      responsive: true,
+      innerScroll: true,
+      modalClass: 'ig-magento-modal',
+      buttons: [
+        {
+          text: '<i class="porto-icon-chevron-left"></i>',
+          class: 'ig-prev',
+          click: function() {
+            this.closeModal();
+          }
+        },
+        {
+          text: '<i class="porto-icon-chevron-right"></i>',
+          class: 'ig-next',
+          click: function() {
+            this.closeModal();
+          }
+        }
+      ]
+    };
+    $('#ig-modal').modal(options);
 
+    var currentSlide;
+    $('body').on('click', '.ig-btn', function (e) {
+      e.preventDefault();
+      currentSlide = this;
 
+      $('.ig-follow-link').attr("href", $(this).data("links"));
+      $('.ig-article-image').fadeOut(200, function () {
+        $('.ig-article-image').attr("src", $(currentSlide).children().attr("src"));
 
-        var feed = new Instafeed({
-            get: 'user',
-            userId: userId,
-            accessToken: token,
-            resolution: 'standard_resolution',
-            template: '<div class="item clear"><a href="" data-type="{{type}}" data-link="{{link}}" class="ig-btn" data-desc="{{caption}}" data-likes="{{likes}}" data-comments="{{comments}}" data-links="{{link}}"><img src="{{image}}" />' +
-            '<div class="ig-overlay"><div class="ig-template"><i class="porto-icon-instagram {{type}}"> </i><div class="ig-overlay-text">{{caption}}</div></div></div>' + '</a></div>',
-            after: function () {
-
-                var owl = $("#instafeed"),
-                    owlSlideSpeed = 300;
-
-                // init owl    
-                $(document).ready(function () {
-                    owl.owlCarousel({
-                        responsive: {
-                            0: {
-                                items: 2
-                            },
-                            479: {
-                                items: 3
-                            }
-                        },
-                        pagination: false,
-                        responsiveRefreshRate: 100,
-                        lazyLoad: true,
-                        loop: true,
-                        margin: 10,
-                        nav: false
-                    });
-                });
-            }
-        });
-        feed.run();
-        var options = {
-                type: 'popup',
-                title: '<a class="ig-header-profile ig-link"><img /></a><a class="ig-username ig-link"></a>',
-                responsive: true,
-                innerScroll: true,
-                modalClass: 'ig-magento-modal',
-                buttons: [
-                    {
-                        text: '<i class="porto-icon-chevron-left"></i>',
-                        class: 'ig-prev',
-                        click: function() {
-                            this.closeModal();
-                        }
-                    },
-                    {
-                        text: '<i class="porto-icon-chevron-right"></i>',
-                        class: 'ig-next',
-                        click: function() {
-                            this.closeModal();
-                        }
-                    }
-                ]
-            };
-        $('#ig-modal').modal(options);
-
-        var currentSlide;
-        $('body').on('click', '.ig-btn', function (e) {
-            e.preventDefault();
-            currentSlide = this;
-
-            $('.ig-follow-link').attr("href", $(this).data("links"));
-            $('.ig-article-image').fadeOut(200, function () {
-                $('.ig-article-image').attr("src", $(currentSlide).children().attr("src"));
-
-            })
-            .fadeIn(400);
-            if ($(this).data('type') == 'video') {
-                $('.ig-img-holder').addClass("video-holder");
-                if ($('.video-btn').length == 0) {
-                    $('.ig-img-holder').prepend('<i class="ig-icon video video-btn"> </i>');
-                }
-            }
-            else {
-                $('.video-btn').remove();
-                $('.ig-img-holder').removeClass("video-holder");
-            }
-            $(".ig-description").html($(this).data("desc"));
-            $('.ig-likes').html('<i class="porto-icon-heart-1"></i>' + $(this).data("likes") + '<i class="porto-icon-chat"></i>' + $(this).data("comments"));
+      })
+      .fadeIn(400);
+      if ($(this).data('type') == 'video') {
+        $('.ig-img-holder').addClass("video-holder");
+        if ($('.video-btn').length == 0) {
+          $('.ig-img-holder').prepend('<i class="ig-icon video video-btn"> </i>');
+        }
+      }
+      else {
+        $('.video-btn').remove();
+        $('.ig-img-holder').removeClass("video-holder");
+      }
+      $(".ig-description").html($(this).data("desc"));
+      $('.ig-likes').html('<i class="porto-icon-heart-1"></i>' + $(this).data("likes") + '<i class="porto-icon-chat"></i>' + $(this).data("comments"));
 
             
-            $('#ig-modal').modal('openModal');
-        });
+      $('#ig-modal').modal('openModal');
+    });
 
-        $('body').on('click', '.video-holder', function (e) {
-            window.open(
-                $(currentSlide).data("links"),
-                '_blank' // <- this is what makes it open in a new window.
-                );
-            return;
-        });
-        $('.ig-prev').on("click", function () {
-            var current = $(currentSlide).parent().parent().prev().children().children();
-            if (current[0] != null) {
-                current.click();
-            }
-            else {
-                $('.ig-btn').last().click();
-            }
-        })
-        $('.ig-next').on("click", function () {
-            var current = $(currentSlide).parent().parent().next().children().children();
-            if (current[0] != null) {
-                current.click();
-            }
-            else {
-                $('.ig-btn').first().click();
-            }
-        })
-            $("body").keydown(function (e) {
-                if (e.keyCode == 37) { // left
-                    var current = $(currentSlide).parent().parent().prev().children().children();
-                    if (current[0] != null) {
-                        current.click();
-                    }
-                    else {
-                        $('.ig-btn').last().click();
-                    }
-                }
-                else if (e.keyCode == 39) { // right
-                    var current = $(currentSlide).parent().parent().next().children().children();
-                    if (current[0] != null) {
-                        current.click();
-                    }
-                    else {
-                        $('.ig-btn').first().click();
-                    }
-                }
-            });
-        $('#ig-modal').on('hidden.bs.modal', function () {
-            $('.ig-article-image').attr("src", "");
-            $(".ig-description").html("");
-        })
-    }
+    $('body').on('click', '.video-holder', function (e) {
+      window.open(
+        $(currentSlide).data("links"),
+        '_blank' // <- this is what makes it open in a new window.
+      );
+      return;
+    });
+    $('.ig-prev').on("click", function () {
+      var current = $(currentSlide).parent().parent().prev().children().children();
+      if (current[0] != null) {
+        current.click();
+      }
+      else {
+        $('.ig-btn').last().click();
+      }
+    })
+    $('.ig-next').on("click", function () {
+      var current = $(currentSlide).parent().parent().next().children().children();
+      if (current[0] != null) {
+        current.click();
+      }
+      else {
+        $('.ig-btn').first().click();
+      }
+    })
+    $("body").keydown(function (e) {
+      if (e.keyCode == 37) { // left
+        var current = $(currentSlide).parent().parent().prev().children().children();
+        if (current[0] != null) {
+          current.click();
+        }
+        else {
+          $('.ig-btn').last().click();
+        }
+      }
+      else if (e.keyCode == 39) { // right
+        var current = $(currentSlide).parent().parent().next().children().children();
+        if (current[0] != null) {
+          current.click();
+        }
+        else {
+          $('.ig-btn').first().click();
+        }
+      }
+    });
+    $('#ig-modal').on('hidden.bs.modal', function () {
+      $('.ig-article-image').attr("src", "");
+      $(".ig-description").html("");
+    })
+  }
 );
 </script>
