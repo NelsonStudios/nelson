@@ -156,12 +156,48 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Submit $order data to Syteline line via GetCart Web Service
+     * Varify and submit $order data to Syteline
      *
      * @param \Magento\Sales\Model\Order $order
      * @return boolean
      */
     public function submitCartToSyteline($order)
+    {
+        if ($this->canSubmitCart($order)) {
+            $successfullRequest = $this->submitCart($order);
+        } else {
+            $successfullRequest = false;
+            $error = 'Order ID: ' . $order->getId() . ' - Cannot submit order to Syteline - Order State: ' . $order->getStatus();
+            $this->logger->err($error);
+        }
+
+        return $successfullRequest;
+    }
+
+    /**
+     * Check if $order can be submitted to Syteline
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return boolean
+     */
+    protected function canSubmitCart($order)
+    {
+        $canSubmitCart = true;
+        // If the $order has not been paid
+        if ($order->getState() == \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT) {
+            $canSubmitCart = false;
+        }
+
+        return $canSubmitCart;
+    }
+
+    /**
+     * Submit $order data to Syteline line via GetCart Web Service
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return boolean
+     */
+    protected function submitCart($order)
     {
         try {
             $orderId = $order->getId();
