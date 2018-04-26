@@ -3,7 +3,7 @@
 namespace Serfe\SytelineIntegration\Plugin\Magento\Sales\Model\Service;
 
 /**
- * Description of OrderService
+ * Plugin for \Magento\Sales\Model\Service\OrderService class
  *
  * @author Xuan Villagran <xuan@serfe.com>
  */
@@ -27,6 +27,13 @@ class OrderService
         $this->sytelineHelper = $sytelineHelper;
     }
 
+    /**
+     * Submit order data to Syteline after the order has been placed
+     *
+     * @param \Magento\Sales\Model\Service\OrderService $subject
+     * @param \Magento\Sales\Api\Data\OrderInterface $result
+     * @return \Magento\Sales\Api\Data\OrderInterface
+     */
     public function afterPlace(
         \Magento\Sales\Model\Service\OrderService $subject,
         $result
