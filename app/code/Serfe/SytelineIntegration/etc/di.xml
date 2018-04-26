@@ -36,4 +36,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Model\Service\OrderService">
+        <plugin name="Serfe_SytelineIntegration_Plugin_Magento_Sales_Model_Service_OrderService" type="Serfe\SytelineIntegration\Plugin\Magento\Sales\Model\Service\OrderService"/>
+    </type>
 </config>
