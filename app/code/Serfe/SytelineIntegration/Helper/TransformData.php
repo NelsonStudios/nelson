@@ -79,7 +79,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "EmailAddress" => (string) $order->getCustomerEmail(),
                 "AccountNumber" => "",
                 "ShipVia" => "BEST",
-                "OrderCustomerName" => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
+                "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
                 "OrderStock" => "Yes",
                 "OrderPhoneNumber" => (string) $shippingAddress->getTelephone(),
