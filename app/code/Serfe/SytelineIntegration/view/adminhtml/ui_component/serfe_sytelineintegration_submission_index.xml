@@ -61,31 +61,35 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">order_id</item>
+                    <item name="label" translate="true" xsi:type="string">Order Id</item>
                 </item>
             </argument>
         </column>
-        <column name="created_at">
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">created_at</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" translate="true" xsi:type="string">Created At</item>
                 </item>
             </argument>
         </column>
-        <column name="updated_at">
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">updated_at</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" translate="true" xsi:type="string">Updated At</item>
                 </item>
             </argument>
         </column>
-        <column name="success">
+        <column name="success" class="Serfe\SytelineIntegration\Ui\Component\Listing\Column\Status">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">success</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="label" translate="true" xsi:type="string">Status</item>
                 </item>
             </argument>
         </column>
@@ -93,7 +97,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">testing</item>
+                    <item name="label" translate="true" xsi:type="string">Testing</item>
                 </item>
             </argument>
         </column>
@@ -101,9 +105,19 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">attempts</item>
+                    <item name="label" translate="true" xsi:type="string">Attempts</item>
                 </item>
             </argument>
         </column>
+        <actionsColumn name="actions" class="Serfe\SytelineIntegration\Ui\Component\Listing\Column\ViewAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="resizeDefaultWidth" xsi:type="string">107</item>
+                    <item name="viewUrlPath" xsi:type="string">serfe_sytelineintegration/submission/view</item>
+                    <item name="indexField" xsi:type="string">submission_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
     </columns>
 </listing>
