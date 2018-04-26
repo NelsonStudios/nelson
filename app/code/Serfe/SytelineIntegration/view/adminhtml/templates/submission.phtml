@@ -7,7 +7,7 @@ $submission = $block->getSubmission();
 ?>
 <section class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Order ID: ') . $submission->getId()) ?></span>
+        <span class="title"><?= $block->escapeHtml(__('Order ID: ') . $submission->getOrderId()) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item">
