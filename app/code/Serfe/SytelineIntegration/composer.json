@@ -1,0 +1,26 @@
+{
+    "name": "serfe/module-sytelineintegration",
+    "description": "Integration with Syteline System",
+    "require": {
+        "zendframework/zend-soap": "2.7.0",
+        "serfe/module-backendconfig": "1.0.0"
+    },
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Serfe\\SytelineIntegration\\": ""
+        }
+    }
+}

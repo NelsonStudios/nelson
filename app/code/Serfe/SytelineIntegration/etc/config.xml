@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <syteline_integration>
+            <setting>
+                <test_mode>1</test_mode>
+                <wsdl_url_production/>
+                <wsdl_url_test>http://sl.fecon.com/FeconWebServicePilot/FeconWebService.asmx?WSDL</wsdl_url_test>
+                <soap_version>SOAP_1_1</soap_version>
+            </setting>
+        </syteline_integration>
+    </default>
+</config>
