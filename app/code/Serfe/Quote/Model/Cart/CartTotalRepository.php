@@ -9,6 +9,8 @@ use Magento\Catalog\Helper\Product\ConfigurationPool;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Quote\Model\Cart\Totals\ItemConverter;
 use Magento\Quote\Api\CouponManagementInterface;
+use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Quote\Model\Cart\TotalsConverter;
 
 /**
  * Override of Magento\Quote\Model\Cart\CartTotalRepository class,
@@ -57,7 +59,7 @@ class CartTotalRepository implements CartTotalRepositoryInterface
      * @param CartRepositoryInterface $quoteRepository
      * @param DataObjectHelper $dataObjectHelper
      * @param CouponManagementInterface $couponService
-     * @param TotalsConverter $totalsConverter
+     * @param \Magento\Quote\Model\Cart\TotalsConverter $totalsConverter
      * @param ItemConverter $converter
      */
     public function __construct(
@@ -93,6 +95,7 @@ class CartTotalRepository implements CartTotalRepositoryInterface
             $addressTotalsData = $quote->getShippingAddress()->getData();
             $addressTotals = $quote->getShippingAddress()->getTotals();
         }
+        unset($addressTotalsData[ExtensibleDataInterface::EXTENSION_ATTRIBUTES_KEY]);
 
         /** @var \Magento\Quote\Api\Data\TotalsInterface $quoteTotals */
         $quoteTotals = $this->totalsFactory->create();
