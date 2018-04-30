@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <remove src="jquery.js" />
+        <remove src="bootstrap/js/bootstrap.min.js" />
+        <remove src="fancybox/js/jquery.fancybox.js" />
+    </head>
+</page>
