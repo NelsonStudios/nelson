@@ -1,0 +1,25 @@
+{
+    "name": "serfe/module-quote",
+    "description": "Override for Magento_Quote module",
+    "require": {
+        "magento/module-quote": "101.0.2"
+    },
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Serfe\\Quote\\": ""
+        }
+    }
+}
