@@ -1,0 +1,22 @@
+{
+    "name": "serfe/module-shipping",
+    "description": "Create custom shippings methods, allowing setting the price manullay from the backend",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Serfe\\Shipping\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
