@@ -125,6 +125,7 @@ return array (
     'Serfe_FlatRateMinimumAmount' => 1,
     'Smartwave_Porto' => 1,
     'Serfe_Quote' => 1,
+    'Serfe_Shipping' => 1,
     'Serfe_SytelineIntegration' => 1,
     'Shopial_Facebook' => 1,
     'Smartwave_Core' => 1,
