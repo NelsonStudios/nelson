@@ -228,6 +228,9 @@ define(
                     if (!quote.isVirtual()) {
                         var shippingAddress = registry.get('checkout.steps.shipping-step.shippingAddress');
                         shippingAddress.setShippingInformation().done(function () {
+			localStorage.setItem('custom_attributes',JSON.stringify(shippingAddress.source.shippingAddress));
+
+							
                             self.clickNativePlaceOrder();
                         }).fail(function () {
                             self.isPlaceOrderActionAllowed(true);

@@ -50,13 +50,16 @@ define(
               paymentIsLoading) {
         'use strict';
 
-        var newAddressOption = {
+        var inlineAddress = "",
+            newAddressOption = {
             getAddressInline: function () {
                 return $t('New Address');
             },
             customerAddressId: null
         }, addressOptions = addressList().filter(function (address) {
-            return address.getType() === 'customer-address';
+            var isDublicate = inlineAddress === address.getAddressInline();
+                inlineAddress = address.getAddressInline();
+            return address.getType() === 'customer-address' && !isDublicate;
         });
         addressOptions.push(newAddressOption);
 
@@ -280,8 +283,7 @@ define(
 
             optionsRenderCallback: [],
 
-            decorateSelect: function (uid, showEmptyOption) {
-                if (typeof showEmptyOption === 'undefined') { showEmptyOption = false; }
+            decorateSelect: function (uid) {
                 if (typeof(this.optionsRenderCallback[uid]) !== 'undefined') {
                     clearTimeout(this.optionsRenderCallback[uid]);
                 }
@@ -289,7 +291,7 @@ define(
                 this.optionsRenderCallback[uid] = setTimeout(function () {
                     var select = $('#' + uid);
                     if (select.length) {
-                        select.decorateSelect(showEmptyOption, true);
+                        select.decorateSelectCustom();
                     }
                 }, 0);
             },
@@ -425,13 +427,20 @@ define(
                     emailValidationResult = customer.isLoggedIn(),
                     shippingMethodValidationResult = true;
                 showErrors = showErrors || false;
-                var shippingMethodForm = $('#co-shipping-method-form');
+                var shippingMethodForm = $('#co-shipping-method-form'),
+                    shippingMethodSelectors = shippingMethodForm.find('.select');
+                shippingMethodSelectors.removeClass('mage-error');
                 shippingMethodForm.validate({
                     errorClass: 'mage-error',
                     errorElement: 'div',
                     meta: 'validate'
                 });
                 shippingMethodForm.validation();
+                //additional validation for non-selected shippingMethod
+                if(showErrors && !quote.shippingMethod()) {
+                    shippingMethodSelectors.addClass('mage-error');
+                }
+
                 if (!shippingMethodForm.validation('isValid') || !quote.shippingMethod()) {
                     if (!showErrors && this.canHideErrors && shippingMethodForm.length) {
                         shippingMethodForm.validate().resetForm();

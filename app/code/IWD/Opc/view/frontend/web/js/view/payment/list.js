@@ -98,7 +98,7 @@ define([
             this.optionsRenderCallback = setTimeout(function () {
                 var select = $('#' + uid);
                 if (select.length) {
-                    select.decorateSelect(false, true);
+                    select.decorateSelectCustom();
                 }
             }, 0);
         },
@@ -152,9 +152,42 @@ define([
         },
 
         selectPaymentMethod: function (obj, event, method) {
+			//console.log(obj);
             if (!!event.originalEvent) {
+				//console.log(method);
                 if (method) {
+					if (document.getElementById('minicart-amazon-pay-button') !=null) {
+					 document.getElementById('minicart-amazon-pay-button').style.display = 'none';	
+					}
+					if (document.getElementById('purchaseorder-form') !=null) {
+					  document.getElementById('purchaseorder-form').style.display = 'block';	
+					}
+					  $(".payment-method _active").show();
+					  	
                     $('.payment-method input[value="' + method + '"]').first().click();
+					if(method=="braintree"){
+					
+                   $("#braintree_cc_number").addClass("braintree-hosted-fields-focused");				  
+                   document.getElementById('co-transparent-form-braintree').style.display = 'block';					
+					}
+				if(method=="amazon_payment"){      
+                 $('#OffAmazonPaymentsWidgets0').trigger('click');                       				
+		         $(".payment-method _active").hide();
+				 if (document.getElementById('co-transparent-form-braintree') !=null) {
+					document.getElementById('co-transparent-form-braintree').style.display = 'none';	
+					}
+			 if (document.getElementById('purchaseorder-form') !=null) {
+					document.getElementById('purchaseorder-form').style.display = 'none';	
+					}
+           				 if (document.getElementById('minicart-amazon-pay-button') !=null) {
+					 document.getElementById('minicart-amazon-pay-button').style.display = 'block';
+					}
+	       	
+					 
+					
+			
+				}
+
                 } else {
                     selectPaymentMethodAction(null);
                 }

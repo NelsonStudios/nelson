@@ -3,7 +3,7 @@
     <default>
         <iwd_opc>
             <general>
-                <enable>0</enable>
+                <enable>1</enable>
             </general>
             <extended>
                 <title>Checkout</title>

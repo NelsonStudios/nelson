@@ -69,8 +69,8 @@ class QuoteSubmitSuccess implements ObserverInterface
             if (!$order) {
                 return $this;
             }
-                       
-            
+
+
             $this->assignOrderToCustomer($order);
             $this->saveComment($order);
             $this->saveSubscribe($order);
@@ -79,6 +79,20 @@ class QuoteSubmitSuccess implements ObserverInterface
         return $this;
     }
 
+
+    /**
+     * @param $order
+     * @param $quote
+     * @return $this
+     */
+    private function orderShippingAddressFields($order, $quote)
+    {
+        $order->getShippingAddress()->setData('daimond_shape', $quote->getShippingAddress()->getData('daimond_shape'))->save();
+
+        return $this;
+    }
+	
+	
     private function saveSubscribe(Order $order)
     {
         if ($this->opcHelper->isShowSubscribe()) {

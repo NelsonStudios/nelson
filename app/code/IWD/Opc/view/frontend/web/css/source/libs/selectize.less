@@ -147,7 +147,7 @@
 			border: @selectize-width-item-border solid lighten(desaturate(@selectize-color-item-border, 100%), @selectize-lighten-disabled-item-border);
 		}
 	}
-	> input {
+	input {
 		&::-ms-clear {
 			display: none;
 		}
@@ -163,6 +163,9 @@
 		-webkit-user-select: auto !important;
 		&:focus { outline: none !important; }
 	}
+    .item + input {
+      display: none !important;
+    }
 }
 
 .selectize-input::after {
@@ -264,4 +267,14 @@
 .selectize-control .selectize-input.disabled {
 	opacity: @selectize-opacity-disabled;
 	background-color: @selectize-color-disabled;
+}
+.iwd_main_wrapper {
+	.field {
+		.input-text._has-datepicker {
+			width: 53%;
+		}
+	}
+}
+._has-datepicker~.ui-datepicker-trigger {
+	margin-left: -3rem;
 }

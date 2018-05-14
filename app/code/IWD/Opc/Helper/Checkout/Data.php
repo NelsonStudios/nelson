@@ -1,14 +1,10 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace IWD\Opc\Helper\Checkout;
 
 /**
  * Checkout default helper
  *
- * @author      Magento Core Team <core@magentocommerce.com>
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Data extends \Magento\Checkout\Helper\Data
@@ -31,7 +27,7 @@ class Data extends \Magento\Checkout\Helper\Data
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     
     /**
      * Check is allowed Guest Checkout

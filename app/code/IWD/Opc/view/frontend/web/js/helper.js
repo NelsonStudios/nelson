@@ -1020,7 +1020,7 @@ define(['iwdOpcSelectize', 'jquery', 'underscore', 'uiRegistry'], function (sele
                 onChange: function() {
                     var value = this.$input.val(),
                         changed = this.$input.html(),
-                        elements = $('select[name=' + this.$input.attr('name') +']');
+                        elements = $("select[name='" + this.$input.attr('name') +"']");
 
                     this.$input.val('');
                     this.$input.val(value);
@@ -1045,6 +1045,113 @@ define(['iwdOpcSelectize', 'jquery', 'underscore', 'uiRegistry'], function (sele
             });
 
             $('.selectize-input input').addClass('input-text');
+
+            return this;
+        };
+
+        $.fn.decorateSelectCustom = function() {
+            var select = this;
+            var parent = select.parent();
+            if (select.find('option').length) {
+                var options = select.find('option');
+                var newSelectClass = '';
+                var canUnselect = !!options.filter(function (index) {
+                    return !$(this).html().trim().length && !$(this).val();
+                }).length;
+                if (select.attr('data-can-unselect')) {
+                    canUnselect = select.attr('data-can-unselect');
+                }
+                var selectedOption = options.filter(':selected').first();
+                if (!select.attr('multiple') && (selectedOption.html().trim().length || (selectedOption.length && selectedOption.attr('data-image')))) {
+                    newSelectClass += ' selected';
+                }
+
+                newSelectClass += (select.is(':disabled') ? ' disabled' : '');
+                newSelectClass += (select.attr('multiple') ? ' multiple' : '');
+                var newSelect = $('<div></div>');
+                newSelect
+                    .attr('tabindex', 0)
+                    .attr('title', select.attr('title'))
+                    .attr('data-element-id', select.attr('id'))
+                    .attr('data-can-unselect', canUnselect)
+                    .addClass('iwd_opc_select_container' + newSelectClass);
+                options.each(function () {
+                    var option = $(this);
+                    if (option.html().trim().length) {
+                        var newOptionClass = (option.is(':selected') ? ' selected' : '');
+                        var newOption = $('<div></div>');
+                        var optionHtml = '';
+                        if (option.data('ccTypes')) {
+                            var ccTypes = option.data('ccTypes');
+                            var ccPreviewHtml = $('<div></div>');
+                            var i = 0;
+                            _.each(ccTypes, function (title, code) {
+                                if (i === 2) {
+                                    return false;
+                                }
+
+                                var ccTypeHtml = $('<div class="iwd_opc_cc_wrapper"></div>').attr('data-cc-type', code).attr('title', title);
+                                ccPreviewHtml.append(ccTypeHtml);
+                                i++;
+                            });
+
+                            optionHtml += '<div class="iwd_opc_cc_preview">' + ccPreviewHtml.html() + '</div>';
+                            if (Object.keys(ccTypes).length > 2) {
+                                newOption.addClass('iwd_opc_cc_option_long');
+                                var ccTypesHtml = $('<div class="iwd_opc_cc_types_tooltip_content"></div>');
+                                _.each(ccTypes, function (title, code) {
+                                    var ccTypeHtml = $('<div class="iwd_opc_cc_wrapper"></div>').attr('data-cc-type', code).attr('title', title);
+                                    ccTypesHtml.append(ccTypeHtml);
+                                });
+                                var tooltipContentClass = 'iwd_opc_cc_tooltip_content_small';
+                                if (Object.keys(ccTypes).length > 4) {
+                                    tooltipContentClass = 'iwd_opc_cc_tooltip_content_big';
+                                }
+
+                                optionHtml += '<div data-icon="&#xf196" class="iwd_opc_field_tooltip iwd_opc_cc_types_tooltip"><div class="' + tooltipContentClass + ' iwd_opc_field_tooltip_content">' + ccTypesHtml.html() + '</div></div>';
+                            } else {
+                                newOption.addClass('iwd_opc_cc_option_short');
+                            }
+                        }
+
+                        optionHtml += option.html();
+                        if (option.attr('data-image')) {
+                            newOption.addClass('iwd_opc_option_with_image');
+                            optionHtml += '<img class="iwd_opc_option_image" src="' + option.attr('data-image') + '" />';
+                        }
+
+                        newOption
+                            .html(optionHtml)
+                            .attr('data-value', option.val())
+                            .attr('data-position-top', 0)
+                            .attr('data-first-letter', option.html().charAt(0).toLowerCase())
+                            .addClass('iwd_opc_select_option' + newOptionClass);
+                        newSelect.append(newOption);
+                    }
+                });
+
+                parent.find('.iwd_opc_select_container').scrollbar('destroy');
+                parent.find('.iwd_opc_select_container').remove();
+                parent.append(newSelect);
+                select.attr('tabindex', -1);
+                if (newSelect.hasClass('selected')) {
+                    newSelect.removeClass('selected');
+                    if (newSelect.children().length > 6 || newSelect.actualScrollHeight() > parseInt(newSelect.css('max-height').replace('px', ''))) {
+                        newSelect.scrollbar();
+                    }
+
+                    newSelect.addClass('selected');
+                    newSelect.css('height', 'auto');
+                } else {
+                    if (newSelect.children().length > 6 || newSelect.actualScrollHeight() > parseInt(newSelect.css('max-height').replace('px', ''))) {
+                        newSelect.scrollbar();
+                    }
+                }
+                select.hide();
+            } else {
+                parent.find('.iwd_opc_select_container').scrollbar('destroy');
+                parent.find('.iwd_opc_select_container').remove();
+            }
 
             return this;
         };

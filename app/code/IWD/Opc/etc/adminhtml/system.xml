@@ -27,21 +27,6 @@
                     <label>Enable Module?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="license_message" translate="label" type="text"
-                       sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>License Status</label>
-                    <frontend_model>IWD\Opc\Block\Adminhtml\System\Config\License</frontend_model>
-                </field>
-                <field id="license_email" translate="label" type="text"
-                       sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Purchased Email</label>
-                    <comment>
-                        <![CDATA[To activate this product,
-                        please enter the email address that was used to purchase this product from
-                        <a href="https://www.iwdagency.com/extensions/" target="_blank">IWD Agency</a>]]>
-                    </comment>
-                    <validate>required-entry validate-email</validate>
-                </field>
             </group>
             <group id="extended" translate="label" type="text"
                    sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -105,18 +90,17 @@
                     <label>Assign order to customer if customer were not logged in (by email)?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="reload_shipping_methods_on_discount" translate="label" type="select"
+                <field id="reload_shipping_methods_on_discount" translate="label comment" type="select"
                        sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Reload shipping methods during applying/removing discount?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>If yes, then shipping methods will be reloaded when customer will applies/removes discount on checkout page.
-                        You should enable it if you offer discounts which make shipping free.</comment>
+                    <comment><![CDATA[If yes, then shipping methods will be reloaded when customer will applies/removes discount on checkout page. You should enable it if you offer discounts which make shipping free.]]></comment>
                 </field>
-                <field id="use_iwd_checkout_experience" translate="label" type="select" 
+                <field id="use_iwd_checkout_experience" translate="label comment" type="select"
                        sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                        <label>Use IWD's Guest Checkout Experience</label>
                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                       <comment>If "Yes", then guests may checkout even if Magento's Guest Checkout setting is disabled. If "No", then users will be forced to create an account to checkout. Setting this as no, may affect your conversion rate.</comment>
+                       <comment><![CDATA[If "Yes", then guests may checkout even if Magento's Guest Checkout setting is disabled. If "No", then users will be forced to create an account to checkout. Setting this as no, may affect your conversion rate.]]></comment>
                 </field>
                 <field id="show_all_ship_methods" translate="label" type="select"
                        sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -141,18 +125,16 @@
             <group id="ga_ab_test" translate="label" type="text"
                    sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Google Analytics Web Experiments</label>
-                <field id="enable" translate="label" type="select"
+                <field id="enable" translate="label comment" type="select"
                        sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>To use Google Analytics Web Experiments you should enable and configure Google Analytics for your website in "System/Sales/Google API".
-                    Also, you should configure 2 variants(pages) of experiment: "Native checkout page" - original page(with url "@your_store_url@/checkout") and "IWD Checkout Page"(with url "@your_store_url@/onepage").
-                    </comment>
+                    <comment><![CDATA[To use Google Analytics Web Experiments you should enable and configure Google Analytics for your website in "System/Sales/Google API". Also, you should configure 2 variants(pages) of experiment: "Native checkout page" - original page(with url "@your_store_url@/checkout") and "IWD Checkout Page"(with url "@your_store_url@/onepage").]]></comment>
                 </field>
-                <field id="code" translate="label" type="textarea"
+                <field id="code" translate="label comment" type="textarea"
                        sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Google Analytics Experiment code</label>
-                    <comment>You will get this code after experiment registered in Google Analytics account</comment>
+                    <comment><![CDATA[You will get this code after experiment registered in Google Analytics account]]></comment>
                     <depends>
                         <field id="enable">1</field>
                     </depends>

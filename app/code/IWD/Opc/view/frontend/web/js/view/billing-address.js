@@ -41,6 +41,7 @@ define(
 
         var observedElements = [],
             setBillingActionTimeout = 0,
+            inlineAddress = "",
             newAddressOption = {
                 /**
                  * Get new address label
@@ -53,7 +54,9 @@ define(
             },
             countryData = customerData.get('directory-data'),
             addressOptions = addressList().filter(function (address) {
-                return address.getType() === 'customer-address';
+                var isDublicate = inlineAddress === address.getAddressInline();
+                inlineAddress = address.getAddressInline();
+                return address.getType() === 'customer-address' && !isDublicate;
             });
 
         addressOptions.push(newAddressOption);

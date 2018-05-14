@@ -24,8 +24,8 @@
 @selectize-width-item-border: 1px;
 @selectize-caret-margin: 0 1px;
 
-@iwd-selectize-element-height: 37px;
-@iwd-selectize-inner-element-height: 35px;
+@iwd-selectize-element-min-height: 35px;
+@iwd-selectize-inner-element-min-height: 37px;
 
 .selectize-control {
 	&.multi {
@@ -57,11 +57,11 @@
 	}
 	&.single {
 		.selectize-input {
-			height: @iwd-selectize-element-height;
+			min-height: @iwd-selectize-element-min-height;
 			padding-right: 20px;
 
 			input {
-				height: @iwd-selectize-inner-element-height;
+				min-height: @iwd-selectize-inner-element-min-height;
 
 				&:focus {
 					outline: none;
@@ -79,7 +79,7 @@
 		}
 
 		.item {
-			height: @iwd-selectize-inner-element-height;
+			min-height: @iwd-selectize-inner-element-min-height;
 			padding: @selectize-padding-y 0 @selectize-padding-y @selectize-padding-x;
 		}
 	}
@@ -107,4 +107,23 @@
 			border-top: 0 none;
 		}
 	}
+}
+
+.selectize_hide_input {
+	opacity: 0 !important;
+	position: absolute !important;
+	left: -10000px !important;
+}
+
+.form.methods-shipping input.input-text {
+	height: 37px !important;
+}
+
+#iwd_opc_shipping_method {
+	width: 100%;
+	min-height: 37px;
+}
+
+.iwd_main_wrapper .selectize-control + .iwd_opc_field_tooltip.iwd_opc_cvv_tooltip {
+	right: -25px;
 }
