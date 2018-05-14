@@ -2,6 +2,8 @@
 return array (
   'modules' => 
   array (
+    'Amasty_Base' => 1,
+    'Amasty_InvisibleCaptcha' => 1,
     'Magento_Store' => 1,
     'Magento_Directory' => 1,
     'IWD_All' => 1,
@@ -59,7 +61,7 @@ return array (
     'Magento_GroupedImportExport' => 1,
     'Magento_GroupedProduct' => 1,
     'Magento_DownloadableImportExport' => 1,
-    'IWD_Opc' => 1,
+    'Magento_Vault' => 1,
     'Magento_InstantPurchase' => 1,
     'Magento_Analytics' => 1,
     'Magento_LayeredNavigation' => 1,
@@ -73,7 +75,7 @@ return array (
     'Magento_SalesRule' => 1,
     'Magento_PageCache' => 1,
     'Brsw_CardConnect' => 1,
-    'Magento_Vault' => 1,
+    'Magento_Paypal' => 1,
     'Magento_Persistent' => 1,
     'Magento_ProductAlert' => 1,
     'Magento_ProductVideo' => 1,
@@ -91,7 +93,7 @@ return array (
     'Magento_SalesAnalytics' => 1,
     'Magento_SalesInventory' => 1,
     'Magento_OfflineShipping' => 1,
-    'Magento_Paypal' => 1,
+    'IWD_Opc' => 1,
     'Magento_UrlRewrite' => 1,
     'Magento_CatalogSearch' => 1,
     'Magento_CustomerAnalytics' => 1,
