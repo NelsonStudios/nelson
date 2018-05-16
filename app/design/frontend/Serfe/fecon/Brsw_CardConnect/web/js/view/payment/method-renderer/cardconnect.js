@@ -6,7 +6,6 @@ define(
     ],
     function (Component) {
         'use strict';
-        console.log('I am in the cardconnect.js file');
         return Component.extend({
             defaults: {
                 template: 'Brsw_CardConnect/payment/cardconnect'
