@@ -1,0 +1,83 @@
+/* 
+    Created on : May 15, 2018, 5:00:35 PM
+    Author     : Xuan Villagran <xuan@serfe.com>
+*/
+
+.iwd_opc_wrapper {
+
+    &.iwd_main_wrapper {
+        margin: 0;
+    }
+
+    .fieldset {
+        /* Card Connect Payment Method classes */
+        .cardconnect {
+            .field {
+                ._with-tooltip {
+                    .input-text {
+                        width: 50%;
+                    }
+                }
+
+                &.date,
+                &.cvv {
+                    margin: 0;
+                }
+            }
+            ul {
+                li {
+                    display: inline;
+                }
+            }
+        }
+    }
+
+    .iwd_opc_section_delimiter {
+        & + .iwd_opc_section_delimiter {
+            display: none;
+        }
+    }
+}
+
+.onepage-index-index,
+.iwd_opc_success_page {
+    .loading-mask {
+        .loader {
+            border: medium none @color-white;
+        }
+    }
+}
+
+//
+//    Desktop
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .iwd_opc_wrapper {
+        .fieldset {
+            /* Card Connect Payment Method classes */
+            .cardconnect {
+                .field {
+                    .field-tooltip {
+                        display: block;
+                        right: 40%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//
+//    Mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .iwd_opc_wrapper {
+        &.iwd_main_wrapper {
+            .iwd_opc_alternative_wrapper {
+                #iwd_opc_top {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}
