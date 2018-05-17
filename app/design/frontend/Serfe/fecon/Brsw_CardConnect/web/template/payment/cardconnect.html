@@ -15,7 +15,9 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-        <!-- ko template: 'IWD_Opc/payment/methods-renderers/cardconnect' --><!-- /ko -->
+        <form id="cardconnect-form">
+            <!-- ko template: 'IWD_Opc/payment/methods-renderers/cardconnect' --><!-- /ko -->
+        </form>
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
