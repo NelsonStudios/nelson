@@ -1,21 +1,4 @@
-$(document).ready(function () {
-	$('.js-lazy').lazy_wait();
-});
-$(window).on('load', function () {
-	$('.js-lazy').lazy_load();
-});
-
-$.fn.lazy_load = function ( complete ) {
-	if ( typeof complete !== 'function' ) {
-		complete = function () {};
-	}
-	var lazy = new LazyLoad ( this, complete, false );
-	return this;
-};
-$.fn.lazy_wait = function () {
-	var lazy = new LazyLoad ( this, function() {}, true );
-	return this;
-};
+define(['jquery'], function($) {
 
 /**
  * Lazy load for images and BGs
@@ -24,7 +7,7 @@ $.fn.lazy_wait = function () {
  * @param wait - if true only wait state will be added, no actual load (default to false)
  * @constructor
  */
-var LazyLoad = function ( $lazys, complete, wait ) {
+LazyLoad = function ( $lazys, complete, wait ) {
 	var _this = this;
 	// Set default values
 	if ( typeof $lazys === 'undefined' ) {
@@ -344,3 +327,17 @@ LazyLoad.prototype.un_wait = function ( $lazy ) {
 		$(this).remove();
 	});
 };
+
+$.fn.lazy_load = function ( complete ) {
+	if ( typeof complete !== 'function' ) {
+		complete = function () {};
+	}
+	var lazy = new LazyLoad ( this, complete, false );
+	return this;
+};
+$.fn.lazy_wait = function () {
+	var lazy = new LazyLoad ( this, function() {}, true );
+	return this;
+};
+
+});
