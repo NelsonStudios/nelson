@@ -1,10 +1,10 @@
 var config = {
     map: {
         '*': {
-            "jquery.bez": "js/library/jquery.bez",
-            "jquery.transform": "js/library/jquery.transform",
-            "lazy": "js/library/lazy",
-            "devphase.widget": "js/widget"
+            "jquery.bez": "DevPhase_Feeds/js/library/jquery.bez",
+            "jquery.transform": "DevPhase_Feeds/js/library/jquery.transform",
+            "lazy": "DevPhase_Feeds/js/library/lazy",
+            "devphase.widget": "DevPhase_Feeds/js/widget"
         }
     },
     shim: {
