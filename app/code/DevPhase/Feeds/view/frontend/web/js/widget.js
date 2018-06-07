@@ -1,10 +1,10 @@
-
+define(['jquery', 'lazy', 'jquery.transform', 'jquery.bez'], function($) {
 /**
  * FeconSocialWidget
  * @param $wrap - .fecon-social-widget jQuery selector. Not .fsw-initialized
  * @constructor
  */
-var FeconSocialWidget = function ( $wrap ) {
+FeconSocialWidget = function ( $wrap ) {
 	var _this = this;
 
 	this.$wrap = $wrap;
@@ -410,3 +410,4 @@ FeconSocialWidget.prototype.video_remove = function ( $item ) {
 	var $vw = $item.find('.fsw-video-wrap');
 	$vw.html('');
 };
+});
