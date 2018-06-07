@@ -5,6 +5,7 @@ return array (
     'Amasty_Base' => 1,
     'Amasty_InvisibleCaptcha' => 1,
     'Magento_Store' => 1,
+    'DevPhase_Feeds' => 1,
     'Magento_Directory' => 1,
     'IWD_All' => 1,
     'Magento_Theme' => 1,
