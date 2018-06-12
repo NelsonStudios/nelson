@@ -403,13 +403,13 @@
     </div>
     <div class="header content">
     <?php echo $this->getChildHtml("logo"); ?>
+    <?php echo $this->getChildHtml("navigation.sections"); ?>
     <?php echo $this->getChildHtml("minicart"); ?>
     <?php if($header_type > 13):?>
     <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
     <?php endif;?>
-    <?php echo $this->getChildHtml("top.search"); ?>
-    <?php echo $this->getChildHtml("custom_block"); ?>
+    <?php //echo $this->getChildHtml("top.search"); ?>
+    <?php //echo $this->getChildHtml("custom_block"); ?>
     </div>
-    <?php echo $this->getChildHtml("navigation.sections"); ?>
 <?php endif; ?>
 </header>
