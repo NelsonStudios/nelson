@@ -395,10 +395,20 @@
 <?php else: ?>
     <div class="panel wrapper">
         <div class="panel header">
-            <?php echo $this->getChildHtml("skip_to_content"); ?>
-            <?php echo $this->getChildHtml("currency"); ?>
+            <?php //echo $this->getChildHtml("skip_to_content"); ?>
+            <?php //echo $this->getChildHtml("currency"); ?>
             <?php echo $this->getChildHtml("store_language"); ?>
+            <div class="magnifying-glass">
+                <?php echo $this->getChildHtml("top.search"); ?>
+                <img src='<?php echo $this->getViewFileUrl('images/magnifying-glass.png'); ?>' alt="search">
+            </div>
             <?php echo $this->getChildHtml("header.links"); ?>
+            <?php 
+                echo $this->getLayout()
+                  ->createBlock('Magento\Cms\Block\Block')
+                  ->setBlockId('porto_custom_block_for_header')
+                  ->toHtml();
+            ?>
         </div>
     </div>
     <div class="header content">
