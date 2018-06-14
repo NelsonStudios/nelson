@@ -1,0 +1,18 @@
+{
+    "name": "devphase/module-feeds",
+    "description": "Module to add Social Feeds and Videos sections",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {
+        "andreyco/instagram": "3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "DevPhase\\Feeds\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

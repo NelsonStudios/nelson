@@ -1,0 +1,21 @@
+<?php
+/**
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+?>
+
+<script>
+require(['jquery', 'devphase.widget'], function($){
+$(document).ready(function () {
+	// Create all widgets on Document load
+	$('.fecon-social-widget').not('.fsw-initialized').each(function () {
+		var fsw = new FeconSocialWidget($(this));
+	});
+        $('.js-lazy').lazy_wait();
+});
+$(window).on('load', function () {
+    $('.js-lazy').lazy_load();
+});
+});
+</script>
