@@ -10,6 +10,7 @@
             height: 41px;
             margin-top: 0;
             margin-bottom: 0;
+            padding-right: 0;
             .magnifying-glass {
                 height: 41px;
                 border-left: 1px solid #FFF;
@@ -17,7 +18,6 @@
                 display: inline-block;
                 position: relative;
                 overflow: hidden;
-
                 float: right;
                 img {
                     position: absolute;
@@ -40,7 +40,7 @@
                             }
                         }
                     }
-                    max-width: 37px;
+                    max-width: 49px;
                     margin-bottom: 0px;
                     margin-top: 0px;
                     margin-left: 0px;
@@ -104,8 +104,8 @@
             background-color: #1EAA75;
             width: 120px;
             position: absolute;
-            top: 0px;
-            right: 0px;
+            top: -45px;
+            right: -48px;
             height: 110px;
             padding-top: 19px;
             padding-left: 17px;
@@ -131,6 +131,20 @@
             }
             .action.search:before {
                 color: @color-white;
+            }
+        }
+        .minicart-wrapper {
+            .ui-widget-content {
+                .block-minicart {
+                    border-top: none;
+                    top: 68px;
+                }
+            }
+            .showcart {
+                .counter {
+                    right: -2px;
+                    margin-top: -20px;
+                }
             }
         }
     }
@@ -188,6 +202,6 @@
 
 @media (min-width: 768px) {
     .sw-megamenu.navigation li.level0.fullwidth > .submenu, .sw-megamenu.navigation li.level0.staticwidth > .submenu {
-        left: 94px;
+        left: 84px;
     }
 }
