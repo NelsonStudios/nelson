@@ -1,3 +1,86 @@
 
 @import 'lib/_global.less';
 @import 'lib/_widget.less';
+
+.widget-wrap {
+    h2 {
+        font-size: 30px;
+        position: relative;
+        text-transform: uppercase;
+        top: -30px;
+    }
+}
+
+.instagram-header {
+    .green-stripes {
+
+        .green-light-background {
+            width: 80%;
+        }
+    }
+
+    .porto-icon-instagram {
+        font-size: 40px;
+    }
+
+    .instagram-name {
+        font-size: 30px;
+    }
+}
+
+.instagram-widget {
+    p {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+    }
+}
+
+//
+//    Desktop
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .instagram-header {
+        div.green-stripes {
+            width: 35%;
+        }
+    }
+
+    .instagram-widget {
+        p {
+            max-width: 70%;
+        }
+    }
+}
+
+//
+//    Tablet
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .instagram-header {
+        .green-stripes {
+            width: 35%;
+        }
+    }
+}
+
+//
+//    Mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .instagram-header {
+        .green-stripes {
+            width: 50%;
+        }
+    }
+}
+
+//
+//    Small Mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+    .instagram-header {
+        div.green-stripes {
+            width: 60%;
+        }
+    }
+}
