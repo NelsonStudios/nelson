@@ -414,12 +414,8 @@
     <div class="header content">
     <?php echo $this->getChildHtml("logo"); ?>
     <?php echo $this->getChildHtml("navigation.sections"); ?>
-    <?php //echo $this->getChildHtml("minicart"); ?>
-    <div class="shopping-cart">
-        <a title="View and edit cart" href="/checkout/cart/">
-            <img src='<?php echo $this->getViewFileUrl('images/cart-icon-white.png'); ?>' alt="go to cart">
-        </a>
-    </div>
+    <?php echo $this->getChildHtml("minicart"); ?>
+    
     <?php if($header_type > 13):?>
     <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
     <?php endif;?>

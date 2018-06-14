@@ -1,5 +1,8 @@
 
 var config = {
+    deps: [
+        "js/header-custom",
+    ],
     map: {
         '*': {
             "Instafeed": "js/library/instafeed.min"

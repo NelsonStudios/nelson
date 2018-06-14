@@ -7,9 +7,13 @@
         border-bottom: 1px solid @color-gray-darken4;
         background-color: @color-gray-darken6;
         .panel.header {
+            height: 41px;
+            margin-top: 0;
+            margin-bottom: 0;
             .magnifying-glass {
+                height: 41px;
                 border-left: 1px solid #FFF;
-                margin-top: 3px;
+                margin-top: -10px;
                 display: inline-block;
                 position: relative;
                 overflow: hidden;
@@ -17,7 +21,7 @@
                 float: right;
                 img {
                     position: absolute;
-                    top: -7px;
+                    top: 2px;
                     left: 5px;
                     padding: 8px 4px 8px 8px ;
                     color: #777;
@@ -36,26 +40,26 @@
                             }
                         }
                     }
-                    max-width: 200px;
+                    max-width: 37px;
                     margin-bottom: 0px;
                     margin-top: 0px;
                     margin-left: 0px;
-                    float: right;
                     input {
-                        height: 27px;
+                        height: 41px;
                         border:none;
                         border-radius: 0px;
                         background: transparent;
-                        font:14px/1.4 sans-serif;
                         padding: 8px 0px 8px 34px;
-                        transition: 0.24s;
                         width: 0px;
+                        display:block;
+                        box-sizing: border-box;
+                        font-size: 14px;
                     }
                     input:focus {
                         background: #FFF;
                         border-color: #aaa;
                         outline: none;
-                        width:200px;
+                        width:220px;
                         padding: 12px 12px 12px 34px;
                         border-color: #0bf;
                     }
@@ -69,12 +73,12 @@
             max-width: 100%;
             background-color: #201D16;
             ul.toplinks {
-                margin-top: 5px;
+                margin-top: 3px;
                 float: left;
                 margin-left: 600px;
             }
             ul.header.links {
-                margin-top: 5px;
+                margin-top: 3px;
                 li {
                     a,span {
                         font-size: 14px;
