@@ -147,6 +147,7 @@
                 border-color: transparent transparent rgba(0,0,0,0.1) transparent;
             }
             &:before {
+                content: none !important;
                 left: auto;
                 right: 26px;
                 border: 8px solid;
@@ -215,12 +216,17 @@
                     &:extend(.abs-visually-hidden all);
                 }
                 &:before, &.active:before {
+                    content: none !important;
                     color: @minicart__icon_color;
                     line-height: 40px;
                     margin: 0;
                 }
                 &:hover:before, &:active:before, &.active:before, &.active:hover:before {
+                    content: none !important;
                     color: @minicart__icon_color;
+                }
+                &:after {
+                    content: none !important;
                 }
             }
         }

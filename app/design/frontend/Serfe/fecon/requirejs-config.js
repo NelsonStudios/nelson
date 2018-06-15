@@ -2,6 +2,7 @@
 var config = {
     deps: [
         "js/header-custom",
+        "js/minicart-custom"
     ],
     map: {
         '*': {
