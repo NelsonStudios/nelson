@@ -1,0 +1,180 @@
+// Color variables (appears count calculates by raw css)
+@color0: #2DAA77; // Appears 6 times
+@color1: #000000; // Appears 2 times
+
+// Width variables (appears count calculates by raw css)
+@width0: 515px; // Appears 1 time
+@width1: 248px; // Appears 1 time
+@width2: 58px; // Appears 1 time
+
+// Height variables (appears count calculates by raw css)
+@height0: 327px; // Appears 1 time
+@height1: 133px; // Appears 1 time
+@height2: 54px; // Appears 1 time
+
+.minicart-wrapper {
+    .ui-widget-content {
+        .block-minicart {
+            z-index: 4;
+            width: @width0;
+            height: @height0;
+            border-top: none;
+            top: 68px;
+            #minicart-content-wrapper {
+                .block-content {
+                    .items-total {
+                        display: none;
+                    }
+                    #btn-minicart-close {
+                        display: none;
+                    }
+                    .minicart-items-wrapper {
+                        height: @height1 !important;
+                        margin-top: -15px;
+                        .minicart-items {
+                            .product-item-name {
+                                margin: 0;
+                                word-wrap: break-word;
+                                width: @width1;
+                            }
+                            .product-item {
+                                .product {
+                                    .product-item-details {
+                                        .product-item-pricing {
+                                            position: relative;
+                                            height: 0;
+                                            .price-container {
+                                                position: absolute;
+                                                display: inline-block;
+                                            }
+                                            .details-qty {
+                                                display: inline-block;
+                                                padding-left: 250px;
+                                                margin-top: -18px;
+                                                input {
+                                                    position: absolute;
+                                                    top: -18px;
+                                                    border: 1px solid @color0;
+                                                    color: @color0;
+                                                    font-weight: 700;
+                                                    width: @width2;
+                                                    height: @height2;
+                                                    font-size: 24px;
+                                                }
+                                                button.update-cart-item {
+                                                    top: 45px;
+                                                    position: absolute;
+                                                    padding: 0px 9px 0px 9px;
+                                                }
+                                                .increment-btn {
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    top: -18px;
+                                                    right: 49px;
+                                                    span {
+                                                        display: block;
+                                                        color: @color0;
+                                                        font-weight: 600;       
+                                                        border: 1px solid @color0;
+                                                    }
+                                                    .plus-btn {
+                                                        font-size: 18px;
+                                                        padding: 0px 7px 0px 8px;
+                                                        border-bottom: none;
+                                                    }
+                                                    .minus-btn {
+                                                        font-size: 16px;
+                                                        padding: 0px 7px 0px 10px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .product.actions {
+                                            margin: -2px -7px 0;
+                                            .primary {
+                                                display: none;
+                                            }
+                                            .secondary {
+                                                a.action.delete {
+                                                    border: 1px solid @color1;
+                                                    padding: 7px 13px 7px 13px;
+                                                    border-radius: 20px;
+                                                    margin-top: -7px;
+                                                    &:before {
+                                                        color: #6F6F6F;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .label {
+                        position: absolute;
+                        top: 31px;
+                        padding-left: 30px;
+                        &:after {
+                            content: none !important;
+                        }
+                        span {
+                            display: inline-block;
+                            font-size: 18px;
+                            color: @color1;
+                            font-weight: 500;
+                        }
+                    }
+                    .subtotal {
+                        position: relative;
+                        border-top: 2px solid #EBEBEB;
+                        margin-left: -18px;
+                        margin-right: -18px;
+                        padding-top: 9px;
+                        div.amount.price-container {
+                            display: inline-block;
+                            padding-left: 280px;
+                            position: absolute;
+                            top: 16px;
+                            .price-wrapper {
+                                .price {
+                                    font-size: 42px;
+                                    font-weight: 200;
+                                    color: @color0;
+                                }
+                            }
+                        }
+                    }
+                    .actions {
+                        .primary {
+                            #top-cart-btn-checkout {
+                                display: none;
+                            }
+                        }
+                        .secondary {
+                            a.viewcart {
+                                position: absolute;
+                                bottom: 0px;
+                                left: 0px;
+                                border: none;
+                                background-color: @color0;
+                                color: #fff;
+                                padding-top: 18px;
+                                padding-bottom: 21px;
+                                font-size: 22px;
+                                font-family: Verb;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .showcart {
+        .counter {
+            right: -2px !important;
+            margin-top: -6px !important;
+        }
+    }
+}

@@ -1,8 +1,7 @@
 
 var config = {
     deps: [
-        "js/header-custom",
-        "js/minicart-custom"
+        "js/header-custom"
     ],
     map: {
         '*': {

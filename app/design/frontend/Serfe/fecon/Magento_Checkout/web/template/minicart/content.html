@@ -66,10 +66,12 @@
         </ol>
     </div>
     <!-- /ko -->
-
-    <!-- ko if: getCartParam('possible_onepage_checkout') -->
-        <!-- ko foreach: getRegion('subtotalContainer') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
+    
+    <!-- ko if: getCartParam('summary_count') -->
+        <!-- ko if: getCartParam('possible_onepage_checkout') -->
+            <!-- ko foreach: getRegion('subtotalContainer') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
         <!-- /ko -->
     <!-- /ko -->
 

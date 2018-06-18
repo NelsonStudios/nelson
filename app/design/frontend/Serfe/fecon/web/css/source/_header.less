@@ -133,171 +133,6 @@
                 color: @color-white;
             }
         }
-        /* Start Minicart */
-        .minicart-wrapper {
-            .ui-widget-content {
-                .block-minicart {
-                    z-index: 4;
-                    width: 515px;
-                    height: 327px;
-                    border-top: none;
-                    top: 68px;
-                    #minicart-content-wrapper {
-                        .block-content {
-                            .items-total {
-                                display: none;
-                            }
-                            #btn-minicart-close {
-                                display: none;
-                            }
-                            .minicart-items-wrapper {
-                                height: 133px !important;
-                                margin-top: -15px;
-                                .minicart-items {
-                                    .product-item-name {
-                                        margin: 0;
-                                        word-wrap: break-word;
-                                        width: 248px;
-                                    }
-                                    .product-item {
-                                        .product {
-                                            .product-item-details {
-                                                .product-item-pricing {
-                                                    position: relative;
-                                                    .price-container {
-                                                        position: absolute;
-                                                        display: inline-block;
-                                                    }
-                                                    .details-qty {
-                                                        display: inline-block;
-                                                        padding-left: 250px;
-                                                        margin-top: -18px;
-                                                        input {
-                                                            position: absolute;
-                                                            top: -18px;
-                                                            border: 1px solid #2DAA77;
-                                                            color: #2DAA77;
-                                                            font-weight: 700;
-                                                            width: 58px;
-                                                            height: 54px;
-                                                            font-size: 24px;
-                                                        }
-                                                        button {
-                                                            display: none;
-                                                        }
-                                                        .increment-btn {
-                                                            display: inline-block;
-                                                            position: absolute;
-                                                            top: -18px;
-                                                            right: 49px;
-                                                            span {
-                                                                display: block;
-                                                                color: #2DAA77;
-                                                                font-weight: 600;       
-                                                                border: 1px solid #2DAA77;
-                                                            }
-                                                            .plus-btn {
-                                                                font-size: 18px;
-                                                                padding: 0px 7px 0px 8px;
-                                                                border-bottom: none;
-                                                            }
-                                                            .minus-btn {
-                                                                font-size: 16px;
-                                                                padding: 0px 7px 0px 10px;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                .product.actions {
-                                                    margin: -17px -7px 0;
-                                                    .primary {
-                                                        display: none;
-                                                    }
-                                                    .secondary {
-                                                        a.action.delete {
-                                                            border: 1px solid #000;
-                                                            padding: 7px 13px 7px 13px;
-                                                            border-radius: 20px;
-                                                            margin-top: -7px;
-                                                            &:before {
-                                                                color: #6F6F6F;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .label {
-                                position: absolute;
-                                top: 31px;
-                                padding-left: 30px;
-                                &:after {
-                                    content: none !important;
-                                }
-                                span {
-                                    display: inline-block;
-                                    font-size: 18px;
-                                    color: #000;
-                                    font-weight: 500;
-                                }
-                            }
-                            .subtotal {
-                                position: relative;
-                                border-top: 2px solid #EBEBEB;
-                                margin-left: -18px;
-                                margin-right: -18px;
-                                padding-top: 9px;
-                                div.amount.price-container {
-                                    display: inline-block;
-                                    padding-left: 280px;
-                                    position: absolute;
-                                    top: 16px;
-                                    .price-wrapper {
-                                        .price {
-                                            font-size: 42px;
-                                            font-weight: 200;
-                                            color: #2DAA77;
-                                        }
-                                    }
-                                }
-                            }
-                            .actions {
-                                .primary {
-                                    #top-cart-btn-checkout {
-                                        display: none;
-                                    }
-                                }
-                                .secondary {
-                                    a.viewcart {
-                                        position: absolute;
-                                        bottom: 0px;
-                                        left: 0px;
-                                        border: none;
-                                        background-color: #2DAA77;
-                                        color: #fff;
-                                        padding-top: 18px;
-                                        padding-bottom: 21px;
-                                        font-size: 22px;
-                                        font-family: Verb;
-                                        font-weight: 600;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .showcart {
-                .counter {
-                    right: -2px;
-                    margin-top: -6px;
-                }
-            }
-        }
-        /* End Minicart */
     }
     .sections.nav-sections {
         margin-right: 70px;
@@ -349,9 +184,147 @@
         }
     }
 }
-
-@media (min-width: 768px) {
+/* Responsive */
+@media (max-width: 1640px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .sections.nav-sections {
+                white-space: inherit !important;
+                top: 16px;
+            }
+        }
+    }
+}
+@media (max-width: 1438px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .sections.nav-sections {
+                white-space: inherit !important;
+                top: 16px;
+                left: 191px;
+            }
+        }
+    }
+}
+@media (max-width: 1338px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 400px;
+                }
+            }
+        }
+        .header.content {
+            .sections.nav-sections {
+                white-space: inherit !important;
+                top: 16px;
+                left: 152px;
+                word-spacing: -2px;
+                .sw-megamenu.navigation li.level0.fullwidth {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 1280px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 400px;
+                }
+            }
+        }
+        .header.content {
+            .sections.nav-sections {
+                width: 80%;
+                white-space: inherit !important;
+                top: 16px;
+                left: 152px;
+                word-spacing: -2px;
+                .sw-megamenu.navigation li.level0.fullwidth {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 1150px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 250px;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 1104px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .sections.nav-sections {
+                width: 75%;
+            }
+        }
+    }
+}
+@media (max-width: 988px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 150px;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 884px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 75px;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 878px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .sections.nav-sections {
+                left: 68px;
+            }
+            .logo {
+                display: none;
+            }
+        }
+    }
+}
+@media (max-width: 808px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 0px;
+                }
+            }
+        }
+        .header.content {
+            .sections.nav-sections {
+                left: 18px;
+                width: 100%;
+            }
+        }
+    }
+}
+@media (max-width: 768px) {
     .sw-megamenu.navigation li.level0.fullwidth > .submenu, .sw-megamenu.navigation li.level0.staticwidth > .submenu {
         left: 84px;
     }
 }
+/* End Responsive */
