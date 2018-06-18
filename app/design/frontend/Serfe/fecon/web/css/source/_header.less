@@ -314,12 +314,51 @@
 }
 @media (max-width: 767px) {
     .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                .magnifying-glass {
+                    margin-top: 0;
+                    .block-search {
+                        img {
+                            top: 3px;
+                        }
+                        .block-content {
+                            .form.minisearch {
+                                .field.search {
+                                    label {
+                                        &:before {
+                                            content: none !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         .header.content {
+            .logo {
+                margin-top: 30px;
+            }
+            .shopping-cart {
+                top: -21px;
+                right: -15px;
+            }
             .sections.nav-sections {
                 width: 85%;
                 top: 0;
                 right: auto;
                 position: fixed;
+            }
+            .action.nav-toggle {
+                margin-top: 24px;
+                margin-left: 40px;
+                float: none;
+                &:before {
+                    font-size: 26px;
+                    color: @color-white;
+                }
             }
         }
     }
