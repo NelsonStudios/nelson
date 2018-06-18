@@ -7,13 +7,13 @@
         border-bottom: 1px solid @color-gray-darken4;
         background-color: @color-gray-darken6;
         .panel.header {
-            height: 41px;
+            height: @height41;
             margin-top: 0;
             margin-bottom: 0;
             padding-right: 0;
             .magnifying-glass {
-                height: 41px;
-                border-left: 1px solid #FFF;
+                height: @height41;
+                border-left: 1px solid @color-white;
                 margin-top: -10px;
                 display: inline-block;
                 position: relative;
@@ -45,7 +45,7 @@
                     margin-top: 0px;
                     margin-left: 0px;
                     input {
-                        height: 41px;
+                        height: @height41;
                         border:none;
                         border-radius: 0px;
                         background: transparent;
@@ -56,7 +56,7 @@
                         font-size: 14px;
                     }
                     input:focus {
-                        background: #FFF;
+                        background: @color-white;
                         border-color: #aaa;
                         outline: none;
                         width:220px;
@@ -95,10 +95,10 @@
     }
     .header.content {
         max-width: 100%;
-        background: linear-gradient(to right, #2a2620, transparent, #2a2620 600%),
-        linear-gradient(to right, #2a2620, transparent, #2a2620 200%),
-        repeating-linear-gradient(-70deg, #222222, #222222 22px, #ffffff 23px, #ffffff 24px);
-        height: 110px;
+        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+        height: @height110;
         background-color: @color-gray-darken5;
         .shopping-cart {
             background-color: #1EAA75;
@@ -106,7 +106,7 @@
             position: absolute;
             top: -45px;
             right: -48px;
-            height: 110px;
+            height: @height110;
             padding-top: 19px;
             padding-left: 17px;
         }
@@ -190,7 +190,7 @@
         .header.content {
             .sections.nav-sections {
                 white-space: inherit !important;
-                top: 16px;
+                top: @top16;
             }
         }
     }
@@ -199,8 +199,6 @@
     .page-header.type16.header-newskin {
         .header.content {
             .sections.nav-sections {
-                white-space: inherit !important;
-                top: 16px;
                 left: 191px;
             }
         }
@@ -218,7 +216,6 @@
         .header.content {
             .sections.nav-sections {
                 white-space: inherit !important;
-                top: 16px;
                 left: 152px;
                 word-spacing: -2px;
                 .sw-megamenu.navigation li.level0.fullwidth {
@@ -230,23 +227,9 @@
 }
 @media (max-width: 1280px) {
     .page-header.type16.header-newskin {
-        .panel.wrapper {
-            .panel.header {
-                ul.toplinks.header.links {
-                    margin-left: 400px;
-                }
-            }
-        }
         .header.content {
             .sections.nav-sections {
                 width: 80%;
-                white-space: inherit !important;
-                top: 16px;
-                left: 152px;
-                word-spacing: -2px;
-                .sw-megamenu.navigation li.level0.fullwidth {
-                    margin-right: 0;
-                }
             }
         }
     }

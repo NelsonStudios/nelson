@@ -1,23 +1,9 @@
-// Color variables (appears count calculates by raw css)
-@color0: #2DAA77; // Appears 6 times
-@color1: #000000; // Appears 2 times
-
-// Width variables (appears count calculates by raw css)
-@width0: 515px; // Appears 1 time
-@width1: 248px; // Appears 1 time
-@width2: 58px; // Appears 1 time
-
-// Height variables (appears count calculates by raw css)
-@height0: 327px; // Appears 1 time
-@height1: 133px; // Appears 1 time
-@height2: 54px; // Appears 1 time
-
 .minicart-wrapper {
     .ui-widget-content {
         .block-minicart {
             z-index: 4;
-            width: @width0;
-            height: @height0;
+            width: @width515;
+            height: @height327;
             border-top: none;
             top: 68px;
             #minicart-content-wrapper {
@@ -29,13 +15,13 @@
                         display: none;
                     }
                     .minicart-items-wrapper {
-                        height: @height1 !important;
+                        height: @height133 !important;
                         margin-top: -15px;
                         .minicart-items {
                             .product-item-name {
                                 margin: 0;
                                 word-wrap: break-word;
-                                width: @width1;
+                                width: @width248;
                             }
                             .product-item {
                                 .product {
@@ -54,11 +40,11 @@
                                                 input {
                                                     position: absolute;
                                                     top: -18px;
-                                                    border: 1px solid @color0;
-                                                    color: @color0;
+                                                    border: 1px solid @minicart-green;
+                                                    color: @minicart-green;
                                                     font-weight: 700;
-                                                    width: @width2;
-                                                    height: @height2;
+                                                    width: @width58;
+                                                    height: @height54;
                                                     font-size: 24px;
                                                 }
                                                 button.update-cart-item {
@@ -73,9 +59,9 @@
                                                     right: 49px;
                                                     span {
                                                         display: block;
-                                                        color: @color0;
+                                                        color: @minicart-green;
                                                         font-weight: 600;       
-                                                        border: 1px solid @color0;
+                                                        border: 1px solid @minicart-green;
                                                     }
                                                     .plus-btn {
                                                         font-size: 18px;
@@ -96,7 +82,7 @@
                                             }
                                             .secondary {
                                                 a.action.delete {
-                                                    border: 1px solid @color1;
+                                                    border: 1px solid @color-black;
                                                     padding: 7px 13px 7px 13px;
                                                     border-radius: 20px;
                                                     margin-top: -7px;
@@ -121,13 +107,13 @@
                         span {
                             display: inline-block;
                             font-size: 18px;
-                            color: @color1;
+                            color: @color-black;
                             font-weight: 500;
                         }
                     }
                     .subtotal {
                         position: relative;
-                        border-top: 2px solid #EBEBEB;
+                        border-top: 2px solid @color-gray-light;
                         margin-left: -18px;
                         margin-right: -18px;
                         padding-top: 9px;
@@ -140,7 +126,7 @@
                                 .price {
                                     font-size: 42px;
                                     font-weight: 200;
-                                    color: @color0;
+                                    color: @minicart-green;
                                 }
                             }
                         }
@@ -157,7 +143,7 @@
                                 bottom: 0px;
                                 left: 0px;
                                 border: none;
-                                background-color: @color0;
+                                background-color: @minicart-green;
                                 color: #fff;
                                 padding-top: 18px;
                                 padding-bottom: 21px;

@@ -6,10 +6,16 @@ function($) {
 
   $(document).ready(function($){
     $('#search').on('focus', function() {
-      $('.magnifying-glass').animate({'width': '200px'});
+      setTimeout(function(){
+        $('.magnifying-glass').animate({'width': '200px'});
+      }, 400);
+      $('.toplinks').fadeOut('slow');
     })
     $('#search').on('blur', function() {
-      $('.magnifying-glass').animate({'width': '49px'});
+      setTimeout(function(){
+        $('.toplinks').fadeIn('slow');
+      }, 300);
+      $('.magnifying-glass').animate({'width': '49px'}, 400);
     })
   });
   return;
