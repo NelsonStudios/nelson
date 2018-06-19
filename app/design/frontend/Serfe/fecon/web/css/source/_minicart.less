@@ -79,7 +79,7 @@
                                                 button.update-cart-item {
                                                     top: 45px;
                                                     position: absolute;
-                                                    padding: 0px 9px 0px 9px;
+                                                    padding: @zeroPx 9px @zeroPx 9px;
                                                 }
                                                 .increment-btn {
                                                     display: inline-block;
@@ -94,12 +94,12 @@
                                                     }
                                                     .plus-btn {
                                                         font-size: 18px;
-                                                        padding: 0px 7px 0px 8px;
+                                                        padding: @zeroPx 7px @zeroPx 8px;
                                                         border-bottom: none;
                                                     }
                                                     .minus-btn {
                                                         font-size: 16px;
-                                                        padding: 0px 7px 0px 10px;
+                                                        padding: @zeroPx 7px @zeroPx 10px;
                                                     }
                                                 }
                                             }
@@ -116,7 +116,7 @@
                                                     border-radius: 20px;
                                                     margin-top: -7px;
                                                     &:before {
-                                                        color: #6F6F6F;
+                                                        color: @color-grey-darken2;
                                                     }
                                                 }
                                             }
@@ -169,11 +169,11 @@
                         .secondary {
                             a.viewcart {
                                 position: absolute;
-                                bottom: 0px;
-                                left: 0px;
+                                bottom:@zeroPx;
+                                left:@zeroPx;
                                 border: none;
                                 background-color: @minicart-green;
-                                color: #fff;
+                                color: @color-white;
                                 padding-top: 18px;
                                 padding-bottom: 21px;
                                 font-size: 22px;
