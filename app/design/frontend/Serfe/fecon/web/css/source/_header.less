@@ -313,51 +313,244 @@
     }
 }
 @media (max-width: 767px) {
-    .page-header.type16.header-newskin {
-        .panel.wrapper {
-            .panel.header {
-                .magnifying-glass {
-                    margin-top: 0;
-                    .block-search {
-                        img {
-                            top: 3px;
-                        }
-                        .block-content {
-                            .form.minisearch {
-                                .field.search {
-                                    label {
-                                        &:before {
-                                            content: none !important;
+    .page-wrapper {
+        left: 85% !important;
+        .page-header.type16.header-newskin {
+            .panel.wrapper {
+                .panel.header {
+                    .magnifying-glass {
+                        margin-top: 0;
+                        .block-search {
+                            img {
+                                top: 3px;
+                            }
+                            .block-content {
+                                .form.minisearch {
+                                    .field.search {
+                                        label {
+                                            &:before {
+                                                content: none !important;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    .toplinks {
+                        display: inline-block;
+                        margin-left: 90px;
+                        word-spacing: 12px;
+                        padding-top: 7px;
+                    }
+                }
+            }
+            .header.content {
+                .minicart-wrapper {
+                    .ui-widget-content {
+                        .block-minicart {
+                           top: 104px; 
+                        }
+                    }
+                    .action.showcart {
+                        .counter {
+                            right: 30px !important;
+                            margin-top: 19px !important;
+                        }
+                    }
+                }
+                .logo {
+                    margin-top: 30px;
+                }
+                .shopping-cart {
+                    top: -21px;
+                    right: -15px;
+                }
+                .sections.nav-sections {
+                    background-color: @color-gray-darken3;
+                    width: 85%;
+                    top: 0;
+                    right: auto;
+                    position: fixed;
+                    .nav-sections-items {
+                        .nav-sections-item-title {
+                            background-color: @color-gray-darken3;
+                            .nav-sections-item-switch {
+                                font-size: 16px;
+                            }
+                            &.active {
+                                background-color: @minicart-green;
+                                .nav-sections-item-switch {
+                                    color: @color-gray-darken3;
+                                }
+                            }
+                        }
+                        .nav-sections-item-content {
+                            .navigation.sw-megamenu {
+                                ul {
+                                    li {
+                                        a {
+                                            color: @color-white !important;
+                                        }
+                                        .alink:visited {
+                                            color: @minicart-green !important;
+                                        }
+                                    }
+                                }
+                            }
+                            .header.links {
+                                li {
+                                    a {
+                                        color: @color-white !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .action.nav-toggle {
+                    width: 30px;
+                    margin-top: 24px;
+                    margin-left: 170px;
+                    float: none;
+                    &:before {
+                        font-size: 26px;
+                        color: @color-white;
+                    }
                 }
             }
         }
+    }
+}
+@media (max-width: 678px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                .toplinks {
+                    margin-left: 0 !important;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 590px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                .toplinks {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 490px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .minicart-wrapper {
+                .ui-widget-content {
+                    .block-minicart {
+                        &:after {
+                            right: 46px;
+                        }
+                        width: 400px !important;
+                        #minicart-content-wrapper {
+                           .block-content {
+                               .minicart-items-wrapper {
+                                   .minicart-items {
+                                       .product-item {
+                                           .product {
+                                                .product-item-details {
+                                                   .product-item-name {
+                                                        text-overflow: ellipsis;
+                                                        white-space: nowrap;
+                                                        overflow: hidden;
+                                                        width: 130px;
+                                                    }
+                                                    .details-qty {
+                                                        input {
+                                                           left: 150px;
+                                                        }
+                                                       .increment-btn {
+                                                            right: 34px;
+                                                            .plus-btn, .minus-btn {
+                                                                border-left: none;
+                                                            }
+                                                        }
+                                                        button {
+                                                            left: 55.6%;
+                                                        }
+                                                    }
+                                                    .product.actions {
+                                                       margin-right: -10px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .subtotal {
+                                    .price-container {
+                                        padding-left: 180px;
+                                    } 
+                                }
+                           }
+                       }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 363px) {
+    .page-header.type16.header-newskin {
         .header.content {
             .logo {
-                margin-top: 30px;
-            }
-            .shopping-cart {
-                top: -21px;
-                right: -15px;
-            }
-            .sections.nav-sections {
-                width: 85%;
-                top: 0;
-                right: auto;
-                position: fixed;
+                margin-top: 10px !important;
+                height: 35px !important;
             }
             .action.nav-toggle {
-                margin-top: 24px;
-                margin-left: 40px;
-                float: none;
-                &:before {
-                    font-size: 26px;
-                    color: @color-white;
+                margin-left: 56px !important;
+                float: none !important;
+                clear: both !important;
+            }
+            .minicart-wrapper {
+                .ui-widget-content {
+                    .block-minicart {
+                       width: 300px !important; 
+                        #minicart-content-wrapper {
+                           .block-content {
+                               .minicart-items-wrapper {
+                                   .minicart-items {
+                                       .product-item {
+                                           .product {
+                                                .product-image-container {
+                                                    display: none;
+                                                }
+                                                .product-item-details {
+                                                    padding-left: 0;
+                                                    .details-qty {
+                                                        input {
+                                                           left: 145px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .subtotal {
+                                    .label {
+                                        top: 34px;
+                                        padding-left: 5px;
+                                    }
+                                    .price-container {
+                                       padding-left: 90px;
+                                    }
+                               }
+                            }
+                        }
+                    }
                 }
             }
         }
