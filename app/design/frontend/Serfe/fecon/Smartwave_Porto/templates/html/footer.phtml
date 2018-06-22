@@ -48,7 +48,7 @@
                     $area = 'footer_middle_column_'.$i;
                     $type = $footer[$area];
                     if( $type ){
-                        echo '<div class="col-lg-'.$footer[$area.'_size'].'">';
+                        echo '<div class="col-lg-' . $footer[$area.'_size'] . ' ' . (($footer[$area.'_size'] == 3)? 'left-block-1' : '') . '">';
                     }
                     if( $type == 'custom' && $footer[$area.'_custom'] ){
                         $block = $this->getLayout()->createBlock('Magento\Cms\Block\Block');
@@ -156,5 +156,17 @@
 <?php
     }
 ?>
+</div>
+<div class="footer-bottom">
+    <div class="container">
+<?php /* Custom footer bottom block for fecon */
+    if($block && !$footer['footer_bottom']) {
+        $block->setBlockId('footer_bottom_fecon_block');
+    }
+    if($block && !$footer['footer_bottom']){
+        echo '<div class="custom-block">'.$block->toHtml().'</div>';
+    }
+?>
+    </div>
 </div>
 <a href="javascript:void(0)" id="totop"><em class="porto-icon-up-open"></em></a>
