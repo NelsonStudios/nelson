@@ -1,7 +1,7 @@
 @import "_theme_extend.less";
 
 //
-//  Porto theme overrides
+//  Serfe theme overrides
 //  _____________________________________________
 
 //  Theme file should contain declarations (overrides) ONLY OF EXISTING variables
@@ -28,7 +28,8 @@
 //  Typography
 //  ---------------------------------------------
 
-@theme-color: #fff;
+@theme-color: #FFF;
+@fecon-theme-color: #00AA73;
 @base-font-family: 'Open Sans',Arial,Helvetica,sans-serif;
 @base-font-size: 13px;
 @base-line-height: 1.42857143;
@@ -48,11 +49,11 @@
 
 @button__font-size: 14px;
 @button-primary__background: @theme-color;
-@button-primary__border: 1px solid @theme-color;
-@button-primary__hover__background: #00AA73;
-@button-primary__hover__border: 1px solid @theme-color;
+@button-primary__border: 1px solid @fecon-theme-color;
+@button-primary__hover__background: @fecon-theme-color;
+@button-primary__hover__border: 1px solid @fecon-theme-color;
 
-@body_background-color: #fff;
+@body_background-color: transparent;
 
 //  Fonts
 @icons__font-path: '@{baseDir}icon-fonts/font/porto-icons';

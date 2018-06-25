@@ -1,0 +1,35 @@
+.customer-account-login, .customer-account-create, .customer-account-forgotpassword {
+    .page-wrapper {
+        #maincontent {
+            .page-title-wrapper {
+                .page-title {
+                    color: @fecon-theme-color;
+                }
+            }
+            .columns {
+                .column.main {
+                    .login-container, .form-create-account, .password.forget {
+                        box-shadow: 6px 10px 49px @color-gray-darken1;
+                        border: none;
+                        border-top: 4px solid @fecon-theme-color;
+                        border-radius: 4px;
+                        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+                        .fieldset, .block-customer-login, .block-new-customer {
+                            color: @color-white;
+                            .legend {
+                                color: @fecon-theme-color;
+                            }
+                            .actions-toolbar {
+                                .action.remind {
+                                    color: @fecon-theme-color;
+                                }    
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
