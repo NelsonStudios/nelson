@@ -1,6 +1,33 @@
 body {
     .page-wrapper {
         main#maincontent {
+            .page-title-wrapper {
+                display: block;
+                text-align: center;
+                h1.page-title {
+                    span {
+                        position: relative;
+                        text-transform: uppercase;
+                        color: black;
+                        font-size: 44px;
+                        font-weight: 600;
+                        &:before,
+                        &:after {
+                          content: "";
+                          position: absolute;
+                          height: 14px;
+                          border-bottom: 3px solid #00aa73;
+                          top: 8px;
+                          width: 580px;
+                          left: 345px;
+                        }
+                        &:before {
+                          width: 580px;
+                          left: -605px;
+                        }
+                    }
+                }
+            }
             .columns {
                 .column.main {
                     #layer-product-list {
