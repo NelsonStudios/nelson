@@ -6,27 +6,32 @@
 
 .cms-index-index {
 
-    #banner-slider-demo-1 {
-
-        .banner-subtitle {
-            /*color: #fff;*/
-            font-size:20px;
-            margin-left: auto;
-            margin-right: auto;
-            width: 64%;
-        }
+    #banner-slider-demo-1,
+    .featured-callout {
 
         .btn-red-slider {
             background: @color-red-button;
             font-size: 25px;
-            /*line-height: 1;*/
             letter-spacing: 0.05em;
             padding: 14px 112px;
             border-radius:3px;
-            /*color: #fff;*/
             text-transform: uppercase; 
             margin-top: 32px;
             font-weight: @font-weight__bold;
+        }
+
+        .green-header {
+            color: @color-green-dark;
+            font-size: 86px;
+        }
+    }
+
+    #banner-slider-demo-1 {
+        .banner-subtitle {
+            font-size:20px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 64%;
         }
 
         .content {
@@ -47,11 +52,6 @@
                 line-height: 1;
                 text-transform:uppercase;
             }
-        }
-
-        .green-header {
-            color: @color-green-dark;
-            font-size: 86px;
         }
 
         .white-header {
@@ -135,7 +135,6 @@
     }
 
     .shop-products-section {
-        margin-bottom:25px;
         padding-bottom:40px;
         padding-top: 39px;
 
@@ -146,6 +145,48 @@
 
         .product-item-photo {
             border: 1px solid @color-brown-light;
+        }
+    }
+
+    .featured-callout {
+        .col-md-12 {
+            padding: 0;
+        }
+
+        .featured-background {
+            margin: 100px 0;
+            max-height: 490px;
+        }
+
+        .featured-content {
+            display: inline-block;
+            vertical-align: top;
+            width: 48%;
+
+            &:first-child {
+                padding-left: 100px;
+                padding-top: 100px;
+            }
+
+            .gree-header {
+                -webkit-box-shadow: 0px 0px 76px 66px rgba(0,0,0,0.46);
+                -moz-box-shadow: 0px 0px 76px 66px rgba(0,0,0,0.46);
+                box-shadow: 0px 0px 76px 66px rgba(0,0,0,0.46);
+                background: rgba(0,0,0,0.46);
+            }
+
+            img {
+                margin-top: -7%;
+            }
+
+            p {
+                text-align: left;
+            }
+
+            .white-header {
+                color: @color-white;
+                font-size: 50px;
+            }
         }
     }
 }
