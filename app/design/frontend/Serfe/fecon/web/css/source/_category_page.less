@@ -1,0 +1,81 @@
+body {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    #layer-product-list {
+                        .products.wrapper {
+                            .product-items {
+                                li.product-item {
+                                    padding: 0;
+                                    margin-left: -1px;
+                                    margin-bottom: -1px;
+                                    .product-item-info {
+                                        border: 1px solid @color-gray-lighten1;
+                                        .product-item-photo {
+                                            width: 75%;
+                                            margin: 0 auto;
+                                        }
+                                        .product-item-details {
+                                            strong.product-item-name {
+                                                a.product-item-link {
+                                                    font-size: 20px;
+                                                    font-weight: 500;
+                                                    color: @color-black;
+                                                }
+                                            }
+                                            .product-reviews-summary {
+                                                .rating-summary {
+                                                    .rating-result {
+                                                        width: 110px;
+                                                        height: 20px;
+                                                        &:before {
+                                                            top: 3px;
+                                                            font-size: 20px;
+                                                            height: 22px;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            .product-item-inner {
+                                                .product-item-actions {
+                                                    .actions-primary {
+                                                        form {
+                                                            button.action.tocart.primary {
+                                                                color: @fecon-theme-color;
+                                                                background-color: @color-white;
+                                                                border-color: @fecon-theme-color;
+                                                                font-weight: 500;
+                                                                font-family: 'Verb';
+                                                                height: 42px;
+                                                                width: 145px;
+                                                                font-size: 17px;
+                                                                &:before {
+                                                                    content: none;
+                                                                }
+                                                                &:hover, &:active, &:focus {
+                                                                    color: @color-white;
+                                                                    background-color: @fecon-theme-color;
+                                                                    border-color: @fecon-theme-color;
+                                                                    font-weight: 500;
+                                                                    font-family: 'Verb';
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    .action.towishlist, .action.tocompare {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                }    
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
