@@ -23,6 +23,8 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $jsonHelper;
 
+    protected $youtubeHelper;
+
     /**
      * Constructor
      *
@@ -34,10 +36,12 @@ class Index extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Json\Helper\Data $jsonHelper
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \DevPhase\Feeds\Helper\FeconWidgetGetterYoutube $youtubeHelper
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->jsonHelper = $jsonHelper;
+        $this->youtubeHelper = $youtubeHelper;
         parent::__construct($context);
     }
 
@@ -52,7 +56,7 @@ class Index extends \Magento\Framework\App\Action\Action
             return;
         }
         try {
-            $feed = FeconWidgetGetterYoutube::get();
+            $feed = $this->youtubeHelper->get();
             return $this->jsonResponse($feed);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             return $this->jsonResponse($e->getMessage());

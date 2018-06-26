@@ -24,6 +24,13 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $jsonHelper;
 
     /**
+     * Instagram Helper
+     *
+     * @var \DevPhase\Feeds\Helper\FeconWidgetGetterInstagram 
+     */
+    protected $instagramHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context  $context
@@ -34,10 +41,12 @@ class Index extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Json\Helper\Data $jsonHelper
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \DevPhase\Feeds\Helper\FeconWidgetGetterInstagram $instagramHelper
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->jsonHelper = $jsonHelper;
+        $this->instagramHelper = $instagramHelper;
         parent::__construct($context);
     }
 
@@ -52,7 +61,7 @@ class Index extends \Magento\Framework\App\Action\Action
             return;
         }
         try {
-            $feed = FeconWidgetGetterInstagram::get();
+            $feed = $this->instagramHelper->get();
             return $this->jsonResponse($feed);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             return $this->jsonResponse($e->getMessage());
