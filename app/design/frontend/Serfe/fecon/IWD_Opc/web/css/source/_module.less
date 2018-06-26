@@ -66,7 +66,7 @@
     font-size: 18px;
     text-align: center;
     font-weight: 600;
-    color: @title_color;
+    color: @title_color_hover;
     margin-bottom: @default_margin_section;
   }
   .iwd_opc_alternative_wrapper {
@@ -150,6 +150,7 @@
   }
 
   .iwd_opc_universal_wrapper {
+    color: @general_color;
     margin-bottom: @default_margin;
     position: relative;
     width: 100%;
@@ -221,7 +222,7 @@
           text-overflow: ellipsis;
           &.selected {
             display: block;
-            background-color: inherit;
+            background-color: @color-white;
             padding-right: calc(@default_padding_right + 18px);
             &[data-value=''] {
               color: @general_color;
@@ -238,7 +239,7 @@
             top: calc(~'50% - 7px');
           }
           &:hover {
-            background-color: inherit;
+            background-color: @color-white;
           }
         }
       }
@@ -287,7 +288,7 @@
     textarea,
     .iwd_opc_hosted_field,
     &.iwd_opc_textarea {
-      background: inherit;
+      background: @color-white;
       border-radius: @default_border_radius;
       border: 1px solid @border_color;
       .padding-default;
@@ -374,7 +375,7 @@
             box-shadow: 0 0 3px 1px @focus_color;
           }
           &:checked ~ label:before {
-            background: @active_color;
+            background: @fecon-theme-color;
           }
           &.mage-error ~ label {
             &:before {
@@ -498,6 +499,7 @@
     color: @fecon_general_color;
     cursor: pointer;
     position: relative;
+    height: auto;
     &.with_angle:after {
       font-family: @font_family_awesome;
       font-size: 14px;
@@ -1514,12 +1516,13 @@
       }
     }
     button.iwd_opc_button.iwd_opc_place_order_button.active {
-      color: #fff;
-      background: @active_color;
+      color: @title_color_hover;
+      background: @fecon_general_color;
       font-weight: 600;
+      height: auto;
       &:hover, &:focus, &:active {
-        color: #fff;
-        background: @active_color_hover;
+        color: @fecon_general_color;
+        background: @title_color_hover;
       }
     }
   }
