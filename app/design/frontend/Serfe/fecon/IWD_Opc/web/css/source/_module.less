@@ -375,7 +375,7 @@
             box-shadow: 0 0 3px 1px @focus_color;
           }
           &:checked ~ label:before {
-            background: @active_color;
+            background: @fecon-theme-color;
           }
           &.mage-error ~ label {
             &:before {
@@ -1516,13 +1516,13 @@
       }
     }
     button.iwd_opc_button.iwd_opc_place_order_button.active {
-      color: @title_color;
-      background: @active_color;
+      color: @title_color_hover;
+      background: @fecon_general_color;
       font-weight: 600;
       height: auto;
       &:hover, &:focus, &:active {
-        color: @title_color_hover;
-        background: @active_color_hover;
+        color: @fecon_general_color;
+        background: @title_color_hover;
       }
     }
   }
