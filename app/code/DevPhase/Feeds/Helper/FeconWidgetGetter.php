@@ -35,7 +35,7 @@ class FeconWidgetGetter
         // Store new values to cache
         $this->feconCache->set($cid, $data, time() + self::CACHE_LIFETIME);
         // Return new values
-        return [];
+        return $data;
     }
 
     /**
