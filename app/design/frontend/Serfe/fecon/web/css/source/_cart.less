@@ -1,0 +1,109 @@
+body {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .cart-container {
+                        padding: 40px;
+                        box-shadow: 6px 10px 49px @color-gray-darken1;
+                        border: none;
+                        border-top: 4px solid @fecon-theme-color;
+                        border-radius: 4px;
+                        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+                        form.form-cart {
+                            .cart.table-wrapper {
+                                #shopping-cart-table {
+                                    thead {
+                                        tr {
+                                            th {
+                                                color: @color-white;
+                                            }
+                                        }
+                                    }
+                                    tbody.cart.item {
+                                        tr.item-info {
+                                            td.col.item {
+                                                a.product-item-photo {
+                                                    span.product-image-container {
+                                                        background: transparent;
+                                                        border: none;
+                                                    }
+                                                }
+                                                .product-item-details {
+                                                    .product-item-name {
+                                                        a {
+                                                           color: @fecon-theme-color;
+                                                        } 
+                                                    }
+                                                }
+                                            }
+                                            td.col.price {
+                                                .price-excluding-tax {
+                                                    .cart-price {
+                                                        .price {
+                                                            color: @color-white;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            td.col.subtotal {
+                                                .price-excluding-tax {
+                                                    .cart-price {
+                                                        .price {
+                                                            color: @fecon-theme-color;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        tr.item-actions {
+                                            .actions-toolbar {
+                                                a.action {
+                                                    &:before {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .cart-discount {
+                            .title {
+                                strong {
+                                    color: @fecon-theme-color;
+                                }
+                            }
+                            .content {
+                                form {
+                                    .fieldset {
+                                        .actions-toolbar {
+                                            .primary {
+                                                button {
+                                                    margin-left: 5px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .cart-summary {
+                            background-color: @color-white;
+                            .checkout-methods-items {
+                                li {
+                                    .action.multicheckout {
+                                        color: @fecon-theme-color;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
