@@ -1,0 +1,130 @@
+body.catalog-product-view {
+    font-family: 'Verb';
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .prev-next-products {
+                            .product-pop {
+                                &:before {
+                                    border-bottom-color: @fecon-theme-color;
+                                }
+                            }
+                        }
+                        .page-title-wrapper {
+                            .page-title {
+                                span {
+                                    font-size: 45px;
+                                }
+                            }
+                        }
+                        .product-reviews-summary {
+                            .reviews-actions {
+                                &:before {
+                                    letter-spacing: 9px;
+                                    font-size: 25px;
+                                }
+                            }
+                        }
+                        .product-info-price {
+                            position: relative;
+                            .price-final_price {
+                                padding-top: 105px;
+                            }
+                            .product-info-stock-sku {
+                                top: 30px;
+                                left: -80px;
+                                position: absolute;
+                                font-size: 18px;
+                                .product.attribute.sku {
+                                    text-align: left;
+                                }
+                            }
+                            .price-box {
+                                span.price-container {
+                                    .price-wrapper {
+                                        span.price {
+                                            font-family: 'Verb';
+                                            font-size: 45px;
+                                            font-weight: 600;
+                                            color: @color-black;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        margin-left: 5px;
+                                        .moved-add-to-links {
+                                            margin-bottom: 15px;
+                                            a {
+                                                color: @fecon-theme-color;
+                                                border: none;
+                                            }
+                                        }
+                                        .field.qty {
+                                            margin-bottom: 36px;
+                                            .qty-changer {
+                                                a {
+                                                    i {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .actions {
+                                            display: block;
+                                            button {
+                                                margin-bottom: 0;
+                                                font-size: 23px;
+                                                padding-top: 4px;
+                                                width: auto;
+                                                height: 55px;
+                                                font-weight: 600;
+                                                &:before {
+                                                    content: none;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-social-links {
+                            margin-left: 5px;
+                            padding-top: 0;
+                        }
+                    }
+                    .product.media {
+                        .gallery-placeholder {
+                            .fotorama-item {
+                                .fotorama__wrap {
+                                    .fotorama__stage {
+                                        background: transparent;
+                                        border: none;
+                                    }
+                                }    
+                            }
+                        }    
+                    }
+                    .product.info.detailed {
+                        .product.data.items {
+                            .data.item.title.active, .data.item.content {
+                                background-color: transparent;
+                                border: none;
+                                a {
+                                    background-color: transparent;
+                                    border-bottom: 4px solid @fecon-theme-color;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
