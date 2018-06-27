@@ -33,6 +33,7 @@ body.catalog-product-view {
                                 padding-top: 105px;
                             }
                             .product-info-stock-sku {
+                                color: @color-gray-lighten4;
                                 top: 30px;
                                 left: -80px;
                                 position: absolute;
@@ -60,6 +61,7 @@ body.catalog-product-view {
                                     .fieldset {
                                         margin-left: 5px;
                                         .moved-add-to-links {
+                                            margin-left: 40px;
                                             margin-bottom: 15px;
                                             a {
                                                 color: @fecon-theme-color;
@@ -68,6 +70,31 @@ body.catalog-product-view {
                                         }
                                         .field.qty {
                                             margin-bottom: 36px;
+                                            .control {
+                                                label.qty-label {
+                                                    margin-left: 20px;
+                                                    font-size: 18px;
+                                                    color: @color-gray-lighten4;
+                                                }
+                                                width: 150px;
+                                                margin-left: 0;
+                                                select {
+                                                    font-family: 'Verb';
+                                                    border: 1px solid @fecon-theme-color;
+                                                    color: @fecon-theme-color;
+                                                    width: 86px !important;
+                                                    font-size: 24px;
+                                                    font-weight: 600;
+                                                    padding-left: 7px;
+                                                    padding-top: 5px;
+                                                }
+                                                span.icon-down-chevron {
+                                                    pointer-events: none;
+                                                    background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 42%;
+                                                    padding: 15px 15px 16px 27px;
+                                                    margin-left: -45px;
+                                                }
+                                            }
                                             .qty-changer {
                                                 a {
                                                     i {
@@ -112,13 +139,58 @@ body.catalog-product-view {
                         }    
                     }
                     .product.info.detailed {
+                        position: relative;
+                        margin: auto;
+                        width: 55%;
+                        margin-left: 20%;
+                        .gray-line {
+                            border-top: 2px solid #ccc;
+                            width: 210%;
+                            top: 41px;
+                            left: -410px;
+                            position: absolute;
+                        }
+                        .product.data.items 
+                            > .item.title.active 
+                                > .switch, .product.data.items 
+                                    > .item.title.active 
+                                        > .switch:focus, .product.data.items 
+                                            > .item.title.active 
+                                                > .switch:hover {
+                            border-bottom: 4px solid @fecon-theme-color;
+                            
+                        }
                         .product.data.items {
-                            .data.item.title.active, .data.item.content {
+                            .data.item.title, .data.item.content {
                                 background-color: transparent;
                                 border: none;
                                 a {
+                                    color: @color-black;
+                                    font-size: 26px;
                                     background-color: transparent;
-                                    border-bottom: 4px solid @fecon-theme-color;
+                                }
+                                .block.review-add {
+                                    .block-content {
+                                        form {
+                                            .fieldset {
+                                                .legend.review-legend {
+                                                    font-size: 18px;
+                                                    color: @fecon-theme-color;
+                                                    strong {
+                                                        margin-left: 10px;
+                                                        display: inline-block;
+                                                    }
+                                                }
+                                            }
+                                            .actions-toolbar {
+                                                .actions-primary, .primary {
+                                                    button {
+                                                        height: 45px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

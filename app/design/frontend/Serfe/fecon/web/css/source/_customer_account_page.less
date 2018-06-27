@@ -1,4 +1,9 @@
-.customer-account-login, .customer-account-create, .customer-account-forgotpassword {
+.customer-account-login,
+.customer-account-create,
+.customer-account-forgotpassword,
+.customer-address-form,
+.customer-account-edit,
+.newsletter-manage-index {
     .page-wrapper {
         #maincontent {
             .page-title-wrapper {
@@ -8,7 +13,12 @@
             }
             .columns {
                 .column.main {
-                    .login-container, .form-create-account, .password.forget {
+                    .login-container,
+                    .form-create-account,
+                    .password.forget,
+                    .form-address-edit,
+                    .form-edit-account,
+                    .form-newsletter-manage {
                         box-shadow: 6px 10px 49px @color-gray-darken1;
                         border: none;
                         border-top: 4px solid @fecon-theme-color;
@@ -25,6 +35,11 @@
                                 .action.remind {
                                     color: @fecon-theme-color;
                                 }    
+                            }
+                        }
+                        .actions-toolbar {
+                            button {
+                                height: 45px;
                             }
                         }
                     }

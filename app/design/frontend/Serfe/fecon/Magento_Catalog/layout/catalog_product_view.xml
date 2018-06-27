@@ -5,7 +5,12 @@
     </head>
     <body>
         <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template" name="product.instafeed" template="Magento_Catalog::instafeed.phtml" before="product.info.details" />
+            <referenceContainer name="sidebar.additional" remove="true" />
+            <block class="Magento\Catalog\Block\Product\ProductList\Related" name="related-carousel" template="Magento_Catalog::product/view/related-products.phtml">
+                <arguments>
+                    <argument name="type" xsi:type="string">related</argument>
+                </arguments>
+            </block>
         </referenceContainer>
         <referenceBlock name="product.info.details">  
             <referenceBlock name="product.info.description">
@@ -33,11 +38,7 @@
                     <argument name="title" translate="true" xsi:type="string">Applications</argument>
                 </arguments>
             </block>
-            <block class="Magento\Catalog\Block\Product\ProductList\Related" name="related-carousel" template="Magento_Catalog::product/view/related-products.phtml">
-                <arguments>
-                    <argument name="type" xsi:type="string">related</argument>
-                </arguments>
-            </block>
+            
             <block class="Magento\Catalog\Block\Product\View" name="related-carousel.tab" as="deliveryinfo" template="Magento_Catalog::product/view/related-products-wrapper.phtml" group="detailed_info" >
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">Compare Products</argument>
