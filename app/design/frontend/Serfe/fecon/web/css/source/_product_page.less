@@ -1,5 +1,6 @@
 body.catalog-product-view {
     overflow-x: hidden;
+    position: fixed;
     font-family: @font-family-name__verb;
     .page-wrapper {
         main#maincontent {
@@ -20,9 +21,12 @@ body.catalog-product-view {
                     }
                     .product-info-main {
                         .prev-next-products {
-                            .product-pop {
-                                &:before {
-                                    border-bottom-color: @fecon-theme-color;
+                            .product-nav {
+                                .product-pop.border-top-color {
+                                    border-color: @fecon-theme-color !important; /* Override another property with !important*/
+                                    &:before {
+                                        border-bottom-color: @fecon-theme-color;
+                                    }
                                 }
                             }
                         }
@@ -106,7 +110,7 @@ body.catalog-product-view {
                                                 span.icon-down-chevron {
                                                     pointer-events: none;
                                                     background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 42%;
-                                                    padding: 15px 15px 16px 27px;
+                                                    padding: 15px 15px 15px 27px;
                                                     margin-left: -45px;
                                                 }
                                             }
@@ -184,6 +188,12 @@ body.catalog-product-view {
                                     color: @color-black;
                                     font-size: 26px;
                                     background-color: transparent;
+                                    span.counter {
+                                        color: @color-black;
+                                        &:before, &:after {
+                                            color: @fecon-theme-color;
+                                        }
+                                    }
                                 }
                                 .block.review-add {
                                     .block-content {
