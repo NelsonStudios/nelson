@@ -1,10 +1,23 @@
 body.catalog-product-view {
     overflow-x: hidden;
-    font-family: 'Verb';
+    font-family: @font-family-name__verb;
     .page-wrapper {
         main#maincontent {
             .columns {
                 .column.main {
+                    .product.media {
+                        .gallery-placeholder {
+                            .fotorama-item {
+                                .fotorama__wrap {
+                                    .fotorama__stage {
+                                        .fotorama__fullscreen-icon {
+                                            color: @fecon-theme-color;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     .product-info-main {
                         .prev-next-products {
                             .product-pop {
@@ -48,7 +61,7 @@ body.catalog-product-view {
                                 span.price-container {
                                     .price-wrapper {
                                         span.price {
-                                            font-family: 'Verb';
+                                            font-family: @font-family-name__verb;
                                             font-size: 45px;
                                             font-weight: 600;
                                             color: @color-black;
@@ -81,7 +94,7 @@ body.catalog-product-view {
                                                 width: 150px;
                                                 margin-left: 0;
                                                 select {
-                                                    font-family: 'Verb';
+                                                    font-family: @font-family-name__verb;
                                                     border: 1px solid @fecon-theme-color;
                                                     color: @fecon-theme-color;
                                                     width: 86px !important;
@@ -237,7 +250,7 @@ body.catalog-product-view {
                                                                 margin-top: 15px;
                                                                 .product-item-name {
                                                                     a.product-item-link {
-                                                                        font-family: 'Verb';
+                                                                        font-family: @font-family-name__verb;
                                                                         font-size: 27px;
                                                                         color: @color-black;
                                                                     }
@@ -246,7 +259,7 @@ body.catalog-product-view {
                                                                     margin-top: 0;
                                                                     .price-wrapper {
                                                                         span.price {
-                                                                            font-family: 'Verb';
+                                                                            font-family: @font-family-name__verb;
                                                                             font-size: 28px;
                                                                         }
                                                                     }
