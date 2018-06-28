@@ -1,4 +1,4 @@
-<div class="shop-products-section">
+<div class="related-products-section">
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
@@ -17,7 +17,7 @@
             'owl.carousel/owl.carousel.min'
           ], function ($) {
             $("#new_product .owl-carousel").owlCarousel({
-              autoplay: true,
+              autoplay: false,
               autoplayTimeout: 5000,
               autoplayHoverPause: true,
               loop: true,
@@ -28,13 +28,16 @@
               dots: false,
               responsive: {
                 0: {
-                  items:2
+                  items:1
+                },
+                540: {
+                  items:1
                 },
                 640: {
-                  items:3
+                  items:2
                 },
                 768: {
-                  items:3
+                  items:2
                 },
                 992: {
                   items:4

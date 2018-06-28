@@ -14,6 +14,7 @@ body.catalog-product-view {
                         }
                         .page-title-wrapper {
                             .page-title {
+                                padding-bottom: 15px;
                                 span {
                                     font-size: 45px;
                                 }
@@ -142,12 +143,12 @@ body.catalog-product-view {
                         position: relative;
                         margin: auto;
                         width: 55%;
-                        margin-left: 20%;
+                        margin-left: 24%;
                         .gray-line {
                             border-top: 2px solid #ccc;
-                            width: 210%;
+                            width: 173%;
                             top: 41px;
-                            left: -410px;
+                            left: -325px;
                             position: absolute;
                         }
                         .product.data.items 
@@ -165,6 +166,7 @@ body.catalog-product-view {
                                 background-color: transparent;
                                 border: none;
                                 a {
+                                    border-top: none;
                                     color: @color-black;
                                     font-size: 26px;
                                     background-color: transparent;
@@ -186,6 +188,96 @@ body.catalog-product-view {
                                                 .actions-primary, .primary {
                                                     button {
                                                         height: 45px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .related-products-section {
+                        .container-fluid {
+                            display: block;
+                            text-align: center;
+                            .filterproduct-title {
+                                span {
+                                    position: relative;
+                                    text-transform: uppercase;
+                                    color: black;
+                                    font-size: 44px;
+                                    font-weight: 600;
+                                    &:before,
+                                    &:after {
+                                      content: "";
+                                      position: absolute;
+                                      height: 14px;
+                                      border-bottom: 3px solid @fecon-theme-color;
+                                      top: 8px;
+                                      width: 459px;
+                                      left: 479px;
+                                    }
+                                    &:before {
+                                      width: 461px;
+                                      left: -488px;
+                                    }
+                                }
+                            }
+                            .owl-bottom-narrow {
+                                .products-grid {
+                                    .filterproducts {
+                                        .owl-stage-outer {
+                                            .owl-stage {
+                                                .owl-item {
+                                                    .product-item {
+                                                        .product-item-info {
+                                                            .product-item-details {
+                                                                margin-top: 15px;
+                                                                .product-item-name {
+                                                                    a.product-item-link {
+                                                                        font-family: 'Verb';
+                                                                        font-size: 27px;
+                                                                        color: @color-black;
+                                                                    }
+                                                                }
+                                                                .price-final_price {
+                                                                    margin-top: 0;
+                                                                    .price-wrapper {
+                                                                        span.price {
+                                                                            font-family: 'Verb';
+                                                                            font-size: 28px;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                .product-item-inner {
+                                                                    .product-item-actions {
+                                                                        .actions-primary {
+                                                                            form {
+                                                                                button {
+                                                                                    height: 55px;
+                                                                                    width: 198px;
+                                                                                    font-size: 22px;
+                                                                                    font-weight: 600;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            background: transparent;
+                                                            .product-item-photo {
+                                                                width: 87%;
+                                                                padding: 0px 33px 0px 33px;
+                                                                margin: 0 auto;
+                                                                border: 1px solid @color-gray-lighten1;
+                                                                a {
+                                                                    img.hover_image {
+                                                                        padding: 0px 33px 0px 33px;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
