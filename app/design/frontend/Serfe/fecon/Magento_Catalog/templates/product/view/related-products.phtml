@@ -6,8 +6,8 @@
         <div id="new_product" class="owl-bottom-narrow">
           <?php 
             echo $this->getLayout()
-              ->createBlock('Smartwave\Filterproducts\Block\Home\LatestList')
-              ->setTemplate('custom_owl_list.phtml')
+              ->createBlock('Serfe\Filterproducts\Block\Home\RelatedList')
+              ->setTemplate('custom_owl_related_list.phtml')
               ->toHtml();
             ?>
         </div>

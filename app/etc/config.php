@@ -127,6 +127,7 @@ return array (
     'Mageplaza_Core' => 1,
     'Mageplaza_LayeredNavigation' => 1,
     'Serfe_BackendConfig' => 1,
+    'Serfe_Filterproducts' => 1,
     'Serfe_FlatRateMinimumAmount' => 1,
     'Smartwave_Porto' => 1,
     'Serfe_Quote' => 1,

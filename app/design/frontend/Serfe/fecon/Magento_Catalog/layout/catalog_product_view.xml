@@ -39,11 +39,11 @@
                 </arguments>
             </block>
             
-            <block class="Magento\Catalog\Block\Product\View" name="related-carousel.tab" as="deliveryinfo" template="Magento_Catalog::product/view/related-products-wrapper.phtml" group="detailed_info" >
+            <!-- <block class="Magento\Catalog\Block\Product\View" name="related-carousel.tab" as="deliveryinfo" template="Magento_Catalog::product/view/related-products-wrapper.phtml" group="detailed_info" >
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">Compare Products</argument>
                 </arguments>
-            </block>
+            </block> -->
         </referenceBlock>
     </body>
 </page>
