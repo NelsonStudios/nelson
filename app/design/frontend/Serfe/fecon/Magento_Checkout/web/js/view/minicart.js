@@ -84,10 +84,6 @@ define([
                 $('.update-cart-item').show();
             }
         });
-        $('.action.delete').on('click', function() {
-            this.closeMinicart();
-        });
-
     }
 
     miniCart.on('dropdowndialogopen', function () {

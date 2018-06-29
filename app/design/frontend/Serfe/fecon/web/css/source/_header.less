@@ -102,6 +102,17 @@
                     }
                     color: @color-white;
                 }
+                li.customer-welcome {
+                    span {
+                        cursor: pointer;
+                    }
+                    .customer-menu {
+                        ul.header.links {
+                            border-top: 3px solid #00aa73;
+                            margin-top: 4px;
+                        }
+                    }
+                }
                 li:last-child:not(.toplink) {
                     display: none;
                 }
@@ -170,6 +181,17 @@
                         }
                         li:first-child {
                             display: none;
+                        }
+                        li.fullwidth.parent {
+                            a {
+                                &:after {
+                                    content: '';
+                                    background: url('../images/down-chevron-white.png') no-repeat 49% 45%;
+                                    width: 24px;
+                                    height: 50px;
+                                    margin-top: -4px;
+                                }
+                            }
                         }
                         li {
                             a {
