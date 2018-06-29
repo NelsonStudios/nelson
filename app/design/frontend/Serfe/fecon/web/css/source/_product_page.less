@@ -1,3 +1,4 @@
+html { overflow-x: hidden; }
 body.catalog-product-view {
     overflow-x: hidden;
     font-family: @font-family-name__verb;
@@ -20,8 +21,14 @@ body.catalog-product-view {
                     }
                     .product-info-main {
                         .prev-next-products {
+                            margin-right: 30px;
+                            margin-top: 13px;
+                            .product-prev {
+                                padding-right: 15px;
+                            }
                             .product-nav {
-                                .product-pop.border-top-color {
+                                .product-pop.theme-border-color {
+                                    z-index: 99;
                                     border-color: @fecon-theme-color !important; /* Override another property with !important*/
                                     &:before {
                                         border-bottom-color: @fecon-theme-color;
@@ -39,9 +46,37 @@ body.catalog-product-view {
                         }
                         .product-reviews-summary {
                             .reviews-actions {
+                                .action.view {
+                                    padding-left: 15px;
+                                }
                                 &:before {
                                     letter-spacing: 9px;
                                     font-size: 25px;
+                                }
+                            }
+                            .rating-summary {
+                                margin-right: 0px;
+                                width: 160px;
+                                .rating-result {
+                                    height: 23px;
+                                    width: 100%;
+                                    &:before {
+                                        font-size: 25px;
+                                        height: 17px;
+                                        margin-top: 5px;
+                                        margin-left: 1px;
+                                        letter-spacing: 9px;
+                                    }
+                                    span {
+                                        &:before {
+                                            color: @fecon-theme-color;
+                                            font-size: 25px;
+                                            height: 17px;
+                                            margin-top: 5px;
+                                            margin-left: 1px;
+                                            letter-spacing: 9px;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -108,7 +143,7 @@ body.catalog-product-view {
                                                 }
                                                 span.icon-down-chevron {
                                                     pointer-events: none;
-                                                    background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 42%;
+                                                    background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 45%;
                                                     padding: 15px 15px 15px 27px;
                                                     margin-left: -45px;
                                                 }
@@ -159,11 +194,11 @@ body.catalog-product-view {
                     .product.info.detailed {
                         position: relative;
                         margin: auto;
-                        width: 55%;
+                        width: 65%;
                         margin-left: 24%;
                         .gray-line {
-                            border-top: 2px solid #ccc;
-                            width: 173%;
+                            border-top: 2px solid @color-gray-lighten5;
+                            width: 146%;
                             top: 41px;
                             left: -325px;
                             position: absolute;
@@ -211,96 +246,6 @@ body.catalog-product-view {
                                                 .actions-primary, .primary {
                                                     button {
                                                         height: 45px;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .related-products-section {
-                        .container-fluid {
-                            display: block;
-                            text-align: center;
-                            .filterproduct-title {
-                                span {
-                                    position: relative;
-                                    text-transform: uppercase;
-                                    color: black;
-                                    font-size: 44px;
-                                    font-weight: 600;
-                                    &:before,
-                                    &:after {
-                                      content: "";
-                                      position: absolute;
-                                      height: 14px;
-                                      border-bottom: 3px solid @fecon-theme-color;
-                                      top: 8px;
-                                      width: 459px;
-                                      left: 479px;
-                                    }
-                                    &:before {
-                                      width: 461px;
-                                      left: -488px;
-                                    }
-                                }
-                            }
-                            .owl-bottom-narrow {
-                                .products-grid {
-                                    .filterproducts {
-                                        .owl-stage-outer {
-                                            .owl-stage {
-                                                .owl-item {
-                                                    .product-item {
-                                                        .product-item-info {
-                                                            .product-item-details {
-                                                                margin-top: 15px;
-                                                                .product-item-name {
-                                                                    a.product-item-link {
-                                                                        font-family: @font-family-name__verb;
-                                                                        font-size: 27px;
-                                                                        color: @color-black;
-                                                                    }
-                                                                }
-                                                                .price-final_price {
-                                                                    margin-top: 0;
-                                                                    .price-wrapper {
-                                                                        span.price {
-                                                                            font-family: @font-family-name__verb;
-                                                                            font-size: 28px;
-                                                                        }
-                                                                    }
-                                                                }
-                                                                .product-item-inner {
-                                                                    .product-item-actions {
-                                                                        .actions-primary {
-                                                                            form {
-                                                                                button {
-                                                                                    height: 55px;
-                                                                                    width: 198px;
-                                                                                    font-size: 22px;
-                                                                                    font-weight: 600;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                            background: transparent;
-                                                            .product-item-photo {
-                                                                width: 87%;
-                                                                padding: 0px 33px 0px 33px;
-                                                                margin: 0 auto;
-                                                                border: 1px solid @color-gray-lighten1;
-                                                                a {
-                                                                    img.hover_image {
-                                                                        padding: 0px 33px 0px 33px;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
                                                     }
                                                 }
                                             }

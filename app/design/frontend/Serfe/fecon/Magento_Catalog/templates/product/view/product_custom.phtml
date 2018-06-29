@@ -89,8 +89,14 @@ require([
     'jquery'
 ], function ($) {
     $(document).ready(function() {
-        $(".reviews-actions").after($(".review-content:last").text());
-        console.log($(".review-content:last").text());
+        $(".reviews-actions").after($("li.review-item:last div.review-content").text());
+        var checkExist = setInterval(function() {
+           if ($("li.review-item:last div.review-content").length) {
+              console.log("Exists!");
+              console.log($("li.review-item:last div.review-content").text());
+              clearInterval(checkExist);
+           }
+        }, 100); // check every 100ms
     });
 });
 </script>
