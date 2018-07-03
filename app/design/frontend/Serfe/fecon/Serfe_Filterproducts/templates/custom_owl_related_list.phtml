@@ -42,9 +42,7 @@ if($move_actions == null) {
 }
 $lazy_owl = $this->getData("lazy_owl");
 ?>
-<?php if (!$_productCollection->count()): ?>
-    <div class="message info empty"><div><?php echo __('We can\'t find products matching the selection.') ?></div></div>
-<?php else: ?>
+<?php if ($_productCollection->count()): ?>
     <?php
     $viewMode = 'grid';
     $image = 'category_page_grid';
@@ -268,4 +266,13 @@ $lazy_owl = $this->getData("lazy_owl");
         }
         </script>
     <?php endif; ?>
+    <script type="text/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        $(document).ready(function() {
+            $('.related-products-title').removeClass('hide');
+        });
+    });
+    </script>
 <?php endif; ?>
