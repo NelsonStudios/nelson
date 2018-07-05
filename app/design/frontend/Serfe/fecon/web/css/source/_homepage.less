@@ -26,6 +26,18 @@ body { overflow-x: hidden; }
             color: @color-green-dark;
             font-size: 86px;
         }
+        .owl-stage-outer {
+            .owl-stage {
+                .owl-item {
+                    .item {
+                        filter: saturate(1.2);
+                        .black-overlay {
+                            background: rgba(0, 0, 0, 0.52);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     #banner-slider-demo-1 {
