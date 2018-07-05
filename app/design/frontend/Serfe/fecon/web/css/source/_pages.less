@@ -1,0 +1,93 @@
+body.catalogsearch-result-index {
+    .page-wrapper {
+        main#maincontent {
+            .page-title-wrapper {
+                .page-title {
+                    color: @fecon-theme-color;
+                } 
+            }
+        }
+    }
+}
+body {
+    background: url('../images/background_fecon.png') repeat;
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    width: 100%;
+                    #layer-product-list {
+                        .toolbar-products {
+                            .modes {
+                                border-left: 1px solid @color-gray-lighten3;
+                                padding-left: 20px;
+                                .mode-grid {
+                                    margin-right: 20px;
+                                }
+                                .mode-grid, .mode-list {
+                                    &:before {
+                                        font-size: 22px;
+                                        padding-right: 22px;
+                                    }
+                                }
+                                .modes-mode.active {
+                                    color: @minicart-green;
+                                }
+                            }
+                            .toolbar-sorter {
+                                label.sorter-label {
+                                    font-size: 22px;
+                                    font-weight: 500;
+                                    text-transform: uppercase;
+                                    color: @color-gray-lighten3;
+                                    &:after {
+                                        content: ':';
+                                    }
+                                }
+                            }
+                            select.sorter-options, select.limiter-options {
+                                font-size: 22px;
+                                background: transparent url('../images/down-chevron-green.png') no-repeat 98% 48%;
+                                border: none;
+                                color: @minicart-green;
+                                &:focus {
+                                    border: none;
+                                    background: @color-soft-black url('../images/down-chevron-green.png') no-repeat 98% 48%;
+                                }
+                                option {
+                                    color: @color-white;
+                                }
+                            }
+                            .field.limiter {
+                                label {
+                                    font-size: 22px;
+                                    font-weight: 500;
+                                    text-transform: uppercase;
+                                    color: @color-gray-lighten3;
+                                    &:after {
+                                        content: ':';
+                                    }
+                                }
+                                .control {
+                                    select.limiter-options {
+                                        padding-right: 30px;
+                                        padding-top: 3px;
+                                    }
+                                }
+                            }
+                        }
+                        .products-grid {
+                            .product-items {
+                                li.product-item {
+                                    .product-item-info {
+                                        background-color: transparent;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }    
+        }
+    }
+}

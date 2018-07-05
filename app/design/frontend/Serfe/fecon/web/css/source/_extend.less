@@ -1,4 +1,42 @@
 @import "_mixins.less";
+@import "_buttons.less";
 @import "_header.less";
+@import "_minicart.less";
 @import "_breadcrumbs.less";
 @import "_instafeed.less";
+@import "_checkout_page.less";
+@import "_cart.less";
+@import "_homepage.less";
+@import "_pages.less";
+@import "_product_page.less";
+@import "_customer_account_page.less";
+@import "_category_page.less";
+@import "_footer.less";
+@import "_modals.less";
+@import "_carousel.less";
+@import "responsive/_header.less";
+@import "responsive/_homepage.less";
+@import "responsive/_minicart.less";
+@import "responsive/_breadcrumbs.less";
+@import "responsive/_pages.less";
+@import "responsive/_product_page.less";
+@import "responsive/_footer.less";
+
+.green-light-background {
+    background: @color-green-light;
+    color: @color-white;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.clearfix {
+    overflow: auto;
+
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}

@@ -36,12 +36,6 @@
             <!-- /ko -->
         </div>
 
-        <!-- ko if: getCartParam('possible_onepage_checkout') -->
-            <!-- ko foreach: getRegion('subtotalContainer') -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
-            <!-- /ko -->
-        <!-- /ko -->
-
         <!-- ko foreach: getRegion('extraInfo') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->
@@ -89,6 +83,13 @@
             </div>
         <!-- /ko -->
     <!-- /ko -->
+
+    <!-- ko if: getCartParam('possible_onepage_checkout') -->
+        <!-- ko foreach: getRegion('subtotalContainer') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    <!-- /ko -->
+
 
     <!-- ko if: getCartParam('summary_count') -->
     <div class="actions">

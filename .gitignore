@@ -75,3 +75,6 @@ atlassian*
 
 ### IGNORE DOCKER COMPOSE OVERRIDE ###
 /docker-composer.override.yml
+
+### IGNORE CACHE FILES FOR INSTAGRAM AND YOUTUBE WIDGETS ###
+/pub/*.json

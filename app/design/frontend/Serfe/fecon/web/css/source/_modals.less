@@ -1,0 +1,31 @@
+.modals-wrapper {
+    .modal-popup.confirm {
+        .modal-inner-wrap {
+            .modal-header {
+                .action-close {
+                    &:before {
+                        color: @fecon-theme-color;
+                        font-size: 18px;
+                    }
+                }
+            }
+            .modal-content {
+                font-size: 18px;
+            }
+            .modal-footer {
+                .action-primary {
+                    color: @color-gray-darken9;
+                    &:hover {
+                        color: @color-white;
+                    }
+                }
+                .action-secondary {
+                    &:hover {
+                        background: @color-gray-lighten2;
+                        border-color: @color-gray-lighten2;
+                    }
+                }   
+            }
+        }
+    }
+}

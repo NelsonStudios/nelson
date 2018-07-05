@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe151bef14f0531a8e7af06a3b70695e",
+    "content-hash": "721e50c2a6c718f8b20e491307e76aaa",
     "packages": [
         {
             "name": "amasty/aminvisiblecaptcha",
@@ -58,6 +58,49 @@
                 "Commercial"
             ],
             "description": "Amasty Base"
+        },
+        {
+            "name": "andreyco/instagram",
+            "version": "v3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Andreyco/Instagram-for-PHP.git",
+                "reference": "4f6e3ca219938f8a1473f83e00574661b70a8292"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Andreyco/Instagram-for-PHP/zipball/4f6e3ca219938f8a1473f83e00574661b70a8292",
+                "reference": "4f6e3ca219938f8a1473f83e00574661b70a8292",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Andreyco\\Instagram\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-4-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Andrej Badin",
+                    "email": "contact@andrejbadin.com",
+                    "homepage": "http://andrejbadin.com"
+                }
+            ],
+            "description": "An easy-to-use PHP Class for accessing Instagram's API.",
+            "homepage": "https://github.com/Andreyco/Instagram",
+            "keywords": [
+                "api",
+                "instagram"
+            ],
+            "time": "2014-07-08T19:09:06+00:00"
         },
         {
             "name": "braintree/braintree_php",

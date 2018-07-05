@@ -12,6 +12,9 @@
 <div data-block="minicart" class="minicart-wrapper">
     <a class="action showcart" href="<?php echo $block->getShoppingCartUrl(); ?>"
        data-bind="scope: 'minicart_content'">
+        <div class="shopping-cart">
+            <span class="cart-img"></span>
+        </div>
         <span class="text"><?php echo __('My Cart'); ?></span>
         <span class="counter qty empty"
               data-bind="css: { empty: !!getCartParam('summary_count') == false }, blockLoader: isLoading">
