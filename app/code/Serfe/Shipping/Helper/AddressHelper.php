@@ -15,7 +15,7 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Customer\Model\AddressFactory 
      */
     protected $addressFactory;
-    
+
     /**
      *
      * @var \Magento\Customer\Api\AddressRepositoryInterface 
@@ -48,16 +48,15 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param boolean $isShipping
      */
     public function createAddressFromQuote(
-        \Magento\Quote\Model\Quote\Address $quoteAddress,
-        $customerId,
-        $isShipping = true
-    ) {
+    \Magento\Quote\Model\Quote\Address $quoteAddress, $customerId, $isShipping = true
+    )
+    {
         $address = $this->addressFactory->create();
         $addressData = $this->getAddressData($quoteAddress);
 
         $address->setCustomerId($customerId);
         $address->addData($addressData);
-        
+
         if ($isShipping) {
             $address->setIsDefaultShipping('1');
         } else {
@@ -67,7 +66,7 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $address->save();
     }
-    
+
     /**
      * Transform quote's address into array
      *
@@ -86,7 +85,7 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'company' => $quoteAddress->getCompany(),
             'street' => $quoteAddress->getStreet()
         ];
-        
+
         return $addressData;
     }
 }

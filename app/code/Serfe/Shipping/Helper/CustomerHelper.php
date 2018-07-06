@@ -9,37 +9,37 @@ namespace Serfe\Shipping\Helper;
  */
 class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
+
     /**
      *
      * @var \Magento\Customer\Model\Session 
      */
-    protected  $session;
-    
-    
+    protected $session;
+
     /**
      *
      * @var type 
      */
     protected $storeManager;
-    
+
     /**
      *
      * @var type 
      */
     protected $customerFactory;
-    
+
     /**
      *
      * @var type 
      */
     protected $mathRandom;
-    
+
     /**
      *
      * @var type 
      */
     protected $encryptor;
-    
+
     /**
      *
      * @var type 
@@ -75,7 +75,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         parent::__construct($context);
     }
-    
+
     /**
      * Autologin a user
      *
@@ -89,7 +89,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if (!$this->session->isLoggedIn()) {
             $login = $this->loginCurrentUser($quote, $customerEmail);
         }
-        
+
         return $login;
     }
 
@@ -119,10 +119,10 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->session->setCustomerAsLoggedIn($customer);
             $login = true;
         }
-        
+
         return $login;
     }
-    
+
     /**
      * Load customer by email
      *
@@ -151,10 +151,10 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected function createUserFromQuote(\Magento\Quote\Model\Quote $quote, $customerEmail)
     {
         // Get Website ID
-        $websiteId  = $this->storeManager->getWebsite()->getWebsiteId();
+        $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
         $customerData = $this->getUserData($quote, $customerEmail);
         // Instantiate object (this is the most important part)
-        $customer   = $this->customerFactory->create();
+        $customer = $this->customerFactory->create();
         $customer->setWebsiteId($websiteId);
         // Preparing data for new customer
         $customer->addData($customerData);
@@ -167,7 +167,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $newCustomer;
     }
-    
+
     /**
      * Get user data
      *
@@ -182,9 +182,9 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'firstname' => $quote->getShippingAddress()->getFirstname(),
             'lastname' => $quote->getShippingAddress()->getLastname(),
             'password' => $this->mathRandom->getRandomString(15),
-            'group_id' => 4
+            'group_id' => 4 //Autoregistered users
         ];
-        
+
         return $customerData;
     }
 }
