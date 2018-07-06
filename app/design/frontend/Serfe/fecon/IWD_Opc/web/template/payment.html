@@ -64,6 +64,11 @@
                         class="iwd_opc_button active iwd_opc_place_order_button">
                     <!-- ko i18n: 'Place Order' --><!-- /ko -->
                 </button>
+                <button type="button"
+                        data-bind="attr :{'title': $t('Place III')}, click: requestQuote, enable: isPlaceOrderActionAllowed"
+                        class="iwd_opc_button active iwd_opc_place_order_button">
+                    <!-- ko i18n: 'Place IIIrder' --><!-- /ko -->
+                </button>
             </div>
             <!-- ko if: isShowSubscribe -->
             <div class="fieldset">

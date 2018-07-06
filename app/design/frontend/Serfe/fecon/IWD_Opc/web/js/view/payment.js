@@ -253,6 +253,17 @@ define(
             clickNativePlaceOrder: function () {
                 this.isPlaceOrderActionAllowed(true);
                 $('.payment-method._active button[type=submit].checkout').click();
+            },
+            requestQuote: function (){
+                var data = {
+                    email: quote.guestEmail
+                };
+                $.ajax({
+                    url: '/preorder/order',
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json'
+                });
             }
         });
     }
