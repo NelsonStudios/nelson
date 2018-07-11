@@ -6,7 +6,15 @@
 body { overflow-x: hidden; }
 
 .cms-index-index {
-
+    .page-wrapper {
+        .page-main {
+            .columns {
+                .column.main {
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
     #banner-slider-demo-1,
     .featured-callout {
 
@@ -257,7 +265,7 @@ body { overflow-x: hidden; }
         height: 133px;
         position: relative;
         .sf-strip-lines {
-            background: linear-gradient(to right, #2a2620, transparent, #2a2620 200%), repeating-linear-gradient(-72deg, #222222, #222222 22px, #5f5f5f 23px, #585858 24px);
+            background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%), repeating-linear-gradient(-72deg, @color-soft-black, @color-soft-black 22px, #5f5f5f 23px, @color-gray-darken10 24px);
             height: 132px;
             width: 45.5%;
         }
@@ -276,9 +284,54 @@ body { overflow-x: hidden; }
             font-size: 70px;
             text-transform: uppercase;
             font-weight: 600;
-            border-bottom: 6px solid #00aa73;
+            border-bottom: 6px solid @fecon-theme-color;
             width: 455px;
             margin-left: 152px;
+        }
+    }
+
+    .pre-footer-container {
+        background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%), linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%), repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+        height: 550px;
+        background-color: @color-gray-darken5;
+        position: relative;
+        .pf-img-left {
+            background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('/media/wysiwyg/homepage/pre-footer-img-left_h400.png') center center no-repeat;
+            padding: 0 451px 400px 400px;
+            position: absolute;
+            top: 75px;
+            left: 80px;
+            span.title-link {
+                &:before {
+                    content: 'view attachments';
+                }
+            }
+        }
+        .pf-img-right {
+            background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('/media/wysiwyg/homepage/pre-footer-img-right_h400.png') center center no-repeat;
+            padding: 0 353px 400px 497px;
+            position: absolute;
+            top: 75px;
+            right: 90px;
+            span.title-link {
+                &:before {
+                    content: 'product registration';
+                }
+            }
+        }
+
+        .pf-img-left,
+        .pf-img-right {
+            border: 1px solid @color-white;
+            span.title-link {
+                text-transform: uppercase;
+                font-size: 42px;
+                font-weight: 600;
+                color: @color-white;
+                position: absolute;
+                top: 170px;
+                left: 195px;
+            }
         }
     }
 }
