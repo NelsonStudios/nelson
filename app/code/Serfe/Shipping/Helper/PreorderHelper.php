@@ -15,16 +15,20 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $preorderFactory;
 
     protected $preorderRepository;
+    
+    protected $preorderCollectionFactory;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Serfe\Shipping\Model\PreorderFactory $preorderFactory,
-        \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository
+        \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository,
+        \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
     ) {
         $this->customerSession = $customerSession;
         $this->preorderFactory = $preorderFactory;
         $this->preorderRepository = $preorderRepository;
+        $this->preorderCollectionFactory = $preorderCollectionFactory;
 
         parent::__construct($context);
     }
@@ -38,7 +42,6 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             $created = $this->preorderRepository->save($preorder);
         } catch (\Exception $exc) {
-//            echo $exc->getTraceAsString();
             $this->_logger->error($exc->getMessage());
             $created = false;
         }
@@ -63,5 +66,50 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         ];
         
         return $preorderData;
+    }
+
+    public function getShippingPrice($shippingCode)
+    {
+        $price = '0.00';
+        if ($this->customerSession->isLoggedIn() && $this->hasPreorderAvailable($shippingCode)) {
+            $preorderId = $this->getPreorderId($shippingCode);
+            $preorder = $this->preorderRepository->getById($preorderId);
+            $price = $preorder->getShippingPrice();
+        }
+        
+        return $price;
+    }
+    
+    public function hasPreorderAvailable($shippingCode = '')
+    {
+        $hasPreorderAvailable = false;
+        $customerId = $this->customerSession->getCustomer()->getId();
+        $preorderCollection = $this->preorderCollectionFactory->create();
+        $preorderCollection
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
+        if ($shippingCode) {
+            $preorderCollection->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
+        }
+        $preorderCollectionSize = $preorderCollection->getSize();
+
+        if ($preorderCollectionSize) {
+            $hasPreorderAvailable = true;
+        }
+        
+        return $hasPreorderAvailable;
+    }   
+    
+    protected function getPreorderId($shippingCode)
+    {
+        $customerId = $this->customerSession->getCustomer()->getId();
+        $preorderCollection = $this->preorderCollectionFactory->create();
+        $preorder = $preorderCollection
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1)
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
+            ->getLastItem();
+        
+        return $preorder->getId();
     }
 }
