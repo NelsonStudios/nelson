@@ -12,6 +12,14 @@ body.blog-search-index {
             .columns {
                 .column.main {
                     .post-view, .post-list-wrapper {
+                        box-shadow: 6px 10px 49px @color-gray-darken1;
+                        border: none;
+                        border-top: 4px solid @fecon-theme-color;
+                        border-radius: 4px;
+                        padding: 30px;
+                        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
                         .post-holder {
                             .post-header {
                                 h2.post-title {
@@ -30,6 +38,7 @@ body.blog-search-index {
                                 }
                             }
                             .post-content {
+                                color: @color-white;
                                 .post-description {
                                     .post-text-hld {
                                         p {
@@ -56,6 +65,9 @@ body.blog-search-index {
                                         }
                                     }
                                 }
+                            }
+                            .post-footer  {
+                                color: @color-white;
                             }
                         }
                     }
