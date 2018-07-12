@@ -41,6 +41,7 @@ body.blog-search-index {
                                 color: @color-white;
                                 .post-description {
                                     .post-text-hld {
+                                        font-size: 16px;
                                         p {
                                             font-size: 16px;
                                             a {
@@ -62,6 +63,48 @@ body.blog-search-index {
                                         line-height: 22px;
                                         &:hover {
                                             color: @color-white;
+                                        }
+                                    }
+                                }
+                            }
+                            .post-bottom {
+                                .post-nextprev-hld {
+                                    a {
+                                        color: @fecon-theme-color;
+                                        font-size: 14px;
+                                    }
+                                }
+                                .block.comments {
+                                    padding-top: 20px;
+                                    #post-comments {
+                                        .c-count {
+                                            color: @color-white;
+                                        }
+                                        .c-reply.cf {
+                                            .c-replyform {
+                                                font-size: 14px;
+                                            }
+                                        }
+                                    }
+                                    .c-comments {
+                                        .c-comment {
+                                            .c-post {
+                                                .p-name, .p-text, .p-actions {
+                                                    color: @color-white;
+                                                    a.reply-action {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                    span.publish-date {
+                                                        color: @color-white;
+                                                    }
+                                                }
+                                                .p-name {
+                                                    font-size: 16px;
+                                                } 
+                                                .p-text {
+                                                    font-size: 14px;
+                                                }
+                                            }
                                         }
                                     }
                                 }
