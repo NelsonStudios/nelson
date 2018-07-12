@@ -3,7 +3,6 @@
 namespace Serfe\Shipping\Model\Carrier;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
-use Magento\Shipping\Model\Rate\Result;
 
 /**
  * Shipping method to calculate rates manually
@@ -41,25 +40,11 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
     protected $rateMethodFactory;
 
     /**
-     * Pre Order Repository
+     * Pre Order Helper
      *
-     * @var \Serfe\Shipping\Api\PreorderRepositoryInterface 
+     * @var \Serfe\Shipping\Helper\PreorderHelper 
      */
-    protected $preOrderRepostory;
-
-    /**
-     * Checkout Session
-     *
-     * @var \Magento\Checkout\Model\Session 
-     */
-    protected $checkoutSession;
-
-    /**
-     * Search Criteria Builder
-     *
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder 
-     */
-    protected $searchCriteriaBuilder;
+    protected $preorderHelper;
 
     /**
      * Constructor
@@ -69,9 +54,6 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
-     * @param \Serfe\Shipping\Api\PreorderRepositoryInterface $preOrderRepository
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param array $data
      */
     public function __construct(
@@ -80,16 +62,12 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Psr\Log\LoggerInterface $logger,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
-        \Serfe\Shipping\Api\PreorderRepositoryInterface $preOrderRepository,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Serfe\Shipping\Helper\PreorderHelper $preorderHelper,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
-        $this->preOrderRepository = $preOrderRepository;
-        $this->checkoutSession = $checkoutSession;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->preorderHelper = $preorderHelper;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -101,32 +79,25 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         if (!$this->getConfigFlag('active')) {
             return false;
         }
-
-        $shippingPrice = $this->getConfigData('price');
-        $shippingPrice = 'Not available';
-
         $result = $this->rateResultFactory->create();
 
-        if ($shippingPrice !== false) {
-            foreach ($this->getAllowedMethods() as $code => $name) {
-                $method = $this->rateMethodFactory->create();
 
-                $method->setCarrier($this->_code);
-                $method->setCarrierTitle($this->getConfigData('title'));
+        foreach ($this->getAllowedMethods() as $code => $name) {
+            $method = $this->rateMethodFactory->create();
 
-                $method->setMethod($code);
-                $method->setMethodTitle($name);
-$shippingPrice = '0.00';
-                if ($request->getFreeShipping() === true || $request->getPackageQty() == $this->getFreeBoxes()) {
-                    $shippingPrice = '0.00';
-                }
+            $method->setCarrier($this->_code);
+            $method->setCarrierTitle($this->getConfigData('title'));
 
-                $method->setPrice($shippingPrice);
-                $method->setCost($shippingPrice);
+            $method->setMethod($code);
+            $method->setMethodTitle($name);
+            $shippingPrice = $this->preorderHelper->getShippingPrice($code);
 
-                $result->append($method);
-            }
+            $method->setPrice($shippingPrice);
+            $method->setCost($shippingPrice);
+
+            $result->append($method);
         }
+        
 
         return $result;
     }
@@ -147,32 +118,6 @@ $shippingPrice = '0.00';
         return $arr;
     }
 
-    /**
-     * Get Pre Order based on current quote
-     *
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface|boolean
-     */
-    protected function getPreOrder()
-    {
-        $quoteId = $this->checkoutSession->getQuoteId();
-        $preOrder = false;
-        try {
-            $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter('quote_id', $quoteId)
-                ->setPageSize(1)
-                ->create();
-            $preOrderItems = $this->preOrderRepostory->getList($searchCriteria);
-            if ($preOrderItems->getTotalCount()) {
-                foreach ($preOrderItems->getItems() as $preOrderItem) {
-                    $preOrder = $preOrderItem;
-                }
-            }
-        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
-            $this->_logger->critical($ex->getLogMessage());
-        }
-
-        return $preOrder;
-    }
 
     /**
      * Get configuration data of carrier
