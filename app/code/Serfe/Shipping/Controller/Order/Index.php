@@ -1,28 +1,69 @@
 <?php
 
-
 namespace Serfe\Shipping\Controller\Order;
 
+/**
+ * Create preorder action
+ *
+ * @author Xuan Villagran <xuan@serfe.com>
+ */
 class Index extends \Magento\Framework\App\Action\Action
 {
 
+    /**
+     *
+     * @var \Magento\Framework\View\Result\PageFactory 
+     */
     protected $resultPageFactory;
-    
+
+    /**
+     *
+     * @var \Magento\Checkout\Model\Session 
+     */
     protected $_checkoutSession;
-    
+
+    /**
+     *
+     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     */
     protected $customerHelper;
 
+    /**
+     *
+     * @var \Serfe\Shipping\Helper\PreorderHelper 
+     */
+    protected $preorderHelper;
 
+    /**
+     *
+     * @var \Magento\Framework\Json\Helper\Data 
+     */
+    protected $jsonHelper;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Checkout\Model\Session $_checkoutSession
+     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Serfe\Shipping\Helper\PreorderHelper $preorderHelper
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Checkout\Model\Session $_checkoutSession,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+        \Serfe\Shipping\Helper\CustomerHelper $customerHelper,
+        \Serfe\Shipping\Helper\PreorderHelper $preorderHelper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->_checkoutSession = $_checkoutSession;
         $this->customerHelper = $customerHelper;
-        
+        $this->preorderHelper = $preorderHelper;
+        $this->jsonHelper = $jsonHelper;
+
         parent::__construct($context);
     }
 
@@ -33,11 +74,41 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $email = $this->getRequest()->getParam('email');
-        $login = $this->customerHelper->autoLoginUser($this->_checkoutSession->getQuote(), $email);
-        
-        var_dump($login);
-        die();
-        return $this->resultPageFactory->create();
+        $success = false;
+
+        if ($this->_checkoutSession->isSessionExists() && $this->_checkoutSession->isSessionExists()) {
+            $quote = $this->_checkoutSession->getQuote();
+            $email = $this->getRequest()->getParam('email');
+            $login = $this->customerHelper->autoLoginUser($quote, $email);
+            $preorder = $this->preorderHelper->createPreorder($quote);
+
+            if ($preorder && $login) {
+                $success = true;
+            }
+            $response = [
+                'success' => $success
+            ];
+        }
+
+        try {
+            return $this->jsonResponse($response);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            return $this->jsonResponse($e->getMessage());
+        } catch (\Exception $e) {
+            $this->logger->critical($e);
+            return $this->jsonResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * Create json response
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
+    public function jsonResponse($response = '')
+    {
+        return $this->getResponse()->representJson(
+                $this->jsonHelper->jsonEncode($response)
+        );
     }
 }
