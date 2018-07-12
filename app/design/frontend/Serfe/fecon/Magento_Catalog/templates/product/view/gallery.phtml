@@ -13,6 +13,9 @@
  */
 ?>
 <?php
+// ZOOM -> http://www.jacklmoore.com/zoom/
+// IMAGE GALLERY -> http://fotorama.io/
+
 $_config = $this->helper('Smartwave\Porto\Helper\Data')->getConfig('porto_settings/product');
 $image_width = (isset($_config['ratio_width']) && $_config['ratio_width'])?$_config['ratio_width']:600;
 $image_height = (isset($_config['ratio_height']) && $_config['ratio_height'])?$_config['ratio_height']:600;
@@ -84,7 +87,8 @@ require([
                 if(!loaded){
                     $('.product.media .fotorama__stage .fotorama__loaded--img').trigger('zoom.destroy');
                     $('.product.media .fotorama__stage .fotorama__active').zoom({
-                        touch:false
+                        touch:false,
+                        magnify: 2
                     });
                     loaded = true;
                 }
@@ -105,7 +109,8 @@ require([
                     $(this).after($(this).parent().children("img.fotorama__img--full"));
                 });
                 $('.product.media .fotorama__stage .fotorama__active').zoom({
-                    touch:false
+                    touch:false,
+                    magnify: 2
                 });
                 $('.product.media .fotorama').off('fotorama:showend').on('fotorama:showend', function (e, fotorama, extra) {
                     $('.product.media .fotorama__stage .fotorama__loaded--img').trigger('zoom.destroy');
