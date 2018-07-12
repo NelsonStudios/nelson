@@ -12,6 +12,14 @@ body.blog-search-index {
             .columns {
                 .column.main {
                     .post-view, .post-list-wrapper {
+                        box-shadow: 6px 10px 49px @color-gray-darken1;
+                        border: none;
+                        border-top: 4px solid @fecon-theme-color;
+                        border-radius: 4px;
+                        padding: 30px;
+                        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
                         .post-holder {
                             .post-header {
                                 h2.post-title {
@@ -30,8 +38,10 @@ body.blog-search-index {
                                 }
                             }
                             .post-content {
+                                color: @color-white;
                                 .post-description {
                                     .post-text-hld {
+                                        font-size: 16px;
                                         p {
                                             font-size: 16px;
                                             a {
@@ -56,6 +66,51 @@ body.blog-search-index {
                                         }
                                     }
                                 }
+                            }
+                            .post-bottom {
+                                .post-nextprev-hld {
+                                    a {
+                                        color: @fecon-theme-color;
+                                        font-size: 14px;
+                                    }
+                                }
+                                .block.comments {
+                                    padding-top: 20px;
+                                    #post-comments {
+                                        .c-count {
+                                            color: @color-white;
+                                        }
+                                        .c-reply.cf {
+                                            .c-replyform {
+                                                font-size: 14px;
+                                            }
+                                        }
+                                    }
+                                    .c-comments {
+                                        .c-comment {
+                                            .c-post {
+                                                .p-name, .p-text, .p-actions {
+                                                    color: @color-white;
+                                                    a.reply-action {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                    span.publish-date {
+                                                        color: @color-white;
+                                                    }
+                                                }
+                                                .p-name {
+                                                    font-size: 16px;
+                                                } 
+                                                .p-text {
+                                                    font-size: 14px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .post-footer  {
+                                color: @color-white;
                             }
                         }
                     }

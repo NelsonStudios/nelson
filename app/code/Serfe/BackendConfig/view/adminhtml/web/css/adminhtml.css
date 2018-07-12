@@ -3,10 +3,10 @@
     Author     : Xuan Villagran <xuan@serfe.com>
 */
 .admin__menu .level-0.item-serfe-top-level > a {
-    /*padding-top: .5rem;*/
+    padding-top: .5rem;
 }
 .admin__menu .level-0.item-serfe-top-level > a:before {
-    /*content: url('../images/serfe_logo.png');*/
-    /*transform: scale(.7);*/
-    /*margin-bottom: 1.4rem;*/
+    content: url('../images/fecon-logo-icon.png');
+    transform: scale(.7);
+    margin-bottom: 1.4rem;
 }
