@@ -48,9 +48,10 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param boolean $isShipping
      */
     public function createAddressFromQuote(
-    \Magento\Quote\Model\Quote\Address $quoteAddress, $customerId, $isShipping = true
-    )
-    {
+        \Magento\Quote\Model\Quote\Address $quoteAddress,
+        $customerId,
+        $isShipping = true
+    ) {
         $address = $this->addressFactory->create();
         $addressData = $this->getAddressData($quoteAddress);
 
