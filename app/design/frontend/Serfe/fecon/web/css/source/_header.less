@@ -110,6 +110,18 @@
                         ul.header.links {
                             border-top: 3px solid #00aa73;
                             margin-top: 4px;
+                            li {
+                                a {
+                                    color: @color-black !important;
+                                }
+                            }
+                            li.link.wishlist {
+                                a {
+                                    span.counter.qty {
+                                        color: @fecon-theme-color;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -182,7 +194,7 @@
                         li:first-child {
                             display: none;
                         }
-                        li.fullwidth.parent {
+                        li.parent {
                             a {
                                 &:after {
                                     content: '';

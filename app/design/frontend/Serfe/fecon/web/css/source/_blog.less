@@ -1,0 +1,79 @@
+body.blog-index-index,
+body.blog-post-view,
+body.blog-archive-view,
+body.blog-search-index {
+    .page-wrapper {
+        .page-main {
+            .page-title-wrapper {
+                h1.page-title {
+                    color: @fecon-theme-color;
+                }
+            }
+            .columns {
+                .column.main {
+                    .post-view, .post-list-wrapper {
+                        .post-holder {
+                            .post-header {
+                                h2.post-title {
+                                    color: @fecon-theme-color !important;
+                                    a.post-item-link {
+                                        color: @fecon-theme-color;
+                                    }
+                                }
+                            }
+                            .post-date {
+                                .day {
+                                    color: @fecon-theme-color;
+                                }
+                                .month {
+                                    background-color: @fecon-theme-color;
+                                }
+                            }
+                            .post-content {
+                                .post-description {
+                                    .post-text-hld {
+                                        p {
+                                            font-size: 16px;
+                                            a {
+                                                color: @fecon-theme-color;
+                                            }
+                                        }
+                                    }
+                                    a.post-read-more {
+                                        text-decoration: none;
+                                        color: @fecon-theme-color;
+                                        border: 1px solid @fecon-theme-color;
+                                        cursor: pointer;
+                                        font-weight: 600;
+                                        padding: 7px 15px;
+                                        font-size: 1.4rem;
+                                        box-sizing: border-box;
+                                        vertical-align: middle;
+                                        font-weight: 400;
+                                        line-height: 22px;
+                                        &:hover {
+                                            color: @color-white;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .sidebar-additional {
+                    .widget.block {
+                        .block-content {
+                            ul {
+                                li {
+                                    a.post-item-link {
+                                        color: @fecon-theme-color;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

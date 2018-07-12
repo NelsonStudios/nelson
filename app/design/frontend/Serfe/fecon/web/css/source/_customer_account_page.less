@@ -6,6 +6,7 @@
 .customer-address-form,
 .customer-account-edit,
 .newsletter-manage-index,
+.wishlist-index-share,
 .wishlist-index-index {
     .page-wrapper {
         #maincontent {
@@ -19,6 +20,7 @@
                     .login-container,
                     .form-create-account,
                     .password.forget,
+                    .form.wishlist.share,
                     .form-address-edit,
                     .form-edit-account,
                     .form-newsletter-manage {
@@ -43,6 +45,17 @@
                         .actions-toolbar {
                             button {
                                 height: 40px;
+                            }
+                        }
+                    }
+                    .form.wishlist.share {
+                        .fieldset {
+                            padding: 15px;
+                        }
+                        .actions-toolbar {
+                            .primary {
+                                margin-left: 8px;
+                                margin-bottom: 15px;        
                             }
                         }
                     }
@@ -113,7 +126,9 @@
                                     }
                                     .product-item-name {
                                         font-size: 27px;
-                                        color: @color-black;
+                                        a {
+                                            color: @color-black;
+                                        }
                                     }
                                     .price-configured_price {
                                         .price-container {
