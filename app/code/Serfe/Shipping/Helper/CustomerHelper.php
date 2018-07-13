@@ -18,33 +18,39 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      *
-     * @var type 
+     * @var \Magento\Store\Model\StoreManagerInterface 
      */
     protected $storeManager;
 
     /**
      *
-     * @var type 
+     * @var \Magento\Customer\Model\CustomerFactory 
      */
     protected $customerFactory;
 
     /**
      *
-     * @var type 
+     * @var \Magento\Framework\Math\Random 
      */
     protected $mathRandom;
 
     /**
      *
-     * @var type 
+     * @var \Magento\Framework\Encryption\EncryptorInterface 
      */
     protected $encryptor;
 
     /**
      *
-     * @var type 
+     * @var \Serfe\Shipping\Helper\AddressHelper 
      */
     protected $addressHelper;
+
+    /**
+     *
+     * @var \Serfe\Shipping\Helper\EmailHelper 
+     */
+    protected $emailHelper;
 
     /**
      * Constructor
@@ -56,6 +62,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Math\Random $mathRandom
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Serfe\Shipping\Helper\AddressHelper $addressHelper
+     * @param \Serfe\Shipping\Helper\EmailHelper $emailHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -64,7 +71,8 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Framework\Math\Random $mathRandom,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Serfe\Shipping\Helper\AddressHelper $addressHelper
+        \Serfe\Shipping\Helper\AddressHelper $addressHelper,
+        \Serfe\Shipping\Helper\EmailHelper $emailHelper
     ) {
         $this->session = $session;
         $this->storeManager = $storeManager;
@@ -72,6 +80,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->mathRandom = $mathRandom;
         $this->encryptor = $encryptor;
         $this->addressHelper = $addressHelper;
+        $this->emailHelper = $emailHelper;
 
         parent::__construct($context);
     }
@@ -186,5 +195,39 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         ];
 
         return $customerData;
+    }
+
+    /**
+     * Create a order token for customer, and send email with it
+     *
+     * @param string $customerId
+     * @return void
+     */
+    public function addOrderTokenToCustomer($customerId)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $token = $this->mathRandom->getRandomString(25);
+        $customer->setOrderToken($token);
+        $customer->save();
+        $this->emailHelper->sendQuoteAvailableEmail($customer, $token);
+    }
+
+    /**
+     * Check user's token and login user
+     *
+     * @param string $customerId
+     * @param string $token
+     * @return boolean
+     */
+    public function loginUserByToken($customerId, $token)
+    {
+        $login = false;
+        $customer = $this->customerFactory->create()->load($customerId);
+        if ($customer->getOrderToken() == $token) {
+            $this->session->setCustomerAsLoggedIn($customer);
+            $login = true;
+        }
+
+        return $login;
     }
 }
