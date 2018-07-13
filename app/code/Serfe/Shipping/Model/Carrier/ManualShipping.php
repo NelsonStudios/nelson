@@ -40,11 +40,11 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
     protected $rateMethodFactory;
 
     /**
-     * Pre Order Helper
+     * Shipping Helper
      *
-     * @var \Serfe\Shipping\Helper\PreorderHelper 
+     * @var \Serfe\Shipping\Helper\ShippingHelper 
      */
-    protected $preorderHelper;
+    protected $shippingHelper;
 
     /**
      * Constructor
@@ -62,12 +62,12 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Psr\Log\LoggerInterface $logger,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
-        \Serfe\Shipping\Helper\PreorderHelper $preorderHelper,
+        \Serfe\Shipping\Helper\ShippingHelper $shippingHelper,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
-        $this->preorderHelper = $preorderHelper;
+        $this->shippingHelper = $shippingHelper;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -90,7 +90,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
 
             $method->setMethod($code);
             $method->setMethodTitle($name);
-            $shippingPrice = $this->preorderHelper->getShippingPrice($code);
+            $shippingPrice = $this->shippingHelper->getShippingPrice($code);
 
             $method->setPrice($shippingPrice);
             $method->setCost($shippingPrice);
