@@ -9,7 +9,7 @@ namespace Serfe\SytelineIntegration\Helper;
  */
 class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const SYTELINE_AVAIALABLE_STATUS = 'Available';
+    const SYTELINE_AVAIALABLE_STATUS = 'In Stock';
 
     /**
      * Api Helper
