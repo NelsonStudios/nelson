@@ -11,6 +11,7 @@ services:
       - db
       - phpfpm
       - redis
+      - mailcatcher
     volumes: &appvolumes
       - ./:/var/www/html
       - ~/.composer:/var/www/html/var/composer_home
@@ -20,6 +21,7 @@ services:
     image: markoshust/magento-php:7.1-fpm
     links:
       - phpmyadmin
+      - mailcatcher
     volumes: *appvolumes
     networks:
       default:
