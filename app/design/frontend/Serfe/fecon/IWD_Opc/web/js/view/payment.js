@@ -18,6 +18,9 @@ define(
         'IWD_Opc/js/model/payment/is-loading',
         'Magento_Checkout/js/action/set-billing-address',
         'Magento_Ui/js/model/messageList',
+        'mage/url',
+        'IWD_Opc/js/model/shipping/shipping-information-validator',
+        'Magento_Checkout/js/model/customer-email-validator',
         'mage/validation'
     ],
     function ($,
@@ -37,7 +40,10 @@ define(
               registry,
               paymentIsLoading,
               setBillingAddressAction,
-              globalMessageList) {
+              globalMessageList,
+              urlBuilder,
+              shippingValidator,
+              emailValidator) {
         'use strict';
 
         /** Set payment methods to collection */
@@ -254,16 +260,25 @@ define(
                 this.isPlaceOrderActionAllowed(true);
                 $('.payment-method._active button[type=submit].checkout').click();
             },
-            requestQuote: function (){
+            requestQuote: function (data) {
                 var data = {
                     email: quote.guestEmail
                 };
-                $.ajax({
-                    url: '/preorder/order',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json'
-                });
+                if (shippingValidator.validate() && emailValidator.validate()) {
+                    fullScreenLoader.startLoader();
+                    $.ajax({
+                        url: '/preorder/order/create',
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function( data, textStatus, jQxhr ) {
+                            fullScreenLoader.stopLoader();
+                            if (data.success === true) {
+                                window.location.href = urlBuilder.build("preorder/order/success");;
+                            }
+                        }
+                    });
+                }
             }
         });
     }
