@@ -8,6 +8,8 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Customer\Api\Data\GroupInterfaceFactory;
+use Magento\Eav\Model\Entity\Attribute\SetFactory as AttributeSetFactory;
+use Magento\Customer\Model\Customer;
 
 /**
  * InstallData class
@@ -38,20 +40,28 @@ class InstallData implements InstallDataInterface
     protected $groupFactory;
 
     /**
+     * @var AttributeSetFactory
+     */
+    protected $attributeSetFactory;
+
+    /**
      * Constructor
      *
      * @param CustomerSetupFactory $customerSetupFactory
      * @param GroupRepositoryInterface $groupRepository
      * @param GroupInterfaceFactory $groupFactory
+     * @param AttributeSetFactory $attributeSetFactory
      */
     public function __construct(
         CustomerSetupFactory $customerSetupFactory,
         GroupRepositoryInterface $groupRepository,
-        GroupInterfaceFactory $groupFactory
+        GroupInterfaceFactory $groupFactory,
+        AttributeSetFactory $attributeSetFactory
     ) {
         $this->customerSetupFactory = $customerSetupFactory;
         $this->groupRepository = $groupRepository;
         $this->groupFactory = $groupFactory;
+        $this->attributeSetFactory = $attributeSetFactory;
     }
 
     /**
@@ -62,6 +72,11 @@ class InstallData implements InstallDataInterface
         ModuleContextInterface $context
     ) {
         $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
+        $customerEntity = $customerSetup->getEavConfig()->getEntityType('customer');
+        $attributeSetId = $customerEntity->getDefaultAttributeSetId();
+        /** @var $attributeSet AttributeSet */
+        $attributeSet = $this->attributeSetFactory->create();
+        $attributeGroupId = $attributeSet->getDefaultGroupId($attributeSetId);
 
         $customerSetup->addAttribute(\Magento\Customer\Model\Customer::ENTITY, 'order_token', [
             'type' => 'text',
@@ -87,6 +102,20 @@ class InstallData implements InstallDataInterface
             'backend' => ''
         ]);
 
+        $attribute = $customerSetup->getEavConfig()->getAttribute(\Magento\Customer\Model\Customer::ENTITY, 'order_token')
+        ->addData([
+            'attribute_set_id' => $attributeSetId,
+            'attribute_group_id' => $attributeGroupId
+        ]);
+         
+        $attribute->save();
+    
+        $secondAttribute = $customerSetup->getEavConfig()->getAttribute(\Magento\Customer\Model\Customer::ENTITY, 'order_token_created_at')
+        ->addData([
+            'attribute_set_id' => $attributeSetId,
+            'attribute_group_id' => $attributeGroupId
+        ]);
+        $secondAttribute->save();
         $this->addCustomerGroup();
     }
 
