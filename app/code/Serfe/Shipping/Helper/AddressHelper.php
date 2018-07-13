@@ -84,7 +84,8 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'city' => $quoteAddress->getCity(),
             'telephone' => $quoteAddress->getTelephone(),
             'company' => $quoteAddress->getCompany(),
-            'street' => $quoteAddress->getStreet()
+            'street' => $quoteAddress->getStreet(),
+            'region_id' => $quoteAddress->getRegionId()
         ];
 
         return $addressData;
