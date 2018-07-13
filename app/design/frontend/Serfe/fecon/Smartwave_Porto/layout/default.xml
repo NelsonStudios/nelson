@@ -3,5 +3,6 @@
         <referenceContainer name="content">
             <referenceBlock name="sidebar.main" remove="true"/>
         </referenceContainer >
+        <referenceBlock name="top_blog_link" remove="true" />
     </body>
 </page>

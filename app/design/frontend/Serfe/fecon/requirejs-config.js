@@ -1,6 +1,7 @@
 
 var config = {
     deps: [
+        "js/polyfills.min",
         "js/header-custom"
     ],
     map: {
