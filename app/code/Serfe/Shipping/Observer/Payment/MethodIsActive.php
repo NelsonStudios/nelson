@@ -3,12 +3,18 @@
 namespace Serfe\Shipping\Observer\Payment;
 
 /**
- * Description of MethodIsActive
+ * Observer to check if payment is available
  *
  * @author Xuan Villagran <xuan@serfe.com>
  */
 class MethodIsActive implements \Magento\Framework\Event\ObserverInterface
 {
+    protected $shippingHelper;
+
+    public function __construct(\Serfe\Shipping\Helper\ShippingHelper $shippingHelper)
+    {
+        $this->shippingHelper = $shippingHelper;
+    }
 
     /**
      * Execute observer
@@ -22,8 +28,12 @@ class MethodIsActive implements \Magento\Framework\Event\ObserverInterface
         $result = $observer->getEvent()->getResult();
         $quote = $observer->getEvent()->getQuote();
         /* If shipping method is manually calculated disable all payment methods */
-        if (null !== $quote && $quote->getShippingAddress() && strpos($quote->getShippingAddress()->getShippingMethod(), 'manualshipping') !== false) {
-            $result->setData('is_available', false);
+        if (null !== $quote && $quote->getShippingAddress())  {
+            $shippingMethod = $quote->getShippingAddress()->getShippingMethod();
+            if (strpos($shippingMethod, 'manualshipping') !== false) {
+                $isPaymentAvailable = $this->shippingHelper->isPaymentAvailable($shippingMethod);
+                $result->setData('is_available', $isPaymentAvailable);
+            }
         }
     }
 }
