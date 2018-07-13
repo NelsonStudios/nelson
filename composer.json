@@ -11,7 +11,8 @@
         "magento/product-community-edition": "2.2.3",
         "composer/composer": "@alpha",
         "amasty/aminvisiblecaptcha": "^2.1",
-        "andreyco/instagram": "3.0.0"
+        "andreyco/instagram": "3.0.0",
+        "m2e/ebay-amazon-magento2": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",
