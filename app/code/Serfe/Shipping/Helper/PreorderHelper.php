@@ -106,24 +106,6 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get shipping price
-     *
-     * @param string $shippingCode
-     * @return string|float
-     */
-    public function getShippingPrice($shippingCode)
-    {
-        $price = '0.00';
-        if ($this->customerSession->isLoggedIn() && $this->hasPreorderAvailable($shippingCode)) {
-            $preorderId = $this->getPreorderId($shippingCode);
-            $preorder = $this->preorderRepository->getById($preorderId);
-            $price = $preorder->getShippingPrice();
-        }
-
-        return $price;
-    }
-
-    /**
      * Check if the current customer has a preorder available
      *
      * @param string $shippingCode
@@ -166,5 +148,22 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             ->getLastItem();
 
         return $preorder->getId();
+    }
+
+    /**
+     * Returns a preorder object based on the shipping code and current user
+     *
+     * @param string $shippingCode
+     * @return \Serfe\Shipping\Model\Preorder|false
+     */
+    public function getPreorderByShippingCode($shippingCode)
+    {
+        $preorder = false;
+        if ($this->customerSession->isLoggedIn() && $this->hasPreorderAvailable($shippingCode)) {
+            $preorderId = $this->getPreorderId($shippingCode);
+            $preorder = $this->preorderRepository->getById($preorderId);
+        }
+
+        return $preorder;
     }
 }
