@@ -83,6 +83,7 @@ class Create extends \Magento\Framework\App\Action\Action
             $preorder = $this->preorderHelper->createPreorder($quote);
 
             if ($preorder && $login) {
+                $this->customerHelper->logoutUser();
                 $success = true;
             }
             $response = [
