@@ -2,7 +2,8 @@
 var config = {
     deps: [
         "js/polyfills.min",
-        "js/header-custom"
+        "js/header-custom",
+        "js/google-language-styles.min"
     ],
     map: {
         '*': {

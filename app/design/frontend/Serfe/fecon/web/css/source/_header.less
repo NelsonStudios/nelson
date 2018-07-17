@@ -88,7 +88,7 @@
             ul.toplinks {
                 margin-top: 3px;
                 float: left;
-                margin-left: 600px;
+                margin-left: 30%;
             }
             ul.header.links {
                 margin-top: 3px;
@@ -243,11 +243,11 @@
 #google_translate_element {
   position: absolute;
   bottom: calc(53px + 16px);
-  right: 166px !important;
+  right: 134px;
   top: 3.5px;
   border-right: 1px solid #fff;
   height: 42px;
-  padding-top: 0.66%;
+  padding-top: 12px;
 }
 .goog-te-gadget {
   font-family: @font-family-name__verb !important;
@@ -262,13 +262,12 @@
   line-height: 2rem !important;
   display: inline-block;
   cursor: pointer;
-  zoom: 1;
 }   
 .goog-te-menu2 {
   max-width: 100%;
 }
 .goog-te-menu-value {
-  color: #fff !important;
+  color: @color-white !important;
 }
 .goog-te-menu-value span:nth-child(5) {
   display:none;
@@ -278,7 +277,6 @@
 }
 
 .goog-te-gadget-icon {
-    background-image: url(https://placehold.it/32)!important;
     background-position: 0px 0px;
     height: 32px!important;
     width: 32px!important;
@@ -286,31 +284,3 @@
     //     OR
     display: none;
 }
-
-// ============ HIDE TOP BAR ============ 
-.goog-te-banner-frame.skiptranslate {display: none!important;} 
-body {top: 0px!important;}
-
-/* ================================== *\
-    Mediaqueries
-\* ================================== */
-@media (max-width: 667px) {
-    #google_translate_element {
-        bottom: calc(100% - 50% - 53px);
-        left: 16px!important;
-        width: 100%!important;
-        goog-te-gadget {
-            width:100%!important;
-        }
-        .skiptranslate {
-            width:100%!important;           
-        }
-        .goog-te-gadget-simple {
-            width: calc(100% - 32px)!important;
-            text-align: center;
-        }   
-    }
-}
-
-
-

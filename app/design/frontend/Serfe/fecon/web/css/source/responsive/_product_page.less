@@ -72,7 +72,7 @@
                             .product-reviews-summary {
                                 .reviews-actions {
                                     a {
-                                        padding-top: 20px;
+                                        padding-top: 0;
                                         border: none;
                                         padding-left: 0px;
                                         margin-left: 0;  
@@ -107,7 +107,7 @@
                                     .box-tocart {
                                         .fieldset {
                                             .moved-add-to-links {
-                                                margin-left: 30px;
+                                                margin-left: 60px;
                                             }
                                         }
                                     }
@@ -184,11 +184,29 @@
                             }
                             .product-info-price {
                                 .product-info-stock-sku {
-                                    left: -49px;
+                                    left: -45px;
                                 }
                             }
                             .product-media {
                                 margin-top: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 645px) {
+    body.catalog-product-view {
+        .page-wrapper {
+            main#maincontent {
+                margin-left: 0;
+                .columns {
+                    .column.main {
+                        .product-info-main {
+                            .product-info-price {
+                                left: -35px;
                             }
                         }
                     }
