@@ -53,6 +53,12 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $emailHelper;
 
     /**
+     *
+     * @var \Magento\Framework\Stdlib\DateTime\DateTime 
+     */
+    protected $date;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -72,7 +78,8 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Math\Random $mathRandom,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Serfe\Shipping\Helper\AddressHelper $addressHelper,
-        \Serfe\Shipping\Helper\EmailHelper $emailHelper
+        \Serfe\Shipping\Helper\EmailHelper $emailHelper,
+        \Magento\Framework\Stdlib\DateTime\DateTime $date
     ) {
         $this->session = $session;
         $this->storeManager = $storeManager;
@@ -81,6 +88,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->encryptor = $encryptor;
         $this->addressHelper = $addressHelper;
         $this->emailHelper = $emailHelper;
+        $this->date = $date;
 
         parent::__construct($context);
     }
@@ -207,7 +215,11 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $customer = $this->customerFactory->create()->load($customerId);
         $token = $this->mathRandom->getRandomString(25);
-        $customer->setOrderToken($token);
+        $datetime = $this->date->gmtDate();
+        $customerData = $customer->getDataModel();
+        $customerData->setCustomAttribute('order_token', $token);
+        $customerData->setCustomAttribute('order_token_created_at', $datetime);
+        $customer->updateData($customerData);
         $customer->save();
         $this->emailHelper->sendQuoteAvailableEmail($customer, $token);
     }
@@ -229,5 +241,17 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $login;
+    }
+
+    /**
+     * Logout current user
+     *
+     * @return void
+     */
+    public function logoutUser()
+    {
+        if ($this->session->isLoggedIn()) {
+            $this->session->logout();
+        }
     }
 }

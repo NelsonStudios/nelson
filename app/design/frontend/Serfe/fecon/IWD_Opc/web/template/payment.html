@@ -59,16 +59,20 @@
                 </div>
             </form>
             <div class="iwd_opc_universal_wrapper">
+                <!-- ko if: isPaymentMethodsAvailable()  -->
                 <button type="button"
                         data-bind="attr :{'title': $t('Place Order')}, click: placeOrder, enable: isPlaceOrderActionAllowed"
                         class="iwd_opc_button active iwd_opc_place_order_button">
                     <!-- ko i18n: 'Place Order' --><!-- /ko -->
                 </button>
+                <!-- /ko -->
+                <!-- ko ifnot: isPaymentMethodsAvailable()  -->
                 <button type="button"
                         data-bind="attr :{'title': $t('Request Quote')}, click: requestQuote, enable: isPlaceOrderActionAllowed"
                         class="iwd_opc_button active iwd_opc_place_order_button">
                     <!-- ko i18n: 'Request Quote' --><!-- /ko -->
                 </button>
+                <!-- /ko -->
             </div>
             <!-- ko if: isShowSubscribe -->
             <div class="fieldset">

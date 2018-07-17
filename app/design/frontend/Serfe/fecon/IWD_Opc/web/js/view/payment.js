@@ -261,6 +261,8 @@ define(
                 $('.payment-method._active button[type=submit].checkout').click();
             },
             requestQuote: function (data) {
+                var self = this;
+                this.isPlaceOrderActionAllowed(false);
                 var data = {
                     email: quote.guestEmail
                 };
