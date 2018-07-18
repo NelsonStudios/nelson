@@ -395,7 +395,12 @@
 <?php else: ?>
     <div class="panel wrapper">
         <div class="panel header">
-            <?php echo $this->getChildHtml("store_language"); ?>
+            <?php 
+                echo $this->getLayout()
+                  ->createBlock('Magento\Cms\Block\Block')
+                  ->setBlockId('store_language')
+                  ->toHtml();
+            ?>
             <div class="magnifying-glass">
                 <?php echo $this->getChildHtml("top.search"); ?>
                 <img src='<?php echo $this->getViewFileUrl('images/magnifying-glass.png'); ?>' alt="search">
