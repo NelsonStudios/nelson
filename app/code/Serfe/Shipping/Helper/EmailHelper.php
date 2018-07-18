@@ -46,7 +46,12 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'customer' => $customer,
             'token' => $token
         );
-        $from = array('email' => "fecon@mage2.com", 'name' => 'Fecon Store');
+        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_STORE);
+        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_STORE);
+        $from = [
+            'name' => $name,
+            'email' => $email
+        ];
         $this->inlineTranslation->suspend();
         $to = array($customer->getEmail());
         $transport = $this->transportBuilder->setTemplateIdentifier('quote_available')
