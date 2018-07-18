@@ -36,6 +36,8 @@ define([
       return setInterval(function() { checkPageTranslatedAndScale(ms) }, 1000);
     }
     $('document').ready(function () {
+      /* Load custom font Verb on iframe */
+      $("iframe.goog-te-menu-frame").contents().find("head").append("<style>@font-face { font-family: Verb; src: url('/media/fonts/VerbRegular/VerbRegular.ttf'); } </style>");
       interval = translateLoaded(3000);
       // RESTYLE THE DROPDOWN MENU
       $('#google_translate_element').on("click", function () {
@@ -49,6 +51,7 @@ define([
           'color': '#FFF',
           'text-transform': 'uppercase',
           'font-weight': '600',
+          'font-size': '14px',
           'font-family': 'Verb',
           'width':'100%'
         });
@@ -67,9 +70,9 @@ define([
 
         // Change hover effects
         $("iframe.goog-te-menu-frame").contents().find(".goog-te-menu2-item div").hover(function () {
-          $(this).css('background-color', '#00AA73').find('span.text').css({'color': '#FFF', 'background-color': '#00AA73'});
+          $(this).css('background-color', '#00AA73').find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'background-color': '#00AA73'});
         }, function () {
-          $(this).css('background-color', '#201D16').find('span.text').css({'color': '#FFF', 'background-color': '#201D16'});
+          $(this).css('background-color', '#201D16').find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'background-color': '#201D16'});
         });
 
         // Change Google's default blue border
