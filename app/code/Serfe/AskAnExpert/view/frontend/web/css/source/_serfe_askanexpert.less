@@ -1,7 +1,6 @@
 @color_1: #333;
 @color_2: #1979c3;
 @color_4: #5a5a5a;
-@background_color_1: #f2f2f2;
 
 .clear {
     clear: both;
@@ -35,7 +34,6 @@ body.askanexpert-front-index {
                                     float: left;
                                     width: 310px;
                                     margin: 0 23px 0 0;
-                                    background-color: @background_color_1;
                                     padding: 20px;
                                     text-align: center;
                                     border-radius: 3px;
@@ -69,7 +67,6 @@ body.askanexpert-front-index {
                                     height: 60px;
                                     padding: 0;
                                     margin-top: 32px;
-                                    background-color: @background_color_1;
                                     border-radius: 0px;
                                 }
                             }
@@ -96,6 +93,10 @@ body.askanexpert-front-index {
                                     text-indent: 15px;
                                     font-size: 14px;
                                     color: @color_1;
+                                    ::-webkit-input-placeholder { color: @color-black; }
+                                    :-moz-placeholder           { color: @color-black; }
+                                    ::-moz-placeholder          { color: @color-black; }
+                                    :-ms-input-placeholder      { color: @color-black; }
                                 }
                             }
                             .last {
@@ -171,15 +172,16 @@ body.askanexpert-front-index {
     width: 100%;
     .page_title {
         padding: 30px 0;
-        h1 {
-            text-align: center;
-            color: @color_1;
-            font-size: 24px;
-            font-weight: 700;
+        h2 {
+            font-size: 22px;
             text-transform: uppercase;
+            font-weight: 600;
             span {
                 color: @color_2;
             }
+        }
+        .aae-description {
+           font-size: 14px; 
         }
     }
     .map_block {
