@@ -46,8 +46,8 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'customer' => $customer,
             'token' => $token
         );
-        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_STORE);
-        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_STORE);
+        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $from = [
             'name' => $name,
             'email' => $email
