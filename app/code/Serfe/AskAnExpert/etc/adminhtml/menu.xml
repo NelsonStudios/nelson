@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add 
+            id="Serfe_AskAnExpert::AskAnExpert" 
+            title="Ask An Expert" 
+            module="Serfe_AskAnExpert" 
+            sortOrder="50" 
+            parent="Serfe::serfe_top_level" 
+            resource="Serfe_AskAnExpert::askanexpert"
+        />
+        
+        <add 
+            id="Serfe_AskAnExpert::AskAnExpert_manage_submissions" 
+            title="Manage Submissions" 
+            module="Serfe_AskAnExpert" 
+            sortOrder="60" 
+            parent="Serfe_AskAnExpert::AskAnExpert" 
+            action="askanexpert/index/index" 
+            resource="Serfe_AskAnExpert::askanexpert"
+        />
+    </menu>
+</config>

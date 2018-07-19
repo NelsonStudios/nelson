@@ -129,6 +129,7 @@ return array (
     'Magento_WishlistAnalytics' => 1,
     'Mageplaza_Core' => 1,
     'Mageplaza_LayeredNavigation' => 1,
+    'Serfe_AskAnExpert' => 1,
     'Serfe_BackendConfig' => 1,
     'Serfe_Filterproducts' => 1,
     'Serfe_FlatRateMinimumAmount' => 1,

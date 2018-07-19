@@ -1,0 +1,32 @@
+
+
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    
+    <tr class="email-summary">
+        <td>
+            <h1>Submission Reply</h1>
+        </td>
+    </tr>
+    <tr class="email-information">
+        <td>            
+            <table class="message-info">                
+                <tr>
+                                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">Reply:</td>
+                                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.reply}}</td>
+                </tr>
+                
+                <tr>
+                                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">Regards,</td>
+                                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">&nbsp; </td>
+                </tr>
+            </table>            
+            
+            
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

@@ -7,7 +7,10 @@
 .customer-account-edit,
 .newsletter-manage-index,
 .wishlist-index-share,
-.wishlist-index-index {
+.wishlist-index-index,
+.multishipping-checkout-login,
+.multishipping-checkout-addresses,
+.multishipping-checkout-address-newshipping {
     .page-wrapper {
         #maincontent {
             .page-title-wrapper {
@@ -23,7 +26,8 @@
                     .form.wishlist.share,
                     .form-address-edit,
                     .form-edit-account,
-                    .form-newsletter-manage {
+                    .form-newsletter-manage,
+                    .multicheckout.address.form {
                         box-shadow: 6px 10px 49px @color-gray-darken1;
                         border: none;
                         border-top: 4px solid @fecon-theme-color;
@@ -31,7 +35,7 @@
                         background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
                         linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
                         repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
-                        .fieldset, .block-customer-login, .block-new-customer {
+                        .fieldset, .block-customer-login, .block-new-customer, .title, .items.data.table {
                             color: @color-white;
                             .legend {
                                 color: @fecon-theme-color;
@@ -56,6 +60,31 @@
                             .primary {
                                 margin-left: 8px;
                                 margin-bottom: 15px;        
+                            }
+                        }
+                    }
+                    .multicheckout.address.form {
+                        font-size: 12px;
+                        padding: 25px;
+                        .col.actions {
+                            a {
+                                span {
+                                    color: @fecon-theme-color;
+                                }
+                            }
+                        }
+                        .actions-toolbar {
+                            .secondary {
+                                .action.add {
+                                    color: @fecon-theme-color;
+                                    &:hover {
+                                        background-color: @fecon-theme-color;
+                                        color: @color-white;
+                                    }
+                                }
+                                .action.back {
+                                    color: @fecon-theme-color;
+                                }
                             }
                         }
                     }
