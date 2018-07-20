@@ -13,7 +13,9 @@
                 <enabled_captcha>0</enabled_captcha>
             	<enabled_emailus>0</enabled_emailus>
                 <enabled_map>0</enabled_map>
-            	<meta_tittle>AskAnExpert</meta_tittle>
+                <category_ajax_url>/support/ajax/category</category_ajax_url>
+            	<products_bycat_ajax_url>/support/ajax/product</products_bycat_ajax_url>
+                <meta_tittle>AskAnExpert</meta_tittle>
             	<meta_keyword>AskAnExpert</meta_keyword>
             	<meta_description>AskAnExpert</meta_description>
             	<contact_heading>GET IN TOUCH WITH US</contact_heading>

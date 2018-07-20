@@ -1,0 +1,22 @@
+{
+    "name": "serfe/module-support",
+    "description": "Support module",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "xuan@serfe.com",
+            "name": "Xuan Villagran"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Serfe\\Support\\": ""
+        }
+    }
+}

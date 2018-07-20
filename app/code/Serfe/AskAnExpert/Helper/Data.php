@@ -7,6 +7,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CP_CONTACT_ENABLE = 'askanexpert/active_display/enabled_askanexpert';
     const CP_CAPTCHA_ENABLE = 'askanexpert/active_display/enabled_captcha';
     const CP_EMAILUS_ENABLE = 'askanexpert/active_display/enabled_emailus';
+    const CP_CATEGORIES_AJAX_URL = 'askanexpert/active_display/category_ajax_url';
+    const CP_PRODUCTS_AJAX_URL = 'askanexpert/active_display/products_bycat_ajax_url';
     const CP_SITE_KEY = 'askanexpert/active_display/site_key';
     const CP_SECURE_KEY = 'askanexpert/active_display/secure_key';
     const CP_MAP_ENABLE = 'askanexpert/active_display/enabled_map';
@@ -397,6 +399,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::CP_EMAILUS_ENABLE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    public function getcategoryajaxurl()
+    {
+        return $this->scopeConfig->getValue(
+            self::CP_CATEGORIES_AJAX_URL,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    public function getproductsbycatajaxurl()
+    {
+        return $this->scopeConfig->getValue(
+            self::CP_PRODUCTS_AJAX_URL,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }

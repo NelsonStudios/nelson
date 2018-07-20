@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
-
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
@@ -13,15 +6,6 @@
             <item name="deps" xsi:type="string">askanexpert_grid.askanexpert_listing_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">askanexpert_columns</item>
-        <!--
-        <item name="buttons" xsi:type="array">
-            <item name="add" xsi:type="array">
-                <item name="name" xsi:type="string">add</item>
-                <item name="label" xsi:type="string" translate="true">Add New</item>
-                <item name="class" xsi:type="string">primary</item>
-                <item name="url" xsi:type="string">*/*/new</item>
-            </item>
-        </item> -->
     </argument>
     <dataSource name="askanexpert_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
@@ -107,18 +91,6 @@
                     <item name="column" xsi:type="string">column</item>
                 </item>
             </argument>
-            <!--<filterSelect name="store_id">
-                <argument name="optionsProvider" xsi:type="configurableObject">
-                    <argument name="class" xsi:type="string">Magento\Cms\Ui\Component\Listing\Column\Cms\Options</argument>
-                </argument>
-                <argument name="data" xsi:type="array">
-                    <item name="config" xsi:type="array">
-                        <item name="dataScope" xsi:type="string">store_id</item>
-                        <item name="label" xsi:type="string" translate="true">Store View</item>
-                        <item name="captionValue" xsi:type="string">0</item>
-                    </item>
-                </argument>
-            </filterSelect>-->
         </filters>
         <massaction name="listing_massaction">
             <argument name="data" xsi:type="array">
@@ -158,18 +130,6 @@
                     </item>
                 </argument>
             </action>            
-        <!--    <action name="edit">
-                <argument name="data" xsi:type="array">
-                    <item name="config" xsi:type="array">
-                        <item name="type" xsi:type="string">edit</item>
-                        <item name="label" xsi:type="string" translate="true">Reply</item>
-                        <item name="callback" xsi:type="array">
-                            <item name="provider" xsi:type="string">askanexpert_grid.askanexpert_grid.askanexpert_columns_editor</item>
-                            <item name="target" xsi:type="string">editSelected</item>
-                        </item>
-                    </item>
-                </argument>
-            </action>  -->
         </massaction>
         <paging name="listing_paging">
             <argument name="data" xsi:type="array">
@@ -190,15 +150,6 @@
                     <item name="provider" xsi:type="string">askanexpert_grid.askanexpert_grid.listing_top.bookmarks</item>
                     <item name="namespace" xsi:type="string">current</item>
                 </item>
-        <!--        <item name="editorConfig" xsi:type="array">
-                    <item name="selectProvider" xsi:type="string">askanexpert_grid.askanexpert_grid.askanexpert_columns.ids</item>
-                    <item name="enabled" xsi:type="boolean">true</item>
-                    <item name="indexField" xsi:type="string">contact_id</item>
-                    <item name="clientConfig" xsi:type="array">
-                        <item name="saveUrl" xsi:type="url" path="news/index/inlineEdit"/> 
-                        <item name="validateBeforeSave" xsi:type="boolean">false</item>
-                    </item> 
-                </item> -->
                 <item name="childDefaults" xsi:type="array">
                     <item name="fieldAction" xsi:type="array">
                         <item name="provider" xsi:type="string">askanexpert_grid.askanexpert_grid.askanexpert_columns_editor</item>
@@ -225,7 +176,71 @@
                 </item>
             </argument>
         </selectionsColumn>
+
+        <column name="product_category">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">Product Category</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="product_name">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">Product Name</item>
+                    <item name="sortOrder" xsi:type="number">11</item>
+                </item>
+            </argument>
+        </column>
     
+        <column name="question_about">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">Question About</item>
+                    <item name="sortOrder" xsi:type="number">12</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="hear_about">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">How did you hear about us?</item>
+                    <item name="sortOrder" xsi:type="number">13</item>
+                </item>
+            </argument>
+        </column>
+
         <column name="name">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -237,7 +252,7 @@
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Name</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="sortOrder" xsi:type="number">14</item>
                 </item>
             </argument>
         </column>
@@ -252,7 +267,7 @@
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Email</item>
-                    <item name="sortOrder" xsi:type="number">11</item>
+                    <item name="sortOrder" xsi:type="number">15</item>
                 </item>
             </argument>
         </column>
@@ -267,7 +282,7 @@
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Phone</item>
-                    <item name="sortOrder" xsi:type="number">12</item>
+                    <item name="sortOrder" xsi:type="number">16</item>
                 </item>
             </argument>
         </column>
@@ -282,7 +297,7 @@
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Country</item>
-                    <item name="sortOrder" xsi:type="number">13</item>
+                    <item name="sortOrder" xsi:type="number">17</item>
                 </item>
             </argument>
         </column>
@@ -297,7 +312,7 @@
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">IP</item>
-                    <item name="sortOrder" xsi:type="number">14</item>
+                    <item name="sortOrder" xsi:type="number">18</item>
                 </item>
             </argument>
         </column>
@@ -312,7 +327,7 @@
                     <item name="editor" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Status</item>
-                    <item name="sortOrder" xsi:type="number">17</item>
+                    <item name="sortOrder" xsi:type="number">19</item>
                 </item>
             </argument>
         </column> 
@@ -324,7 +339,7 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="dataType" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Created</item>
-                    <item name="sortOrder" xsi:type="number">18</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </column> 
@@ -337,7 +352,7 @@
                         
                     </item>
                     <item name="label" xsi:type="string" translate="true">Replied at</item>
-                    <item name="sortOrder" xsi:type="number">19</item>
+                    <item name="sortOrder" xsi:type="number">21</item>
                 </item>
             </argument>
         </column>             
@@ -347,6 +362,7 @@
                     <item name="resizeEnabled" xsi:type="boolean">false</item>
                     <item name="resizeDefaultWidth" xsi:type="string">107</item>
                     <item name="indexField" xsi:type="string">contact_id</item>
+                    <item name="sortOrder" xsi:type="number">22</item>
                 </item>
             </argument>
         </actionsColumn>  

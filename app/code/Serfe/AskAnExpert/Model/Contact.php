@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2016 AionNext Ltd. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Model;
 
 class Contact extends \Magento\Framework\Model\AbstractModel

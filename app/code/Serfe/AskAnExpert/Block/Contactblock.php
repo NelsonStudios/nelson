@@ -316,4 +316,20 @@ class Contactblock extends Template {
     {
         return $this->_mymoduleHelper->getenableemailus();
     }
+    /**
+     * [getStoreName description]
+     * @return [type] [description]
+     */
+    public function getcategoryajaxurl()
+    {
+        return $this->_mymoduleHelper->getcategoryajaxurl();
+    }
+    /**
+     * [getStoreName description]
+     * @return [type] [description]
+     */
+    public function getproductsbycatajaxurl()
+    {
+        return $this->_mymoduleHelper->getproductsbycatajaxurl();
+    }
 }

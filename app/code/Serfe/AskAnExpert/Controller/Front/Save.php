@@ -1,9 +1,4 @@
 <?php
-/**
- *
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Controller\Front;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -68,26 +63,24 @@ class Save extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Save newsletter subscription preference action
+     * Save form data
      *
      * @return void|null
      */
     public function execute()
     {
-       
         $error = false;
         $post = $this->getRequest()->getPostValue();
         if (!$post) {
             $this->_redirect('*/*/');
             return;
         }
-        // $this->inlineTranslation->suspend();
         try {
             $postObject = new \Magento\Framework\DataObject();
             $postObject->setData($post);
             if ($this->_mymoduleHelper->isCaptchaEnabled()) {
                 $captcha = $this->getRequest()->getParam('g-recaptcha-response');
-                $secret = $this->_mymoduleHelper->getsecurekey();//"6Le9kwgUAAAAAJn2pRWDkbkls26F3SKBJ7hlggtk"; //Replace with your secret key
+                $secret = $this->_mymoduleHelper->getsecurekey();
                 $response = null;
                 $path = self::$_siteVerifyUrl;
                 $dataC =  [
@@ -163,14 +156,13 @@ class Save extends \Magento\Framework\App\Action\Action
                 $contactModel = $this->_contactModel->create();
                 $contactModel->setData($post);
                 $contactModel->save();
-                $this->messageManager->addSuccess(__('Your inquiry has been submitted successfully.We will contact you back shortly.'));
+                $this->messageManager->addSuccess(__('Your inquiry has been submitted successfully. We will contact you back shortly.'));
                 $this->_redirect($this->_redirect->getRefererUrl());
                 return;
             }
         } catch (\Exception $e) {
-            //$this->inlineTranslation->resume();
             $this->messageManager->addError(
-                __('We can\'t process your request right now. Sorry, that\'s all we know.')
+                __('We can\'t process your request right now. Please try again later.')
             );
             $this->getDataPersistor()->set('askanexpert', $post);
             $this->_redirect($this->_redirect->getRefererUrl());
@@ -179,8 +171,9 @@ class Save extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * [getDataPersistor description]
-     * @return [type] [description]
+     * getDataPersistor
+     * 
+     * @return \Magento\Framework\App\Request\DataPersistor
      */
     private function getDataPersistor() {
         if ($this->dataPersistor === null) {

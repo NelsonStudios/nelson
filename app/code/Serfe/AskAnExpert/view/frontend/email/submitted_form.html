@@ -1,5 +1,5 @@
-
 {{template config_path="design/email/header_template"}}
+<!--@subject Ask an expert - question from {{var data.name}}  @-->
 <table>
     <tr class="email-intro">
         <td>            
@@ -16,6 +16,22 @@
     <tr class="email-information">
         <td>            
             <table class="message-info">                
+                <tr>
+                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">Product Category:</td>
+                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.product_category}}</td>
+                </tr>
+                <tr>
+                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">Product Name:</td>
+                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.product_name}}</td>
+                </tr>
+                <tr>
+                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">Question About:</td>
+                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.question_about}}</td>
+                </tr>
+                <tr>
+                   <td align="center" style="text-align:left;width:30%;font-weight:bold;">How did you hear about us?:</td>
+                   <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.hear_about}}</td>
+                </tr>
                 <tr>
                    <td align="center" style="text-align:left;width:30%;font-weight:bold;">Name:</td>
                    <td align="center" style="padding-left:5px;text-align:left;width:70%;">{{var data.name}}</td>

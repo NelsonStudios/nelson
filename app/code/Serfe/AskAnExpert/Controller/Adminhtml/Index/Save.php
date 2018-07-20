@@ -49,15 +49,13 @@ class Save extends \Magento\Backend\App\Action
         \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateFactory,
         \Serfe\AskAnExpert\Helper\Data $myModuleHelper
     ) {
-       // $this->filter = $filter;
-       // $this->collectionFactory = $collectionFactory;
         $this->dataPersistor = $dataPersistor;
-         $this->_transportBuilder = $transportBuilder;
-         $this->scopeConfig = $scopeConfig;
-         $this->_escaper = $escaper;
+        $this->_transportBuilder = $transportBuilder;
+        $this->scopeConfig = $scopeConfig;
+        $this->_escaper = $escaper;
         $this->_dateFactory = $dateFactory;
-         $this->_mymoduleHelper = $myModuleHelper;
-         $this->inlineTranslation = $inlineTranslation;
+        $this->_mymoduleHelper = $myModuleHelper;
+        $this->inlineTranslation = $inlineTranslation;
         parent::__construct($context);
     }
 
@@ -81,8 +79,6 @@ class Save extends \Magento\Backend\App\Action
             if (empty($data['contact_id'])) {
                 $data['contact_id'] = null;
             }
-
-           
             /** @var \Magento\Cms\Model\Block $model */
             $model = $this->_objectManager->create('Serfe\AskAnExpert\Model\Contact')->load($id);
             if (!$model->getId() && $id) {
@@ -93,16 +89,9 @@ class Save extends \Magento\Backend\App\Action
             if ($data['reply']!='') {
                 $data['status'] = 0;
             }
-            //print_r($data);
-           // exit;
             date_default_timezone_set($this->_mymoduleHelper->timezone());
             $rep_time = date("Y-m-d").' '.date("h:i:sa");
             $data['reply_time']= $rep_time;
-        // print_r($data);
-          //  echo $this->_mymoduleHelper->timezone();
-         //   echo  $this->_dateFactory->create()->gmtDate();
-        //  exit;
-            
             $model->setData($data);
 
 
@@ -111,12 +100,6 @@ class Save extends \Magento\Backend\App\Action
                  /////////// custom code end
                 $postObject = new \Magento\Framework\DataObject();
                 $postObject->setData($data);
-
-              //  print_r($postObject);
-              // echo $this->_mymoduleHelper->getemailreplytemplate();
-             //  exit;
-              //   print_r($postObject);
-              //   exit;
                 $transport = $this->_transportBuilder
                 ->setTemplateIdentifier($this->_mymoduleHelper->getemailreplytemplate())
                 ->setTemplateOptions(
@@ -133,7 +116,7 @@ class Save extends \Magento\Backend\App\Action
 
                 $transport->sendMessage();
 
-                    //////////////////// email
+                //////////////////// email
                 $model->save();
                 $this->messageManager->addSuccess(__('Email sent successfully'));
                 $this->dataPersistor->clear('serfe_askanexpert');
@@ -153,64 +136,4 @@ class Save extends \Magento\Backend\App\Action
         }
         return $resultRedirect->setPath('*/*/');
     }
-
- /*   private function _processNewsImage($data, $model){
-                
-        try{
-            
-        
-            $media_dir_obj = $this->_objectManager->get('Magento\Framework\Filesystem')
-                                                    ->getDirectoryRead(DirectoryList::MEDIA);                                                                        
-            $media_dir = $media_dir_obj->getAbsolutePath();
-
-
-            if(!empty($_FILES['newsimage']['name'])){
-
-                $Uploader = $this->_objectManager->create(
-                                               'Magento\MediaStorage\Model\File\Uploader',
-                                                ['fileId' => 'newsimage']);
-
-                $Uploader->setAllowCreateFolders(true);
-                $Uploader->setAllowRenameFiles(true);
-
-                $news_dir = $media_dir.'/news/';                                
-                $result = $Uploader->save($news_dir);
-
-                unset($result['tmp_name']);
-                unset($result['path']);
-
-                $data['newsimage'] = 'news/'.$Uploader->getUploadedFileName();
-
-            }else{
-
-                if(isset($data['newsimage']['delete'])){
-
-                    $data['newsimage'] = '';
-
-                }else{
-
-                    if($model->getId()) { //edit mode
-
-                        if($model->getNewsimage() != ''){                                        
-                            $data['newsimage'] = $model->getNewsimage();
-                        }
-
-                    }else{
-                        $data['newsimage'] = '';
-                    }
-                }
-            }
-            
-            if(isset($data['newsimage']))
-                return $data['newsimage'];    
-            
-        
-        } catch (\Exception $e) {
-        
-                $this->messageManager->addError(
-                        __($e->getMessage())
-                );                                
-        }            
-        
-    } */
 }

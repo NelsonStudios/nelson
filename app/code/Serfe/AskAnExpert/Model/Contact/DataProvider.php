@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Model\Contact;
 
 use Serfe\AskAnExpert\Model\ResourceModel\Contact\CollectionFactory;
@@ -68,11 +64,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         foreach ($items as $block) {
             $this->loadedData[$block->getId()] = $block->getData();
         }
-        
-
         $data = $this->dataPersistor->get('serfe_askanexpert');
-       // print_r($data);
-       // exit;
         if (!empty($data)) {
             $block = $this->collection->getNewEmptyItem();
             $block->setData($data);
@@ -80,8 +72,6 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
              
             $this->dataPersistor->clear('serfe_askanexpert');
         }
-      //  print_r($this->loadedData);
-      //  exit;
         return $this->loadedData;
     }
 }

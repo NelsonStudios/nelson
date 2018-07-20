@@ -2,9 +2,7 @@
 namespace Serfe\AskAnExpert\Controller;
 
 /**
- * Inchoo Custom router Controller Router
- *
- * @author      Zoran Salamun <zoran.salamun@inchoo.net>
+ * Custom router Controller Router
  */
 class Router implements \Magento\Framework\App\RouterInterface
 {
@@ -39,10 +37,7 @@ class Router implements \Magento\Framework\App\RouterInterface
      */
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
-      
         $identifier = trim($request->getPathInfo(), '/');
-
-
         if (strpos($identifier, $this->_mymoduleHelper->pagelink()) !== false) {
             /*
              * We must set module, controller path and action name for our controller class(Controller/Test/Test.php)

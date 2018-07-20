@@ -9,7 +9,7 @@ function geocode($address) {
   // decode the json
   $resp = json_decode($resp_json, true);
   // response status will be 'OK', if able to geocode given address 
-  if($resp['status']=='OK'){
+  if($resp['status'] == 'OK'){
     // get the important data
     $lati = $resp['results'][0]['geometry']['location']['lat'];
     $longi = $resp['results'][0]['geometry']['location']['lng'];
@@ -36,7 +36,6 @@ $add_qry = $this->getstreet1().' '.$this->getstreet2().' '.$this->getcity().' '.
 $data_arr = geocode($add_qry);
 // if able to geocode the address
 if($data_arr){
-
   $latitude = $data_arr[0];
   $longitude = $data_arr[1];
   $formatted_address = $data_arr[2];
@@ -57,31 +56,101 @@ $xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
 $country = $xml->geoplugin_countryName ;
 ?>
 <script type="text/javascript">
-function myFunction() {
-  var exists = document.getElementById("g-recaptcha-response");
-  if(exists.length !== 0) {
-    var check = document.getElementById("g-recaptcha-response").value;
-  }
-  if(check == '' || check == null){
-    document.getElementById("recaptcha").style.border = "1px solid #ea0e0e";
-    return false;
-  }
-  else{
-    document.getElementById("recaptcha").style.border = "none";
-    return true;
-  }
-}
-</script>
-<script type="text/javascript">
 require([
   'jquery',
-  'jquery/ui' 
+  'jquery/ui',
+  'mage/mage'
 ], function ($) {
-  $( document ).ready(function() {
-   initialize();
-		//google.maps.event.addDomListener(window, 'load', initialize);  
+  $('document').ready(function() {
+    getCategories();
+    /**
+     * getCategories ajax function.
+     * Function to get all categories.
+     * 
+     * @return {void} 
+     */
+    function getCategories() {
+      var catUrl = '<?php echo $this->getcategoryajaxurl(); ?>';
+      var param = '?ajax=1';
+      $.ajax({
+        showLoader: true,
+        url: catUrl + param,
+        type: "GET",
+        dataType: 'json'
+      }).done(function (data) {
+        var dropdown = $('#category-dropdown');
+        dropdown.empty();
+        if(data.length != 0) {
+          dropdown.append('<option selected="true" disabled>Choose Category</option>');
+          dropdown.prop('selectedIndex', 0);
+          var catAlreadyDisplayed = [];
+          $.each(data, function (key, entry) {
+            if(entry.entity_id != 1 && entry.entity_id != 2) {
+              catAlreadyDisplayed.push(entry.entity_id);
+              if(entry.children_count == 0) {
+                dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
+              }
+              if(entry.children_count > 0 && !catAlreadyDisplayed.includes(entry.entity_id)) {
+                dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
+              }
+            }
+          });
+        } else {
+          dropdown.append('<option selected="true" disabled>No Available Categories</option>');
+          dropdown.prop('selectedIndex', 0);
+        }
+      });
+    }
+    /**
+     * getProducstByCategory ajax function.
+     * Function to get all products under a specific category.
+     * 
+     * @param  {int} catId Category Id
+     * @return {void}
+     */
+    function getProducstByCategory(catId) {
+      var catUrl = '<?php echo $this->getproductsbycatajaxurl(); ?>';
+      var param = '?cat=' + catId + '&ajax=1';
+      $.ajax({
+        showLoader: true,
+        url: catUrl + param,
+        type: "GET",
+        dataType: 'json'
+      }).done(function (data) {
+        var dropdown = $('#product-dropdown');
+        dropdown.empty();
+        if(data.length != 0) {
+          dropdown.append('<option selected="true" disabled>Choose Product</option>');
+          dropdown.prop('selectedIndex', 0);
+          $.each(data, function (key, entry) {
+            dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
+          });
+        } else {
+          dropdown.append('<option selected="true" disabled>No Available Products</option>');
+          dropdown.prop('selectedIndex', 0);
+        }
+      });
+    }
+    
+    var dataForm = $('#contact-form');   
+    dataForm.mage('validation', {});
+
+    /* Category dropdown change bind to fill products selector */
+    $('#category-dropdown').change(function() {
+      getProducstByCategory($(this).val());
+    });
+    /* Send select text instead of value */
+    $('#contact-form').submit(function(){
+      $('#category-dropdown option:selected').val(function(){
+        return $(this).text().toUpperCase();
+      });
+      $('#product-dropdown option:selected').val(function(){
+        return $(this).text().toUpperCase();
+      });
+    });
   });
 });
+
 function initialize() {
 	var exists = document.getElementById("map");
  	var long = <?php echo $longitude; ?>//73.0373642;
@@ -119,10 +188,10 @@ function initialize() {
     <div class="main_block">
       <div class="map_container">
         <div class="page_title">
-          <h2><?php echo $this->pageheading(); ?></h2>
           <div class="aae-description">
             <?php echo $this->pagedescription(); ?>
           </div>
+          <h2><?php echo $this->pageheading(); ?></h2>
         </div>
         <?php if($this->isMapEnabled() && $add_qry != '') { ?>
           <div class="map_block" id="map"></div>
@@ -170,34 +239,71 @@ function initialize() {
               action="<?php /* @escapeNotVerified */ echo $block->getFormAction(); ?>"
               id="contact-form"
               name="contact-form"
-              onsubmit="return myFunction()"
+              onsubmit="return handle_recaptcha()"
               method="post"
               data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
               data-mage-init='{"validation":{}}'>
               <fieldset class="fieldset"> 
                <div>
+                <div class="field select-category required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>PRODUCT CATEGORY</label>
+                  <select id="category-dropdown" name="product_category" class="category-select" data-validate="{required:true}"></select>
+                </div>
+                <div class="field select-product required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>SELECT PRODUCT</label>
+                  <select id="product-dropdown" name="product_name" class="product-select" data-validate="{required:true}"></select>
+                </div>
+                <div class="field select-question-about required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>MY QUESTION IS ABOUT</label>
+                  <select id="question-dropdown" name="question_about" class="question-select" data-validate="{required:true}">
+                    <option selected="true" disabled>PLEASE SELECT ONE</option>
+                    <option>PRODUCT SUPPORT</option>
+                    <option>PARTS</option>
+                    <option>CUSTOMER SERVICE</option>
+                    <option>OTHER</option>
+                  </select>
+                </div>
+                <div class="field select-hearabout required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>HOW DID YOU HEAR ABOUT US?</label>
+                  <select id="hearabout-dropdown" name="hear_about" class="hearabout-select" data-validate="{required:true}">
+                    <option selected="true" disabled>PLEASE SELECT ONE</option>
+                    <option>WEB SEARCH</option>
+                    <option>FB/INSTAGRAM AD</option>
+                    <option>TRADE SHOW</option>
+                    <option>MAGAZINE</option>
+                    <option>FECON DEALER/PARTNER</option>
+                    <option>YOUTUBE AD</option>
+                    <option>PRIOR KNOWLEDGE</option>
+                    <option>WORD OF MOUTH</option>
+                    <option>OTHER</option>
+                  </select>
+                </div> 
                 <div class="field name required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>NAME</label>
                   <div class="control">
                     <input name="name" id="name" placeholder="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>"  class="input-text" type="text" data-validate="{required:true}"/>
                   </div>
                 </div>
                 <div class="field email required input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>EMAIL</label>
                   <div class="control">
                     <input name="email" id="email" placeholder="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>"  class="input-text" type="email" data-validate="{required:true, 'validate-email':true}"/>
                   </div>
                 </div>
                 <?php if($this->phonetittle() != '') {?>
                 <div class="field telephone input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>PHONE NUMBER</label>
                   <div class="control">
-                    <input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text" />
+                    <input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text" data-validate="{required:true}" />
                   </div>
                 </div>
                 <?php } ?>
 
                 <?php if($this->subjecttittle() != '') {?>
                 <div class="field subject input_outer">
+                  <label class="ask-expert-form-label"><span class="required">*</span>SUBJECT</label>
                   <div class="control">
-                    <input name="subject" id="subject" placeholder="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" class="input-text" type="text" />
+                    <input name="subject" id="subject" placeholder="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" class="input-text" type="text" data-validate="{required:true}" />
                   </div>
                 </div>
                 <?php } ?>

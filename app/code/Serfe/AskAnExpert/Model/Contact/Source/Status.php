@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Model\Contact\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
@@ -12,7 +8,6 @@ use Magento\Framework\Data\OptionSourceInterface;
  */
 class Status implements OptionSourceInterface
 {
-    
     /**
      * Get options
      *

@@ -1,14 +1,10 @@
 <?php
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Model\ResourceModel;
 
 abstract class AbstractCollection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
-     * [__construct description]
+     * Constructor
      * 
      * @param \Magento\Framework\Data\Collection\EntityFactoryInterface    $entityFactory [description]
      * @param \Psr\Log\LoggerInterface                                     $logger        [description]
@@ -29,10 +25,10 @@ abstract class AbstractCollection extends \Magento\Framework\Model\ResourceModel
     }
     
     /**
-     * [addFieldToFilter description]
+     * addFieldToFilter
      * 
-     * @param [type] $field     [description]
-     * @param [type] $condition [description]
+     * @param [string] $field
+     * @param [string] $condition
      */
     public function addFieldToFilter($field, $condition = null)
     {
