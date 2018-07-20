@@ -126,12 +126,12 @@ require([
             dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
           });
         } else {
-          dropdown.append('<option selected="true" disabled>No Available Products</option>');
+          dropdown.append('<option selected="true">No Available Products</option>');
           dropdown.prop('selectedIndex', 0);
         }
       });
     }
-    
+
     var dataForm = $('#contact-form');   
     dataForm.mage('validation', {});
 
