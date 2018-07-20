@@ -1,5 +1,6 @@
 @color_1: #333;
 @color_2: #1979c3;
+@color_3: #949494;
 @color_4: #5a5a5a;
 
 .clear {
@@ -93,11 +94,18 @@ body.askanexpert-front-index {
                                     text-indent: 15px;
                                     font-size: 14px;
                                     color: @color_1;
-                                    ::-webkit-input-placeholder { color: @color-black; }
-                                    :-moz-placeholder           { color: @color-black; }
-                                    ::-moz-placeholder          { color: @color-black; }
-                                    :-ms-input-placeholder      { color: @color-black; }
                                 }
+                                input::-webkit-input-placeholder { color: @color_3; }
+                                input::-moz-placeholder          { color: @color_3; }
+                                input:-moz-placeholder           { color: @color_3; }
+                                input:-ms-input-placeholder      { color: @color_3; }
+                            }
+                            textarea::-webkit-input-placeholder { color: @color_3; }
+                            textarea::-moz-placeholder          { color: @color_3; }
+                            textarea:-moz-placeholder           { color: @color_3; }
+                            textarea:-ms-input-placeholder      { color: @color_3; }
+                            textarea {
+                                font-size: 14px;
                             }
                             .last {
                                 margin-right: 0;
