@@ -10,6 +10,9 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
 
     protected $_eventPrefix = 'serfe_shipping_preorder';
 
+    const AVAILABLE = 1;
+    const NOT_AVAILABLE = 0;
+
     /**
      * @return void
      */
