@@ -13,14 +13,14 @@
                 <enabled_captcha>0</enabled_captcha>
             	<enabled_emailus>0</enabled_emailus>
                 <enabled_map>0</enabled_map>
-                <category_ajax_url>/support/ajax/category</category_ajax_url>
-            	<products_bycat_ajax_url>/support/ajax/product</products_bycat_ajax_url>
-                <meta_tittle>AskAnExpert</meta_tittle>
-            	<meta_keyword>AskAnExpert</meta_keyword>
-            	<meta_description>AskAnExpert</meta_description>
-            	<contact_heading>GET IN TOUCH WITH US</contact_heading>
+                <category_ajax_url>/askanexpert/ajax/category</category_ajax_url>
+            	<products_bycat_ajax_url>/askanexpert/ajax/product</products_bycat_ajax_url>
+                <meta_tittle>Ask An Expert</meta_tittle>
+            	<meta_keyword>Ask An Expert</meta_keyword>
+            	<meta_description>Ask An Expert</meta_description>
+            	<contact_heading>SUBMIT YOUR QUESTION</contact_heading>
             	<contact_description>Jot us a note and we’ll get back to you as quickly as possible.</contact_description>
-            	<contact_link>askanexpert.html</contact_link>
+            	<contact_link>ask-an-expert.html</contact_link>
             </active_display>
             <popup_display>
             	<enabled_popup>1</enabled_popup>

@@ -227,7 +227,7 @@ require([
               </div>
             </div>
             <?php if($this->isCaptchaEnabled()) { ?>
-              <div class="g-recaptcha" name="recaptcha" id="recaptcha" data-sitekey="<?php echo $this->getsitekey(); ?>"></div>
+              <div class="g-recaptcha" name="recaptcha" id="recaptcha" style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;" data-sitekey="<?php echo $this->getsitekey(); ?>"></div>
               <?php } ?>
              <!-- <?php echo $block->getChildHtml('form.additional.info'); ?> -->
             </fieldset>

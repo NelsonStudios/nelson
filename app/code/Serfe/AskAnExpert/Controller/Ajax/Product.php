@@ -1,30 +1,30 @@
 <?php
 
-namespace Serfe\Support\Controller\Ajax;
+namespace Serfe\AskAnExpert\Controller\Ajax;
 
-class Category extends \Magento\Framework\App\Action\Action
+class Product extends \Magento\Framework\App\Action\Action
 {
 
     protected $resultPageFactory;
     protected $jsonHelper;
-    protected $categoryCollection;
+    protected $productCollection;
 
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context  $context
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
-     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollection
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollection
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->jsonHelper = $jsonHelper;
-        $this->categoryCollection = $categoryCollection;
+        $this->productCollection = $productCollection;
         parent::__construct($context);
     }
 
@@ -35,8 +35,13 @@ class Category extends \Magento\Framework\App\Action\Action
      */
     public function execute() {
         if ($this->getRequest()->isAjax()) {
+            $params = $this->getRequest()->getParams();
             try {
-                $data = $this->getCategoryCollection();
+                if(!empty($params['cat'])) {
+                    $data = $this->getProductCollection()->addCategoriesFilter(['eq' => $params['cat']]);
+                } else {
+                    $data = $this->getProductCollection();
+                }
                 return $this->jsonResponse($data->toArray());
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 return $this->jsonResponse($e->getMessage());
@@ -60,13 +65,13 @@ class Category extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Returns Category collection
+     * Returns Product collection
      *
-     * @return \Magento\Catalog\Model\ResourceModel\Category\Collection
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
-    protected function getCategoryCollection()
+    protected function getProductCollection()
     {
-        $collection = $this->categoryCollection->create()->addAttributeToSelect('name');
+        $collection = $this->productCollection->create()->addAttributeToSelect('name');
 
         return $collection;
     }
