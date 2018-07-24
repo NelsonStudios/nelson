@@ -50,6 +50,7 @@ class Save extends \Magento\Framework\App\Action\Action
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         \Serfe\AskAnExpert\Helper\Data $myModuleHelper,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Serfe\AskAnExpert\Model\ContactFactory $_contactModel
     ) {
         $this->storeManager = $storeManager;
@@ -57,6 +58,7 @@ class Save extends \Magento\Framework\App\Action\Action
         $this->customerRepository = $customerRepository;
         $this->subscriberFactory = $subscriberFactory;
         $this->_mymoduleHelper = $myModuleHelper;
+        $this->messageManager = $messageManager;
         $this->_contactModel = $_contactModel;
         $this->_transportBuilder = $transportBuilder;
         parent::__construct($context);
@@ -91,28 +93,37 @@ class Save extends \Magento\Framework\App\Action\Action
                 ];
                 $req = "";
                 foreach ($dataC as $key => $value) {
-                     $req .= $key . '=' . urlencode(stripslashes($value)) . '&';
+                    $req .= $key . '=' . urlencode(stripslashes($value)) . '&';
                 }
                 // Cut the last '&'
                 $req = substr($req, 0, strlen($req)-1);
                 $response = file_get_contents($path . $req);
                 $answers = json_decode($response, true);
-                if (trim($answers ['success']) == true) {
-                    if ($this->_mymoduleHelper->getreceipt() !='') {
+                if (trim($answers['success']) == true) {
+                    /**** Start Email Block ****/
+                    if ($this->_mymoduleHelper->getreceipt() != '') {
+                        $sender = '';
+                        if($this->_mymoduleHelper->getemailsender() == '') {
+                            $sender = 'test@devphase.io';
+                        } else {
+                            $sender = $this->_mymoduleHelper->getemailsender();
+                        }
                         $transport = $this->_transportBuilder
                         ->setTemplateIdentifier($this->_mymoduleHelper->getemailtemplate())
-                        ->setTemplateOptions([
+                        ->setTemplateOptions(
+                            [
                             'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
                             'store' => \Magento\Store\Model\Store::DEFAULT_STORE_ID,
-                        ])
+                            ]
+                        )
                         ->setTemplateVars(['data' => $postObject])
-                        ->setFrom($this->_mymoduleHelper->getemailsender())
+                        ->setFrom($sender)
                         ->addTo($this->_mymoduleHelper->getreceipt())
                         ->setReplyTo($post['email'])
                         ->getTransport();
                         $transport->sendMessage();
                     }
-                    ///////////////////////////////////////////////////////////////////////////////////
+                    /**** End Email Block ****/
                     $contactModel = $this->_contactModel->create();
                     $contactModel->setData($post);
                     $contactModel->save();
@@ -156,7 +167,9 @@ class Save extends \Magento\Framework\App\Action\Action
                 $contactModel = $this->_contactModel->create();
                 $contactModel->setData($post);
                 $contactModel->save();
+                
                 $this->messageManager->addSuccess(__('Your inquiry has been submitted successfully. We will contact you back shortly.'));
+                
                 $this->_redirect($this->_redirect->getRefererUrl());
                 return;
             }

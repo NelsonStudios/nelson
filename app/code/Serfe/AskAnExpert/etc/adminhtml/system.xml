@@ -42,23 +42,6 @@
                     </depends>
                 </field>
 
-
-                <field id="enabled_map" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable Map</label>
-                    <comment>This Map is shown on askanexpert page</comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
-                </field>
-
-                <field id="map_key" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Google Map Key</label>
-                    <validate>required-entry</validate>  
-                    <comment>Get Key From https://developers.google.com/maps/documentation/javascript/get-api-key</comment>
-                    <depends>
-                        <field id="enabled_map">1</field>
-                    </depends>
-                </field>
-
                 <field id="enabled_emailus" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable Email Us</label>
                     <comment>The Email Us section is shown in Ask An Expert page.</comment>
@@ -96,22 +79,6 @@
                     <comment>This text is identifier. Note: Use text other than 'contact'.</comment>
                 </field>
             </group>
-
-
-            <group id="popup_display" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Ask An Expert Popup Settings</label>
-                <field id="enabled_popup" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable Popup</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
-                </field>
-
-                <field id="popup_view" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Popup Position</label>
-                <source_model>Serfe\AskAnExpert\Model\Config\Source\ListMode</source_model>
-            </field>
-            </group>
-
 
             <group id="form_display" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Ask An Expert Form Settings</label>

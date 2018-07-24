@@ -31,9 +31,6 @@ class Save extends \Magento\Backend\App\Action
     protected $_escaper;
     protected $inlineTranslation;
     protected $_dateFactory;
-    //protected $_modelNewsFactory;
-  //  protected $collectionFactory;
-   //  protected $filter;
     /**
      * @param Context $context
      * @param \Magento\Framework\Registry $coreRegistry

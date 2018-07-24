@@ -1,57 +1,7 @@
-<?php
-function geocode($address) {
-  // url encode the address
-  $address = urlencode($address);
-  // google map geocode api url
-  $url = "http://maps.google.com/maps/api/geocode/json?address={$address}";
-  // get the json response
-  $resp_json = file_get_contents($url);
-  // decode the json
-  $resp = json_decode($resp_json, true);
-  // response status will be 'OK', if able to geocode given address 
-  if($resp['status'] == 'OK'){
-    // get the important data
-    $lati = $resp['results'][0]['geometry']['location']['lat'];
-    $longi = $resp['results'][0]['geometry']['location']['lng'];
-    $formatted_address = $resp['results'][0]['formatted_address'];
-    // verify if data is complete
-    if($lati && $longi && $formatted_address){
-      // put the data in the array
-      $data_arr = array();            
-      array_push(
-        $data_arr, 
-        $lati, 
-        $longi, 
-        $formatted_address
-        );
-      return $data_arr;
-    } else {
-      return false;
-    }
-  } else {
-    return false;
-  }
-}
-$add_qry = $this->getstreet1().' '.$this->getstreet2().' '.$this->getcity().' '.$this->getregion().' '.$this->getzip().' '.$this->getcountry();
-$data_arr = geocode($add_qry);
-// if able to geocode the address
-if($data_arr){
-  $latitude = $data_arr[0];
-  $longitude = $data_arr[1];
-  $formatted_address = $data_arr[2];
-} else {
-  $latitude = 0;
-  $longitude = 0;
-  $formatted_address = '';
-}
-// $check_map = 	$this->isMapEnabled();
-?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $this->getmapkey(); ?> "></script>
 <?php 
 $om = \Magento\Framework\App\ObjectManager::getInstance();
 $obj = $om->get('Magento\Framework\HTTP\PhpEnvironment\RemoteAddress');
 $ip =  $obj->getRemoteAddress();
-//echo  $ip;
 $xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
 $country = $xml->geoplugin_countryName ;
 ?>
@@ -109,11 +59,11 @@ require([
      * @return {void}
      */
     function getProducstByCategory(catId) {
-      var catUrl = '<?php echo $this->getproductsbycatajaxurl(); ?>';
+      var prodUrl = '<?php echo $this->getproductsbycatajaxurl(); ?>';
       var param = '?cat=' + catId + '&ajax=1';
       $.ajax({
         showLoader: true,
-        url: catUrl + param,
+        url: prodUrl + param,
         type: "GET",
         dataType: 'json'
       }).done(function (data) {
@@ -150,34 +100,6 @@ require([
     });
   });
 });
-
-function initialize() {
-	var exists = document.getElementById("map");
- 	var long = <?php echo $longitude; ?>//73.0373642;
-	var lat = <?php echo $latitude; ?>//33.4819688;
-	var myLatlng = new google.maps.LatLng(lat, long); // Change your location Latitude and Longitude 
-	var mapOptions = {
-    zoom: 14,
-    center: myLatlng
-  }
-  var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-	// Disabled Map Scroll in Contact Page 
-  map.setOptions({'scrollwheel': false});
-
-	// Black and White style for Google Map
-  var contentString = '<?php echo $add_qry; ?>';
-  var infowindow = new google.maps.InfoWindow({
-    content: contentString
-  })
-	// Google Map Maker 
-  var marker = new google.maps.Marker({
-    position: myLatlng,
-    map: map,
-  });
-  marker.addListener('click', function() {
-    infowindow.open(map, marker);
-  });
-}
 </script>
 <head>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -193,13 +115,6 @@ function initialize() {
           </div>
           <h2><?php echo $this->pageheading(); ?></h2>
         </div>
-        <?php if($this->isMapEnabled() && $add_qry != '') { ?>
-          <div class="map_block" id="map"></div>
-          <div>
-            <p>
-          </div>
-</div>
-<?php } ?>
 <div class="contact_container">
   <div class="inner_container">
     <ul>
