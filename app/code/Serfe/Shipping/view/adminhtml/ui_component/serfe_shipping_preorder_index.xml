@@ -91,7 +91,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">created_at</item>
+                    <item name="label" translate="true" xsi:type="string">Created At</item>
                 </item>
             </argument>
         </column>
@@ -99,39 +99,65 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">updated_at</item>
+                    <item name="label" translate="true" xsi:type="string">Updated At</item>
                 </item>
             </argument>
         </column>
-        <column name="is_available">
+        <column name="is_available" class="Serfe\Shipping\Ui\Component\Listing\Column\Status">
             <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Serfe\Shipping\Model\Preorder\StatusList</item>
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">is_available</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" translate="true" xsi:type="string">Is Available</item>
                 </item>
             </argument>
         </column>
-        <column name="customer_id">
+        <column name="customer" class="Serfe\Shipping\Ui\Component\Listing\Column\Customer">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">customer_id</item>
+                    <item name="label" translate="true" xsi:type="string">Customer</item>
                 </item>
             </argument>
         </column>
-        <column name="quote_id">
+        <column name="country" class="Serfe\Shipping\Ui\Component\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">quote_id</item>
+                    <item name="label" translate="true" xsi:type="string">Country</item>
                 </item>
             </argument>
         </column>
-        <column name="shipping_method">
+        <column name="state" class="Serfe\Shipping\Ui\Component\Listing\Column\State">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">shipping_method</item>
+                    <item name="label" translate="true" xsi:type="string">State</item>
+                </item>
+            </argument>
+        </column>
+        <column name="city" class="Serfe\Shipping\Ui\Component\Listing\Column\City">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">City</item>
+                </item>
+            </argument>
+        </column>
+        <column name="zip_code" class="Serfe\Shipping\Ui\Component\Listing\Column\ZipCode">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Zip Code</item>
+                </item>
+            </argument>
+        </column>
+        <column name="shipping_method" class="Serfe\Shipping\Ui\Component\Listing\Column\ShippingMethod">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Shipping Method</item>
                 </item>
             </argument>
         </column>
@@ -139,7 +165,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">shipping_price</item>
+                    <item name="label" translate="true" xsi:type="string">Shipping Price</item>
                     <item name="editor" xsi:type="array">
                         <item name="editorType" xsi:type="string">text</item>
                         <item name="validation" xsi:type="array">
