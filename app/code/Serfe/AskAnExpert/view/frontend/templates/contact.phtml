@@ -137,11 +137,9 @@ require([
             <li class="divider"></li>
             <?php } ?>
              <?php if ($this->getstoreemail() != '' && $this->getenableemailus() == true) { ?>
-              <li class="last">
+              <li class="last email-us">
                 <h3>Email Us</h3>
                 <p><a href="#"><?php echo $this->getstoreemail(); ?></a>
-                  <br>
-                  <br></p>
                 </li>
                 <?php } ?>
               </ul>
