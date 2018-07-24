@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 namespace Serfe\AskAnExpert\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -75,8 +71,8 @@ class Actions extends Column
                         'href' => $this->urlBuilder->getUrl(self::URL_PATH_DELETE, ['contact_id' => $item['contact_id']]),
                         'label' => __('Delete'),
                         'confirm' => [
-                            'title' => __('Delete ${ $.$data.title }'),
-                            'message' => __('Are you sure you wan\'t to delete a ${ $.$data.title } record?')
+                            'title' => __('Delete question about: ${ $.$data.question_about }'),
+                            'message' => __('Are you sure you wan\'t to delete question about ${ $.$data.question_about } ?')
                         ]
                     ];
                 }

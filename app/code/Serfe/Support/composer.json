@@ -7,6 +7,10 @@
         {
             "email": "xuan@serfe.com",
             "name": "Xuan Villagran"
+        },
+        {
+            "email": "bruno@serfe.com",
+            "name": "Bruno Binci"
         }
     ],
     "minimum-stability": "dev",

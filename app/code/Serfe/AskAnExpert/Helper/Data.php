@@ -43,8 +43,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
  
     /**
-     * [getFrontName description]
-     * @return [type] [description]
+     * getFrontName
+     * 
+     * @return string $pageLink | 'contact'
      */
     public function getFrontName()
     {
@@ -59,8 +60,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
     /**
-     * [timezone description]
-     * @return [type] [description]
+     * timezone
+     * 
+     * @return string timezone config value
      */
     public function timezone()
     {
@@ -70,8 +72,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [isContactEnabled description]
-     * @return boolean [description]
+     * isContactEnabled
+     * 
+     * @return boolean isContactEnabled config value
      */
     public function isContactEnabled()
     {
@@ -82,7 +85,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * [isCaptchaEnabled description]
-     * @return boolean [description]
+     * @return boolean isCaptchaEnabled config value
      */
     public function isCaptchaEnabled()
     {
@@ -92,8 +95,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [getsitekey description]
-     * @return [type] [description]
+     * getsitekey
+     * 
+     * @return string getsitekey config value
      */
     public function getsitekey()
     {
@@ -103,8 +107,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [getsecurekey description]
-     * @return [type] [description]
+     * getsecurekey 
+     * 
+     * @return string getsecurekey config value
      */
     public function getsecurekey()
     {
@@ -114,8 +119,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [isMapEnabled description]
-     * @return boolean [description]
+     * isMapEnabled
+     * 
+     * @return boolean isMapEnabled config value
      */
     public function isMapEnabled()
     {
@@ -125,8 +131,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [getmapkey description]
-     * @return [type] [description]
+     * getmapkey
+     * 
+     * @return string getmapkey config value
      */
     public function getmapkey()
     {
@@ -136,8 +143,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [getmapkey description]
-     * @return [type] [description]
+     * metatittle
+     * 
+     * @return string metatittle config value
      */
     public function metatittle()
     {
@@ -147,8 +155,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [getmapkey description]
-     * @return [type] [description]
+     * metakeyword
+     * 
+     * @return string metakeyword config value
      */
     public function metakeyword()
     {
@@ -158,8 +167,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [metadescription description]
-     * @return [type] [description]
+     * metadescription
+     * 
+     * @return string metadescription config value
      */
     public function metadescription()
     {
@@ -169,8 +179,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [metadescription description]
-     * @return [type] [description]
+     * pageheading
+     * 
+     * @return string pageheading config value
      */
     public function pageheading()
     {
@@ -180,8 +191,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [metadescription description]
-     * @return [type] [description]
+     * pagedescription
+     * 
+     * @return string pagedescription config value
      */
     public function pagedescription()
     {
@@ -191,8 +203,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [pagelink description]
-     * @return [type] [description]
+     * pagelink
+     * 
+     * @return string pagelink config value
      */
     public function pagelink()
     {
@@ -202,8 +215,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [pagelink description]
-     * @return [type] [description]
+     * isPopupEnabled
+     * 
+     * @return string isPopupEnabled config value
      */
     public function isPopupEnabled()
     {
@@ -213,8 +227,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [pagelink description]
-     * @return [type] [description]
+     * popupposition
+     * 
+     * @return string popupposition config value
      */
     public function popupposition()
     {
@@ -225,8 +240,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * [nametittle description]
-     * @return [type] [description]
+     * nametittle
+     * 
+     * @return string nametittle config value
      */
     public function nametittle()
     {
@@ -236,8 +252,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [nametittle description]
-     * @return [type] [description]
+     * emailtittle
+     * 
+     * @return string emailtittle config value
      */
     public function emailtittle()
     {
@@ -247,8 +264,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [nametittle description]
-     * @return [type] [description]
+     * phonetittle
+     * 
+     * @return string phonetittle config value
      */
     public function phonetittle()
     {
@@ -258,8 +276,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [subjecttittle description]
-     * @return [type] [description]
+     * subjecttittle
+     * 
+     * @return string subjecttittle config value
      */
     public function subjecttittle()
     {
@@ -269,8 +288,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [subjecttittle description]
-     * @return [type] [description]
+     * messagetittle
+     * 
+     * @return string messagetittle config value
      */
     public function messagetittle()
     {
@@ -280,8 +300,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * [subjecttittle description]
-     * @return [type] [description]
+     * buttontext
+     * 
+     * @return string buttontext config value
      */
     public function buttontext()
     {
@@ -291,8 +312,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///////////////// store information ////////////////////////////////////////
+    /** Store Information **/
+
+    /**
+     * getStoreName
+     * 
+     * @return string getStoreName config value
+     */
     public function getStoreName()
     {
         return $this->scopeConfig->getValue(
@@ -300,7 +326,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getstreet1
+     * 
+     * @return string getstreet1 config value
+     */
     public function getstreet1()
     {
         return $this->scopeConfig->getValue(
@@ -308,7 +338,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getstreet2
+     * 
+     * @return string getstreet2 config value
+     */
     public function getstreet2()
     {
         return $this->scopeConfig->getValue(
@@ -316,7 +350,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getcity
+     * 
+     * @return string getcity config value
+     */
     public function getcity()
     {
         return $this->scopeConfig->getValue(
@@ -324,7 +362,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getzip
+     * 
+     * @return string getzip config value
+     */
     public function getzip()
     {
         return $this->scopeConfig->getValue(
@@ -332,7 +374,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getregion
+     * 
+     * @return string getregion config value
+     */
     public function getregion()
     {
         return $this->scopeConfig->getValue(
@@ -340,6 +386,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getcountry
+     * 
+     * @return string getcountry config value
+     */
     public function getcountry()
     {
         return $this->scopeConfig->getValue(
@@ -347,6 +398,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getphone
+     * 
+     * @return string getphone config value
+     */
     public function getphone()
     {
         return $this->scopeConfig->getValue(
@@ -354,7 +410,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getstoreemail
+     * 
+     * @return string getstoreemail config value
+     */
     public function getstoreemail()
     {
         return $this->scopeConfig->getValue(
@@ -363,9 +423,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    /** Email Section **/
 
-    ////////////////////////////// email //////////////////////////////////////
-
+    /**
+     * getreceipt
+     * 
+     * @return string getreceipt config value
+     */
     public function getreceipt()
     {
         return $this->scopeConfig->getValue(
@@ -373,7 +437,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * getemailsender
+     * 
+     * @return string getemailsender config value
+     */
     public function getemailsender()
     {
         return $this->scopeConfig->getValue(
@@ -381,6 +449,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getemailtemplate
+     * 
+     * @return string getemailtemplate config value
+     */
     public function getemailtemplate()
     {
         return $this->scopeConfig->getValue(
@@ -388,6 +461,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getemailreplytemplate
+     * 
+     * @return string getemailreplytemplate config value
+     */
     public function getemailreplytemplate()
     {
         return $this->scopeConfig->getValue(
@@ -395,6 +473,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getenableemailus
+     * 
+     * @return string getenableemailus config value
+     */
     public function getenableemailus()
     {
         return $this->scopeConfig->getValue(
@@ -402,6 +485,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getcategoryajaxurl
+     * 
+     * @return string getcategoryajaxurl config value
+     */
     public function getcategoryajaxurl()
     {
         return $this->scopeConfig->getValue(
@@ -409,6 +497,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * getproductsbycatajaxurl
+     * 
+     * @return string getproductsbycatajaxurl config value
+     */
     public function getproductsbycatajaxurl()
     {
         return $this->scopeConfig->getValue(
