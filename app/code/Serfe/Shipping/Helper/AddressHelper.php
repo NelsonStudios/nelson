@@ -129,7 +129,7 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         try {
             $address = $this->addressRepository->getById($addressId);
-            $value = $address->getRegion();
+            $value = $address->getRegion()->getRegion();
         } catch (\Magento\Framework\Exception\LocalizedException $ex) {
             $this->_logger->error('Cannot get Address by id in AddressHelper, error: ' . $ex->getMessage());
             $value = '';
