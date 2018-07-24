@@ -90,16 +90,22 @@
         <column name="created_at">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Created At</item>
+                    <item name="timezone" xsi:type="boolean">false</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="label" xsi:type="string" translate="true">Created</item>
+                    <item name="dateFormat" xsi:type="string">MMM dd, YYYY, H:mm:ss A</item>
                 </item>
             </argument>
         </column>
         <column name="updated_at">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Updated At</item>
+                    <item name="timezone" xsi:type="boolean">false</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="label" xsi:type="string" translate="true">Updated</item>
+                    <item name="dateFormat" xsi:type="string">MMM dd, YYYY, H:mm:ss A</item>
                 </item>
             </argument>
         </column>
@@ -116,7 +122,6 @@
         <column name="customer" class="Serfe\Shipping\Ui\Component\Listing\Column\Customer">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Customer</item>
                 </item>
             </argument>
@@ -124,7 +129,6 @@
         <column name="country" class="Serfe\Shipping\Ui\Component\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Country</item>
                 </item>
             </argument>
@@ -132,7 +136,6 @@
         <column name="state" class="Serfe\Shipping\Ui\Component\Listing\Column\State">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">State</item>
                 </item>
             </argument>
@@ -140,7 +143,6 @@
         <column name="city" class="Serfe\Shipping\Ui\Component\Listing\Column\City">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">City</item>
                 </item>
             </argument>
@@ -148,7 +150,6 @@
         <column name="zip_code" class="Serfe\Shipping\Ui\Component\Listing\Column\ZipCode">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Zip Code</item>
                 </item>
             </argument>
