@@ -14,7 +14,6 @@ class Save extends \Magento\Framework\App\Action\Action
      */
     private $dataPersistor;
     protected $formKeyValidator;
-    //const CP_PAGE_HEADING = 'askanexpert/active_display/contact_heading';
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
