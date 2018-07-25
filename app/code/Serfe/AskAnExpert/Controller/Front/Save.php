@@ -112,7 +112,7 @@ class Save extends \Magento\Framework\App\Action\Action
                         ->setTemplateOptions(
                             [
                             'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                            'store' => \Magento\Store\Model\Store::DEFAULT_STORE_ID,
+                            'store' => $this->storeManager->getStore()->getStoreId(),
                             ]
                         )
                         ->setTemplateVars(['data' => $postObject])
@@ -151,7 +151,7 @@ class Save extends \Magento\Framework\App\Action\Action
                     ->setTemplateOptions(
                         [
                         'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                        'store' => \Magento\Store\Model\Store::DEFAULT_STORE_ID,
+                        'store' => $this->storeManager->getStore()->getStoreId(),
                         ]
                     )
                     ->setTemplateVars(['data' => $postObject])
