@@ -4,9 +4,6 @@
 		<script src="https://www.google.com/recaptcha/api.js" src_type="url" />
 	</head>
     <body>
-        <referenceBlock name="after.body.start">
-            <block class="Serfe\AskAnExpert\Block\Contactblock" name="popup" after="-" template="Serfe_AskAnExpert::popup.phtml"/>
-        </referenceBlock>
         <referenceBlock name="askanexpert-link" remove="true"/>
         <referenceBlock name="footer_links" >
             <block class="Magento\Framework\View\Element\Html\Link\Current" name="askanexpert-link2">
