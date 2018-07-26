@@ -1,9 +1,11 @@
 <?php 
-$om = \Magento\Framework\App\ObjectManager::getInstance();
+$om  = \Magento\Framework\App\ObjectManager::getInstance();
 $obj = $om->get('Magento\Framework\HTTP\PhpEnvironment\RemoteAddress');
-$ip =  $obj->getRemoteAddress();
+$ip  =  $obj->getRemoteAddress();
 $xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
-$country = $xml->geoplugin_countryName ;
+if (false === $xml) {
+  $country = $xml->geoplugin_countryName ;
+}
 ?>
 <script type="text/javascript">
 require([
@@ -118,7 +120,7 @@ require([
 <div class="contact_container">
   <div class="inner_container">
     <ul>
-      <?php if ($this->getphone() != '') {?>
+      <?php if ($this->getphone() != '' && $this->getenablestoreinfo() == true) {?>
         <li>
           <h3>Phone Number</h3>
           <p><?php echo $this->getphone(); ?>
@@ -127,7 +129,7 @@ require([
           </li>
           <li class="divider"></li>
           <?php } ?>
-          <?php if ($this->getStoreName() != '') { ?>
+          <?php if ($this->getStoreName() != '' && $this->getenablestoreinfo() == true) { ?>
           <li> 
             <h3><?php echo $this->getStoreName(); ?></h3>
             <p><?php echo $this->getstreet1() . ' ' . $this->getstreet2() . ' ' . $this->getcity() . ',' . $this->getzip();?>
@@ -234,7 +236,7 @@ require([
             <div class="actions-toolbar">
               <div class="primary">
                 <input type="hidden" name="ip" id="ip" value="<?php echo $ip; ?>" />
-                <input type="hidden" name="country" id="country" value="<?php echo $country; ?>" />
+                <input type="hidden" name="country" id="country" value="<?php echo ((!empty($country)) ? $country : 'N/A'); ?>" />
                 <input type="hidden" name="hideit" id="hideit" value="" />
                 <button type="submit" name="submit" id="submit"  title="<?php /* @escapeNotVerified */ echo __($this->buttontext()) ?>" class="action submit primary">
                   <span><?php /* @escapeNotVerified */ echo __($this->buttontext()) ?></span>

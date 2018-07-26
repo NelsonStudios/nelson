@@ -36,6 +36,7 @@ class Save extends \Magento\Backend\App\Action
         DataPersistorInterface $dataPersistor,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Escaper $escaper,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateFactory,
@@ -45,6 +46,7 @@ class Save extends \Magento\Backend\App\Action
         $this->_transportBuilder = $transportBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->_escaper = $escaper;
+        $this->storeManager = $storeManager;
         $this->_dateFactory = $dateFactory;
         $this->_mymoduleHelper = $myModuleHelper;
         $this->inlineTranslation = $inlineTranslation;
@@ -97,7 +99,7 @@ class Save extends \Magento\Backend\App\Action
                 ->setTemplateOptions(
                     [
                         'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                        'store' => \Magento\Store\Model\Store::DEFAULT_STORE_ID,
+                        'store' => $this->storeManager->getStore()->getStoreId(),
                     ]
                 )
                 ->setTemplateVars(['data' => $postObject])

@@ -26,7 +26,7 @@ class Contactblock extends Template {
     /**
      * _prepareLayout
      * 
-     * @return [type]
+     * @return string config value
      */
     protected function _prepareLayout() {
         parent::_prepareLayout();
@@ -41,7 +41,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function getFormAction()
     {
@@ -50,7 +50,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function isimage()
     {
@@ -59,7 +59,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function isContactEnabled()
     {
@@ -69,7 +69,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function isCaptchaEnabled()
     {
@@ -78,7 +78,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function getsitekey()
     {
@@ -87,7 +87,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function getsecurekey()
     {
@@ -96,7 +96,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function isMapEnabled()
     {
@@ -105,7 +105,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function getmapkey()
     {
@@ -114,7 +114,7 @@ class Contactblock extends Template {
     /**
      * Get action
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function metatittle()
     {
@@ -123,7 +123,7 @@ class Contactblock extends Template {
     /**
      * Get metakeyword
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function metakeyword()
     {
@@ -132,7 +132,7 @@ class Contactblock extends Template {
     /**
      * Get metadescription
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function metadescription()
     {
@@ -141,7 +141,7 @@ class Contactblock extends Template {
     /**
      * Get pageheading
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function pageheading()
     {
@@ -150,7 +150,7 @@ class Contactblock extends Template {
     /**
      * Get pagedescription
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function pagedescription()
     {
@@ -159,75 +159,73 @@ class Contactblock extends Template {
     /**
      * Get pagelink
      * 
-     * @return [type] [description]
+     * @return string config value 
      */
     public function pagelink()
     {
          return $this->_mymoduleHelper->pagelink();
     }
     
-    ////////////////////////////////////////////////////////////
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [isPopupEnabled
+     * @return boolean 
      */
     public function isPopupEnabled()
     {
          return $this->_mymoduleHelper->isPopupEnabled();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [popupposition
+     * @return boolean 
      */
     public function popupposition()
     {
          return $this->_mymoduleHelper->popupposition();
     }
 
-    ////////////////////////////////////////////////////////////
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [nametittle
+     * @return boolean 
      */
     public function nametittle()
     {
          return $this->_mymoduleHelper->nametittle();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [emailtittle
+     * @return boolean 
      */
     public function emailtittle()
     {
          return $this->_mymoduleHelper->emailtittle();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [phonetittle
+     * @return boolean 
      */
     public function phonetittle()
     {
          return $this->_mymoduleHelper->phonetittle();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [subjecttittle
+     * @return boolean 
      */
     public function subjecttittle()
     {
          return $this->_mymoduleHelper->subjecttittle();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [messagetittle
+     * @return boolean 
      */
     public function messagetittle()
     {
          return $this->_mymoduleHelper->messagetittle();
     }
     /**
-     * [isPopupEnabled description]
-     * @return boolean [description]
+     * [buttontext
+     * @return boolean 
      */
     public function buttontext()
     {
@@ -237,96 +235,104 @@ class Contactblock extends Template {
     ////////////////////Store information /////////////////////////////////
 
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getStoreName
+     * @return string config value 
      */
     public function getStoreName()
     {
         return $this->_mymoduleHelper->getStoreName();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getstreet1
+     * @return string config value 
      */
     public function getstreet1()
     {
         return $this->_mymoduleHelper->getstreet1();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getstreet2
+     * @return string config value 
      */
     public function getstreet2()
     {
         return $this->_mymoduleHelper->getstreet2();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getcity
+     * @return string config value 
      */
     public function getcity()
     {
         return $this->_mymoduleHelper->getcity();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getzip
+     * @return string config value 
      */
     public function getzip()
     {
         return $this->_mymoduleHelper->getzip();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getregion
+     * @return string config value 
      */
     public function getregion()
     {
         return $this->_mymoduleHelper->getregion();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getcountry
+     * @return string config value 
      */
     public function getcountry()
     {
         return $this->_mymoduleHelper->getcountry();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getphone
+     * @return string config value 
      */
     public function getphone()
     {
         return $this->_mymoduleHelper->getphone();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getstoreemail
+     * @return string config value 
      */
     public function getstoreemail()
     {
         return $this->_mymoduleHelper->getstoreemail();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getenableemailus
+     * @return string config value 
      */
     public function getenableemailus()
     {
         return $this->_mymoduleHelper->getenableemailus();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getEnableStoreInfo
+     * @return string config value
+     */
+    public function getenablestoreinfo()
+    {
+        return $this->_mymoduleHelper->getenablestoreinfo();
+    }
+    /**
+     * getcategoryajaxurl
+     * @return string config value 
      */
     public function getcategoryajaxurl()
     {
         return $this->_mymoduleHelper->getcategoryajaxurl();
     }
     /**
-     * [getStoreName description]
-     * @return [type] [description]
+     * getproductsbycatajaxurl
+     * @return string config value 
      */
     public function getproductsbycatajaxurl()
     {

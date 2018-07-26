@@ -42,6 +42,13 @@
                     </depends>
                 </field>
 
+                <field id="enabled_storeinfo" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Store Info</label>
+                    <comment>The Store Info section is shown in Ask An Expert page.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
+                </field>
+
                 <field id="enabled_emailus" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable Email Us</label>
                     <comment>The Email Us section is shown in Ask An Expert page.</comment>

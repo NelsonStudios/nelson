@@ -7,6 +7,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CP_CONTACT_ENABLE = 'askanexpert/active_display/enabled_askanexpert';
     const CP_CAPTCHA_ENABLE = 'askanexpert/active_display/enabled_captcha';
     const CP_EMAILUS_ENABLE = 'askanexpert/active_display/enabled_emailus';
+    const CP_STOREINFO_ENABLE = 'askanexpert/active_display/enabled_storeinfo';
     const CP_CATEGORIES_AJAX_URL = 'askanexpert/active_display/category_ajax_url';
     const CP_PRODUCTS_AJAX_URL = 'askanexpert/active_display/products_bycat_ajax_url';
     const CP_SITE_KEY = 'askanexpert/active_display/site_key';
@@ -482,6 +483,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::CP_EMAILUS_ENABLE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * getenablestoreinfo
+     * 
+     * @return string getenableemailus config value
+     */
+    public function getenablestoreinfo()
+    {
+        return $this->scopeConfig->getValue(
+            self::CP_STOREINFO_ENABLE,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
