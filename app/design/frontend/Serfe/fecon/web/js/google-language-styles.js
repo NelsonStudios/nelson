@@ -36,6 +36,17 @@ define([
       return setInterval(function() { checkPageTranslatedAndScale(ms) }, 1000);
     }
     $('document').ready(function () {
+      /* Fix issue with logged-in user name delayed request */
+      var intervalLoggedUser = setInterval(function() {
+        if($('.customer-welcome').length > 0) {
+          var luw = $('.header.links').width()
+          if(luw > 44) {
+            $('.customer-name').css('border-left', 'none');
+            $('#google_translate_element').css('right', luw + 48 + 'px');
+            clearInterval(intervalLoggedUser);
+          }
+        }
+      }, 500);
       /* Load custom font Verb on iframe */
       $("iframe.goog-te-menu-frame").contents().find("head").append("<style>@font-face { font-family: Verb; src: url('/media/fonts/VerbRegular/VerbRegular.ttf'); } </style>");
       interval = translateLoaded(3000);
