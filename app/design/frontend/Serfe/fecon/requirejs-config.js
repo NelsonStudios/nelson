@@ -1,4 +1,3 @@
-
 var config = {
     deps: [
         "js/polyfills.min",

@@ -9,7 +9,23 @@ body.catalogsearch-result-index {
         }
     }
 }
+body.cms-noroute-index {
+        .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    p {
+                        a {
+                            color: @fecon-theme-color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 body {
+    height: 100%;
     background: url('../images/background_fecon.png') repeat;
     .page-wrapper {
         main#maincontent {

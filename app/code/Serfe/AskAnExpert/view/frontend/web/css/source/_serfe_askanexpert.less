@@ -1,0 +1,216 @@
+@color_1: #333;
+@color_2: #1979c3;
+@color_3: #949494;
+@color_4: #5a5a5a;
+
+.clear {
+    clear: both;
+}
+body.askanexpert-front-index {
+    margin: 0;
+    font-family: @font-family-name__verb;
+    .page-wrapper {
+        .page-main {
+            .page-title-wrapper {
+                .page-title {
+                    span {
+                        text-transform: uppercase;
+                        color: @fecon-theme-color;
+                        font-size: 35px;
+                        font-weight: 600;
+                    }
+                }
+            }
+            .columns {
+                .column.main {
+                    .main_block {
+                        width: 100%;
+                        .contact_container {
+                            margin: 0;
+                            ul {
+                                margin: 0;
+                                padding: 0;
+                                list-style: none;
+                                li {
+                                    float: left;
+                                    width: 310px;
+                                    margin: 0 23px 0 0;
+                                    padding: 20px;
+                                    text-align: center;
+                                    border-radius: 3px;
+                                    h3 {
+                                        font-size: 18px;
+                                        font-weight: 600;
+                                        color: @fecon-theme-color;
+                                        margin: 0;
+                                        padding-bottom: 10px;
+                                    }
+                                    p {
+                                        color: @color_1;
+                                        font-size: 14px;
+                                        font-weight: normal;
+                                        line-height: 24px;
+                                        margin: 0;
+                                        a {
+                                            color: @color_1;
+                                            text-decoration: none;
+                                            &:hover {
+                                                color: @fecon-theme-color;
+                                            }
+                                        }
+                                    }
+                                }
+                                .divider {
+                                    width: 1px;
+                                    height: 60px;
+                                    padding: 0;
+                                    margin-top: 32px;
+                                    border-radius: 0px;
+                                }
+                            }
+                        }
+                        .form_block {
+                            box-shadow: 6px 10px 49px @color-gray-darken1;
+                            border: none;
+                            border-top: 4px solid @fecon-theme-color;
+                            border-radius: 4px;
+                            background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                            linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                            repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+                            padding: 30px;
+                            margin-top: 0;
+                            .input_outer {
+                                width: 360px;
+                                margin: 0 35px 30px 0;
+                                float: left;
+                                .input {
+                                    width: 100%;
+                                    background-color: @color-white;
+                                    border: solid 1px #e7e7e7;
+                                    padding: 15px 0;
+                                    text-indent: 15px;
+                                    font-size: 14px;
+                                    color: @color_1;
+                                }
+                                input::-webkit-input-placeholder { color: @color_3; }
+                                input::-moz-placeholder          { color: @color_3; }
+                                input:-moz-placeholder           { color: @color_3; }
+                                input:-ms-input-placeholder      { color: @color_3; }
+                            }
+                            textarea::-webkit-input-placeholder { color: @color_3; }
+                            textarea::-moz-placeholder          { color: @color_3; }
+                            textarea:-moz-placeholder           { color: @color_3; }
+                            textarea:-ms-input-placeholder      { color: @color_3; }
+                            .field {
+                                label.ask-expert-form-label {
+                                    color: @color-white;
+                                    font-size: 14px;
+                                    span.required {
+                                        padding-right: 3px;
+                                        color: @color-red;
+                                    }
+                                }
+                                select {
+                                    font-size: 14px;
+                                    text-transform: uppercase;
+                                    height: 38px;
+                                }
+                            }
+                            textarea {
+                                font-size: 14px;
+                            }
+                            .last {
+                                margin-right: 0;
+                            }
+                            .textarea_input {
+                                width: 100%;
+                                background-color: @color-white;
+                                border: solid 1px #e7e7e7;
+                                padding: 20px 15px;
+                                font-size: 14px;
+                                color: @color_1;
+                                font-family: @font-family-name__verb;
+                                line-height: 24px;
+                                box-sizing: border-box;
+                            }
+                            .captcha_container {
+                                float: right;
+                                margin-top: 40px;
+                                .button {
+                                    float: right;
+                                    padding: 0px;
+                                    margin: 0px;
+                                    border: 1px solid #e7e7e7;
+                                    background: #1979c3;
+                                    box-sizing: border-box;
+                                    color: @color-white;
+                                    font-size: 15px;
+                                    font-weight: 600;
+                                    padding: 15px 27px 13px 27px;
+                                    cursor: pointer;
+                                    font-family: @font-family-name__verb;
+                                    &:hover {
+                                        background: #484848 none repeat scroll 0 0;
+                                        color: @color-white;
+                                    }
+                                }
+                                .Submit_input {
+                                    float: right;
+                                    .input {
+                                        border: 1px solid #e7e7e7;
+                                        color: @color_4;
+                                        font-size: 15px;
+                                        padding: 15px 0;
+                                        width: 100px;
+                                        margin: 0px 15px 0 0;
+                                        text-align: center;
+                                        text-indent: 0;
+                                        background-color: @color-white;
+                                    }
+                                }
+                                .captcha {
+                                    float: right;
+                                    margin: 0px 15px 0 0;
+                                    width: 160px;
+                                    img {
+                                        border: 1px solid #e7e7e7;
+                                        max-width: 100%;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.inner_container {
+    margin: 0 auto;
+}
+.map_container {
+    width: 100%;
+    .page_title {
+        padding: 30px 0;
+        .aae-description {
+           font-size: 14px; 
+        }
+        h2 {
+            margin-top: 30px;
+            font-size: 22px;
+            text-transform: uppercase;
+            font-weight: 600;
+            span {
+                color: @color_2;
+            }
+        }
+    }
+    .map_block {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 30px;
+        img {
+            max-width: 100%;
+        }
+    }
+}

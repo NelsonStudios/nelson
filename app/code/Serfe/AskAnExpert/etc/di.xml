@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="askanexpert_listing_data_source" xsi:type="string">Serfe\AskAnExpert\Model\ResourceModel\Contact\Grid\Collection</item>                
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Serfe\AskAnExpert\Model\ResourceModel\Contact\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">serfe_askanexpert</argument>
+            <argument name="eventPrefix" xsi:type="string">askanexpert_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">askanexpert_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Serfe\AskAnExpert\Model\ResourceModel\Contact</argument>
+        </arguments>
+    </type>
+<!--
+    <type name="Serfe\AskAnExpert\Controller\Adminhtml\Index\Image\Upload">
+    <arguments>
+        <argument name="imageUploader" xsi:type="object">Serfe\AskAnExpert\CategoryImageUpload</argument>
+    </arguments>
+    </type>
+-->
+<!--
+    <virtualType name="Serfe\News\CategoryImageUpload" type="Serfe\News\Model\ImageUploader">
+    <arguments>
+        <argument name="baseTmpPath" xsi:type="string">news/tmp/news</argument>
+        <argument name="basePath" xsi:type="string">news/news</argument>
+        <argument name="allowedExtensions" xsi:type="array">
+            <item name="jpg" xsi:type="string">jpg</item>
+            <item name="jpeg" xsi:type="string">jpeg</item>
+            <item name="gif" xsi:type="string">gif</item>
+            <item name="png" xsi:type="string">png</item>
+        </argument>
+    </arguments>
+</virtualType>
+
+-->
+    
+    <virtualType name="AskAnExpertGirdFilterPool" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    
+    <virtualType name="AskAnExpertGridDataProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">Serfe\AskAnExpert\Model\ResourceModel\Contact\Collection</argument>
+            <argument name="filterPool" xsi:type="object" shared="false">AskAnExpertGirdFilterPool</argument>
+        </arguments>
+    </virtualType>
+
+
+
+    
+</config>

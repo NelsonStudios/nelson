@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add action="serfe_shipping/preorder/index" id="Serfe::serfe_shipping_preorder" module="Serfe_Shipping" parent="Serfe::serfe_top_level" resource="Magento_Backend::content" sortOrder="9999" title="Preorder"/>
+        <add action="serfe_shipping/preorder/index" id="Serfe::serfe_shipping_preorder" module="Serfe_Shipping" parent="Serfe_FlatRateMinimumAmount::shipping_configurations" resource="Magento_Backend::content" sortOrder="40" title="Preorder"/>
     </menu>
 </config>
