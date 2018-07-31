@@ -2,12 +2,27 @@
 namespace Serfe\ExternalCart\Api;
 
 /**
- * 
+ * Cart Interface
  */
 interface CartInterface
 {
     /**
-     * Get the token of the created guest cart
+     * Create and get new token of the created guest cart
+     *
+     * @api
+     * @return string $token of created guest cart.
+     * @throws \SoapFault response
+     */
+    public function createCartToken();
+    /**
+     * Set the token of the recently created guest cart
+     *
+     * @api
+     * @return string $token of created guest cart.
+     */
+    public function setCartToken($cartId);
+    /**
+     * Get the token of the recently created guest cart
      *
      * @api
      * @return string $token of created guest cart.
@@ -19,6 +34,7 @@ interface CartInterface
      * @api
      * @param  string $cartId The cartId to search in
      * @return \Serfe\ExternalCart\Api\CartInterface $cartInfo The cart information as an object.
+     * @throws \SoapFault response
      */
     public function getCartInfo($cartId);
     /**
@@ -26,7 +42,7 @@ interface CartInterface
      * 
      * @api
      * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \SoapFault response
      */
     public function addProductIntoCart();
     /**
@@ -36,11 +52,4 @@ interface CartInterface
      * @return string $url The cart url
      */
     public function getCartUrl();
-    /**
-     * Function to get the checkout url to access to the checkout with cart items loaded.
-     * 
-     * @api
-     * @return string $url The checkout url
-     */
-    public function getCheckoutUrl();
 }

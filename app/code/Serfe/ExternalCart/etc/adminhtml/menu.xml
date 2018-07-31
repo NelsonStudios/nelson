@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add 
+            id="Serfe_ExternalCart::ExternalCart" 
+            title="Ask An Expert" 
+            module="Serfe_ExternalCart" 
+            sortOrder="50" 
+            parent="Serfe::serfe_top_level" 
+            resource="Serfe_ExternalCart::externalcart"
+        />
+        
+        <add 
+            id="Serfe_ExternalCart::ExternalCart_config" 
+            title="Configuration" 
+            module="Serfe_ExternalCart" 
+            sortOrder="60" 
+            parent="Serfe_ExternalCart::ExternalCart" 
+            action="externalcart/index/index" 
+            resource="Serfe_ExternalCart::externalcart"
+        />
+    </menu>
+</config>
