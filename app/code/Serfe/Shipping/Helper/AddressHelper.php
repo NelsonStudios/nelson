@@ -23,19 +23,27 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $addressRepository;
 
     /**
+     * @var \Magento\Directory\Model\CountryFactory 
+     */
+    protected $countryFactory;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Customer\Model\AddressFactory $addressFactory
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\AddressFactory $addressFactory,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
+        \Magento\Directory\Model\CountryFactory $countryFactory
     ) {
         $this->addressFactory = $addressFactory;
         $this->addressRepository = $addressRepository;
+        $this->countryFactory = $countryFactory;
 
         parent::__construct($context);
     }
@@ -85,9 +93,100 @@ class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'telephone' => $quoteAddress->getTelephone(),
             'company' => $quoteAddress->getCompany(),
             'street' => $quoteAddress->getStreet(),
+            'region' => $quoteAddress->getRegion(),
             'region_id' => $quoteAddress->getRegionId()
         ];
 
         return $addressData;
+    }
+
+    /**
+     * Get address postcode by address id
+     *
+     * @param string $addressId
+     * @return string
+     */
+    public function getAddressPostcode($addressId)
+    {
+        try {
+            $address = $this->addressRepository->getById($addressId);
+            $value = $address->getPostcode();
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Cannot get Address by id in AddressHelper, error: ' . $ex->getMessage());
+            $value = '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get address state by address id
+     *
+     * @param string $addressId
+     * @return string
+     */
+    public function getAddressState($addressId)
+    {
+        try {
+            $address = $this->addressRepository->getById($addressId);
+            $value = $address->getRegion()->getRegion();
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Cannot get Address by id in AddressHelper, error: ' . $ex->getMessage());
+            $value = '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get address country by address id
+     *
+     * @param string $addressId
+     * @return string
+     */
+    public function getAddressCountry($addressId)
+    {
+        try {
+            $address = $this->addressRepository->getById($addressId);
+            $countryId = $address->getCountryId();
+            $value = $this->getCountryName($countryId);
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Cannot get Address by id in AddressHelper, error: ' . $ex->getMessage());
+            $value = '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get address city by address id
+     *
+     * @param string $addressId
+     * @return string
+     */
+    public function getAddressCity($addressId)
+    {
+        try {
+            $address = $this->addressRepository->getById($addressId);
+            $value = $address->getCity();
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Cannot get Address by id in AddressHelper, error: ' . $ex->getMessage());
+            $value = '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get Country name
+     *
+     * @param string $countryCode
+     * @return string
+     */
+    protected function getCountryName($countryCode)
+    {
+        $country = $this->countryFactory->create()->loadByCode($countryCode);
+
+        return $country->getName();
     }
 }

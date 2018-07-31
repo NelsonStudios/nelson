@@ -4,6 +4,7 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="serfe_shipping_preorder_form"/>
+            <block class="Serfe\Shipping\Block\Adminhtml\Preorder\Edit\AddressInformation" name="address-information" template="Serfe_Shipping::preorder/address-information.phtml" />
         </referenceContainer>
     </body>
 </page>

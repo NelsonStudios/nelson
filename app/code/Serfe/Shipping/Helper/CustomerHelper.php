@@ -53,6 +53,13 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $emailHelper;
 
     /**
+     * Customer Repository
+     *
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface 
+     */
+    protected $customerRepository;
+
+    /**
      *
      * @var \Magento\Framework\Stdlib\DateTime\DateTime 
      */
@@ -69,6 +76,8 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Serfe\Shipping\Helper\AddressHelper $addressHelper
      * @param \Serfe\Shipping\Helper\EmailHelper $emailHelper
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -79,6 +88,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Serfe\Shipping\Helper\AddressHelper $addressHelper,
         \Serfe\Shipping\Helper\EmailHelper $emailHelper,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Framework\Stdlib\DateTime\DateTime $date
     ) {
         $this->session = $session;
@@ -88,6 +98,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->encryptor = $encryptor;
         $this->addressHelper = $addressHelper;
         $this->emailHelper = $emailHelper;
+        $this->customerRepository = $customerRepository;
         $this->date = $date;
 
         parent::__construct($context);
@@ -253,5 +264,47 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->session->isLoggedIn()) {
             $this->session->logout();
         }
+    }
+
+    /**
+     * Get default shipping address id
+     *
+     * @param string $customerId
+     * @return string|boolean   Returns false if customer does not exists
+     */
+    public function getCustomerDefaultShipping($customerId)
+    {
+        try {
+            $customer = $this->customerRepository->getById($customerId);
+            $shippingAddressId = $customer->getDefaultShipping();
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
+            $this->_logger->error('Cannot get customer by ID in CustomerHelper, error: ' . $ex->getMessage());
+            $shippingAddressId = false;
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Error in CustomerHelper, error: ' . $ex->getMessage());
+        }
+
+        return $shippingAddressId;
+    }
+
+    /**
+     * Get customer name
+     *
+     * @param string $customerId
+     * @return string|boolean   Returns false if customer does not exists
+     */
+    public function getCustomerName($customerId)
+    {
+        try {
+            $customer = $this->customerRepository->getById($customerId);
+            $name = $customer->getFirstname() . ' ' . $customer->getLastname();
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
+            $this->_logger->error('Cannot get customer by ID in CustomerHelper, error: ' . $ex->getMessage());
+            $name = false;
+        } catch (\Magento\Framework\Exception\LocalizedException $ex) {
+            $this->_logger->error('Error in CustomerHelper, error: ' . $ex->getMessage());
+        }
+
+        return $name;
     }
 }

@@ -35,6 +35,11 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $preorderCollectionFactory;
 
     /**
+     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     */
+    protected $customerHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -42,18 +47,21 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Serfe\Shipping\Model\PreorderFactory $preorderFactory
      * @param \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository
      * @param \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
+     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Serfe\Shipping\Model\PreorderFactory $preorderFactory,
         \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository,
-        \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
+        \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory,
+        \Serfe\Shipping\Helper\CustomerHelper $customerHelper
     ) {
         $this->customerSession = $customerSession;
         $this->preorderFactory = $preorderFactory;
         $this->preorderRepository = $preorderRepository;
         $this->preorderCollectionFactory = $preorderCollectionFactory;
+        $this->customerHelper = $customerHelper;
 
         parent::__construct($context);
     }
@@ -91,7 +99,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerId = $this->customerSession->getCustomer()->getId();
         $shippingMethod = $quote->getShippingAddress()->getShippingMethod();
         $quoteId = $quote->getId();
-        $addressId = $quote->getShippingAddress()->getId();
+        $addressId = $this->customerHelper->getCustomerDefaultShipping($customerId);
 
 
         $preorderData = [
@@ -118,7 +126,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorderCollection
             ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Serfe\Shipping\Model\Preorder::AVAILABLE);
         if ($shippingCode) {
             $preorderCollection->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
         }
@@ -143,7 +151,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorder = $preorderCollection
             ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1)
+            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Serfe\Shipping\Model\Preorder::AVAILABLE)
             ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
             ->getLastItem();
 
