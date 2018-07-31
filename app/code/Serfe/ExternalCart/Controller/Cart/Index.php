@@ -94,7 +94,8 @@ class Index extends \Magento\Framework\App\Action\Action
                     /* Load in checkout session as guest */
                     $this->checkoutSession->setQuoteId($quoteId);
                     /* Redirect to cart page */
-                    $this->responseFactory->create()->setRedirect('/checkout/cart/index')->sendResponse(); 
+                    $this->responseFactory->create()->setRedirect('/checkout/cart/index')->sendResponse();
+                    return;
                 } else {
                     /* Display error and go to cart page */
                     $this->displayErrorMsg('/checkout/cart/index');
