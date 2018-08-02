@@ -4,7 +4,7 @@ namespace Serfe\ExternalCart\Model;
 use Serfe\ExternalCart\Api\CartInterface;
  
 /**
- * Cart model
+ * Defines the implementaiton class of the CartInterface
  */
 class Cart implements CartInterface
 {

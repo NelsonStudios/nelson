@@ -1,8 +1,14 @@
 <?php
+/**
+ * Contributor company: Fecon.
+ * Contributor Author : Bruno <bruno@serfe.com>
+ * Date: 2018/08/02
+ */
 namespace Serfe\ExternalCart\Api;
 
 /**
- * Cart Interface
+ * Interface CartInterface
+ * @api
  */
 interface CartInterface
 {
@@ -41,6 +47,15 @@ interface CartInterface
      * Function to add products into guest cart.
      * 
      * @api
+     * @param  $cartId The cart id token that should look like: 7c6aa34c8ed9ccdb71f78f7b25d047b1
+     * @param  $body The body json data that should looks like:
+     * {
+     *     "cartItem": {
+     *         "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",
+     *         "sku": "BH-080",
+     *         "qty": "1"
+     *     }
+     * } 
      * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
@@ -58,6 +73,15 @@ interface CartInterface
      *  - If token exists only add to cart in the current sessioned cart.
      * 
      * @api
+     * @param  $cartId The cart id token that should look like: 7c6aa34c8ed9ccdb71f78f7b25d047b1 (optional)
+     * @param  $body The body json data that should looks like:
+     * {
+     *     "cartItem": {
+     *         "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1", (optional)
+     *         "sku": "BH-080",
+     *         "qty": "1"
+     *     }
+     * } 
      * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */

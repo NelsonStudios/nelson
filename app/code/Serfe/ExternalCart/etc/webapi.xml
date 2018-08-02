@@ -29,15 +29,21 @@
         <resources>
             <resource ref="anonymous"/>
         </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+            <parameter name="body" force="true">%
+                {
+                    "cartItem": {
+                        "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",
+                        "sku": "BH-080",
+                        "qty": "1"
+                    }
+                }   
+            %</parameter>
+        </data>
     </route>
     <route url="/V1/external-cart/get-cart-url/" method="GET">
         <service class="Serfe\ExternalCart\Api\CartInterface" method="getCartUrl"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
-    <route url="/V1/external-cart/get-checkout-url/" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="getCheckoutUrl"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
@@ -47,5 +53,15 @@
         <resources>
             <resource ref="anonymous"/>
         </resources>
+        <data>
+            <parameter name="body" force="false">%
+                {
+                    "cartItem": {
+                        "sku": "BH-080",
+                        "qty": "1"
+                    }
+                }   
+            %</parameter>
+        </data>
     </route>
 </routes>
