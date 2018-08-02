@@ -52,4 +52,14 @@ interface CartInterface
      * @return string $url The cart url
      */
     public function getCartUrl();
+    /**
+     * Function to add products into cart but also:
+     *  - Generate token if not exists
+     *  - If token exists only add to cart in the current sessioned cart.
+     * 
+     * @api
+     * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
+     * @throws \SoapFault response
+     */
+    public function addToCart();
 }

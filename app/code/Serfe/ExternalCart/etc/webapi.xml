@@ -42,4 +42,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/external-cart/add-to-cart/" method="POST">
+        <service class="Serfe\ExternalCart\Api\CartInterface" method="addToCart"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
