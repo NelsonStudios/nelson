@@ -1,13 +1,53 @@
 <?php
-namespace Serfe\ExternalCart\Model;
+namespace Fecon\ExternalCart\Model;
 
-use Serfe\ExternalCart\Api\CartInterface;
+use Fecon\ExternalCart\Api\CartInterface;
  
 /**
  * Defines the implementaiton class of the CartInterface
  */
-class Cart implements CartInterface
-{
+class Cart implements CartInterface {
+    /**
+     * $quoteCartManagementV1
+     * @var string
+     */
+    protected $quoteCartManagementV1;
+    /**
+     * $quoteCartRepositoryV1
+     * @var string
+     */
+    protected $quoteCartRepositoryV1;
+    /**
+     * $quoteCartItemRepositoryV1
+     * @var string
+     */
+    protected $quoteCartItemRepositoryV1;
+    /**
+     * $quoteCartManagementV1CreateEmptyCart
+     * @var string
+     */
+    protected $quoteCartManagementV1CreateEmptyCart;
+    /**
+     * $quoteCartRepositoryV1Get
+     * @var string
+     */
+    protected $quoteCartRepositoryV1Get;
+    /**
+     * $quoteCartItemRepositoryV1Save
+     * @var string
+     */
+    protected $quoteCartItemRepositoryV1Save;
+    /**
+     * $customerLoggedIn
+     * @var mixed integer/boolean
+     */
+    protected $customerLoggedIn = false;
+    /**
+     * $authorize
+     * 
+     * @var \Magento\Framework\AuthorizationInterface
+     */
+    protected $authorize;
     /**
      * $jsonHelper
      * 
@@ -21,17 +61,23 @@ class Cart implements CartInterface
      */
     protected $coreSession;
     /**
-     * $storeManagerInterface
+     * $customerSession
      * 
-     * @var \Magento\Store\Model\StoreManagerInterface 
+     * @var \Magento\Customer\Model\Session 
      */
-    protected $storeManagerInterface;
+    protected $customerSession;
     /**
      * $request
      * 
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
+    /**
+     * $externalCartHelper
+     * 
+     * @var \Fecon\ExternalCart\Helper\Data 
+     */
+    protected $externalCartHelper;
     /**
      * $protocol
      * 
@@ -59,18 +105,31 @@ class Cart implements CartInterface
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+     * @param \Magento\Framework\AuthorizationInterface          $authorize         
+     * @param \Magento\Framework\Json\Helper\Data                $jsonHelper        
+     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession       
+     * @param \Magento\Customer\Model\SessionFactory             $customerSession   
+     * @param \Magento\Framework\App\Request\Http                $request           
+     * @param \Fecon\ExternalCart\Helper\Data                    $externalCartHelper
      */
     public function __construct(
+        \Magento\Framework\AuthorizationInterface $authorize,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
-        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\App\Request\Http $request,
-        \Serfe\ExternalCart\Helper\Data $externalCartHelper
+        \Fecon\ExternalCart\Helper\Data $externalCartHelper
     ) {
+        $this->authorize = $authorize;
+
+        /**
+         * First check if it's allowed to use the API.
+         */
+        $this->_checkAllowed();
+
         $this->jsonHelper = $jsonHelper;
         $this->coreSession = $coreSession;
-        $this->storeManager = $storeManagerInterface;
+        $this->customerSession = $customerSession;
         $this->request = $request;
         $this->externalCartHelper = $externalCartHelper;
 
@@ -90,6 +149,22 @@ class Cart implements CartInterface
                 __('Please check External Cart Settings in Admin section.')
             );
         }
+        /**
+         * Get customer id or false otherwise.
+         */
+        $this->customerLoggedIn = $this->getLoggedinCustomerId();
+        /**
+         * Get wsdl endpoint names based on guest or non-guest customers.
+         */
+        $this->quoteCartManagementV1     = (($this->customerLoggedIn)? 'quoteCartManagementV1' : 'quoteGuestCartManagementV1');
+        $this->quoteCartRepositoryV1     = (($this->customerLoggedIn)? 'quoteCartRepositoryV1' : 'quoteGuestCartRepositoryV1');
+        $this->quoteCartItemRepositoryV1 = (($this->customerLoggedIn)? 'quoteCartItemRepositoryV1' : 'quoteGuestCartItemRepositoryV1');
+        /**
+         * Dinamically get the methods names to call based on guest or non-guest customers.
+         */
+        $this->quoteCartManagementV1CreateEmptyCart = $this->quoteCartManagementV1 . 'CreateEmptyCart';
+        $this->quoteCartRepositoryV1Get             = $this->quoteCartRepositoryV1 . 'Get';
+        $this->quoteCartItemRepositoryV1Save        = $this->quoteCartItemRepositoryV1 . 'Save';
     }
     /**
      * Create and get new token of the created guest cart
@@ -99,9 +174,9 @@ class Cart implements CartInterface
      * @throws \SoapFault response
      */
     public function createCartToken() {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteGuestCartManagementV1');
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartManagementV1);
         try {
-            $token = $client->quoteGuestCartManagementV1CreateEmptyCart();
+            $token = $client->{$this->quoteCartManagementV1CreateEmptyCart}();
             /* Store cartId token in session temporary */
             $this->setCartToken($token->result);
             return $token->result; //token id of recently created cart.
@@ -137,9 +212,9 @@ class Cart implements CartInterface
      * @throws \SoapFault response
      */
     public function getCartInfo($cartId) {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteGuestCartRepositoryV1');
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1);
         try {
-            $cartInfo = $client->quoteGuestCartRepositoryV1Get(array('cartId' => $cartId));
+            $cartInfo = $client->{$this->quoteCartRepositoryV1Get}(array('cartId' => $cartId));
             return $this->jsonResponse($cartInfo->result); //Return cartInfo result object with cart information.
         } catch(\SoapFault $e) {
             return $e->getMessage();
@@ -167,7 +242,7 @@ class Cart implements CartInterface
     public function getCartUrl() {
         $cartId = $this->getCartToken();
         if(!empty($cartId)) {
-            return $this->storeManager->getStore()->getBaseUrl() . 'externalcart/cart/?cartId=' . $this->getCartToken();
+            return $this->origin . '/externalcart/cart/?cartId=' . $this->getCartToken();
         }
         return false;
     }
@@ -194,7 +269,7 @@ class Cart implements CartInterface
      * @api
      * @param cartId The cart id where you want to store the items (optional, if is not sent, a new will be created and used in next requests)
      * @param body The body (json object) post data with items you want to store. (quoteId is optional)
-     * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
+     * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
     public function addToCart() {
@@ -219,7 +294,7 @@ class Cart implements CartInterface
      * @throws \SoapFault response
      */
     private function _addProduct($postData, $updateCartId = false) {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteGuestCartItemRepositoryV1');
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartItemRepositoryV1);
         $cartItemData = $this->jsonHelper->jsonDecode($postData['body'], 1);
         if($updateCartId) {
             /* Update cartId in body post data */
@@ -230,7 +305,7 @@ class Cart implements CartInterface
             'cartItem' => $cartItemData['cartItem']
         ];
         try {
-            $productAdded = $client->quoteGuestCartItemRepositoryV1Save($productData);
+            $productAdded = $client->{$this->quoteCartItemRepositoryV1Save}($productData);
             if($updateCartId) {
                 $productAdded->result->cartId = $postData['cartId'];
             }
@@ -258,5 +333,37 @@ class Cart implements CartInterface
      */
     public function jsonDecode($strToDecode = '') {
         return $this->jsonHelper->jsonDecode($strToDecode, 1);
+    }
+    /**
+     * [getLoggedinCustomerId description]
+     * @return [type] [description]
+     */
+    public function getLoggedinCustomerId() {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getId();
+        }
+        return false;
+    }
+    /**
+     * [getCustomerData description]
+     * @return [type] [description]
+     */
+    public function getCustomerData() {
+        if ($this->customerSession->isLoggedIn()) {
+            return $this->customerSession->getCustomerData();
+        }
+        return false;
+    }
+
+    /**
+     * checkAllowed function used to check for a valid access token.
+     * @throws \Exception Authorization required. message as output.
+     */
+    private function _checkAllowed() {
+        if($this->authorize->isAllowed('Fecon_ExternalCart::cart') === false) {
+            throw new \Exception(
+                __('Authorization required.')
+            );
+        }
     }
 }

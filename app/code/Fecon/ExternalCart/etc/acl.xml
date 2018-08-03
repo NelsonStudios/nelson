@@ -3,15 +3,10 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Magento_Backend::content">
-                    <resource id="Fecon_ExternalCart::elements" title="All" sortOrder="10">
-                        <resource id="Fecon_ExternalCart::cart" title="External Cart Functions" sortOrder="10" />
-                    </resource>
-                </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Fecon_ExternalCart::config_externalcart" title="External Cart Section" />
+                            <resource id="Fecon_ExternalCart::cart" title="External Cart Functions" />
                         </resource>
                     </resource>
                 </resource>

@@ -1,6 +1,6 @@
 <?php
  
-namespace Serfe\ExternalCart\Helper;
+namespace Fecon\ExternalCart\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {

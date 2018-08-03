@@ -1,31 +1,31 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/external-cart/create-cart-token/" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="createCartToken"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="createCartToken"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/external-cart/set-cart-token/" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="setCartToken"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="setCartToken"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/external-cart/get-cart-token/" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="getCartToken"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartToken"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/external-cart/get-cart-info/:cartId" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="getCartInfo"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartInfo"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/external-cart/add-product/" method="POST">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="addProductIntoCart"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="addProductIntoCart"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
@@ -43,13 +43,13 @@
         </data>
     </route>
     <route url="/V1/external-cart/get-cart-url/" method="GET">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="getCartUrl"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartUrl"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/external-cart/add-to-cart/" method="POST">
-        <service class="Serfe\ExternalCart\Api\CartInterface" method="addToCart"/>
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="addToCart"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>

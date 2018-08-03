@@ -4,7 +4,7 @@
  * Contributor Author : Bruno <bruno@serfe.com>
  * Date: 2018/08/02
  */
-namespace Serfe\ExternalCart\Api;
+namespace Fecon\ExternalCart\Api;
 
 /**
  * Interface CartInterface
@@ -39,7 +39,7 @@ interface CartInterface
      * 
      * @api
      * @param  string $cartId The cartId to search in
-     * @return \Serfe\ExternalCart\Api\CartInterface $cartInfo The cart information as an object.
+     * @return \Fecon\ExternalCart\Api\CartInterface $cartInfo The cart information as an object.
      * @throws \SoapFault response
      */
     public function getCartInfo($cartId);
@@ -56,7 +56,7 @@ interface CartInterface
      *         "qty": "1"
      *     }
      * } 
-     * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
+     * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
     public function addProductIntoCart();
@@ -82,7 +82,7 @@ interface CartInterface
      *         "qty": "1"
      *     }
      * } 
-     * @return \Serfe\ExternalCart\Api\CartInterface $productAdded object with product related information.
+     * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
     public function addToCart();

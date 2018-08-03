@@ -4,7 +4,7 @@
         <section id="externalcart" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>External Cart Settings</label>
             <tab>serfe</tab>
-            <resource>Serfe_ExternalCart::externalcart</resource>
+            <resource>Fecon_ExternalCart::externalcart</resource>
             <group id="active_display" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>External Cart Settings</label>
                 
