@@ -18,7 +18,7 @@ Then when you send the request you'll need to use the following header:
 
 ```
 
-where "<access-token>" should be something similar to: **fd35xyhc2cun28w39prottpekbvrv12e**
+where **"access-token"** should be something similar to: **fd35xyhc2cun28w39prottpekbvrv12e**
 
 If the above token is not sent, you will receive an **Exception** as output with following message: **Authorization required.**
 
