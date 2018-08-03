@@ -175,7 +175,9 @@ if ($err) {
 
   * PARAM-KEY: **body**
   * PARAM-VALUE:
+
 ``` json
+
 {
   "cartItem":
   { 
@@ -183,6 +185,7 @@ if ($err) {
     "qty": "1"
   }
 }
+
 ```
 
 ### PHP - Curl Request
