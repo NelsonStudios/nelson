@@ -119,8 +119,10 @@ You'll need to send the following POST data:
   * PARAM-VALUE: **{cart-id}** should looks like the following token **7c6aa34c8ed9ccdb71f78f7b25d047b1** 
 
   * PARAM-KEY: **body**
-  * PARAM-VALUE: 
+  * PARAM-VALUE:
+
 ``` json
+
 {
   "cartItem": 
   {
@@ -182,8 +184,11 @@ if ($err) {
   }
 }
 ```
+
 ### PHP - Curl Request
+
 ``` php
+
 <?php
 
 $curl = curl_init();
