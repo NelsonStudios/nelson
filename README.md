@@ -9,7 +9,7 @@ The main goal of custom external cart is to:
 
 ## Authorization Access Token
 
-You will need first generate the an API integration in Magento 2 site before you can be able to consume the endpoints, to do that follow this: https://devdocs.magento.com/guides/v2.0/get-started/create-integration.html
+You will need first generate the an API integration in Magento 2 site before you can be able to consume the endpoints, to do that follow this: https://devdocs.magento.com/guides/v2.2/get-started/create-integration.html
 
 Then when you send the request you'll need to use the following header:
 ```
