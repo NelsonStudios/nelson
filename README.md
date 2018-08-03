@@ -130,7 +130,9 @@ You'll need to send the following POST data:
   }
 }
 ```
+
 ### PHP - Curl Request
+
 ``` php
 <?php
 
