@@ -138,6 +138,10 @@
         repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
         height: @height110;
         background-color: @color-gray-darken5;
+        .logo {
+            margin-top: 24px;
+            margin-left: 84px;
+        }
         .shopping-cart {
             background-color: @minicart-green;
             width: 120px;
@@ -178,7 +182,7 @@
             margin-right: 70px;
             white-space: nowrap;
             position: absolute;
-            top: 38px;
+            top: 35px;
             left: 300px;
             margin-bottom: 0;
             .section-items.nav-sections-items {
@@ -283,4 +287,14 @@
     width: 32px!important;
     margin-right: 8px!important;
     display: none;
+}
+/* Fix only for Firefox */
+@supports (display: -moz-grid) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .shopping-cart {
+                top: -48px !important;
+            }
+        }
+    }
 }

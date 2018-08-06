@@ -169,6 +169,9 @@ body.catalog-product-view {
                                                     content: none;
                                                 }
                                             }
+                                            #instant-purchase {
+                                                padding-top: 20px;
+                                            }
                                         }
                                     }
                                 }
@@ -246,6 +249,44 @@ body.catalog-product-view {
                                                 .actions-primary, .primary {
                                                     button {
                                                         height: 45px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Fix only for Firefox */
+@supports (display: -moz-grid) {
+    body.catalog-product-view {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field.qty {
+                                            margin-bottom: 36px;
+                                            .control {
+                                                    select {
+                                                        padding-left: 0px;
+                                                        width: 76px !important;
+                                                        padding-right: 20%;
+                                                    }
+                                                    span.icon-down-chevron {
+                                                        padding: 14px 15px 14px 27px;
+                                                        margin-left: -30px;
                                                     }
                                                 }
                                             }

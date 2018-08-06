@@ -4,7 +4,9 @@
         .header.content {
             .sections.nav-sections {
                 white-space: inherit !important;
-                top: @top16;
+                /*Removed since task #55931 - The problem here is that when more menu items are added, we can fit that dinamically using js */
+                /*top: @top16;*/
+
             }
         }
     }
@@ -13,7 +15,8 @@
     .page-header.type16.header-newskin {
         .header.content {
             .sections.nav-sections {
-                left: 191px;
+                /*Removed since task #55931 - The problem here is that when more menu items are added, we can fit that dinamically using js */
+                /*left: 191px;*/
             }
         }
     }
@@ -35,6 +38,9 @@
                 .sw-megamenu.navigation li.level0.fullwidth {
                     margin-right: 0;
                 }
+            }
+            .logo {
+                margin-left: 4px;
             }
         }
     }
