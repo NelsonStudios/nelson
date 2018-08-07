@@ -18,6 +18,7 @@
                 position: relative;
                 overflow: hidden;
                 float: right;
+                color: @color-gray-lighten2;
                 img {
                     position: absolute;
                     top: 2px;
@@ -88,7 +89,7 @@
             ul.toplinks {
                 margin-top: 3px;
                 float: left;
-                margin-left: 30%;
+                margin-left: 33%;
             }
             ul.header.links {
                 margin-top: 3px;
@@ -98,9 +99,9 @@
                 li {
                     a,span {
                         font-size: 14px;
-                        color: @color-white;
+                        color: @color-gray-lighten2;
                     }
-                    color: @color-white;
+                    color: @color-gray-lighten2;
                 }
                 li.customer-welcome {
                     span {
@@ -108,7 +109,7 @@
                     }
                     .customer-menu {
                         ul.header.links {
-                            border-top: 3px solid #00aa73;
+                            border-top: 3px solid @fecon-theme-color;
                             margin-top: 4px;
                             li {
                                 a {
@@ -139,6 +140,9 @@
         height: @height110;
         background-color: @color-gray-darken5;
         .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
             margin-top: 24px;
             margin-left: 84px;
         }
@@ -179,11 +183,9 @@
     /* This is only to exclude from mobile sizes */
     @media (min-width: 768px) {
         .sections.nav-sections {
-            margin-right: 70px;
+            margin-left: 360px;
+            margin-top: 36px;
             white-space: nowrap;
-            position: absolute;
-            top: 35px;
-            left: 300px;
             margin-bottom: 0;
             .section-items.nav-sections-items {
                 nav.navigation.sw-megamenu {
@@ -206,11 +208,12 @@
                                     width: 24px;
                                     height: 50px;
                                     margin-top: -4px;
-                                    margin-left: 10px;
+                                    margin-left: 11px;
                                 }
                             }
                         }
                         li {
+                            margin-right: 5%;
                             a {
                                 span {
                                     line-height: 42px;
@@ -251,7 +254,7 @@
   bottom: calc(53px + 16px);
   right: 134px;
   top: 3.5px;
-  border-right: 1px solid #fff;
+  border-right: 1px solid @color-gray-lighten2;
   height: 42px;
   padding-top: 12px;
 }
@@ -273,7 +276,7 @@
   max-width: 100%;
 }
 .goog-te-menu-value {
-  color: @color-white !important;
+  color: @color-gray-lighten2 !important;
 }
 .goog-te-menu-value span:nth-child(5) {
   display:none;
@@ -297,5 +300,8 @@
                 top: -48px !important;
             }
         }
+    }
+    #google_translate_element {
+      top: 4.5px;
     }
 }

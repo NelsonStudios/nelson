@@ -1,11 +1,16 @@
 /* Responsive */
 @media (max-width: 1640px) and (min-width: 768px) {
     .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 28%;
+                }
+            }
+        }
         .header.content {
             .sections.nav-sections {
-                white-space: inherit !important;
-                /*Removed since task #55931 - The problem here is that when more menu items are added, we can fit that dinamically using js */
-                /*top: @top16;*/
+                margin-left: 20%;
 
             }
         }
@@ -13,10 +18,11 @@
 }
 @media (max-width: 1438px) and (min-width: 768px) {
     .page-header.type16.header-newskin {
-        .header.content {
-            .sections.nav-sections {
-                /*Removed since task #55931 - The problem here is that when more menu items are added, we can fit that dinamically using js */
-                /*left: 191px;*/
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 25%;
+                }
             }
         }
     }
@@ -32,15 +38,13 @@
         }
         .header.content {
             .sections.nav-sections {
-                white-space: inherit !important;
-                left: 152px;
-                word-spacing: -2px;
+                margin-left: 17%;
                 .sw-megamenu.navigation li.level0.fullwidth {
                     margin-right: 0;
                 }
             }
             .logo {
-                margin-left: 4px;
+                margin-left: 4%;
             }
         }
     }
@@ -50,13 +54,6 @@
         .header.content {
             .sections.nav-sections {
                 width: 80%;
-            }
-        }
-        .panel.wrapper {
-            .panel.header {
-                ul.toplinks.header.links {
-                    margin-left: 18%;
-                }
             }
         }
     }
@@ -82,7 +79,18 @@
         .panel.wrapper {
             .panel.header {
                 ul.toplinks.header.links {
-                    margin-left: 5%;
+                    margin-left: 12%;
+                }
+            }
+        }
+    }
+}
+@media (max-width: 1022px) and (min-width: 768px) {
+    .page-header.type16.header-newskin {
+        .panel.wrapper {
+            .panel.header {
+                ul.toplinks.header.links {
+                    margin-left: 8%;
                 }
             }
         }
@@ -93,13 +101,13 @@
         .panel.wrapper {
             .panel.header {
                 ul.toplinks.header.links {
-                    margin-left: 0;
+                    margin-left: 5%;
                 }
             }
         }
     }
 }
-@media (max-width: 937px) and (min-width: 768px) {
+@media (max-width: 962px) and (min-width: 768px) {
     .page-wrapper {
         .page-header.type16.header-newskin {
             .header.content {
@@ -124,11 +132,24 @@
         }
     }
 }
+@media (max-width: 937px) and (min-width: 768px) {
+    .page-wrapper {
+        .page-header.type16.header-newskin {
+            .panel.wrapper {
+                .panel.header {
+                    ul.toplinks.header.links {
+                        margin-left: 2%;
+                    }
+                }
+            }
+        }
+    }
+}
 @media (max-width: 915px) and (min-width: 768px) {
     .page-header.type16.header-newskin {
         .header.content {
             .sections.nav-sections {
-                left: 68px;
+                margin-left: 8%;
             }
             .logo {
                 display: none;
@@ -147,7 +168,7 @@
     .page-header.type16.header-newskin {
         .header.content {
             .sections.nav-sections {
-                left: 18px;
+                margin-left: 0;
                 width: 100%;
             }
         }
@@ -290,8 +311,8 @@
                 }
                 .action.nav-toggle {
                     width: 30px;
-                    margin-top: 24px;
-                    margin-left: 170px;
+                    margin-top: 23px;
+                    margin-left: 250px;
                     float: none;
                     &:before {
                         font-size: 26px;
@@ -313,17 +334,52 @@
         }
     }
 }
-@media (max-width: 363px) {
+@media (max-width: 456px) {
     .page-header.type16.header-newskin {
         .header.content {
             .logo {
-                margin-top: 10px !important;
+                margin-top: 12px !important;
                 height: 35px !important;
             }
             .action.nav-toggle {
-                margin-left: 56px !important;
-                float: none !important;
-                clear: both !important;
+                margin-top: 56px !important;
+                margin-left: 125px !important;
+            }
+        }
+    }
+}
+@media (max-width: 375px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .logo {
+                margin-left: 54px !important;
+            }
+            .action.nav-toggle {
+                margin-left: 95px !important;
+            }
+        }
+    }
+}
+@media (max-width: 320px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .logo {
+                margin-left: 34px !important;
+            }
+            .action.nav-toggle {
+                margin-left: 75px !important;
+            }
+        }
+    }
+}
+@media (max-width: 298px) {
+    .page-header.type16.header-newskin {
+        .header.content {
+            .logo {
+                margin-left: 24px !important;
+            }
+            .action.nav-toggle {
+                margin-left: 65px !important;
             }
         }
     }
