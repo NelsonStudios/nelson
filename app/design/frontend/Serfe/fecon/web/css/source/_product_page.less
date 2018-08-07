@@ -343,8 +343,8 @@ body.catalog-product-view {
         }
     }
 }
-/* Fix only for IE 11 or higher */
-@media screen and (min-width:0\0) and (min-resolution: +72dpi) { 
+/* Fix only for Edge */
+@supports (-ms-ime-align: auto) {
     body.catalog-product-view {
     .page-wrapper {
         main#maincontent {
@@ -358,7 +358,7 @@ body.catalog-product-view {
                                         .field.qty {
                                             .control {
                                                     span.icon-down-chevron {
-                                                        padding-top: 12px; //IE 11 and higher
+                                                        padding-top: 12px;
                                                     }
                                                 }
                                             }
