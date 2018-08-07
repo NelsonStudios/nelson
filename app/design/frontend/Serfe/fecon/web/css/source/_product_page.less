@@ -346,17 +346,26 @@ body.catalog-product-view {
 /* Fix only for Edge */
 @supports (-ms-ime-align: auto) {
     body.catalog-product-view {
-    .page-wrapper {
-        main#maincontent {
-            .columns {
-                .column.main {
-                    .product-info-main {
-                        .product-add-form {
-                            form {
-                                .box-tocart {
-                                    .fieldset {
-                                        .field.qty {
-                                            .control {
+        .header.content {
+            .minicart-wrapper {
+                a.action.showcart {
+                    .shopping-cart {
+                        top: -49px !important;
+                    }
+                }
+            }
+        }
+        .page-wrapper {
+            main#maincontent {
+                .columns {
+                    .column.main {
+                        .product-info-main {
+                            .product-add-form {
+                                form {
+                                    .box-tocart {
+                                        .fieldset {
+                                            .field.qty {
+                                                .control {
                                                     span.icon-down-chevron {
                                                         padding-top: 12px;
                                                     }

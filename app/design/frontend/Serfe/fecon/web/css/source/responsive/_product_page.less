@@ -280,6 +280,20 @@
             }
         }
     }
+    /* Fix only for Edge */
+    @supports (-ms-ime-align: auto) {
+        body.catalog-product-view {
+            .header.content {
+                .minicart-wrapper {
+                    a.action.showcart {
+                        .shopping-cart {
+                            top: -25px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 @media (max-width: 414px) {
     body.catalog-product-view {
