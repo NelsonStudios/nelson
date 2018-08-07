@@ -326,10 +326,39 @@ body.catalog-product-view {
                                 .box-tocart {
                                     .fieldset {
                                         .field.qty {
-                                            margin-bottom: 36px;
                                             .control {
                                                     span.icon-down-chevron {
                                                         padding: 13px 15px 15px 27px; //FF 61 on High Sierra
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/* Fix only for IE 11 or higher */
+@media screen and (min-width:0\0) and (min-resolution: +72dpi) { 
+    body.catalog-product-view {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field.qty {
+                                            .control {
+                                                    span.icon-down-chevron {
+                                                        padding-top: 12px; //IE 11 and higher
                                                     }
                                                 }
                                             }
