@@ -297,7 +297,39 @@ body.catalog-product-view {
                                                     }
                                                     span.icon-down-chevron {
                                                         padding: 12px 15px 14px 27px;
+                                                        //13px 15px 15px 27px; FF 61 on High Sierra
                                                         margin-left: -30px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/* Fix only for Firefox - Using Mac OS X */
+@supports (-moz-osx-font-smoothing:auto) { 
+    body.catalog-product-view {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field.qty {
+                                            margin-bottom: 36px;
+                                            .control {
+                                                    span.icon-down-chevron {
+                                                        padding: 13px 15px 15px 27px; //FF 61 on High Sierra
                                                     }
                                                 }
                                             }
