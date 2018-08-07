@@ -206,7 +206,73 @@
                     .column.main {
                         .product-info-main {
                             .product-info-price {
-                                left: -35px;
+                                left: 0;
+                                .product-info-stock-sku {
+                                    left: -36px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* Fix only for Firefox */
+    @supports (display: -moz-grid) {
+        body.catalog-product-view {
+            .page-wrapper {
+                main#maincontent {
+                    margin-left: 0;
+                    .columns {
+                        .column.main {
+                            .product-info-main {
+                                .product-info-price {
+                                    .product-info-stock-sku {
+                                        left: -40px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 480px) {
+    body.catalog-product-view {
+        .page-wrapper {
+            main#maincontent {
+                margin-left: 0;
+                .columns {
+                    .column.main {
+                        .product-info-main {
+                            .product-info-price {
+                                left: 0;
+                                .product-info-stock-sku {
+                                    left: -30px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* Fix only for Firefox */
+    @supports (display: -moz-grid) {
+        body.catalog-product-view {
+            .page-wrapper {
+                main#maincontent {
+                    margin-left: 0;
+                    .columns {
+                        .column.main {
+                            .product-info-main {
+                                .product-info-price {
+                                    .product-info-stock-sku {
+                                        left: -25px !important;
+                                    }
+                                }
                             }
                         }
                     }

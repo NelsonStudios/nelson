@@ -322,6 +322,22 @@
             }
         }
     }
+    /* Fix only for Firefox */
+    @supports (display: -moz-grid) {
+        .page-wrapper {
+            .page-header.type16.header-newskin {
+                .header.content {
+                    .shopping-cart {
+                        top: -24px;
+                    }
+                    .action.nav-toggle {
+                        position: absolute;
+                        top: 23px;
+                    }
+                }
+            }
+        }
+    }
 }
 @media (max-width: 749px) {
     .page-header.type16.header-newskin {
@@ -344,6 +360,16 @@
             .action.nav-toggle {
                 margin-top: 56px !important;
                 margin-left: 125px !important;
+            }
+        }
+    }
+    /* Fix only for Firefox */
+    @supports (display: -moz-grid) {
+        .page-header.type16.header-newskin {
+            .header.content {
+                .action.nav-toggle {
+                    margin-top: 32px !important;
+                }
             }
         }
     }
