@@ -24,6 +24,7 @@ interface CartInterface
      * Set the token of the recently created guest cart
      *
      * @api
+     * @param  string $cartId The cartId to save.
      * @return string $token of created guest cart.
      */
     public function setCartToken($cartId);
