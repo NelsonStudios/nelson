@@ -7,7 +7,7 @@ use \DevPhase\Feeds\Helper\FeconWidgetGetterInstagram;
 /**
  * Endpoint to get instagram feed data
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * @author  <fecon.com>
  */
 class Index extends \Magento\Framework\App\Action\Action
 {

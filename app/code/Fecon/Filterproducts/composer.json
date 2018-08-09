@@ -6,8 +6,8 @@
     "version": "1.0.0",
     "authors": [
         {
-            "email": "bruno@fecon.com",
-            "name": "Bruno"
+            "email": "fecon.com",
+            "name": ""
         }
     ],
     "minimum-stability": "dev",

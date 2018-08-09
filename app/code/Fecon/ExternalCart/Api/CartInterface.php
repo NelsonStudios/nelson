@@ -1,7 +1,7 @@
 <?php
 /**
  * Contributor company: Fecon.
- * Contributor Author : Bruno <bruno@serfe.com>
+ * Contributor Author :  <fecon.com>
  * Date: 2018/08/02
  */
 namespace Fecon\ExternalCart\Api;

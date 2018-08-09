@@ -6,7 +6,7 @@
             title="Ask An Expert" 
             module="Fecon_ExternalCart" 
             sortOrder="50" 
-            parent="Serfe::serfe_top_level" 
+            parent="Fecon::fecon_top_level" 
             resource="Fecon_ExternalCart::externalcart"
         />
         

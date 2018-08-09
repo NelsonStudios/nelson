@@ -5,8 +5,8 @@
     "license": "proprietary",
     "authors": [
         {
-            "email": "bruno@fecon.com",
-            "name": "Bruno"
+            "email": "fecon.com",
+            "name": ""
         }
     ],
     "minimum-stability": "dev",

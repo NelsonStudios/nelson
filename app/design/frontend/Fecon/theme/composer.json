@@ -1,5 +1,5 @@
 {
-    "name": "serfe/theme-frontend-fecon",
+    "name": "fecon/theme-frontend-fecon",
     "description": "N/A",
     "require": {
         "php": "~5.5.0|~5.6.0|~7.0.0",
@@ -10,8 +10,8 @@
     "type": "magento2-theme",
     "authors": [
         {
-            "email": "xuan@serfe.com",
-            "name": "Xuan Villagran"
+            "email": "fecon.com",
+            "name": ""
         }
     ],
     "version": "1.0.0",
