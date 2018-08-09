@@ -1,13 +1,13 @@
 <?php
 
-namespace Serfe\Shipping\Ui\Component\Listing\Column;
+namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
-use Serfe\Shipping\Api\Data\PreorderInterface;
+use Fecon\Shipping\Api\Data\PreorderInterface;
 
 /**
  * Data source for  Customer
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Customer extends \Magento\Ui\Component\Listing\Columns\Column
 {
@@ -16,7 +16,7 @@ class Customer extends \Magento\Ui\Component\Listing\Columns\Column
     public function __construct(
         \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
         \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper,
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
         array $components = array(),
         array $data = array()
     ) {

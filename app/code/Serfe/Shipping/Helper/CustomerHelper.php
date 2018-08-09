@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Helper;
+namespace Fecon\Shipping\Helper;
 
 /**
  * Helper to create customer
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -42,13 +42,13 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      *
-     * @var \Serfe\Shipping\Helper\AddressHelper 
+     * @var \Fecon\Shipping\Helper\AddressHelper 
      */
     protected $addressHelper;
 
     /**
      *
-     * @var \Serfe\Shipping\Helper\EmailHelper 
+     * @var \Fecon\Shipping\Helper\EmailHelper 
      */
     protected $emailHelper;
 
@@ -74,8 +74,8 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Framework\Math\Random $mathRandom
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \Serfe\Shipping\Helper\AddressHelper $addressHelper
-     * @param \Serfe\Shipping\Helper\EmailHelper $emailHelper
+     * @param \Fecon\Shipping\Helper\AddressHelper $addressHelper
+     * @param \Fecon\Shipping\Helper\EmailHelper $emailHelper
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
      */
@@ -86,8 +86,8 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Framework\Math\Random $mathRandom,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Serfe\Shipping\Helper\AddressHelper $addressHelper,
-        \Serfe\Shipping\Helper\EmailHelper $emailHelper,
+        \Fecon\Shipping\Helper\AddressHelper $addressHelper,
+        \Fecon\Shipping\Helper\EmailHelper $emailHelper,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Framework\Stdlib\DateTime\DateTime $date
     ) {

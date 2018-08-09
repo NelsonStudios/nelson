@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Ui\Component\Listing\Column;
+namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
 class PreorderActions extends \Magento\Ui\Component\Listing\Columns\Column
 {

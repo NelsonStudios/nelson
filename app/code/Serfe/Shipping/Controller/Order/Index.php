@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Controller\Order;
+namespace Fecon\Shipping\Controller\Order;
 
 /**
  * Create preorder action
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Index extends \Magento\Framework\App\Action\Action
 {
@@ -18,7 +18,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
     /**
      *
-     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     * @var \Fecon\Shipping\Helper\CustomerHelper 
      */
     protected $customerHelper;
 
@@ -27,12 +27,12 @@ class Index extends \Magento\Framework\App\Action\Action
      *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->customerHelper = $customerHelper;

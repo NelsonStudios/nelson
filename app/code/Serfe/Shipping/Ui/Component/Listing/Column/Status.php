@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Ui\Component\Listing\Column;
+namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
 /**
  * Data source for Preorder status in backend grid
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Status extends \Magento\Ui\Component\Listing\Columns\Column
 {
@@ -22,7 +22,7 @@ class Status extends \Magento\Ui\Component\Listing\Columns\Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $isAvailable = $item[\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE];
+                $isAvailable = $item[\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE];
                 $availability = $isAvailable ? $this::AVAILABLE : $this::NOT_AVAILABLE;
                 $item[$this->getData('name')] = $availability;
             }

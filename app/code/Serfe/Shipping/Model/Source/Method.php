@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Model\Source;
+namespace Fecon\Shipping\Model\Source;
 
 /**
  * Method class
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Method implements \Magento\Framework\Option\ArrayInterface
 {

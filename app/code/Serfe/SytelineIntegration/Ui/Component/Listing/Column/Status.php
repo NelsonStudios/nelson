@@ -9,7 +9,7 @@ use \Magento\Ui\Component\Listing\Columns\Column;
 /**
  * Status Class
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Status extends Column
 {

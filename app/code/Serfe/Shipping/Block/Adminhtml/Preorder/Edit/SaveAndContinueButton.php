@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Block\Adminhtml\Preorder\Edit;
+namespace Fecon\Shipping\Block\Adminhtml\Preorder\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 

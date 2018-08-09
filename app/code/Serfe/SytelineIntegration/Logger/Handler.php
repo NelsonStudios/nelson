@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Logger;
 /**
  * Logger Error Handler
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Handler extends \Magento\Framework\Logger\Handler\Base
 {

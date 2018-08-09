@@ -1,18 +1,18 @@
 <?php
 
 
-namespace Serfe\Shipping\Model;
+namespace Fecon\Shipping\Model;
 
-use Serfe\Shipping\Api\Data\PreorderInterfaceFactory;
+use Fecon\Shipping\Api\Data\PreorderInterfaceFactory;
 use Magento\Framework\Api\SortOrder;
-use Serfe\Shipping\Api\PreorderRepositoryInterface;
+use Fecon\Shipping\Api\PreorderRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
-use Serfe\Shipping\Model\ResourceModel\Preorder as ResourcePreorder;
+use Fecon\Shipping\Model\ResourceModel\Preorder as ResourcePreorder;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Serfe\Shipping\Api\Data\PreorderSearchResultsInterfaceFactory;
+use Fecon\Shipping\Api\Data\PreorderSearchResultsInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
-use Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory as PreorderCollectionFactory;
+use Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory as PreorderCollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 
@@ -70,7 +70,7 @@ class PreorderRepository implements preorderRepositoryInterface
      * {@inheritdoc}
      */
     public function save(
-        \Serfe\Shipping\Api\Data\PreorderInterface $preorder
+        \Fecon\Shipping\Api\Data\PreorderInterface $preorder
     ) {
         /* if (empty($preorder->getStoreId())) {
             $storeId = $this->storeManager->getStore()->getId();
@@ -146,7 +146,7 @@ class PreorderRepository implements preorderRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        \Serfe\Shipping\Api\Data\PreorderInterface $preorder
+        \Fecon\Shipping\Api\Data\PreorderInterface $preorder
     ) {
         try {
             $preorder->getResource()->delete($preorder);

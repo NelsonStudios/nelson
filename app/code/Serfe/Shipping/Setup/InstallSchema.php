@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\Shipping\Setup;
+namespace Fecon\Shipping\Setup;
 
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
@@ -9,7 +9,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 /**
  * InstallSchema class
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class InstallSchema implements InstallSchemaInterface
 {
@@ -24,10 +24,10 @@ class InstallSchema implements InstallSchemaInterface
         $installer = $setup;
         $installer->startSetup();
 
-        $tableSerfeShippingPreorder = $setup->getConnection()->newTable($setup->getTable('serfe_shipping_preorder'));
+        $tableFeconShippingPreorder = $setup->getConnection()->newTable($setup->getTable('serfe_shipping_preorder'));
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'preorder_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -37,7 +37,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'created_at',
             \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
             null,
@@ -47,7 +47,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'updated_at',
             \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
             null,
@@ -57,7 +57,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'is_available',
             \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
             null,
@@ -67,7 +67,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'customer_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -77,7 +77,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'quote_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -87,7 +87,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'address_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -97,7 +97,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'shipping_method',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             255,
@@ -107,7 +107,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $tableSerfeShippingPreorder->addColumn(
+        $tableFeconShippingPreorder->addColumn(
             'shipping_price',
             \Magento\Framework\DB\Ddl\Table::TYPE_FLOAT,
             null,
@@ -116,7 +116,7 @@ class InstallSchema implements InstallSchemaInterface
         );
         
 
-        $setup->getConnection()->createTable($tableSerfeShippingPreorder);
+        $setup->getConnection()->createTable($tableFeconShippingPreorder);
 
         $setup->endSetup();
     }

@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Serfe\Shipping\Model;
+namespace Fecon\Shipping\Model;
 
-use Serfe\Shipping\Api\Data\PreorderInterface;
+use Fecon\Shipping\Api\Data\PreorderInterface;
 
 class Preorder extends \Magento\Framework\Model\AbstractModel implements PreorderInterface
 {
@@ -18,7 +18,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
      */
     protected function _construct()
     {
-        $this->_init('Serfe\Shipping\Model\ResourceModel\Preorder');
+        $this->_init('Fecon\Shipping\Model\ResourceModel\Preorder');
     }
 
     /**
@@ -33,7 +33,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set preorder_id
      * @param string $preorderId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setPreorderId($preorderId)
     {
@@ -52,7 +52,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set created_at
      * @param string $createdAt
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setCreatedAt($createdAt)
     {
@@ -71,7 +71,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set updated_at
      * @param string $updatedAt
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -90,7 +90,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set is_available
      * @param string $isAvailable
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setIsAvailable($isAvailable)
     {
@@ -109,7 +109,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set customer_id
      * @param string $customerId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setCustomerId($customerId)
     {
@@ -128,7 +128,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set quote_id
      * @param string $quoteId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setQuoteId($quoteId)
     {
@@ -147,7 +147,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set address_id
      * @param string $addressId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setAddressId($addressId)
     {
@@ -166,7 +166,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set shipping_method
      * @param string $shippingMethod
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setShippingMethod($shippingMethod)
     {
@@ -185,7 +185,7 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     /**
      * Set shipping_price
      * @param string $shippingPrice
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setShippingPrice($shippingPrice)
     {

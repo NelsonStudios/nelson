@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Save Submission entity to  the database
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class SubmissionHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Helper;
+namespace Fecon\Shipping\Helper;
 
 /**
  * Helper to send email
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {

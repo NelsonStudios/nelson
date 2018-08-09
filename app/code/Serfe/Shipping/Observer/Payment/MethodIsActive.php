@@ -1,17 +1,17 @@
 <?php
 
-namespace Serfe\Shipping\Observer\Payment;
+namespace Fecon\Shipping\Observer\Payment;
 
 /**
  * Observer to check if payment is available
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class MethodIsActive implements \Magento\Framework\Event\ObserverInterface
 {
     protected $shippingHelper;
 
-    public function __construct(\Serfe\Shipping\Helper\ShippingHelper $shippingHelper)
+    public function __construct(\Fecon\Shipping\Helper\ShippingHelper $shippingHelper)
     {
         $this->shippingHelper = $shippingHelper;
     }

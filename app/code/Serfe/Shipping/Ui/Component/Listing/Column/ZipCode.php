@@ -1,13 +1,13 @@
 <?php
 
-namespace Serfe\Shipping\Ui\Component\Listing\Column;
+namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
-use Serfe\Shipping\Api\Data\PreorderInterface;
+use Fecon\Shipping\Api\Data\PreorderInterface;
 
 /**
  * Data source for ZipCode
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ZipCode extends \Magento\Ui\Component\Listing\Columns\Column
 {
@@ -15,14 +15,14 @@ class ZipCode extends \Magento\Ui\Component\Listing\Columns\Column
     /**
      * Address Helper
      *
-     * @var \Serfe\Shipping\Helper\AddressHelper 
+     * @var \Fecon\Shipping\Helper\AddressHelper 
      */
     protected $addressHelper;
 
     public function __construct(
         \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
         \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
-        \Serfe\Shipping\Helper\AddressHelper $addressHelper,
+        \Fecon\Shipping\Helper\AddressHelper $addressHelper,
         array $components = array(),
         array $data = array()
     ) {

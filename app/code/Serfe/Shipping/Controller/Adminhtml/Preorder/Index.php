@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml\Preorder;
+namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
 class Index extends \Magento\Backend\App\Action
 {

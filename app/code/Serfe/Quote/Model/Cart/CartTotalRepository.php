@@ -16,7 +16,7 @@ use Magento\Quote\Model\Cart\TotalsConverter;
  * Override of Magento\Quote\Model\Cart\CartTotalRepository class,
  *  including fix: https://github.com/magento/magento2/commit/aa535ea5d4bf78915bddd4387a9d3c4b39943eea
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class CartTotalRepository implements CartTotalRepositoryInterface
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Controller\Order;
+namespace Fecon\Shipping\Controller\Order;
 
 /**
  * Description of Success
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Success extends \Magento\Framework\App\Action\Action
 {

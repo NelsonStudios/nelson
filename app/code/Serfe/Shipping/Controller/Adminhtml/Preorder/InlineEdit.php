@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml\Preorder;
+namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
 class InlineEdit extends \Magento\Backend\App\Action
 {
@@ -39,8 +39,8 @@ class InlineEdit extends \Magento\Backend\App\Action
                 $error = true;
             } else {
                 foreach (array_keys($postItems) as $modelid) {
-                    /** @var \Serfe\Shipping\Model\Preorder $model */
-                    $model = $this->_objectManager->create('Serfe\Shipping\Model\Preorder')->load($modelid);
+                    /** @var \Fecon\Shipping\Model\Preorder $model */
+                    $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($modelid);
                     try {
                         $model->setData(array_merge($model->getData(), $postItems[$modelid]));
                         $model->save();

@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Helper to make SOAP API calls
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
 {

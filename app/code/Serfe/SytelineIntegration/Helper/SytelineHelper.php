@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Main Syteline Helper
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {

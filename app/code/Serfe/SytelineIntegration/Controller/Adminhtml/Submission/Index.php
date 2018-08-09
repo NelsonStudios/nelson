@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Controller\Adminhtml\Submission;
 /**
  * Controller to list submissions
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Index extends \Magento\Backend\App\Action
 {

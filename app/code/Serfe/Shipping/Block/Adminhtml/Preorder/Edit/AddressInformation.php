@@ -1,14 +1,14 @@
 <?php
 
-namespace Serfe\Shipping\Block\Adminhtml\Preorder\Edit;
+namespace Fecon\Shipping\Block\Adminhtml\Preorder\Edit;
 
 use Magento\Framework\Exception\LocalizedException;
-use Serfe\Shipping\Api\Data\PreorderInterface;
+use Fecon\Shipping\Api\Data\PreorderInterface;
 
 /**
  * Block to display address Information
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class AddressInformation extends \Magento\Backend\Block\Template
 {

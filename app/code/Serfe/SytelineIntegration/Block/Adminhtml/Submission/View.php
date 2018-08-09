@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Block\Adminhtml\Submission;
 /**
  * View Submission Block
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class View extends \Magento\Backend\Block\Template
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Controller\Order;
+namespace Fecon\Shipping\Controller\Order;
 
 /**
  * Create Preorder action
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Create extends \Magento\Framework\App\Action\Action
 {
@@ -24,13 +24,13 @@ class Create extends \Magento\Framework\App\Action\Action
 
     /**
      *
-     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     * @var \Fecon\Shipping\Helper\CustomerHelper 
      */
     protected $customerHelper;
 
     /**
      *
-     * @var \Serfe\Shipping\Helper\PreorderHelper 
+     * @var \Fecon\Shipping\Helper\PreorderHelper 
      */
     protected $preorderHelper;
 
@@ -46,16 +46,16 @@ class Create extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Checkout\Model\Session $_checkoutSession
-     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
-     * @param \Serfe\Shipping\Helper\PreorderHelper $preorderHelper
+     * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Helper\PreorderHelper $preorderHelper
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Checkout\Model\Session $_checkoutSession,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper,
-        \Serfe\Shipping\Helper\PreorderHelper $preorderHelper,
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
+        \Fecon\Shipping\Helper\PreorderHelper $preorderHelper,
         \Magento\Framework\Json\Helper\Data $jsonHelper
     ) {
         $this->resultPageFactory = $resultPageFactory;

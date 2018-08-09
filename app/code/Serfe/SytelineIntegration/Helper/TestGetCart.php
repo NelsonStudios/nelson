@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Description of TestGetCart
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class TestGetCart
 {

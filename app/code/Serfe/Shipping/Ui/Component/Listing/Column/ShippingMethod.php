@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Ui\Component\Listing\Column;
+namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
 /**
  * Data source for Shipping Method in backend grid
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
 {
@@ -13,7 +13,7 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
     /**
      * Carrier
      *
-     * @var \Serfe\Shipping\Model\Carrier\ManualShipping 
+     * @var \Fecon\Shipping\Model\Carrier\ManualShipping 
      */
     protected $manualShipping;
 
@@ -22,14 +22,14 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Serfe\Shipping\Model\Carrier\ManualShipping $manualShipping
+     * @param \Fecon\Shipping\Model\Carrier\ManualShipping $manualShipping
      * @param array $components
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
         \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
-        \Serfe\Shipping\Model\Carrier\ManualShipping $manualShipping,
+        \Fecon\Shipping\Model\Carrier\ManualShipping $manualShipping,
         array $components = array(),
         array $data = array()
     ) {
@@ -65,7 +65,7 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $shippingMethod = $item[\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD];
+                $shippingMethod = $item[\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD];
                 $shippingCode = $this->getShippingCode($shippingMethod);
                 $shippingTitle = $this->manualShipping->getCode('method', $shippingCode);
                 $item[$this->getData('name')] = $shippingTitle;

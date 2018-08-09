@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Wrapper for SoapClient Helper
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ApiHelper extends SoapClient
 {

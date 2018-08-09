@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Serfe\Shipping\Model\Preorder;
+namespace Fecon\Shipping\Model\Preorder;
 
-use Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory;
+use Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider

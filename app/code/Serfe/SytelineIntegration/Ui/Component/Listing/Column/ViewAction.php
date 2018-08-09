@@ -10,7 +10,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 /**
  * Class ViewAction
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ViewAction extends Column
 {

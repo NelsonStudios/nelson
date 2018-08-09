@@ -5,7 +5,7 @@ namespace Serfe\FlatRateMinimumAmount\Helper;
 /**
  * Helper to get module configurations
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Config extends \Magento\Framework\App\Helper\AbstractHelper
 {

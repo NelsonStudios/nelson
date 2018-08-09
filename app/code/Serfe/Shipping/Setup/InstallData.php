@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\Shipping\Setup;
+namespace Fecon\Shipping\Setup;
 
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Framework\Setup\InstallDataInterface;
@@ -14,7 +14,7 @@ use Magento\Customer\Model\Customer;
 /**
  * InstallData class
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class InstallData implements InstallDataInterface
 {

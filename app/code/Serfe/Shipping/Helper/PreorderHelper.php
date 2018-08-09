@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Helper;
+namespace Fecon\Shipping\Helper;
 
 /**
  * Helper to create PreorderHelper from quote's data
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -18,24 +18,24 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      *
-     * @var \Serfe\Shipping\Model\PreorderFactory 
+     * @var \Fecon\Shipping\Model\PreorderFactory 
      */
     protected $preorderFactory;
 
     /**
      *
-     * @var \Serfe\Shipping\Api\PreorderRepositoryInterface 
+     * @var \Fecon\Shipping\Api\PreorderRepositoryInterface 
      */
     protected $preorderRepository;
 
     /**
      *
-     * @var \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory 
+     * @var \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory 
      */
     protected $preorderCollectionFactory;
 
     /**
-     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     * @var \Fecon\Shipping\Helper\CustomerHelper 
      */
     protected $customerHelper;
 
@@ -44,18 +44,18 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Serfe\Shipping\Model\PreorderFactory $preorderFactory
-     * @param \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository
-     * @param \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
-     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Model\PreorderFactory $preorderFactory
+     * @param \Fecon\Shipping\Api\PreorderRepositoryInterface $preorderRepository
+     * @param \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
+     * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Customer\Model\Session $customerSession,
-        \Serfe\Shipping\Model\PreorderFactory $preorderFactory,
-        \Serfe\Shipping\Api\PreorderRepositoryInterface $preorderRepository,
-        \Serfe\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+        \Fecon\Shipping\Model\PreorderFactory $preorderFactory,
+        \Fecon\Shipping\Api\PreorderRepositoryInterface $preorderRepository,
+        \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory,
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper
     ) {
         $this->customerSession = $customerSession;
         $this->preorderFactory = $preorderFactory;
@@ -103,11 +103,11 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
 
         $preorderData = [
-            \Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE => false,
-            \Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID => $customerId,
-            \Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD => $shippingMethod,
-            \Serfe\Shipping\Api\Data\PreorderInterface::QUOTE_ID => $quoteId,
-            \Serfe\Shipping\Api\Data\PreorderInterface::ADDRESS_ID => $addressId
+            \Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE => false,
+            \Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID => $customerId,
+            \Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD => $shippingMethod,
+            \Fecon\Shipping\Api\Data\PreorderInterface::QUOTE_ID => $quoteId,
+            \Fecon\Shipping\Api\Data\PreorderInterface::ADDRESS_ID => $addressId
         ];
 
         return $preorderData;
@@ -125,10 +125,10 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerId = $this->customerSession->getCustomer()->getId();
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorderCollection
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Serfe\Shipping\Model\Preorder::AVAILABLE);
+            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE);
         if ($shippingCode) {
-            $preorderCollection->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
+            $preorderCollection->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
         }
         $preorderCollectionSize = $preorderCollection->getSize();
 
@@ -150,9 +150,9 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerId = $this->customerSession->getCustomer()->getId();
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorder = $preorderCollection
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Serfe\Shipping\Model\Preorder::AVAILABLE)
-            ->addFieldToFilter(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
+            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
+            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
             ->getLastItem();
 
         return $preorder->getId();
@@ -162,7 +162,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Returns a preorder object based on the shipping code and current user
      *
      * @param string $shippingCode
-     * @return \Serfe\Shipping\Model\Preorder|false
+     * @return \Fecon\Shipping\Model\Preorder|false
      */
     public function getPreorderByShippingCode($shippingCode)
     {

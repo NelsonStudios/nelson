@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Plugin\Magento\Catalog\Model;
 /**
  * Plugin to detect if a product is Available based on Syteline Web Service
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Product
 {

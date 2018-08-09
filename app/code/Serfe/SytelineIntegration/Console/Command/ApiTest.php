@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Test Syteline API
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ApiTest extends Command
 {

@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Plugin\Magento\Sales\Model\Service;
 /**
  * Plugin for \Magento\Sales\Model\Service\OrderService class
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class OrderService
 {

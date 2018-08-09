@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml\Preorder;
+namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
-class Edit extends \Serfe\Shipping\Controller\Adminhtml\Preorder
+class Edit extends \Fecon\Shipping\Controller\Adminhtml\Preorder
 {
 
     protected $resultPageFactory;
@@ -31,7 +31,7 @@ class Edit extends \Serfe\Shipping\Controller\Adminhtml\Preorder
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('preorder_id');
-        $model = $this->_objectManager->create('Serfe\Shipping\Model\Preorder');
+        $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder');
         
         // 2. Initial checking
         if ($id) {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml\Preorder;
+namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
 use Magento\Framework\Exception\LocalizedException;
 
@@ -35,7 +35,7 @@ class Save extends \Magento\Backend\App\Action
         if ($data) {
             $id = $this->getRequest()->getParam('preorder_id');
         
-            $model = $this->_objectManager->create('Serfe\Shipping\Model\Preorder')->load($id);
+            $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Preorder no longer exists.'));
                 return $resultRedirect->setPath('*/*/');

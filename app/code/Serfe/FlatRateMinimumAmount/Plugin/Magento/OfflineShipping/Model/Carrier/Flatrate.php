@@ -5,7 +5,7 @@ namespace Serfe\FlatRateMinimumAmount\Plugin\Magento\OfflineShipping\Model\Carri
 /**
  * Flatrate Plugin
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class Flatrate
 {

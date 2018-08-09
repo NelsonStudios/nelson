@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Api\Data;
+namespace Fecon\Shipping\Api\Data;
 
 interface PreorderInterface
 {
@@ -26,7 +26,7 @@ interface PreorderInterface
     /**
      * Set preorder_id
      * @param string $preorderId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setPreorderId($preorderId);
 
@@ -39,7 +39,7 @@ interface PreorderInterface
     /**
      * Set created_at
      * @param string $createdAt
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setCreatedAt($createdAt);
 
@@ -52,7 +52,7 @@ interface PreorderInterface
     /**
      * Set updated_at
      * @param string $updatedAt
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setUpdatedAt($updatedAt);
 
@@ -65,7 +65,7 @@ interface PreorderInterface
     /**
      * Set is_available
      * @param string $isAvailable
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setIsAvailable($isAvailable);
 
@@ -78,7 +78,7 @@ interface PreorderInterface
     /**
      * Set customer_id
      * @param string $customerId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setCustomerId($customerId);
 
@@ -91,7 +91,7 @@ interface PreorderInterface
     /**
      * Set quote_id
      * @param string $quoteId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setQuoteId($quoteId);
 
@@ -104,7 +104,7 @@ interface PreorderInterface
     /**
      * Set address_id
      * @param string $addressId
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setAddressId($addressId);
 
@@ -117,7 +117,7 @@ interface PreorderInterface
     /**
      * Set shipping_method
      * @param string $shippingMethod
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setShippingMethod($shippingMethod);
 
@@ -130,7 +130,7 @@ interface PreorderInterface
     /**
      * Set shipping_price
      * @param string $shippingPrice
-     * @return \Serfe\Shipping\Api\Data\PreorderInterface
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setShippingPrice($shippingPrice);
 }

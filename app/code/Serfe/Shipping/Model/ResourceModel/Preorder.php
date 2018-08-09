@@ -1,12 +1,12 @@
 <?php
 
-namespace Serfe\Shipping\Model\ResourceModel;
+namespace Fecon\Shipping\Model\ResourceModel;
 
 class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
     /**
-     * @var \Serfe\Shipping\Helper\CustomerHelper 
+     * @var \Fecon\Shipping\Helper\CustomerHelper 
      */
     protected $customerHelper;
 
@@ -14,12 +14,12 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * Constructor
      *
      * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
-     * @param \Serfe\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
      * @param string $connectionName
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
-        \Serfe\Shipping\Helper\CustomerHelper $customerHelper,
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
         $connectionName = null
     ) {
         $this->customerHelper = $customerHelper;
@@ -41,8 +41,8 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($object->dataHasChangedFor(\Serfe\Shipping\Api\Data\PreorderInterface::SHIPPING_PRICE)) {
-            $object->setData(\Serfe\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
+        if ($object->dataHasChangedFor(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_PRICE)) {
+            $object->setData(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
             $this->customerHelper->addOrderTokenToCustomer($object->getCustomerId());
         }
 

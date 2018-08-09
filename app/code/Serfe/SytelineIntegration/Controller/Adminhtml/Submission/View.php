@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Controller\Adminhtml\Submission;
 /**
  * View Submission on Backend
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class View extends \Magento\Backend\App\Action
 {

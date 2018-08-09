@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Transform Magento entities to arrays, in order to use with the Syteline Web Services
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {

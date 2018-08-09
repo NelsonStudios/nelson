@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Model\Config\Source;
 /**
  * Source Model for SOAP version configuration
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class SoapVersion implements \Magento\Framework\Option\ArrayInterface
 {

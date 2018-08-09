@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\Shipping\Model\ResourceModel\Preorder;
+namespace Fecon\Shipping\Model\ResourceModel\Preorder;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
@@ -14,8 +14,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            'Serfe\Shipping\Model\Preorder',
-            'Serfe\Shipping\Model\ResourceModel\Preorder'
+            'Fecon\Shipping\Model\Preorder',
+            'Fecon\Shipping\Model\ResourceModel\Preorder'
         );
     }
 }

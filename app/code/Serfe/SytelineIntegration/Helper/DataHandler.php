@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Helper to manage Web Services data
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class DataHandler
 {

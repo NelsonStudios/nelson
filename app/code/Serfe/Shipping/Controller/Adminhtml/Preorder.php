@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml;
+namespace Fecon\Shipping\Controller\Adminhtml;
 
 abstract class Preorder extends \Magento\Backend\App\Action
 {
 
-    const ADMIN_RESOURCE = 'Serfe_Shipping::top_level';
+    const ADMIN_RESOURCE = 'Fecon_Shipping::top_level';
     protected $_coreRegistry;
 
     /**
@@ -29,7 +29,7 @@ abstract class Preorder extends \Magento\Backend\App\Action
     public function initPage($resultPage)
     {
         $resultPage->setActiveMenu(self::ADMIN_RESOURCE)
-            ->addBreadcrumb(__('Serfe'), __('Serfe'))
+            ->addBreadcrumb(__('Fecon'), __('Fecon'))
             ->addBreadcrumb(__('Preorder'), __('Preorder'));
         return $resultPage;
     }

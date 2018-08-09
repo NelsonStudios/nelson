@@ -5,7 +5,7 @@ namespace Serfe\SytelineIntegration\Helper;
 /**
  * Helper for module configurations
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {

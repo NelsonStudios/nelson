@@ -1,13 +1,13 @@
 <?php
 
-namespace Serfe\Shipping\Model\Carrier;
+namespace Fecon\Shipping\Model\Carrier;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
 
 /**
  * Shipping method to calculate rates manually
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implements \Magento\Shipping\Model\Carrier\CarrierInterface
 {
@@ -42,7 +42,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
     /**
      * Shipping Helper
      *
-     * @var \Serfe\Shipping\Helper\ShippingHelper 
+     * @var \Fecon\Shipping\Helper\ShippingHelper 
      */
     protected $shippingHelper;
 
@@ -62,7 +62,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Psr\Log\LoggerInterface $logger,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
-        \Serfe\Shipping\Helper\ShippingHelper $shippingHelper,
+        \Fecon\Shipping\Helper\ShippingHelper $shippingHelper,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;

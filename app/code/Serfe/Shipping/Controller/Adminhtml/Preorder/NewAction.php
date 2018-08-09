@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Serfe\Shipping\Controller\Adminhtml\Preorder;
+namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
-class NewAction extends \Serfe\Shipping\Controller\Adminhtml\Preorder
+class NewAction extends \Fecon\Shipping\Controller\Adminhtml\Preorder
 {
 
     protected $resultForwardFactory;

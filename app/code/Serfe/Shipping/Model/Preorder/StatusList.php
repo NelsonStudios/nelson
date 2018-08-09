@@ -1,14 +1,14 @@
 <?php
 
-namespace Serfe\Shipping\Model\Preorder;
+namespace Fecon\Shipping\Model\Preorder;
 
-use Serfe\Shipping\Ui\Component\Listing\Column\Status;
-use Serfe\Shipping\Model\Preorder;
+use Fecon\Shipping\Ui\Component\Listing\Column\Status;
+use Fecon\Shipping\Model\Preorder;
 
 /**
  * Status list
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class StatusList implements \Magento\Framework\Option\ArrayInterface
 {

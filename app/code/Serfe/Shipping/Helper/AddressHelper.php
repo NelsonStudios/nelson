@@ -1,11 +1,11 @@
 <?php
 
-namespace Serfe\Shipping\Helper;
+namespace Fecon\Shipping\Helper;
 
 /**
  * Helper to create Address
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * 
  */
 class AddressHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
