@@ -8,6 +8,11 @@ class Index extends \Magento\Framework\App\Action\Action
 {
 
     /**
+     * $quoteCartRepositoryV1
+     * @var string
+     */
+    protected $quoteCartRepositoryV1;
+    /**
      * $quoteFactory
      * 
      * @var \Magento\Quote\Model\QuoteFactory 
@@ -66,6 +71,12 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var string
      */
     public $origin;
+    /**
+     * $customerLoggedIn
+     * @var mixed integer/boolean
+     */
+    protected $customerLoggedIn = false;
+    protected $opts;
 
     /**
      * Constructor
@@ -80,23 +91,31 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\ResponseFactory $responseFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->responseFactory = $responseFactory;
+        $this->storeManager = $storeManager;
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
+        $this->customerSession = $customerSession;
+        $this->customerRepository = $customerRepository;
+        $this->customerFactory = $customerFactory;
         $this->request = $request;
-        $this->externalCartHelper = $externalCartHelper;
+        $this->cartHelper = $externalCartHelper;
         $this->messageManager = $messageManager;
 
-        $this->protocol = $this->externalCartHelper->protocol();
-        $this->hostname = $this->externalCartHelper->hostname();
-        $this->port = $this->externalCartHelper->port();
+        $this->protocol = $this->cartHelper->protocol();
+        $this->hostname = $this->cartHelper->hostname();
+        $this->port = $this->cartHelper->port();
 
         if(!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
@@ -122,12 +141,36 @@ class Index extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $cartId = $this->request->getParam('cartId');
-        if(!empty($cartId)) {
+        $customerToken = $this->request->getParam('customerToken');
+        if(!empty($cartId) || !empty($customerToken)) {
+            /**
+             * Get wsdl endpoint names based on guest or non-guest customers.
+             */
+            $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
+            $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
+            if($customerToken) {
+                $this->opts['stream_context'] = stream_context_create([
+                    'http' => [
+                        'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                    ]
+                ]);
+                $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken);
+                if(!empty($customerData)) {
+                    $customerInfo = $this->cartHelper->jsonDecode($customerData);
+                    if(!empty($customerInfo['id'])) {
+                        $requestData = ['customerId' => $customerInfo['id']];
+                        /* Perform user login */
+                        $this->makeUserLogin($customerInfo['email']);
+                    }
+                }
+            } else {
+                $requestData = ['cartId' => $cartId];
+            }
             /* byPass Authorization access for internal use only */
-            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteGuestCartRepositoryV1');
+            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : [] ));
             try {
                 /* Get quote */
-                $cartInfo = $client->quoteGuestCartRepositoryV1Get(array('cartId' => $cartId));
+                $cartInfo = $client->{$this->quoteGuestCartRepositoryV1}(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {
                     $quoteId = $cartInfo->result->id;
                     unset($cartInfo);
@@ -136,7 +179,7 @@ class Index extends \Magento\Framework\App\Action\Action
                     /* Load in checkout session as guest */
                     $this->checkoutSession->setQuoteId($quoteId);
                     /* Redirect to cart page */
-                    $this->responseFactory->create()->setRedirect('/checkout/cart/index')->sendResponse();
+                    $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
                     return;
                 } else {
                     /* Display error and go to cart page */
@@ -167,5 +210,39 @@ class Index extends \Magento\Framework\App\Action\Action
         );
         $this->responseFactory->create()->setRedirect($redirectPath)->sendResponse(); 
         return;
+    }
+
+    /**
+     * Load customer by email
+     *
+     * @param string $email
+     * @return boolean
+     */
+    private function getCustomerByEmail($email)
+    {
+        $websiteId = $this->storeManager->getStore()->getWebsiteId();
+        try {
+            $customer = $this->customerRepository->get($email, $websiteId);
+        } catch (\Exception $ex) {
+            $customer = false;
+        }
+
+        return $customer;
+    }
+    /**
+     * makeUserLogin auto login user.
+     * 
+     * This maybe look redundant, first get by email then load by id, but since is not 
+     * loaded correctly we need to make that additional step.
+     * 
+     * @return void
+     */
+    private function makeUserLogin($customerEmail) {
+        //Load customer first by id
+        $customer = $this->getCustomerByEmail($customerEmail);
+        $customerId = $customer->getId();
+        //Then since repository does not return the correct type, so we need to load the customer
+        $customer = $this->customerFactory->create()->load($customerId);
+        $this->customerSession->setCustomerAsLoggedIn($customer);
     }
 }

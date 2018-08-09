@@ -134,7 +134,6 @@ class Cart implements CartInterface {
         /**
          * Get customer id or false otherwise.
          */
-        // $this->customerLoggedIn = $this->getLoggedinCustomerId();
         $this->customerLoggedIn = $this->customerSession->getData('loggedInUserToken');
         
         /**
@@ -147,8 +146,8 @@ class Cart implements CartInterface {
          * Dinamically get the methods names to call based on guest or non-guest customers.
          */
         $this->quoteCartManagementV1Endpoint = $this->quoteCartManagementV1 . (($this->customerLoggedIn)? 'GetCartForCustomer' : 'CreateEmptyCart');
-        $this->quoteCartRepositoryV1Get             = $this->quoteCartRepositoryV1 . 'Get';
-        $this->quoteCartItemRepositoryV1Save        = $this->quoteCartItemRepositoryV1 . 'Save';
+        $this->quoteCartRepositoryV1Get      = $this->quoteCartRepositoryV1 . 'Get';
+        $this->quoteCartItemRepositoryV1Save = $this->quoteCartItemRepositoryV1 . 'Save';
 
         if($this->customerLoggedIn) {
             //'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km'
@@ -173,8 +172,9 @@ class Cart implements CartInterface {
             $token = $client->{$this->quoteCartManagementV1Endpoint}((($this->customerLoggedIn)? ['customerId' => $this->customerSession->getId()] : ''));
             if(!empty($token) && is_object($token)) {
                 // Magneto 2 return an object with cart data instead a token here.
-                $this->setCartToken($token->result->id);
-                return $this->cartHelper->jsonResponse($token->result->id);
+                // $this->setCartToken($token->result->id);
+                $this->setCartToken($this->customerLoggedIn);
+                return $this->customerLoggedIn;//$this->cartHelper->jsonResponse($token->result->id);
             } else {
                 /* Store cartId token in session temporary */
                 $this->setCartToken($token->result);
@@ -215,7 +215,7 @@ class Cart implements CartInterface {
      * @throws \SoapFault response
      */
     public function getCartInfo($cartId) {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1);
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : '' ));
         try {
             $cartInfo = $client->{$this->quoteCartRepositoryV1Get}(array('cartId' => $cartId));
             return $this->cartHelper->jsonResponse($cartInfo->result); //Return cartInfo result object with cart information.
@@ -244,8 +244,10 @@ class Cart implements CartInterface {
      */
     public function getCartUrl() {
         $cartId = $this->getCartToken();
-        if(!empty($cartId)) {
-            return $this->origin . '/externalcart/cart/?cartId=' . $this->getCartToken();
+        if(!empty($cartId) && !is_int($cartId)) { //It's a customerToken
+            return $this->origin . '/externalcart/cart/?customerToken=' . $cartId;
+        } else if(!empty($cartId) && is_int($cartId)) {
+            return $this->origin . '/externalcart/cart/?cartId=' . $cartId;
         }
         return false;
     }
@@ -316,26 +318,5 @@ class Cart implements CartInterface {
         } catch(\SoapFault $e) {
             return $e->getMessage() . nl2br("\n Are you sure this is the correct cartId?", false);
         }
-    }
-    
-    /**
-     * [getLoggedinCustomerId description]
-     * @return [type] [description]
-     */
-    public function getLoggedinCustomerId() {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getId();
-        }
-        return false;
-    }
-    /**
-     * [getCustomerData description]
-     * @return [type] [description]
-     */
-    public function getCustomerData() {
-        if ($this->customerSession->isLoggedIn()) {
-            return $this->customerSession->getCustomerData();
-        }
-        return false;
     }
 }
