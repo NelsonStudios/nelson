@@ -1,9 +1,9 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Adminhtml\Index;
+namespace Fecon\AskAnExpert\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\App\Action;
-use Serfe\AskAnExpert\Model\Contact;
+use Fecon\AskAnExpert\Model\Contact;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\TestFramework\Inspection\Exception;
@@ -13,7 +13,7 @@ use Magento\Framework\App\RequestInterface;
 
 //use Magento\Framework\Stdlib\DateTime\DateTime;
 //use Magento\Ui\Component\MassAction\Filter;
-//use Serfe\News\Model\ResourceModel\Test\CollectionFactory;
+//use Fecon\News\Model\ResourceModel\Test\CollectionFactory;
 
 class Save extends \Magento\Backend\App\Action
 {
@@ -40,7 +40,7 @@ class Save extends \Magento\Backend\App\Action
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateFactory,
-        \Serfe\AskAnExpert\Helper\Data $myModuleHelper
+        \Fecon\AskAnExpert\Helper\Data $myModuleHelper
     ) {
         $this->dataPersistor = $dataPersistor;
         $this->_transportBuilder = $transportBuilder;
@@ -74,7 +74,7 @@ class Save extends \Magento\Backend\App\Action
                 $data['contact_id'] = null;
             }
             /** @var \Magento\Cms\Model\Block $model */
-            $model = $this->_objectManager->create('Serfe\AskAnExpert\Model\Contact')->load($id);
+            $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact')->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addError(__('This Submission no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
@@ -113,7 +113,7 @@ class Save extends \Magento\Backend\App\Action
                 //////////////////// email
                 $model->save();
                 $this->messageManager->addSuccess(__('Email sent successfully'));
-                $this->dataPersistor->clear('serfe_askanexpert');
+                $this->dataPersistor->clear('fecon_askanexpert');
 
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('*/*/edit', ['contact_id' => $model->getId()]);
@@ -125,7 +125,7 @@ class Save extends \Magento\Backend\App\Action
                 $this->messageManager->addException($e, __('Something went wrong while saving the Submission.'));
             }
 
-            $this->dataPersistor->set('serfe_askanexpert', $data);
+            $this->dataPersistor->set('fecon_askanexpert', $data);
             return $resultRedirect->setPath('*/*/edit', ['contact_id' => $this->getRequest()->getParam('contact_id')]);
         }
         return $resultRedirect->setPath('*/*/');

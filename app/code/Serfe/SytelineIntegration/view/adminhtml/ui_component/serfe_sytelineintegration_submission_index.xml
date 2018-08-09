@@ -2,19 +2,19 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="context" xsi:type="configurableObject">
         <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\Context</argument>
-        <argument name="namespace" xsi:type="string">serfe_sytelineintegration_submission_index</argument>
+        <argument name="namespace" xsi:type="string">fecon_sytelineintegration_submission_index</argument>
     </argument>
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">serfe_sytelineintegration_submission_index.serfe_sytelineintegration_submission_grid_data_source</item>
-            <item name="deps" xsi:type="string">serfe_sytelineintegration_submission_index.serfe_sytelineintegration_submission_grid_data_source</item>
+            <item name="provider" xsi:type="string">fecon_sytelineintegration_submission_index.fecon_sytelineintegration_submission_grid_data_source</item>
+            <item name="deps" xsi:type="string">fecon_sytelineintegration_submission_index.fecon_sytelineintegration_submission_grid_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">serfe_sytelineintegration_submission_columns</item>
+        <item name="spinner" xsi:type="string">fecon_sytelineintegration_submission_columns</item>
     </argument>
-    <dataSource name="serfe_sytelineintegration_submission_grid_data_source">
+    <dataSource name="fecon_sytelineintegration_submission_grid_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">serfe_sytelineintegration_submission_grid_data_source</argument>
+            <argument name="name" xsi:type="string">fecon_sytelineintegration_submission_grid_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">submission_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
@@ -39,7 +39,7 @@
         <filters name="listing_filters"/>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="serfe_sytelineintegration_submission_columns">
+    <columns name="fecon_sytelineintegration_submission_columns">
         <argument name="data" xsi:type="array"/>
         <selectionsColumn name="ids">
             <argument name="data" xsi:type="array">
@@ -85,7 +85,7 @@
                 </item>
             </argument>
         </column>
-        <column name="success" class="Serfe\SytelineIntegration\Ui\Component\Listing\Column\Status">
+        <column name="success" class="Fecon\SytelineIntegration\Ui\Component\Listing\Column\Status">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="visible" xsi:type="boolean">true</item>
@@ -109,12 +109,12 @@
                 </item>
             </argument>
         </column>
-        <actionsColumn name="actions" class="Serfe\SytelineIntegration\Ui\Component\Listing\Column\ViewAction">
+        <actionsColumn name="actions" class="Fecon\SytelineIntegration\Ui\Component\Listing\Column\ViewAction">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="resizeEnabled" xsi:type="boolean">false</item>
                     <item name="resizeDefaultWidth" xsi:type="string">107</item>
-                    <item name="viewUrlPath" xsi:type="string">serfe_sytelineintegration/submission/view</item>
+                    <item name="viewUrlPath" xsi:type="string">fecon_sytelineintegration/submission/view</item>
                     <item name="indexField" xsi:type="string">submission_id</item>
                 </item>
             </argument>

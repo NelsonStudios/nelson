@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\FlatRateMinimumAmount\Plugin\Magento\OfflineShipping\Model\Carrier;
+namespace Fecon\FlatRateMinimumAmount\Plugin\Magento\OfflineShipping\Model\Carrier;
 
 /**
  * Flatrate Plugin
@@ -19,7 +19,7 @@ class Flatrate
     /**
      * Configuration Helper
      *
-     * @var \Serfe\FlatRateMinimumAmount\Helper\Config
+     * @var \Fecon\FlatRateMinimumAmount\Helper\Config
      */
     protected $configHelper;
 
@@ -30,7 +30,7 @@ class Flatrate
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Serfe\FlatRateMinimumAmount\Helper\Config $configHelper
+        \Fecon\FlatRateMinimumAmount\Helper\Config $configHelper
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->configHelper = $configHelper;

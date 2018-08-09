@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Model;
+namespace Fecon\AskAnExpert\Model;
 
 class Contact extends \Magento\Framework\Model\AbstractModel
 {
@@ -31,7 +31,7 @@ class Contact extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Serfe\AskAnExpert\Model\ResourceModel\Contact');
+        $this->_init('Fecon\AskAnExpert\Model\ResourceModel\Contact');
     }
 
     /**

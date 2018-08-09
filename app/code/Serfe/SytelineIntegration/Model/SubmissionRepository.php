@@ -1,19 +1,19 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Model;
+namespace Fecon\SytelineIntegration\Model;
 
-use Serfe\SytelineIntegration\Api\Data\SubmissionInterfaceFactory;
-use Serfe\SytelineIntegration\Model\ResourceModel\Submission\CollectionFactory as SubmissionCollectionFactory;
-use Serfe\SytelineIntegration\Api\Data\SubmissionSearchResultsInterfaceFactory;
+use Fecon\SytelineIntegration\Api\Data\SubmissionInterfaceFactory;
+use Fecon\SytelineIntegration\Model\ResourceModel\Submission\CollectionFactory as SubmissionCollectionFactory;
+use Fecon\SytelineIntegration\Api\Data\SubmissionSearchResultsInterfaceFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Reflection\DataObjectProcessor;
-use Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface;
+use Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
-use Serfe\SytelineIntegration\Model\ResourceModel\Submission as ResourceSubmission;
+use Fecon\SytelineIntegration\Model\ResourceModel\Submission as ResourceSubmission;
 use Magento\Framework\Exception\CouldNotSaveException;
 
 class SubmissionRepository implements submissionRepositoryInterface
@@ -70,7 +70,7 @@ class SubmissionRepository implements submissionRepositoryInterface
      * {@inheritdoc}
      */
     public function save(
-        \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
+        \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
     ) {
         /* if (empty($submission->getStoreId())) {
             $storeId = $this->storeManager->getStore()->getId();
@@ -146,7 +146,7 @@ class SubmissionRepository implements submissionRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
+        \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
     ) {
         try {
             $submission->getResource()->delete($submission);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Block\Adminhtml\Submission;
+namespace Fecon\SytelineIntegration\Block\Adminhtml\Submission;
 
 /**
  * View Submission Block
@@ -36,7 +36,7 @@ class View extends \Magento\Backend\Block\Template
     /**
      * Get Submission
      *
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function getSubmission()
     {

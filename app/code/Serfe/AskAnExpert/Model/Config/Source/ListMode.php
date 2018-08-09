@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Model\Config\Source;
+namespace Fecon\AskAnExpert\Model\Config\Source;
 
 class ListMode implements \Magento\Framework\Option\ArrayInterface
 {

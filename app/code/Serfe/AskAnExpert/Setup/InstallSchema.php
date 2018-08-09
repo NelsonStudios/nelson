@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Setup;
+namespace Fecon\AskAnExpert\Setup;
 
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -19,7 +19,7 @@ class InstallSchema implements InstallSchemaInterface
         $installer = $setup;
         $installer->startSetup();
         $table = $installer->getConnection()->newTable(
-            $installer->getTable('serfe_askanexpert')
+            $installer->getTable('fecon_askanexpert')
         )->addColumn(
             'contact_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,

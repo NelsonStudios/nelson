@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Controller\Adminhtml\Submission;
+namespace Fecon\SytelineIntegration\Controller\Adminhtml\Submission;
 
 /**
  * View Submission on Backend
@@ -19,7 +19,7 @@ class View extends \Magento\Backend\App\Action
     /**
      * Submission Repository
      *
-     * @var \Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface 
+     * @var \Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface 
      */
     protected $submissionRepository;
 
@@ -35,13 +35,13 @@ class View extends \Magento\Backend\App\Action
      *
      * @param \Magento\Backend\App\Action\Context                           $context
      * @param \Magento\Framework\View\Result\PageFactory                    $resultPageFactory
-     * @param \Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface  $submissionRepository
+     * @param \Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface  $submissionRepository
      */
     public function __construct(
         \Magento\Backend\App\Action\Context                             $context,
         \Magento\Framework\View\Result\PageFactory                      $resultPageFactory,
         \Magento\Framework\Registry                                     $coreRegistry,
-        \Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface    $submissionRepository
+        \Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface    $submissionRepository
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->submissionRepository = $submissionRepository;

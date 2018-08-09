@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\AskAnExpert\Controller\Ajax;
+namespace Fecon\AskAnExpert\Controller\Ajax;
 
 class Category extends \Magento\Framework\App\Action\Action
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Helper;
+namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Save Submission entity to  the database
@@ -12,37 +12,37 @@ class SubmissionHelper extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Submission Factory
      *
-     * @var \Serfe\SytelineIntegration\Model\SubmissionFactory 
+     * @var \Fecon\SytelineIntegration\Model\SubmissionFactory 
      */
     protected $submissionFactory;
 
     /**
      * Submission Repository
      *
-     * @var \Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface 
+     * @var \Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface 
      */
     protected $submissionRepository;
 
     /**
      * Config Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\ConfigHelper 
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper 
      */
     protected $configHelper;
 
     /**
      * Logger
      *
-     * @var \Serfe\SytelineIntegration\Logger\Handler 
+     * @var \Fecon\SytelineIntegration\Logger\Handler 
      */
     protected $logger;
 
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Serfe\SytelineIntegration\Model\SubmissionFactory $submissionFactory,
-        \Serfe\SytelineIntegration\Api\SubmissionRepositoryInterface $submissionRepository,
-        \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper,
-        \Serfe\SytelineIntegration\Logger\Logger $logger
+        \Fecon\SytelineIntegration\Model\SubmissionFactory $submissionFactory,
+        \Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface $submissionRepository,
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
+        \Fecon\SytelineIntegration\Logger\Logger $logger
     ) {
         parent::__construct($context);
 

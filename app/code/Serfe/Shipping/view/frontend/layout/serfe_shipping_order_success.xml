@@ -2,7 +2,7 @@
 <page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block class="Serfe\Shipping\Block\Order\Success" name="order.success" template="Serfe_Shipping::order/request-quote-success.phtml"/>
+            <block class="Fecon\Shipping\Block\Order\Success" name="order.success" template="Fecon_Shipping::order/request-quote-success.phtml"/>
         </referenceContainer>
     </body>
 </page>

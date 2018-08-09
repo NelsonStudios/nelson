@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Api\Data;
+namespace Fecon\SytelineIntegration\Api\Data;
 
 interface SubmissionInterface
 {
@@ -27,7 +27,7 @@ interface SubmissionInterface
     /**
      * Set submission_id
      * @param string $submissionId
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setSubmissionId($submissionId);
 
@@ -40,7 +40,7 @@ interface SubmissionInterface
     /**
      * Set order_id
      * @param string $orderId
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setOrderId($orderId);
 
@@ -53,7 +53,7 @@ interface SubmissionInterface
     /**
      * Set created_at
      * @param string $creationAt
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setCreationAt($creationAt);
 
@@ -66,7 +66,7 @@ interface SubmissionInterface
     /**
      * Set updated_at
      * @param string $updatedAt
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setUpdatedAt($updatedAt);
 
@@ -79,7 +79,7 @@ interface SubmissionInterface
     /**
      * Set success
      * @param string $success
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setSuccess($success);
 
@@ -92,7 +92,7 @@ interface SubmissionInterface
     /**
      * Set testing
      * @param string $testing
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setTesting($testing);
 
@@ -105,7 +105,7 @@ interface SubmissionInterface
     /**
      * Set request
      * @param string $request
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setRequest($request);
 
@@ -118,7 +118,7 @@ interface SubmissionInterface
     /**
      * Set attempts
      * @param string $attempts
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setAttempts($attempts);
 
@@ -131,7 +131,7 @@ interface SubmissionInterface
     /**
      * Set response
      * @param string $response
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setResponse($response);
 
@@ -144,7 +144,7 @@ interface SubmissionInterface
     /**
      * Set errors
      * @param string $errors
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setErrors($errors);
 }

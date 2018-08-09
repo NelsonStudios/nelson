@@ -9,8 +9,8 @@
     <system>
         <section id="askanexpert" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Ask An Expert Page</label>
-            <tab>serfe</tab>
-            <resource>Serfe_AskAnExpert::askanexpert</resource>
+            <tab>fecon</tab>
+            <resource>Fecon_AskAnExpert::askanexpert</resource>
             <group id="active_display" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Ask An Expert Page Settings</label>
                 <field id="enabled_askanexpert" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">

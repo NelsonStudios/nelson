@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Adminhtml\Index;
+namespace Fecon\AskAnExpert\Controller\Adminhtml\Index;
 
 class Delete extends \Magento\Backend\App\Action
 {
@@ -8,7 +8,7 @@ class Delete extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('Serfe_AskAnExpert::askanexpert');
+        return $this->_authorization->isAllowed('Fecon_AskAnExpert::askanexpert');
     }
 
     /**
@@ -26,7 +26,7 @@ class Delete extends \Magento\Backend\App\Action
             $title = "";
             try {
                 // init model and delete
-                $model = $this->_objectManager->create('Serfe\AskAnExpert\Model\Contact');
+                $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact');
                 $model->load($id);
                 $title = $model->getName();
                 $model->delete();

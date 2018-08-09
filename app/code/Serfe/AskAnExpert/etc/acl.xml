@@ -12,7 +12,7 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">                            
-                                <resource id="Serfe_AskAnExpert::askanexpert_config" title="askanexpert" />                            
+                                <resource id="Fecon_AskAnExpert::askanexpert_config" title="askanexpert" />                            
                         </resource>
                     </resource>
                 </resource>             

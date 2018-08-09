@@ -1,7 +1,7 @@
 var config = {
   map: {
     '*': {
-      askanexpert: "Serfe_AskAnExpert/js/askanexpert",
+      askanexpert: "Fecon_AskAnExpert/js/askanexpert",
     }
   }
 };

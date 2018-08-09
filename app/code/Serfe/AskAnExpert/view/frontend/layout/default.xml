@@ -9,7 +9,7 @@
             <block class="Magento\Framework\View\Element\Html\Link\Current" name="askanexpert-link2">
                 <arguments>
                     <argument name="label" xsi:type="string">Ask An Expert</argument>
-                    <argument name="path" xsi:type="helper" helper="Serfe\AskAnExpert\Helper\Data::getFrontName"/>
+                    <argument name="path" xsi:type="helper" helper="Fecon\AskAnExpert\Helper\Data::getFrontName"/>
                 </arguments>
             </block>
         </referenceBlock>

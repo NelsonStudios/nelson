@@ -2,14 +2,14 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="context" xsi:type="configurableObject">
         <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\Context</argument>
-        <argument name="namespace" xsi:type="string">serfe_shipping_preorder_index</argument>
+        <argument name="namespace" xsi:type="string">fecon_shipping_preorder_index</argument>
     </argument>
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">serfe_shipping_preorder_index.serfe_shipping_preorder_grid_data_source</item>
-            <item name="deps" xsi:type="string">serfe_shipping_preorder_index.serfe_shipping_preorder_grid_data_source</item>
+            <item name="provider" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_grid_data_source</item>
+            <item name="deps" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_grid_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">serfe_shipping_preorder_columns</item>
+        <item name="spinner" xsi:type="string">fecon_shipping_preorder_columns</item>
         <item name="buttons" xsi:type="array">
             <item name="add" xsi:type="array">
                 <item name="name" xsi:type="string">add</item>
@@ -19,10 +19,10 @@
             </item>
         </item>
     </argument>
-    <dataSource name="serfe_shipping_preorder_grid_data_source">
+    <dataSource name="fecon_shipping_preorder_grid_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">serfe_shipping_preorder_grid_data_source</argument>
+            <argument name="name" xsi:type="string">fecon_shipping_preorder_grid_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">preorder_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
@@ -47,21 +47,21 @@
         <filters name="listing_filters"/>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="serfe_shipping_preorder_columns">
+    <columns name="fecon_shipping_preorder_columns">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="editorConfig" xsi:type="array">
-                    <item name="selectProvider" xsi:type="string">serfe_shipping_preorder_index.serfe_shipping_preorder_index.serfe_shipping_preorder_columns.ids</item>
+                    <item name="selectProvider" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_index.fecon_shipping_preorder_columns.ids</item>
                     <item name="enabled" xsi:type="boolean">true</item>
                     <item name="indexField" xsi:type="string">preorder_id</item>
                     <item name="clientConfig" xsi:type="array">
-                        <item name="saveUrl" path="serfe_shipping/Preorder/inlineEdit" xsi:type="url"/>
+                        <item name="saveUrl" path="fecon_shipping/Preorder/inlineEdit" xsi:type="url"/>
                         <item name="validateBeforeSave" xsi:type="boolean">false</item>
                     </item>
                 </item>
                 <item name="childDefaults" xsi:type="array">
                     <item name="fieldAction" xsi:type="array">
-                        <item name="provider" xsi:type="string">serfe_shipping_preorder_index.serfe_shipping_preorder_index.serfe_shipping_preorder_columns_editor</item>
+                        <item name="provider" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_index.fecon_shipping_preorder_columns_editor</item>
                         <item name="target" xsi:type="string">startEdit</item>
                         <item name="params" xsi:type="array">
                             <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
@@ -109,9 +109,9 @@
                 </item>
             </argument>
         </column>
-        <column name="is_available" class="Serfe\Shipping\Ui\Component\Listing\Column\Status">
+        <column name="is_available" class="Fecon\Shipping\Ui\Component\Listing\Column\Status">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Serfe\Shipping\Model\Preorder\StatusList</item>
+                <item name="options" xsi:type="object">Fecon\Shipping\Model\Preorder\StatusList</item>
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
@@ -119,42 +119,42 @@
                 </item>
             </argument>
         </column>
-        <column name="customer" class="Serfe\Shipping\Ui\Component\Listing\Column\Customer">
+        <column name="customer" class="Fecon\Shipping\Ui\Component\Listing\Column\Customer">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" translate="true" xsi:type="string">Customer</item>
                 </item>
             </argument>
         </column>
-        <column name="country" class="Serfe\Shipping\Ui\Component\Listing\Column\Country">
+        <column name="country" class="Fecon\Shipping\Ui\Component\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" translate="true" xsi:type="string">Country</item>
                 </item>
             </argument>
         </column>
-        <column name="state" class="Serfe\Shipping\Ui\Component\Listing\Column\State">
+        <column name="state" class="Fecon\Shipping\Ui\Component\Listing\Column\State">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" translate="true" xsi:type="string">State</item>
                 </item>
             </argument>
         </column>
-        <column name="city" class="Serfe\Shipping\Ui\Component\Listing\Column\City">
+        <column name="city" class="Fecon\Shipping\Ui\Component\Listing\Column\City">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" translate="true" xsi:type="string">City</item>
                 </item>
             </argument>
         </column>
-        <column name="zip_code" class="Serfe\Shipping\Ui\Component\Listing\Column\ZipCode">
+        <column name="zip_code" class="Fecon\Shipping\Ui\Component\Listing\Column\ZipCode">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" translate="true" xsi:type="string">Zip Code</item>
                 </item>
             </argument>
         </column>
-        <column name="shipping_method" class="Serfe\Shipping\Ui\Component\Listing\Column\ShippingMethod">
+        <column name="shipping_method" class="Fecon\Shipping\Ui\Component\Listing\Column\ShippingMethod">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
@@ -176,7 +176,7 @@
                 </item>
             </argument>
         </column>
-        <actionsColumn class="Serfe\Shipping\Ui\Component\Listing\Column\PreorderActions" name="actions">
+        <actionsColumn class="Fecon\Shipping\Ui\Component\Listing\Column\PreorderActions" name="actions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="indexField" xsi:type="string">preorder_id</item>

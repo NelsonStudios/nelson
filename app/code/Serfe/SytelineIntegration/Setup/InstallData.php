@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Setup;
+namespace Fecon\SytelineIntegration\Setup;
 
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;

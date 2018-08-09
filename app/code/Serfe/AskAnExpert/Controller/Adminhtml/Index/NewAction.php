@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\News\Controller\Adminhtml\Index;
+namespace Fecon\News\Controller\Adminhtml\Index;
 
 class NewAction extends \Magento\Backend\App\Action
 {
@@ -25,7 +25,7 @@ class NewAction extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('Serfe_News::news');
+        return $this->_authorization->isAllowed('Fecon_News::news');
     }
 
     /**

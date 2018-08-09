@@ -1,6 +1,6 @@
 <?php
  
-namespace Serfe\AskAnExpert\Helper;
+namespace Fecon\AskAnExpert\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {

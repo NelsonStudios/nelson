@@ -1,7 +1,7 @@
 <?php
-namespace Serfe\AskAnExpert\Model\Contact;
+namespace Fecon\AskAnExpert\Model\Contact;
 
-use Serfe\AskAnExpert\Model\ResourceModel\Contact\CollectionFactory;
+use Fecon\AskAnExpert\Model\ResourceModel\Contact\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
@@ -64,13 +64,13 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         foreach ($items as $block) {
             $this->loadedData[$block->getId()] = $block->getData();
         }
-        $data = $this->dataPersistor->get('serfe_askanexpert');
+        $data = $this->dataPersistor->get('fecon_askanexpert');
         if (!empty($data)) {
             $block = $this->collection->getNewEmptyItem();
             $block->setData($data);
             $this->loadedData[$block->getId()] = $block->getData();
              
-            $this->dataPersistor->clear('serfe_askanexpert');
+            $this->dataPersistor->clear('fecon_askanexpert');
         }
         return $this->loadedData;
     }

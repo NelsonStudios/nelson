@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Controller;
+namespace Fecon\AskAnExpert\Controller;
 
 /**
  * Custom router Controller Router
@@ -23,7 +23,7 @@ class Router implements \Magento\Framework\App\RouterInterface
     public function __construct(
         \Magento\Framework\App\ActionFactory $actionFactory,
         \Magento\Framework\App\ResponseInterface $response,
-        \Serfe\AskAnExpert\Helper\Data $myModuleHelper
+        \Fecon\AskAnExpert\Helper\Data $myModuleHelper
     ) {
         $this->actionFactory = $actionFactory;
         $this->_mymoduleHelper = $myModuleHelper;

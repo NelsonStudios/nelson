@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\Filterproducts\Block\Home;
+namespace Fecon\Filterproducts\Block\Home;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Model\ResourceModel\Submission;
+namespace Fecon\SytelineIntegration\Model\ResourceModel\Submission;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
@@ -14,8 +14,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            'Serfe\SytelineIntegration\Model\Submission',
-            'Serfe\SytelineIntegration\Model\ResourceModel\Submission'
+            'Fecon\SytelineIntegration\Model\Submission',
+            'Fecon\SytelineIntegration\Model\ResourceModel\Submission'
         );
     }
 }

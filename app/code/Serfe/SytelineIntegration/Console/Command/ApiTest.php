@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Console\Command;
+namespace Fecon\SytelineIntegration\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,15 +27,15 @@ class ApiTest extends Command
     /**
      * Constructor
      *
-     * @param \Serfe\SytelineIntegration\Helper\ApiHelper $client
-     * @param \Serfe\SytelineIntegration\Helper\SytelineHelper $testHelper
+     * @param \Fecon\SytelineIntegration\Helper\ApiHelper $client
+     * @param \Fecon\SytelineIntegration\Helper\SytelineHelper $testHelper
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
      * @param \Magento\Framework\App\State $state
      * @param mixed $name
      */
     public function __construct(
-        \Serfe\SytelineIntegration\Helper\ApiHelper $client,
-        \Serfe\SytelineIntegration\Helper\SytelineHelper $testHelper,
+        \Fecon\SytelineIntegration\Helper\ApiHelper $client,
+        \Fecon\SytelineIntegration\Helper\SytelineHelper $testHelper,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \Magento\Framework\App\State $state,
         $name = null
@@ -78,7 +78,7 @@ class ApiTest extends Command
      */
     protected function configure()
     {
-        $this->setName("serfe:syteline:test");
+        $this->setName("fecon:syteline:test");
         $this->setDescription("Test the configured API its working properly");
         $this->setDefinition([
             new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),

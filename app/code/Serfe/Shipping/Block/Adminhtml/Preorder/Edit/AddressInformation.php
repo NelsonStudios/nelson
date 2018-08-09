@@ -68,7 +68,7 @@ class AddressInformation extends \Magento\Backend\Block\Template
      */
     protected function getAddress()
     {
-        $preorder = $this->coreRegistry->registry('serfe_shipping_preorder');
+        $preorder = $this->coreRegistry->registry('fecon_shipping_preorder');
         $addressId = $preorder->getData(PreorderInterface::ADDRESS_ID);
         try {
             $address = $this->addressRepository->getById($addressId);

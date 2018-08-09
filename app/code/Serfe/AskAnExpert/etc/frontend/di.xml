@@ -10,7 +10,7 @@
         <arguments>
             <argument name="routerList" xsi:type="array">
                 <item name="askanexpert" xsi:type="array">
-                    <item name="class" xsi:type="string">Serfe\AskAnExpert\Controller\Router</item>
+                    <item name="class" xsi:type="string">Fecon\AskAnExpert\Controller\Router</item>
                     <item name="disable" xsi:type="boolean">false</item>
                     <item name="sortOrder" xsi:type="string">60</item>
                 </item>

@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Adminhtml\Index;
+namespace Fecon\AskAnExpert\Controller\Adminhtml\Index;
 
 class PostDataProcessor
 {

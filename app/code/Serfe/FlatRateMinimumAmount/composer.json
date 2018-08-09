@@ -1,25 +1,25 @@
 {
-    "name": "serfe/module-flatrateminimumamount",
+    "name": "fecon/module-flatrateminimumamount",
     "description": "Enable Flat Rate when minimum amount",
     "type": "magento2-module",
     "license": "proprietary",
     "version": "1.0.0",
     "authors": [
         {
-            "email": "xuan@serfe.com",
+            "email": "xuan@fecon.com",
             "name": "Xuan Villagran"
         }
     ],
     "minimum-stability": "dev",
     "require": {
-        "serfe/module-backendconfig": "1.0.0"
+        "fecon/module-backendconfig": "1.0.0"
     },
     "autoload": {
         "files": [
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\FlatRateMinimumAmount\\": ""
+            "Fecon\\FlatRateMinimumAmount\\": ""
         }
     }
 }

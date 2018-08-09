@@ -6,9 +6,9 @@ namespace Fecon\Shipping\Ui\Component\Listing\Column;
 class PreorderActions extends \Magento\Ui\Component\Listing\Columns\Column
 {
 
-    const URL_PATH_EDIT = 'serfe_shipping/preorder/edit';
-    const URL_PATH_DELETE = 'serfe_shipping/preorder/delete';
-    const URL_PATH_DETAILS = 'serfe_shipping/preorder/details';
+    const URL_PATH_EDIT = 'fecon_shipping/preorder/edit';
+    const URL_PATH_DELETE = 'fecon_shipping/preorder/delete';
+    const URL_PATH_DETAILS = 'fecon_shipping/preorder/details';
     protected $urlBuilder;
 
     /**

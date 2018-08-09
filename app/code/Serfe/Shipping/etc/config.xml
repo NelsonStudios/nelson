@@ -3,7 +3,7 @@
     <default>
         <carriers>
             <manualshipping>
-                <model>Serfe\Shipping\Model\Carrier\ManualShipping</model>
+                <model>Fecon\Shipping\Model\Carrier\ManualShipping</model>
                 <active>0</active>
                 <title>Manually Calculated</title>
                 <name>Manual Shipping</name>

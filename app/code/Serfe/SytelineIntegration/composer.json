@@ -1,15 +1,15 @@
 {
-    "name": "serfe/module-sytelineintegration",
+    "name": "fecon/module-sytelineintegration",
     "description": "Integration with Syteline System",
     "require": {
         "zendframework/zend-soap": "2.7.0",
-        "serfe/module-backendconfig": "1.0.0"
+        "fecon/module-backendconfig": "1.0.0"
     },
     "type": "magento2-module",
     "license": "proprietary",
     "authors": [
         {
-            "email": "xuan@serfe.com",
+            "email": "xuan@fecon.com",
             "name": "Xuan Villagran"
         }
     ],
@@ -20,7 +20,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\SytelineIntegration\\": ""
+            "Fecon\\SytelineIntegration\\": ""
         }
     }
 }

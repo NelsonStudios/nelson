@@ -2,25 +2,25 @@
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">serfe_shipping_preorder_form.preorder_form_data_source</item>
-            <item name="deps" xsi:type="string">serfe_shipping_preorder_form.preorder_form_data_source</item>
+            <item name="provider" xsi:type="string">fecon_shipping_preorder_form.preorder_form_data_source</item>
+            <item name="deps" xsi:type="string">fecon_shipping_preorder_form.preorder_form_data_source</item>
         </item>
         <item name="label" translate="true" xsi:type="string">General Information</item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
-            <item name="namespace" xsi:type="string">serfe_shipping_preorder_form</item>
+            <item name="namespace" xsi:type="string">fecon_shipping_preorder_form</item>
         </item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
         <item name="buttons" xsi:type="array">
-            <item name="back" xsi:type="string">Serfe\Shipping\Block\Adminhtml\Preorder\Edit\BackButton</item>
-            <item name="delete" xsi:type="string">Serfe\Shipping\Block\Adminhtml\Preorder\Edit\DeleteButton</item>
-            <item name="save" xsi:type="string">Serfe\Shipping\Block\Adminhtml\Preorder\Edit\SaveButton</item>
-            <item name="save_and_continue" xsi:type="string">Serfe\Shipping\Block\Adminhtml\Preorder\Edit\SaveAndContinueButton</item>
+            <item name="back" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\BackButton</item>
+            <item name="delete" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\DeleteButton</item>
+            <item name="save" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\SaveButton</item>
+            <item name="save_and_continue" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\SaveAndContinueButton</item>
         </item>
     </argument>
     <dataSource name="preorder_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">Serfe\Shipping\Model\Preorder\DataProvider</argument>
+            <argument name="class" xsi:type="string">Fecon\Shipping\Model\Preorder\DataProvider</argument>
             <argument name="name" xsi:type="string">preorder_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">preorder_id</argument>
             <argument name="requestFieldName" xsi:type="string">preorder_id</argument>

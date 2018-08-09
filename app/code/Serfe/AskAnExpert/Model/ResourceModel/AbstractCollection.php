@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Model\ResourceModel;
+namespace Fecon\AskAnExpert\Model\ResourceModel;
 
 abstract class AbstractCollection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {

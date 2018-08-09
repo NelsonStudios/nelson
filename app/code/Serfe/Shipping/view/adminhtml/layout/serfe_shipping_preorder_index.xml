@@ -3,7 +3,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="serfe_shipping_preorder_index"/>
+            <uiComponent name="fecon_shipping_preorder_index"/>
         </referenceContainer>
     </body>
 </page>

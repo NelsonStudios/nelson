@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Controller;
+namespace Fecon\AskAnExpert\Controller;
 
 use Magento\Framework\App\RequestInterface;
 use Magento\Store\Model\ScopeInterface;

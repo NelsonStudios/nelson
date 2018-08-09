@@ -1,5 +1,5 @@
 {
-    "name": "serfe/module-quote",
+    "name": "fecon/module-quote",
     "description": "Override for Magento_Quote module",
     "require": {
         "magento/module-quote": "101.0.2"
@@ -8,7 +8,7 @@
     "license": "proprietary",
     "authors": [
         {
-            "email": "xuan@serfe.com",
+            "email": "xuan@fecon.com",
             "name": "Xuan Villagran"
         }
     ],
@@ -19,7 +19,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\Quote\\": ""
+            "Fecon\\Quote\\": ""
         }
     }
 }

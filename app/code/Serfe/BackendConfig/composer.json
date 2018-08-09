@@ -1,12 +1,12 @@
 {
-    "name": "serfe/module-backendconfig",
+    "name": "fecon/module-backendconfig",
     "description": "Add backend config tab",
     "type": "magento2-module",
     "license": "proprietary",
     "version": "1.0.0",
     "authors": [
         {
-            "email": "xuan@serfe.com",
+            "email": "xuan@fecon.com",
             "name": "Xuan Villagran"
         }
     ],
@@ -17,7 +17,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\BackendConfig\\": ""
+            "Fecon\\BackendConfig\\": ""
         }
     }
 }

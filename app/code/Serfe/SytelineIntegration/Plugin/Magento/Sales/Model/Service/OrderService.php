@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Plugin\Magento\Sales\Model\Service;
+namespace Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Service;
 
 /**
  * Plugin for \Magento\Sales\Model\Service\OrderService class
@@ -12,17 +12,17 @@ class OrderService
     /**
      * Syteline Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\SytelineHelper 
+     * @var \Fecon\SytelineIntegration\Helper\SytelineHelper 
      */
     protected $sytelineHelper;
 
     /**
      * Constructor
      *
-     * @param \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
+     * @param \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
      */
     public function __construct(
-        \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
+        \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
     ) {
         $this->sytelineHelper = $sytelineHelper;
     }

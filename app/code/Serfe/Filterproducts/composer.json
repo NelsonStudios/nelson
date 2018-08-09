@@ -1,12 +1,12 @@
 {
-    "name": "serfe/module-filterproducts",
+    "name": "fecon/module-filterproducts",
     "description": "Add related products list",
     "type": "magento2-module",
     "license": "proprietary",
     "version": "1.0.0",
     "authors": [
         {
-            "email": "bruno@serfe.com",
+            "email": "bruno@fecon.com",
             "name": "Bruno"
         }
     ],
@@ -17,7 +17,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Serfe\\filterproducts\\": ""
+            "Fecon\\filterproducts\\": ""
         }
     }
 }

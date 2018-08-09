@@ -3,8 +3,8 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="serfe_shipping_preorder_form"/>
-            <block class="Serfe\Shipping\Block\Adminhtml\Preorder\Edit\AddressInformation" name="address-information" template="Serfe_Shipping::preorder/address-information.phtml" />
+            <uiComponent name="fecon_shipping_preorder_form"/>
+            <block class="Fecon\Shipping\Block\Adminhtml\Preorder\Edit\AddressInformation" name="address-information" template="Fecon_Shipping::preorder/address-information.phtml" />
         </referenceContainer>
     </body>
 </page>

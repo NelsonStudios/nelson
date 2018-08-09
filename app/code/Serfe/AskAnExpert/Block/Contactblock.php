@@ -1,6 +1,6 @@
 <?php
 
-namespace  Serfe\AskAnExpert\Block;
+namespace  Fecon\AskAnExpert\Block;
 
 use Magento\Framework\View\Element\Template;
 
@@ -12,10 +12,10 @@ class Contactblock extends Template {
      * 
      * @param Template\Context                 $context        
      * @param array                            $data           
-     * @param \Serfe\AskAnExpert\Helper\Data   $myModuleHelper 
+     * @param \Fecon\AskAnExpert\Helper\Data   $myModuleHelper 
      * @param \Magento\Store\Model\Information $storeInfo      
      */
-    public function __construct(Template\Context $context, array $data = [], \Serfe\AskAnExpert\Helper\Data $myModuleHelper, \Magento\Store\Model\Information $storeInfo) {
+    public function __construct(Template\Context $context, array $data = [], \Fecon\AskAnExpert\Helper\Data $myModuleHelper, \Magento\Store\Model\Information $storeInfo) {
         
         parent::__construct($context, $data);
         $this->_mymoduleHelper = $myModuleHelper;

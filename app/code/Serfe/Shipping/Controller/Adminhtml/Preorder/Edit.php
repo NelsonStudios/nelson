@@ -43,7 +43,7 @@ class Edit extends \Fecon\Shipping\Controller\Adminhtml\Preorder
                 return $resultRedirect->setPath('*/*/');
             }
         }
-        $this->_coreRegistry->register('serfe_shipping_preorder', $model);
+        $this->_coreRegistry->register('fecon_shipping_preorder', $model);
         
         // 3. Build edit form
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */

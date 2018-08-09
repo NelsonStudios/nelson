@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Helper;
+namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Main Syteline Helper
@@ -14,28 +14,28 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Api Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\ApiHelper 
+     * @var \Fecon\SytelineIntegration\Helper\ApiHelper 
      */
     protected $apiHelper;
 
     /**
      * Logger
      *
-     * @var \Serfe\SytelineIntegration\Logger\Handler 
+     * @var \Fecon\SytelineIntegration\Logger\Handler 
      */
     protected $logger;
     
     /**
      * Data Transformer
      *
-     * @var \Serfe\SytelineIntegration\Helper\TransformData 
+     * @var \Fecon\SytelineIntegration\Helper\TransformData 
      */
     protected $dataTransformHelper;
 
     /**
      * Submission Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\SubmissionHelper 
+     * @var \Fecon\SytelineIntegration\Helper\SubmissionHelper 
      */
     protected $submissionHelper;
 
@@ -50,18 +50,18 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Serfe\SytelineIntegration\Helper\ApiHelper $apiHelper
-     * @param \Serfe\SytelineIntegration\Logger\Logger $logger
-     * @param \Serfe\SytelineIntegration\Helper\TransformData $dataTransformHelper
-     * @param \Serfe\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
+     * @param \Fecon\SytelineIntegration\Helper\ApiHelper $apiHelper
+     * @param \Fecon\SytelineIntegration\Logger\Logger $logger
+     * @param \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper
+     * @param \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Serfe\SytelineIntegration\Helper\ApiHelper $apiHelper,
-        \Serfe\SytelineIntegration\Logger\Logger $logger,
-        \Serfe\SytelineIntegration\Helper\TransformData $dataTransformHelper,
-        \Serfe\SytelineIntegration\Helper\SubmissionHelper $submissionHelper,
+        \Fecon\SytelineIntegration\Helper\ApiHelper $apiHelper,
+        \Fecon\SytelineIntegration\Logger\Logger $logger,
+        \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper,
+        \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         $this->apiHelper = $apiHelper;

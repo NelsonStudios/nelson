@@ -1,11 +1,11 @@
 {
-    "name": "serfe/module-shipping",
+    "name": "fecon/module-shipping",
     "description": "Create custom shippings methods, allowing setting the price manullay from the backend",
     "type": "magento2-module",
     "license": "proprietary",
     "authors": [
         {
-            "email": "xuan@serfe.com",
+            "email": "xuan@fecon.com",
             "name": "Xuan Villagran"
         }
     ],
@@ -13,7 +13,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Serfe\\Shipping\\": ""
+            "Fecon\\Shipping\\": ""
         },
         "files": [
             "registration.php"

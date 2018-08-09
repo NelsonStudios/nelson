@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Api;
+namespace Fecon\SytelineIntegration\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
 
@@ -11,18 +11,18 @@ interface SubmissionRepositoryInterface
 
     /**
      * Save Submission
-     * @param \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @param \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function save(
-        \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
+        \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
     );
 
     /**
      * Retrieve Submission
      * @param string $submissionId
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getById($submissionId);
@@ -30,7 +30,7 @@ interface SubmissionRepositoryInterface
     /**
      * Retrieve Submission matching the specified criteria.
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionSearchResultsInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getList(
@@ -39,12 +39,12 @@ interface SubmissionRepositoryInterface
 
     /**
      * Delete Submission
-     * @param \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
+     * @param \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
      * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function delete(
-        \Serfe\SytelineIntegration\Api\Data\SubmissionInterface $submission
+        \Fecon\SytelineIntegration\Api\Data\SubmissionInterface $submission
     );
 
     /**

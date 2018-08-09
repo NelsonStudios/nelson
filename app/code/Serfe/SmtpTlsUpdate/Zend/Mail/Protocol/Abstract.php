@@ -1,6 +1,6 @@
 <?php
 
-// namespace Serfe\SmtpTlsUpdate\Zend\Mail\Protocol;
+// namespace Fecon\SmtpTlsUpdate\Zend\Mail\Protocol;
 
 /**
  * Zend Framework

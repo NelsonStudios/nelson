@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Helper;
+namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Wrapper for SoapClient Helper
@@ -12,7 +12,7 @@ class ApiHelper extends SoapClient
     /**
      * Data Handler
      *
-     * @var \Serfe\SytelineIntegration\Helper\DataHandler 
+     * @var \Fecon\SytelineIntegration\Helper\DataHandler 
      */
     protected $dataHandler;
 
@@ -20,13 +20,13 @@ class ApiHelper extends SoapClient
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
-     * @param \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
+     * @param \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
+     * @param \Fecon\SytelineIntegration\Helper\DataHandler $dataHandler
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper,
-        \Serfe\SytelineIntegration\Helper\DataHandler $dataHandler
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
+        \Fecon\SytelineIntegration\Helper\DataHandler $dataHandler
     ) {
         $this->dataHandler = $dataHandler;
 

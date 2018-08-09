@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\AskAnExpert\Controller\Adminhtml\Index;
+namespace Fecon\AskAnExpert\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action;
 
@@ -31,7 +31,7 @@ class Edit extends \Magento\Backend\App\Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('Serfe_AskAnExpert::askanexpert');
+        return $this->_authorization->isAllowed('Fecon_AskAnExpert::askanexpert');
     }
 
     /**
@@ -44,7 +44,7 @@ class Edit extends \Magento\Backend\App\Action
         // load layout, set active menu and breadcrumbs
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Serfe_AskAnExpert::askanexpert')
+        $resultPage->setActiveMenu('Fecon_AskAnExpert::askanexpert')
             ->addBreadcrumb(__('Submissions'), __('Submissions'))
             ->addBreadcrumb(__('Manage Submissions'), __('Manage Submissions'));
         return $resultPage;
@@ -60,7 +60,7 @@ class Edit extends \Magento\Backend\App\Action
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('contact_id');
-        $model = $this->_objectManager->create('Serfe\AskAnExpert\Model\Contact');
+        $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact');
 
         // 2. Initial checking
         if ($id) {

@@ -1,11 +1,11 @@
 {
-    "name": "serfe/module-smtptlsupdate",
+    "name": "fecon/module-smtptlsupdate",
     "description": "This module is intended to update tls protocol to version 1.1",
     "type": "magento2-module",
     "license": "proprietary",
     "authors": [
         {
-            "email": "bruno@serfe.com",
+            "email": "bruno@fecon.com",
             "name": "Bruno"
         }
     ],
@@ -13,10 +13,10 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Serfe\\SmtpTlsUpdate\\": ""
+            "Fecon\\SmtpTlsUpdate\\": ""
         },
         "files": [
-            "app/code/Serfe/SmtpTlsUpdate/Zend/Mail/Protocol/Smtp.php"
+            "app/code/Fecon/SmtpTlsUpdate/Zend/Mail/Protocol/Smtp.php"
         ]
     }
 }

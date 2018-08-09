@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Controller\Adminhtml\Submission;
+namespace Fecon\SytelineIntegration\Controller\Adminhtml\Submission;
 
 /**
  * Controller to list submissions

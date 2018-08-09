@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Api\Data;
+namespace Fecon\SytelineIntegration\Api\Data;
 
 interface SubmissionSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
@@ -9,13 +9,13 @@ interface SubmissionSearchResultsInterface extends \Magento\Framework\Api\Search
 
     /**
      * Get Submission list.
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface[]
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface[]
      */
     public function getItems();
 
     /**
      * Set order_id list.
-     * @param \Serfe\SytelineIntegration\Api\Data\SubmissionInterface[] $items
+     * @param \Fecon\SytelineIntegration\Api\Data\SubmissionInterface[] $items
      * @return $this
      */
     public function setItems(array $items);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Helper;
+namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Description of TestGetCart

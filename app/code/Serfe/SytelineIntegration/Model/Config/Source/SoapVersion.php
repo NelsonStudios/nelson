@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Model\Config\Source;
+namespace Fecon\SytelineIntegration\Model\Config\Source;
 
 /**
  * Source Model for SOAP version configuration

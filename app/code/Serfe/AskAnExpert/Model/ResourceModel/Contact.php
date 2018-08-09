@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\AskAnExpert\Model\ResourceModel;
+namespace Fecon\AskAnExpert\Model\ResourceModel;
 
 class Contact extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
@@ -11,6 +11,6 @@ class Contact extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('serfe_askanexpert', 'contact_id');
+        $this->_init('fecon_askanexpert', 'contact_id');
     }
 }

@@ -1,10 +1,10 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Adminhtml\Index;
+namespace Fecon\AskAnExpert\Controller\Adminhtml\Index;
 
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Ui\Component\MassAction\Filter;
-use Serfe\AskAnExpert\Model\ResourceModel\Contact\CollectionFactory;
+use Fecon\AskAnExpert\Model\ResourceModel\Contact\CollectionFactory;
 
 /**
  * Class MassDelete

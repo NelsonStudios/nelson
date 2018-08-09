@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\Quote\Model\Cart;
+namespace Fecon\Quote\Model\Cart;
 
 use Magento\Quote\Api;
 use Magento\Quote\Api\CartRepositoryInterface;

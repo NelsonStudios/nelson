@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Logger;
+namespace Fecon\SytelineIntegration\Logger;
 
 /**
  * Custom Logger

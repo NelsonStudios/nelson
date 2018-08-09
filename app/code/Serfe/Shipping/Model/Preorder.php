@@ -8,7 +8,7 @@ use Fecon\Shipping\Api\Data\PreorderInterface;
 class Preorder extends \Magento\Framework\Model\AbstractModel implements PreorderInterface
 {
 
-    protected $_eventPrefix = 'serfe_shipping_preorder';
+    protected $_eventPrefix = 'fecon_shipping_preorder';
 
     const AVAILABLE = 1;
     const NOT_AVAILABLE = 0;

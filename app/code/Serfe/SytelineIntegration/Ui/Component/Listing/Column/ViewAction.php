@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Ui\Component\Listing\Column;
+namespace Fecon\SytelineIntegration\Ui\Component\Listing\Column;
 
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;

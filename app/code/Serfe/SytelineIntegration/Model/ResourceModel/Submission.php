@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Model\ResourceModel;
+namespace Fecon\SytelineIntegration\Model\ResourceModel;
 
 class Submission extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
@@ -13,6 +13,6 @@ class Submission extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('serfe_sytelineintegration_submission', 'submission_id');
+        $this->_init('fecon_sytelineintegration_submission', 'submission_id');
     }
 }

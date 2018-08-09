@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\FlatRateMinimumAmount\Helper;
+namespace Fecon\FlatRateMinimumAmount\Helper;
 
 /**
  * Helper to get module configurations
@@ -10,7 +10,7 @@ namespace Serfe\FlatRateMinimumAmount\Helper;
 class Config extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
-    const FLAT_RATE_MIN_AMOUNT = 'serfe_flat_rate/settings/minimum_amount';
+    const FLAT_RATE_MIN_AMOUNT = 'fecon_flat_rate/settings/minimum_amount';
 
     /**
      * Constructor

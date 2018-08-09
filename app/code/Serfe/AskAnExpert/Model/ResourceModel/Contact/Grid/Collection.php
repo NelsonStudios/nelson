@@ -1,9 +1,9 @@
 <?php
-namespace Serfe\AskAnExpert\Model\ResourceModel\Contact\Grid;
+namespace Fecon\AskAnExpert\Model\ResourceModel\Contact\Grid;
 
 use Magento\Framework\Api\Search\SearchResultInterface;
 use Magento\Framework\Search\AggregationInterface;
-use Serfe\AskAnExpert\Model\ResourceModel\Contact\Collection as QuoteCollection;
+use Fecon\AskAnExpert\Model\ResourceModel\Contact\Collection as QuoteCollection;
 
 class Collection extends QuoteCollection implements SearchResultInterface
 {

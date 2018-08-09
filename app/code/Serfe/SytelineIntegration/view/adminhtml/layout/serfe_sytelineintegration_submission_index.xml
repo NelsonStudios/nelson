@@ -3,7 +3,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="serfe_sytelineintegration_submission_index"/>
+            <uiComponent name="fecon_sytelineintegration_submission_index"/>
         </referenceContainer>
     </body>
 </page>

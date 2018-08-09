@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Serfe::serfe_top_level" module="Serfe_BackendConfig" resource="Magento_Backend::content" sortOrder="50" title="Fecon"/>
+        <add id="Fecon::fecon_top_level" module="Fecon_BackendConfig" resource="Magento_Backend::content" sortOrder="50" title="Fecon"/>
     </menu>
 </config>

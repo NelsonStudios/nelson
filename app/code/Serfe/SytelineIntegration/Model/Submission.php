@@ -1,21 +1,21 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Model;
+namespace Fecon\SytelineIntegration\Model;
 
-use Serfe\SytelineIntegration\Api\Data\SubmissionInterface;
+use Fecon\SytelineIntegration\Api\Data\SubmissionInterface;
 
 class Submission extends \Magento\Framework\Model\AbstractModel implements SubmissionInterface
 {
 
-    protected $_eventPrefix = 'serfe_sytelineintegration_submission';
+    protected $_eventPrefix = 'fecon_sytelineintegration_submission';
 
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('Serfe\SytelineIntegration\Model\ResourceModel\Submission');
+        $this->_init('Fecon\SytelineIntegration\Model\ResourceModel\Submission');
     }
 
     /**
@@ -30,7 +30,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set submission_id
      * @param string $submissionId
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setSubmissionId($submissionId)
     {
@@ -49,7 +49,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set order_id
      * @param string $orderId
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setOrderId($orderId)
     {
@@ -68,7 +68,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set created_at
      * @param string $creationAt
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setCreationAt($creationAt)
     {
@@ -87,7 +87,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set updated_at
      * @param string $updatedAt
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -106,7 +106,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set success
      * @param string $success
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setSuccess($success)
     {
@@ -125,7 +125,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set testing
      * @param string $testing
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setTesting($testing)
     {
@@ -144,7 +144,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set request
      * @param string $request
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setRequest($request)
     {
@@ -163,7 +163,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set attempts
      * @param string $attempts
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setAttempts($attempts)
     {
@@ -182,7 +182,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set response
      * @param string $response
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setResponse($response)
     {
@@ -201,7 +201,7 @@ class Submission extends \Magento\Framework\Model\AbstractModel implements Submi
     /**
      * Set errors
      * @param string $errors
-     * @return \Serfe\SytelineIntegration\Api\Data\SubmissionInterface
+     * @return \Fecon\SytelineIntegration\Api\Data\SubmissionInterface
      */
     public function setErrors($errors)
     {

@@ -1,5 +1,5 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Front;
+namespace Fecon\AskAnExpert\Controller\Front;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\ObjectManager;
@@ -47,10 +47,10 @@ class Save extends \Magento\Framework\App\Action\Action
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         CustomerRepository $customerRepository,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
-        \Serfe\AskAnExpert\Helper\Data $myModuleHelper,
+        \Fecon\AskAnExpert\Helper\Data $myModuleHelper,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Serfe\AskAnExpert\Model\ContactFactory $_contactModel
+        \Fecon\AskAnExpert\Model\ContactFactory $_contactModel
     ) {
         $this->storeManager = $storeManager;
         $this->formKeyValidator = $formKeyValidator;

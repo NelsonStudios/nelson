@@ -24,7 +24,7 @@ class InstallSchema implements InstallSchemaInterface
         $installer = $setup;
         $installer->startSetup();
 
-        $tableFeconShippingPreorder = $setup->getConnection()->newTable($setup->getTable('serfe_shipping_preorder'));
+        $tableFeconShippingPreorder = $setup->getConnection()->newTable($setup->getTable('fecon_shipping_preorder'));
 
         
         $tableFeconShippingPreorder->addColumn(

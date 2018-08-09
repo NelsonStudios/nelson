@@ -3,7 +3,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <block class="Serfe\SytelineIntegration\Block\Adminhtml\Submission\View" template="Serfe_SytelineIntegration::submission.phtml"/>
+            <block class="Fecon\SytelineIntegration\Block\Adminhtml\Submission\View" template="Fecon_SytelineIntegration::submission.phtml"/>
         </referenceContainer>
     </body>
 </page>

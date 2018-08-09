@@ -3,11 +3,11 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Serfe_Shipping::Preorder" sortOrder="10" title="Preorder">
-                    <resource id="Serfe_Shipping::Preorder_save" sortOrder="10" title="Save Preorder"/>
-                    <resource id="Serfe_Shipping::Preorder_delete" sortOrder="20" title="Delete Preorder"/>
-                    <resource id="Serfe_Shipping::Preorder_update" sortOrder="30" title="Update Preorder"/>
-                    <resource id="Serfe_Shipping::Preorder_view" sortOrder="40" title="View Preorder"/>
+                <resource id="Fecon_Shipping::Preorder" sortOrder="10" title="Preorder">
+                    <resource id="Fecon_Shipping::Preorder_save" sortOrder="10" title="Save Preorder"/>
+                    <resource id="Fecon_Shipping::Preorder_delete" sortOrder="20" title="Delete Preorder"/>
+                    <resource id="Fecon_Shipping::Preorder_update" sortOrder="30" title="Update Preorder"/>
+                    <resource id="Fecon_Shipping::Preorder_view" sortOrder="40" title="View Preorder"/>
                 </resource>
             </resource>
         </resources>

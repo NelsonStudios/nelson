@@ -54,13 +54,13 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         foreach ($items as $model) {
             $this->loadedData[$model->getId()] = $model->getData();
         }
-        $data = $this->dataPersistor->get('serfe_shipping_preorder');
+        $data = $this->dataPersistor->get('fecon_shipping_preorder');
         
         if (!empty($data)) {
             $model = $this->collection->getNewEmptyItem();
             $model->setData($data);
             $this->loadedData[$model->getId()] = $model->getData();
-            $this->dataPersistor->clear('serfe_shipping_preorder');
+            $this->dataPersistor->clear('fecon_shipping_preorder');
         }
         
         return $this->loadedData;

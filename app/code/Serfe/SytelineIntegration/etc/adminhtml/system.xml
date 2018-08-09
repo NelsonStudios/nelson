@@ -3,8 +3,8 @@
     <system>
         <section id="syteline_integration" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
             <label>Syteline Integration</label>
-            <tab>serfe</tab>
-            <resource>Serfe_SytelineIntegration::config_serfe_sytelineintegration</resource>
+            <tab>fecon</tab>
+            <resource>Fecon_SytelineIntegration::config_fecon_sytelineintegration</resource>
             <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
                 <label>Settings</label>
                 <field id="test_mode" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select"  canRestore="1">
@@ -23,7 +23,7 @@
                 <field id="soap_version" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select" canRestore="1">
                     <label>SOAP Version</label>
                     <comment/>
-                    <source_model>Serfe\SytelineIntegration\Model\Config\Source\SoapVersion</source_model>
+                    <source_model>Fecon\SytelineIntegration\Model\Config\Source\SoapVersion</source_model>
                 </field>
             </group>
         </section>

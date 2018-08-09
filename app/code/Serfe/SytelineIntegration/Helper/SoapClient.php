@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Helper;
+namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Helper to make SOAP API calls
@@ -12,7 +12,7 @@ class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Config Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\ConfigHelper
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper
      */
     protected $configHelper;
 
@@ -20,11 +20,11 @@ class SoapClient extends \Magento\Framework\App\Helper\AbstractHelper
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
+     * @param \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Serfe\SytelineIntegration\Helper\ConfigHelper $configHelper
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
     ) {
         $this->configHelper = $configHelper;
         

@@ -1,7 +1,7 @@
 <?php
-namespace Serfe\AskAnExpert\Controller\Front;
+namespace Fecon\AskAnExpert\Controller\Front;
 
-class Index extends \Serfe\AskAnExpert\Controller\Front
+class Index extends \Fecon\AskAnExpert\Controller\Front
 {
     public function execute()
     {

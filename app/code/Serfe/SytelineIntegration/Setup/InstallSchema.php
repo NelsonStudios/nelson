@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Serfe\SytelineIntegration\Setup;
+namespace Fecon\SytelineIntegration\Setup;
 
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\InstallSchemaInterface;
@@ -20,10 +20,10 @@ class InstallSchema implements InstallSchemaInterface
         $installer = $setup;
         $installer->startSetup();
 
-        $table_serfe_sytelineintegration_submission = $setup->getConnection()->newTable($setup->getTable('serfe_sytelineintegration_submission'));
+        $table_fecon_sytelineintegration_submission = $setup->getConnection()->newTable($setup->getTable('fecon_sytelineintegration_submission'));
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'submission_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -33,7 +33,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'order_id',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -43,7 +43,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'created_at',
             \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
             null,
@@ -53,7 +53,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'updated_at',
             \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
             null,
@@ -63,7 +63,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'success',
             \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
             null,
@@ -73,7 +73,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'testing',
             \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
             null,
@@ -83,7 +83,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'request',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             null,
@@ -93,7 +93,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'attempts',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null,
@@ -103,7 +103,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'response',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             null,
@@ -113,7 +113,7 @@ class InstallSchema implements InstallSchemaInterface
         
 
         
-        $table_serfe_sytelineintegration_submission->addColumn(
+        $table_fecon_sytelineintegration_submission->addColumn(
             'errors',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             null,
@@ -122,7 +122,7 @@ class InstallSchema implements InstallSchemaInterface
         );
         
 
-        $setup->getConnection()->createTable($table_serfe_sytelineintegration_submission);
+        $setup->getConnection()->createTable($table_fecon_sytelineintegration_submission);
 
         $setup->endSetup();
     }

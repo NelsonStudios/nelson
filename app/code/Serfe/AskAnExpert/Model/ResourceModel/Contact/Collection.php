@@ -1,7 +1,7 @@
 <?php
-namespace Serfe\AskAnExpert\Model\ResourceModel\Contact;
+namespace Fecon\AskAnExpert\Model\ResourceModel\Contact;
 
-use \Serfe\AskAnExpert\Model\ResourceModel\AbstractCollection;
+use \Fecon\AskAnExpert\Model\ResourceModel\AbstractCollection;
 
 class Collection extends AbstractCollection
 {
@@ -10,7 +10,7 @@ class Collection extends AbstractCollection
 
     protected function _construct()
     {
-        $this->_init('Serfe\AskAnExpert\Model\Contact', 'Serfe\AskAnExpert\Model\ResourceModel\Contact');
+        $this->_init('Fecon\AskAnExpert\Model\Contact', 'Fecon\AskAnExpert\Model\ResourceModel\Contact');
         $this->_map['fields']['contact_id'] ='main_table.contact_id';
     }
 }

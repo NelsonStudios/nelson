@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Serfe\Shipping\Api\PreorderRepositoryInterface" type="Serfe\Shipping\Model\PreorderRepository"/>
-    <preference for="Serfe\Shipping\Api\Data\PreorderInterface" type="Serfe\Shipping\Model\Preorder"/>
-    <preference for="Serfe\Shipping\Api\Data\PreorderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
-    <virtualType name="Serfe\Shipping\Model\ResourceModel\Preorder\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+    <preference for="Fecon\Shipping\Api\PreorderRepositoryInterface" type="Fecon\Shipping\Model\PreorderRepository"/>
+    <preference for="Fecon\Shipping\Api\Data\PreorderInterface" type="Fecon\Shipping\Model\Preorder"/>
+    <preference for="Fecon\Shipping\Api\Data\PreorderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Fecon\Shipping\Model\ResourceModel\Preorder\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
-            <argument name="mainTable" xsi:type="string">serfe_shipping_preorder</argument>
-            <argument name="resourceModel" xsi:type="string">Serfe\Shipping\Model\ResourceModel\Preorder\Collection</argument>
+            <argument name="mainTable" xsi:type="string">fecon_shipping_preorder</argument>
+            <argument name="resourceModel" xsi:type="string">Fecon\Shipping\Model\ResourceModel\Preorder\Collection</argument>
         </arguments>
     </virtualType>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="serfe_shipping_preorder_grid_data_source" xsi:type="string">Serfe\Shipping\Model\ResourceModel\Preorder\Grid\Collection</item>
+                <item name="fecon_shipping_preorder_grid_data_source" xsi:type="string">Fecon\Shipping\Model\ResourceModel\Preorder\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

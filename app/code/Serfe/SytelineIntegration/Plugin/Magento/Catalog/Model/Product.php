@@ -1,6 +1,6 @@
 <?php
 
-namespace Serfe\SytelineIntegration\Plugin\Magento\Catalog\Model;
+namespace Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model;
 
 /**
  * Plugin to detect if a product is Available based on Syteline Web Service
@@ -12,17 +12,17 @@ class Product
     /**
      * Syteline  Helper
      *
-     * @var \Serfe\SytelineIntegration\Helper\SytelineHelper 
+     * @var \Fecon\SytelineIntegration\Helper\SytelineHelper 
      */
     protected $sytelineHelper;
 
     /**
      * Constructor
      *
-     * @param \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
+     * @param \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
      */
     public function __construct(
-        \Serfe\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
+        \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
     ) {
         $this->sytelineHelper = $sytelineHelper;
     }
