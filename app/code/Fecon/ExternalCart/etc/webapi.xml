@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- 
+        Cart Routes
+    -->
     <route url="/V1/external-cart/create-cart-token/" method="GET">
         <service class="Fecon\ExternalCart\Api\CartInterface" method="createCartToken"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
-    <route url="/V1/external-cart/set-cart-token/" method="GET">
+    <route url="/V1/external-cart/set-cart-token/:cartId" method="GET">
         <service class="Fecon\ExternalCart\Api\CartInterface" method="setCartToken"/>
         <resources>
             <resource ref="anonymous"/>
@@ -63,5 +66,24 @@
                 }   
             %</parameter>
         </data>
+    </route>
+    <!--
+        Customer Routes
+    -->
+    <route url="/V1/external-cart/log-in/" method="POST">
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="customerLogIn"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+        <data>
+            <parameter name="username" force="true">%username%</parameter>
+            <parameter name="password" force="true">%password%</parameter>
+        </data>
+    </route>
+    <route url="/V1/external-cart/get-customer-info/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerData"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
     </route>
 </routes>
