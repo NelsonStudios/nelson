@@ -21,6 +21,13 @@ function($) {
       }, 300);
       $('.magnifying-glass').animate({'width': '49px'}, 400);
     });
+    /* Hack to detect windows 10 & Chrome and fix style issue */
+    if (navigator.userAgent.indexOf("Chrome") !== -1 && 
+    navigator.userAgent.indexOf("Windows") !== -1) {
+      $('.shopping-cart').css({
+        'top': '-48px'
+      });
+    }
   });
   return;
 });

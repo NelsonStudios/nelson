@@ -36,7 +36,7 @@
         },
         "files": [
             "app/etc/NonComposerComponentRegistration.php",
-            "app/code/Serfe/SmtpTlsUpdate/Zend/Mail/Protocol/Smtp.php"
+            "app/code/Fecon/SmtpTlsUpdate/Zend/Mail/Protocol/Smtp.php"
         ],
         "exclude-from-classmap": [
             "**/dev/**",
