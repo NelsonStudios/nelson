@@ -7,8 +7,6 @@ use Fecon\Shipping\Api\Data\PreorderInterface;
 
 /**
  * Block to display address Information
- *
- * 
  */
 class AddressInformation extends \Magento\Backend\Block\Template
 {

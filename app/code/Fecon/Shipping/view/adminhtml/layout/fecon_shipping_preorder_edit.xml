@@ -4,7 +4,10 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="fecon_shipping_preorder_form"/>
+            <block class="Fecon\Shipping\Block\Adminhtml\Preorder\Edit\CustomerInformation" name="customer-information" template="Fecon_Shipping::preorder/customer-information.phtml" />
+            <block class="Fecon\Shipping\Block\Adminhtml\Preorder\Edit\ShippingMethod" name="shipping-method" template="Fecon_Shipping::preorder/shipping-method.phtml" />
             <block class="Fecon\Shipping\Block\Adminhtml\Preorder\Edit\AddressInformation" name="address-information" template="Fecon_Shipping::preorder/address-information.phtml" />
+            <block class="Fecon\Shipping\Block\Adminhtml\Preorder\Edit\Products" name="products-information" template="Fecon_Shipping::preorder/products-information.phtml" />
         </referenceContainer>
     </body>
 </page>

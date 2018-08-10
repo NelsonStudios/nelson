@@ -4,8 +4,9 @@
  */
 ?>
 
-<h2>Address Information</h2>
-
-<address>
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= /* @escapeNotVerified */ __('Address Information') ?></span>
+    </div>
     <?= $block->getAddressHtml() ?>
-</address>
+</section>
