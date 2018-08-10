@@ -10,52 +10,52 @@
                         }
                         width: 400px !important;
                         #minicart-content-wrapper {
-                           .block-content {
-                               .minicart-items-wrapper {
-                                   .minicart-items {
-                                       .product-item {
-                                           .product {
-                                            .product-item-details {
-                                               .product-item-name {
-                                                text-overflow: ellipsis;
-                                                white-space: nowrap;
-                                                overflow: hidden;
-                                                width: 130px;
-                                            }
-                                            .details-qty {
-                                                input {
-                                                   left: 150px;
-                                               }
-                                               .increment-btn {
-                                                right: 34px;
-                                                .plus-btn, .minus-btn {
-                                                    border-left: none;
+                            .block-content {
+                                .minicart-items-wrapper {
+                                       .minicart-items {
+                                           .product-item {
+                                               .product {
+                                                    .product-item-details {
+                                                       .product-item-name {
+                                                        text-overflow: ellipsis;
+                                                        white-space: nowrap;
+                                                        overflow: hidden;
+                                                        width: 130px;
+                                                    }
+                                                    .details-qty {
+                                                        input {
+                                                           left: 150px;
+                                                        }
+                                                        .increment-btn {
+                                                            right: 34px;
+                                                            .plus-btn, .minus-btn {
+                                                                border-left: none;
+                                                            }
+                                                        }
+                                                        button {
+                                                            left: 55.6%;
+                                                        }
+                                                    }
+                                                    .product.actions {
+                                                       margin-right: -10px;
+                                                    }
                                                 }
                                             }
-                                            button {
-                                                left: 55.6%;
-                                            }
                                         }
-                                        .product.actions {
-                                           margin-right: -10px;
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                   }
-                   .subtotal {
-                    .price-container {
-                        padding-left: 180px;
-                    } 
+                                    }
+                                }
+                                .subtotal {
+                                    .price-container {
+                                        padding-left: 180px;
+                                    } 
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-}
-}
-}
-}
 }
 @media (max-width: 363px) {
         .page-header.type16.header-newskin {
@@ -70,7 +70,12 @@
                                        .minicart-items {
                                            .product-item {
                                                .product {
-                                                .product-image-container {
+                                                a {
+                                                    img.photo.image {
+                                                        display: none;
+                                                    }
+                                                }
+                                                .product-image-container,  {
                                                     display: none;
                                                 }
                                                 .product-item-details {

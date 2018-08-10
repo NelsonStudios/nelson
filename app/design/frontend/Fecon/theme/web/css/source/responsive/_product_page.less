@@ -355,7 +355,7 @@
                             .page-title-wrapper {
                                 .page-title {
                                     span {
-                                        font-size: 30px;
+                                        font-size: 30px !important;
                                     }
                                 }
                             }
@@ -371,6 +371,43 @@
                                                 font-size: 30px;
                                                 font-weight: 600;
                                                 color: @color-black;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .product-reviews-summary {
+                                .reviews-actions {
+                                    margin-left: -7px;
+                                }
+                                .rating-summary {
+                                    margin-bottom: 15px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    @supports (-webkit-overflow-scrolling: touch) {
+        body.catalog-product-view {
+            .page-wrapper {
+                main#maincontent {
+                    .columns {
+                        .column.main {
+                            .product-info-main {
+                                .product-add-form {
+                                    form {
+                                        .box-tocart {
+                                            .fieldset {
+                                                .field.qty {
+                                                    .control {
+                                                        span.icon-down-chevron {
+                                                            padding: 15px 15px 15px 27px;
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }

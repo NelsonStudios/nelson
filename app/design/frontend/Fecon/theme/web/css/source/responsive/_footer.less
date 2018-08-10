@@ -119,6 +119,7 @@
 @media (max-width: 767px) {
     .page-wrapper {
         .page-footer {
+            width: 115%;
             .footer {
                 .footer-middle {
                     .container {
@@ -142,11 +143,26 @@
         }
     }
 }
-
-@media (max-width: 767px) {
+@media (max-width: 360px) {
     .page-wrapper {
         .page-footer {
-            width: 115%;
+            .footer {
+                .footer-bottom {
+                    .container {
+                        .custom-block {
+                            .row {
+                                .block-bottom {
+                                    .row {
+                                        address {
+                                            width: 200px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
