@@ -22,6 +22,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $jsonHelper;
 
     /**
+     * $customerToken
+     * 
+     * @var string
+     */
+    protected $customerToken;
+
+    /**
      * Constructor
      * 
      * @param \Magento\Framework\AuthorizationInterface          $authorize
@@ -107,13 +114,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * makeCurlRequest
+     * This function is intended to perform curl requests when needed.
      * 
-     * @param  string $origin           
-     * @param  string $endpointPath     
-     * @param  string $loggedInUserToken
-     * @return string $response                   
+     * @param  string $origin The origin with protocol + domain + port
+     * @param  string $endpointPath The endpoint path when the request need to be performed.
+     * @param  string $loggedInUserToken The user token if there's a logged-in customer or the Authorization access-token.
+     * @param  string $type The method type like "POST", "GET", etc
+     * @return string $response The response result from curl request or error message.               
      */
-    public function makeCurlRequest($origin, $endpointPath, $loggedInUserToken) {
+    public function makeCurlRequest($origin, $endpointPath, $loggedInUserToken, $type) {
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $origin . $endpointPath,
@@ -122,9 +131,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_MAXREDIRS => 10,
           CURLOPT_TIMEOUT => 30,
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "GET",
+          CURLOPT_CUSTOMREQUEST => $type,
           CURLOPT_HTTPHEADER => array(
-            "authorization: Bearer " . $loggedInUserToken, //This is the logged-in user Bearer do not confuse with access token.
+            "Authorization: Bearer " . $loggedInUserToken, //This is the logged-in user Bearer do not confuse with access token.
             "cache-control: no-cache"
           ),
         ));
@@ -137,5 +146,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         } else {
           return $response;
         }
+    }
+    /**
+     * checkUserTypeAndSetEndpoints
+     * 
+     * @param  boolean $isCustomer in order to check if settings need to be prepared for guest or customer user type.
+     * @return array $settings settings to be used in SOAP requests.
+     */
+    public function checkUserTypeAndSetEndpoints($isCustomer = false) {
+        $settings = [
+            'endpointsPaths' => [],
+            'opts' => [],
+            'customer' => $isCustomer
+        ];
+        /**
+         * Get wsdl endpoint names based on guest or non-guest customers.
+         */
+        $settings['endpointsPaths']['quoteCartManagementV1']     = (($isCustomer)? 'quoteCartManagementV1' : 'quoteGuestCartManagementV1');
+        $settings['endpointsPaths']['quoteCartRepositoryV1']     = (($isCustomer)? 'quoteCartRepositoryV1' : 'quoteGuestCartRepositoryV1');
+        $settings['endpointsPaths']['quoteCartItemRepositoryV1'] = (($isCustomer)? 'quoteCartItemRepositoryV1' : 'quoteGuestCartItemRepositoryV1');
+        /**
+         * Dinamically get the methods names to call based on guest or non-guest customers.
+         */
+        $settings['endpointsPaths']['quoteCartManagementV1Endpoint'] = $settings['endpointsPaths']['quoteCartManagementV1'] . (($isCustomer)? 'GetCartForCustomer' : 'CreateEmptyCart');
+        $settings['endpointsPaths']['quoteCartRepositoryV1Get']      = $settings['endpointsPaths']['quoteCartRepositoryV1'] . 'Get';
+        $settings['endpointsPaths']['quoteCartItemRepositoryV1Save'] = $settings['endpointsPaths']['quoteCartItemRepositoryV1'] . 'Save';
+
+        if($isCustomer) {
+            $settings['opts']['stream_context'] = stream_context_create([
+                'http' => [
+                    'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                ]
+            ]);
+        }
+        return $settings;
     }
 }

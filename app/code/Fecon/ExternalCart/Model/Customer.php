@@ -7,12 +7,22 @@ use Fecon\ExternalCart\Api\CustomerInterface;
  * Defines the implementaiton class of the CustomerInterface
  */
 class Customer implements CustomerInterface {
-        
+    /**
+     * integrationCustomerTokenServiceV1
+     * 
+     * @var string
+     */
     protected $integrationCustomerTokenServiceV1;
+    /**
+     * customerCustomerRepositoryV1
+     * 
+     * @var string
+     */
     protected $customerCustomerRepositoryV1;
     /**
      * $customerData 
-     * @var [type]
+     * 
+     * @var stdClass
      */
     protected $customerData;
     /**
@@ -151,5 +161,27 @@ class Customer implements CustomerInterface {
             return $customerData;
         }
         return false;
+    }
+    /**
+     * Set the token of the recently created customer customer
+     *
+     * @api
+     * @param  string $customerId The customerId to save.
+     * @return string $customerId
+     */
+    public function setCustomerToken($customerId) {
+        $this->coreSession->start();
+        $this->coreSession->setCustomerId($customerId);
+        return $this->getCustomerToken();
+    }
+    /**
+     * Get the token of the recently created customer cart
+     *
+     * @api
+     * @return string $token of created customer cart or empty array otherwise.
+     */
+    public function getCustomerToken() {
+        $this->coreSession->start();
+        return $this->coreSession->getCustomerId();
     }
 }
