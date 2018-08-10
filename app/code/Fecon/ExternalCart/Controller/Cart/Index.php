@@ -6,7 +6,6 @@ namespace Fecon\ExternalCart\Controller\Cart;
  */
 class Index extends \Magento\Framework\App\Action\Action
 {
-
     /**
      * $quoteCartRepositoryV1
      * @var string
@@ -76,6 +75,11 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var mixed integer/boolean
      */
     protected $customerLoggedIn = false;
+    /**
+     * $opts 
+     * Options array to be sent in SOAP request.
+     * @var array
+     */
     protected $opts;
 
     /**
@@ -154,7 +158,7 @@ class Index extends \Magento\Framework\App\Action\Action
                         'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
                     ]
                 ]);
-                $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken);
+                $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
                 if(!empty($customerData)) {
                     $customerInfo = $this->cartHelper->jsonDecode($customerData);
                     if(!empty($customerInfo['id'])) {

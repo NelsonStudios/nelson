@@ -30,4 +30,19 @@ interface CustomerInterface
      * @return string $customerData The data of logged-in customer.
      */
     public function getCustomerData();
+    /**
+     * Set the token of the recently created customer customer
+     *
+     * @api
+     * @param  string $customerId The customerId to save.
+     * @return string $customerId
+     */
+    public function setCustomerToken($customerId);
+    /**
+     * Get the token of the recently created customer cart
+     *
+     * @api
+     * @return string $token of created customer cart or empty array otherwise.
+     */
+    public function getCustomerToken();
 }

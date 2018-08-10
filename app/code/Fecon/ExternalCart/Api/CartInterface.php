@@ -16,10 +16,11 @@ interface CartInterface
      * Create and get new token of the created guest cart
      *
      * @api
+     * @param boolean $forceGuest force to create cart id as guest.
      * @return string $token of created guest cart.
      * @throws \SoapFault response
      */
-    public function createCartToken();
+    public function createCartToken($forceGuest = false);
     /**
      * Set the token of the recently created guest cart
      *

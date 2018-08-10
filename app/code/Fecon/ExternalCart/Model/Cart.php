@@ -38,10 +38,10 @@ class Cart implements CartInterface {
      */
     protected $quoteCartItemRepositoryV1Save;
     /**
-     * $customerLoggedIn
+     * $customerToken
      * @var mixed integer/boolean
      */
-    protected $customerLoggedIn = false;
+    protected $customerToken;
     /**
      * $coreSession
      * 
@@ -89,6 +89,11 @@ class Cart implements CartInterface {
      * @var string
      */
     public $origin;
+    /**
+     * $opts 
+     * Options array to be sent in SOAP request.
+     * @var array
+     */
     protected $opts;
 
     /**
@@ -134,47 +139,28 @@ class Cart implements CartInterface {
         /**
          * Get customer id or false otherwise.
          */
-        $this->customerLoggedIn = $this->customerSession->getData('loggedInUserToken');
-        
-        /**
-         * Get wsdl endpoint names based on guest or non-guest customers.
-         */
-        $this->quoteCartManagementV1     = (($this->customerLoggedIn)? 'quoteCartManagementV1' : 'quoteGuestCartManagementV1');
-        $this->quoteCartRepositoryV1     = (($this->customerLoggedIn)? 'quoteCartRepositoryV1' : 'quoteGuestCartRepositoryV1');
-        $this->quoteCartItemRepositoryV1 = (($this->customerLoggedIn)? 'quoteCartItemRepositoryV1' : 'quoteGuestCartItemRepositoryV1');
-        /**
-         * Dinamically get the methods names to call based on guest or non-guest customers.
-         */
-        $this->quoteCartManagementV1Endpoint = $this->quoteCartManagementV1 . (($this->customerLoggedIn)? 'GetCartForCustomer' : 'CreateEmptyCart');
-        $this->quoteCartRepositoryV1Get      = $this->quoteCartRepositoryV1 . 'Get';
-        $this->quoteCartItemRepositoryV1Save = $this->quoteCartItemRepositoryV1 . 'Save';
-
-        if($this->customerLoggedIn) {
-            //'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km'
-            $this->opts['stream_context'] = stream_context_create([
-                'http' => [
-                    'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')//$this->customerLoggedIn)
-                ]
-            ]);
-        }
-
+        $this->customerToken = $this->customerSession->getData('loggedInUserToken');
+        $this->setEndpoints($this->customerToken);
     }
     /**
-     * Create and get new token of the created guest cart
+     * Create and get new token of the created guest/customer cart
      *
      * @api
      * @return string $token of created guest cart.
      * @throws \SoapFault response
      */
-    public function createCartToken() {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartManagementV1, (($this->opts)? $this->opts : '' ));
+    public function createCartToken($forceGuest = false) {
+        if($forceGuest) {
+            $this->setEndpoints(false);
+            $this->customerSession->setData('loggedInUserToken', '');
+        }
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartManagementV1, (($this->opts)? $this->opts : [] ));
         try {
-            $token = $client->{$this->quoteCartManagementV1Endpoint}((($this->customerLoggedIn)? ['customerId' => $this->customerSession->getId()] : ''));
-            if(!empty($token) && is_object($token)) {
+            $token = $client->{$this->quoteCartManagementV1Endpoint}(((!$forceGuest && $this->customerToken)? ['customerId' => $this->customerSession->getId()] : ''));
+            if(!empty($token->result->id)) {
                 // Magneto 2 return an object with cart data instead a token here.
-                // $this->setCartToken($token->result->id);
-                $this->setCartToken($this->customerLoggedIn);
-                return $this->customerLoggedIn;//$this->cartHelper->jsonResponse($token->result->id);
+                $this->setCartToken($token->result->id);
+                return $token->result->id;
             } else {
                 /* Store cartId token in session temporary */
                 $this->setCartToken($token->result);
@@ -244,9 +230,12 @@ class Cart implements CartInterface {
      */
     public function getCartUrl() {
         $cartId = $this->getCartToken();
-        if(!empty($cartId) && !is_int($cartId)) { //It's a customerToken
-            return $this->origin . '/externalcart/cart/?customerToken=' . $cartId;
-        } else if(!empty($cartId) && is_int($cartId)) {
+        $customerToken = $this->customerSession->getData('loggedInUserToken');
+        if(!empty($cartId) && $customerToken) { //It's a customerToken
+            return $this->origin . '/externalcart/cart/?customerToken=' . $customerToken;
+        } else if(!empty($cartId)) {
+            //Make sure user is logged out.
+            $this->customerSession->logout();
             return $this->origin . '/externalcart/cart/?cartId=' . $cartId;
         }
         return false;
@@ -287,11 +276,13 @@ class Cart implements CartInterface {
         } else if(empty($postData['cartId']) && empty($cartIdFromSession)) { // Create new cartId
             $postData['cartId'] = $this->createCartToken();
         }
+
         /* Then add product */
         return $this->_addProduct($postData, true);
     }
     /**
      * Function to add product into cart using Magneto 2 REST API (with SOAP in this case)
+     * Updated to set quoteId of the customer if customer id is sent, user must be logged-in first.
      * 
      * @api
      * @param $postData array with product data.
@@ -299,24 +290,43 @@ class Cart implements CartInterface {
      * @throws \SoapFault response
      */
     private function _addProduct($postData, $updateCartId = false) {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartItemRepositoryV1, (($this->opts)? $this->opts : '' ));
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartItemRepositoryV1, (($this->opts)? $this->opts : [] ));
         $cartItemData = $this->cartHelper->jsonDecode($postData['body'], 1);
         if($updateCartId) {
             /* Update cartId in body post data */
-            $cartItemData['cartItem']['quoteId'] = $postData['cartId'];
+            $cartItemData['cartItem']['quoteId'] = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
         }
         $productData = [
-            'cartId' => $postData['cartId'], 
+            'cartId' => (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']), 
             'cartItem' => $cartItemData['cartItem']
         ];
         try {
             $productAdded = $client->{$this->quoteCartItemRepositoryV1Save}($productData);
             if($updateCartId) {
-                $productAdded->result->cartId = $postData['cartId'];
+                $productAdded->result->cartId = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
             }
             return $this->cartHelper->jsonResponse($productAdded->result); //Return cartInfo result object with cart information.
         } catch(\SoapFault $e) {
             return $e->getMessage() . nl2br("\n Are you sure this is the correct cartId?", false);
+        }
+    }
+    /**
+     * setEndpoints function to set proper endpoints paths (customer or guest) and options
+     * for SOAP client.
+     * 
+     * @param void
+     */
+    private function setEndpoints($customer) {
+        /* Regarding user type get proper settings and options to make SOAP requests */
+        $settings = $this->cartHelper->checkUserTypeAndSetEndpoints($customer);
+        foreach($settings['endpointsPaths'] as $k => $v) {
+            $this->{$k} = $v;
+            /* Above line (explanation) will be the same to do the following down below:
+             *   $this->quoteCartManagementV1 = $settings['endpointsPaths']['quoteCartManagementV1'];
+             */
+        }
+        if(!empty($settings['opts'])) {
+            $this->opts = $settings['opts'];
         }
     }
 }
