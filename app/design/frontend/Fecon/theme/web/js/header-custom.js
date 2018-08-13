@@ -21,11 +21,25 @@ function($) {
       }, 300);
       $('.magnifying-glass').animate({'width': '49px'}, 400);
     });
-    /* Hack to detect windows 10 & Chrome and fix style issue */
+    /* Hack to detect windows 10 & Chrome to fix style issue */
     if (navigator.userAgent.indexOf("Chrome") !== -1 && 
     navigator.userAgent.indexOf("Windows") !== -1) {
       $('.shopping-cart').css({
         'top': '-48px'
+      });
+    }
+    /* Hack to detect windows 10 & Edge to fix style issue */
+    if (navigator.userAgent.indexOf("Edge") !== -1 && 
+    navigator.userAgent.indexOf("Windows") !== -1) {
+      $('.shopping-cart').css({
+        'top': '-49px'
+      });
+    }
+    /* Hack to detect windows 10 & Firefox to fix style issue */
+    if (navigator.userAgent.indexOf("firefox") !== -1 && 
+    navigator.userAgent.indexOf("Windows") !== -1) {
+      $('.shopping-cart').css({
+        'top': '-49px'
       });
     }
   });
