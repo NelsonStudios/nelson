@@ -345,13 +345,33 @@
         }
     }
 }
-@media (max-width: 318px) {
+/* ----------- iPhone 4 and 4S ----------- */
+
+/* Portrait and Landscape */
+@media (max-width: 318px), only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2) {
     body.catalog-product-view {
         .page-wrapper {
             main#maincontent {
                 .columns {
                     .column.main {
                         .product-info-main {
+                            .product-add-form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field-qty {
+                                            .moved-add-to-links {
+                                                margin-left: 0px;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .prev-next-products {
+                                display: none !important;
+                            }
                             .page-title-wrapper {
                                 .page-title {
                                     span {
