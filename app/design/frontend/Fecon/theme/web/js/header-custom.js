@@ -36,7 +36,7 @@ function($) {
       });
     }
     /* Hack to detect windows 10 & Firefox to fix style issue */
-    if (navigator.userAgent.indexOf("firefox") !== -1 && 
+    if (navigator.userAgent.indexOf("Firefox") !== -1 && 
     navigator.userAgent.indexOf("Windows") !== -1) {
       $('.shopping-cart').css({
         'top': '-49px'
