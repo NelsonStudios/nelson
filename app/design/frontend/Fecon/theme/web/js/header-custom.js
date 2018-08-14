@@ -24,23 +24,29 @@ function($) {
     /* Hack to detect windows 10 & Chrome to fix style issue */
     if (navigator.userAgent.indexOf("Chrome") !== -1 && 
     navigator.userAgent.indexOf("Windows") !== -1) {
-      $('.shopping-cart').css({
-        'top': '-48px'
-      });
+      if($('body').width() > 767) {
+        $('.shopping-cart').css({
+          'top': '-48px'
+        });
+      }
     }
     /* Hack to detect windows 10 & Edge to fix style issue */
     if (navigator.userAgent.indexOf("Edge") !== -1 && 
     navigator.userAgent.indexOf("Windows") !== -1) {
-      $('.shopping-cart').css({
-        'top': '-49px'
-      });
+      if($('body').width() > 767) {
+        $('.shopping-cart').css({
+          'top': '-49px'
+        });
+      }
     }
     /* Hack to detect windows 10 & Firefox to fix style issue */
     if (navigator.userAgent.indexOf("Firefox") !== -1 && 
     navigator.userAgent.indexOf("Windows") !== -1) {
-      $('.shopping-cart').css({
-        'top': '-49px'
-      });
+      if($('body').width() > 767) {
+        $('.shopping-cart').css({
+          'top': '-49px'
+        });
+      }
     }
   });
   return;
