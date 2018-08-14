@@ -1,0 +1,12 @@
+/* 
+    Created on : Apr 25, 2018, 4:00:35 PM
+    Author     :  <fecon.com>
+*/
+.admin__menu .level-0.item-fecon-top-level > a {
+    padding-top: .5rem;
+}
+.admin__menu .level-0.item-fecon-top-level > a:before {
+    content: url('../images/fecon-logo-icon.png');
+    transform: scale(.7);
+    margin-bottom: 1.4rem;
+}

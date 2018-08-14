@@ -5,7 +5,7 @@ namespace DevPhase\Feeds\Model\Cache;
 /**
  * Custom Cache Type
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * @author  <fecon.com>
  */
 class Type extends \Magento\Framework\Cache\Frontend\Decorator\TagScope
 {

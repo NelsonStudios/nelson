@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add action="fecon_shipping/preorder/index" id="Fecon::fecon_shipping_preorder" module="Fecon_Shipping" parent="Fecon_FlatRateMinimumAmount::shipping_configurations" resource="Magento_Backend::content" sortOrder="40" title="Preorder"/>
+    </menu>
+</config>

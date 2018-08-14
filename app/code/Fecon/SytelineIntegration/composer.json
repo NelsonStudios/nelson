@@ -1,0 +1,26 @@
+{
+    "name": "fecon/module-sytelineintegration",
+    "description": "Integration with Syteline System",
+    "require": {
+        "zendframework/zend-soap": "2.7.0",
+        "fecon/module-backendconfig": "1.0.0"
+    },
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\SytelineIntegration\\": ""
+        }
+    }
+}

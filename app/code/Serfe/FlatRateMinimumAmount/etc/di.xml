@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Magento\OfflineShipping\Model\Carrier\Flatrate">
-        <plugin disabled="false" name="Serfe_FlatRateMinimumAmount_Plugin_Magento_OfflineShipping_Model_Carrier_Flatrate" sortOrder="10" type="Serfe\FlatRateMinimumAmount\Plugin\Magento\OfflineShipping\Model\Carrier\Flatrate"/>
-    </type>
-</config>

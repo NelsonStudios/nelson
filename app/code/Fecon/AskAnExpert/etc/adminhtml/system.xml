@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="askanexpert" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Ask An Expert Page</label>
+            <tab>fecon</tab>
+            <resource>Fecon_AskAnExpert::askanexpert</resource>
+            <group id="active_display" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Ask An Expert Page Settings</label>
+                <field id="enabled_askanexpert" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Ask An Expert</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
+                </field>
+
+
+                <field id="enabled_captcha" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Captcha</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
+                </field>
+                <field id="site_key" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enter Captcha Site Key</label>
+                    <validate>required-entry</validate>  
+                    <comment>Get Key From https://www.google.com/recaptcha/admin</comment>
+                    <depends>
+                        <field id="enabled_captcha">1</field>
+                    </depends>
+                </field>
+                <field id="secure_key" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enter Captcha Secret Key</label>
+                    <validate>required-entry</validate>  
+                    <comment>Get Key From https://www.google.com/recaptcha/admin</comment>
+                    <depends>
+                        <field id="enabled_captcha">1</field>
+                    </depends>
+                </field>
+
+                <field id="enabled_storeinfo" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Store Info</label>
+                    <comment>The Store Info section is shown in Ask An Expert page.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
+                </field>
+
+                <field id="enabled_emailus" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Email Us</label>
+                    <comment>The Email Us section is shown in Ask An Expert page.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Magento\Contact\Model\System\Config\Backend\Links</backend_model>
+                </field>
+                
+                 <field id="meta_tittle" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Meta Tittle</label>
+                    <comment>This text is meta tittle.</comment>
+                </field>
+
+                 <field id="meta_keyword" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Meta Keyword</label>
+                    <comment>This text is meta keyword.</comment>
+                </field>
+
+                 <field id="meta_description" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Meta Description</label>
+                    <comment>This text is meta description.</comment>
+                </field>
+
+                 <field id="contact_heading" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Heading</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+
+                 <field id="contact_description" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Description</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+
+                <field id="contact_link" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ask An Expert Page Link</label>
+                    <comment>This text is identifier. Note: Use text other than 'contact'.</comment>
+                </field>
+            </group>
+
+            <group id="form_display" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Ask An Expert Form Settings</label>
+
+                <field id="name_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Name Tittle Text</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+                <field id="email_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Email Tittle Text</label>
+                    <comment>This text will display on the frontend.</comment>
+
+                </field>
+                <field id="phone_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Phone Tittle Text</label>
+                    <comment>Note : If this field is empty then it is disabled on frontend</comment>
+                </field>
+                <field id="subject_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Subject Tittle Text</label>
+                   <comment>Note : If this field is empty then it is disabled on frontend</comment>
+                </field>
+                <field id="message_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Message Tittle Text</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+                <field id="submitbtn_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Submit Button Text</label>
+                    <comment>This text will display on the frontend.</comment>
+                </field>
+            </group>
+
+             <group id="email" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Email Options</label>
+                <field id="recipient_email" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Send Emails To</label>
+                    <validate>validate-email</validate>
+                </field>
+                <field id="sender_email_identity" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="email_template" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Email Template</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="email_replytemplate" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Reply Email Template</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

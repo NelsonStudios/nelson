@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="externalcart" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>External Cart Settings</label>
+            <tab>fecon</tab>
+            <resource>Fecon_ExternalCart::externalcart</resource>
+            <group id="active_display" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>External Cart Settings</label>
+                
+                 <field id="protocol" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>External Cart Protocol</label>
+                    <comment>This config is to set protocol (E.g: "https://").</comment>
+                </field>
+
+                 <field id="hostname" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>External Cart Hostname</label>
+                    <comment>This config is to set hostname (E.g: "localhost").</comment>
+                </field>
+
+                 <field id="port" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>External Cart Port</label>
+                    <comment>This config is to set port (E.g: "8080").</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

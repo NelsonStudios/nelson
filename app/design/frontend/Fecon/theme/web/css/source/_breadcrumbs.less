@@ -1,0 +1,36 @@
+.page-wrapper {
+    .breadcrumbs {
+        padding: 40px 0 10px !important;
+        background-color: transparent !important;
+        ul.items {
+            background-color: transparent;
+            li:first-child:before {
+                content: none;
+            }
+            li:before {
+                content: '\203a';
+            }
+            li.item {
+                font-size: 14px;
+                color: @color-gray-darken10 !important;
+                display: inline;
+                text-transform: uppercase;
+                a {
+                    color: @color-gray-darken5;
+                    overflow: visible;
+                    float: none;
+                    width: auto;
+                    text-indent: 0;
+                }
+                color: @color-gray-darken5;
+            }
+            li.item.home {
+                a {
+                    &:after {
+                        content: none;
+                    }
+                }
+            }
+        }
+    }
+}

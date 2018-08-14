@@ -1,0 +1,203 @@
+.minicart-wrapper {
+        a.action.showcart {
+            .shopping-cart {
+                span.cart-img {
+                    background-image: url('../images/cart-icon-white.png');
+                    padding-top: 13px;
+                    background-repeat: no-repeat;
+                    margin-top: 15px;
+                    padding-left: 90px;
+                    padding-bottom: 50px;
+                }
+            }
+        }
+        &.active {
+        a.action.showcart {
+            &.active {
+                .shopping-cart {
+                    background-color: @color-white;
+                    span.cart-img {
+                        background-image: url('../images/cart-icon-green.png') !important;
+                        padding-top: 13px;
+                        background-repeat: no-repeat;
+                        margin-top: 15px;
+                        padding-left: 90px;
+                        padding-bottom: 50px;
+                    }
+                }
+            }
+        }
+    }
+    .ui-widget-content {
+        .block-minicart {
+            z-index: 4;
+            width: @width515;
+            height: @height327;
+            border-top: none;
+            top: 68px;
+            #minicart-content-wrapper {
+                .block-content {
+                    .items-total {
+                        display: none;
+                    }
+                    #btn-minicart-close {
+                        display: none;
+                    }
+                    .minicart-items-wrapper {
+                        height: @height133 !important;
+                        margin-top: -15px;
+                        .minicart-items {
+                            .product-item-name {
+                                margin: 0;
+                                word-wrap: break-word;
+                                width: @width248;
+                                a {
+                                    color: @minicart-green;
+                                }
+                            }
+                            .product-item {
+                                .product {
+                                    .product-item-details {
+                                        .product-item-pricing {
+                                            position: relative;
+                                            height: 0;
+                                            .price-container {
+                                                position: absolute;
+                                                display: inline-block;
+                                            }
+                                            .details-qty {
+                                                display: inline-block;
+                                                padding-left: 250px;
+                                                margin-top: -18px;
+                                                input {
+                                                    position: absolute;
+                                                    top: -18px;
+                                                    border: 1px solid @minicart-green;
+                                                    color: @minicart-green;
+                                                    font-weight: 700;
+                                                    width: @width58;
+                                                    height: @height54;
+                                                    font-size: 24px;
+                                                    right: 67px;
+                                                }
+                                                button.update-cart-item {
+                                                    top: 45px;
+                                                    position: absolute;
+                                                    padding: @zeroPx 9px @zeroPx 9px;
+                                                }
+                                                button.update-cart-item:hover {
+                                                    background-color: @minicart-green;
+                                                }
+                                                .increment-btn {
+                                                    display: inline-block;
+                                                    position: absolute;
+                                                    top: -18px;
+                                                    right: 49px;
+                                                    span {
+                                                        display: block;
+                                                        color: @minicart-green;
+                                                        font-weight: 600;       
+                                                        border: 1px solid @minicart-green;
+                                                    }
+                                                    .plus-btn {
+                                                        font-size: 18px;
+                                                        padding: 1px 7px @zeroPx 8px;
+                                                        border-bottom: none;
+                                                    }
+                                                    .minus-btn {
+                                                        font-size: 18px;
+                                                        padding: @zeroPx 7px @zeroPx 10px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .product.actions {
+                                            margin: -2px -7px 0;
+                                            .primary {
+                                                display: none;
+                                            }
+                                            .secondary {
+                                                a.action.delete {
+                                                    border: 1px solid @color-black;
+                                                    padding: 7px 13px 7px 13px;
+                                                    border-radius: 20px;
+                                                    margin-top: -7px;
+                                                    &:before {
+                                                        color: @color-gray-darken2;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .label {
+                        position: absolute;
+                        top: 31px;
+                        padding-left: 30px;
+                        &:after {
+                            content: none !important;
+                        }
+                        span {
+                            display: inline-block;
+                            font-size: 18px;
+                            color: @color-black;
+                            font-weight: 500;
+                        }
+                    }
+                    .subtotal {
+                        position: relative;
+                        border-top: 2px solid @color-gray-light;
+                        margin-left: -18px;
+                        margin-right: -18px;
+                        padding-top: 9px;
+                        div.amount.price-container {
+                            display: inline-block;
+                            padding-left: 266px;
+                            position: absolute;
+                            top: 16px;
+                            .price-wrapper {
+                                .price {
+                                    font-size: 42px;
+                                    font-weight: 200;
+                                    color: @minicart-green;
+                                }
+                            }
+                        }
+                    }
+                    .actions {
+                        .primary {
+                            #top-cart-btn-checkout {
+                                display: none;
+                            }
+                        }
+                        .secondary {
+                            a.viewcart {
+                                position: absolute;
+                                bottom:@zeroPx;
+                                left:@zeroPx;
+                                border: none;
+                                background-color: @minicart-green;
+                                color: @color-white;
+                                padding-top: 18px;
+                                padding-bottom: 21px;
+                                font-size: 22px;
+                                font-family: Verb;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .showcart {
+        .counter {
+            background-color: @color-gray-darken3 !important;
+            right: -2px !important;
+            margin-top: -6px !important;
+        }
+    }
+}

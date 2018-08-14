@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <askanexpert>
+            <active_display>
+            	<enabled_askanexpert>1</enabled_askanexpert>
+                <enabled_captcha>0</enabled_captcha>
+            	<enabled_emailus>0</enabled_emailus>
+                <enabled_map>0</enabled_map>
+                <category_ajax_url>/askanexpert/ajax/category</category_ajax_url>
+            	<products_bycat_ajax_url>/askanexpert/ajax/product</products_bycat_ajax_url>
+                <meta_tittle>Ask An Expert</meta_tittle>
+            	<meta_keyword>Ask An Expert</meta_keyword>
+            	<meta_description>Ask An Expert</meta_description>
+            	<contact_heading>SUBMIT YOUR QUESTION</contact_heading>
+            	<contact_description>Jot us a note and we’ll get back to you as quickly as possible.</contact_description>
+            	<contact_link>ask-an-expert.html</contact_link>
+            </active_display>
+            <popup_display>
+            	<enabled_popup>1</enabled_popup>
+            	<popup_view>0</popup_view>
+            </popup_display>
+            <form_display>
+            	<name_tittle>Name</name_tittle>
+            	<email_tittle>Email</email_tittle>
+            	<phone_tittle>Phone Number</phone_tittle>
+            	<subject_tittle>Subject</subject_tittle>
+            	<message_tittle>What’s on your mind?</message_tittle>
+            	<submitbtn_tittle>Submit</submitbtn_tittle>
+            </form_display>
+            <email>
+            	<recipient_email><![CDATA[hello@example.com]]></recipient_email>
+            	<sender_email_identity>custom2</sender_email_identity>
+            	<email_template>askanexpert_email_email_template</email_template>
+                <email_replytemplate>askanexpert_email_email_replytemplate</email_replytemplate>
+            </email>
+        </askanexpert>
+    </default>
+</config>

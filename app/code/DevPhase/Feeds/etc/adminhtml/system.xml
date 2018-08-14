@@ -3,8 +3,8 @@
     <system>
         <section id="social_config" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="20" translate="label">
             <label>Social Feeds</label>
-            <tab>serfe</tab>
-            <resource>Serfe_SytelineIntegration::config_serfe_sytelineintegration</resource>
+            <tab>fecon</tab>
+            <resource>Fecon_SytelineIntegration::config_fecon_sytelineintegration</resource>
             <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label">
                 <label>Instagram</label>
                 <field id="instagram_token" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">

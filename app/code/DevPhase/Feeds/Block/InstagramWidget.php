@@ -5,7 +5,7 @@ namespace DevPhase\Feeds\Block;
 /**
  * Description of InstagramWidget
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * @author  <fecon.com>
  */
 class InstagramWidget extends \Magento\Framework\View\Element\Template
 {

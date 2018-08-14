@@ -1,0 +1,103 @@
+/* 
+    Created on : May 15, 2018, 5:00:35 PM
+    Author     :  <fecon.com>
+*/
+
+.iwd_opc_wrapper {
+    padding: 40px;
+    box-shadow: 6px 10px 49px @color-gray-darken1;
+    border: none;
+    border-top: 4px solid @fecon-theme-color;
+    border-radius: 4px;
+    background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+    linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+    repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+
+    &.iwd_main_wrapper {
+        margin: 0;
+    }
+
+    .iwd_opc_column {
+        .iwd_opc_column_name {
+            color: @color-white;
+        }
+    }
+
+    .fieldset {
+        color: @color-white;
+        /* Card Connect Payment Method classes */
+        .cardconnect {
+            .field {
+                ._with-tooltip {
+                    .input-text {
+                        width: 50%;
+                    }
+                }
+
+                &.date,
+                &.cvv {
+                    margin: 0;
+                }
+            }
+
+            ul {
+                li {
+                    display: inline;
+                }
+            }
+
+            div.mage-error[generated] {
+                display: block !important; /* This override another "!important" property */
+            }
+        }
+    }
+
+    .iwd_opc_section_delimiter {
+        & + .iwd_opc_section_delimiter {
+            display: none;
+        }
+    }
+}
+
+.onepage-index-index,
+.iwd_opc_success_page {
+    .loading-mask {
+        .loader {
+            border: medium none @color-white;
+        }
+    }
+}
+
+//
+//    Desktop
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .iwd_opc_wrapper {
+        .fieldset {
+            /* Card Connect Payment Method classes */
+            .cardconnect {
+                .field {
+                    .field-tooltip {
+                        display: block;
+                        right: 40%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//
+//    Mobile
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .iwd_opc_wrapper {
+        &.iwd_main_wrapper {
+            .iwd_opc_alternative_wrapper {
+                #iwd_opc_top {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}

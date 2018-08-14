@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- 
+        Cart Routes
+    -->
+    <route url="/V1/external-cart/create-cart-token/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="createCartToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/set-cart-token/:cartId" method="GET">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="setCartToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/get-cart-token/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/get-cart-info/:cartId" method="GET">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartInfo"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/add-product/" method="POST">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="addProductIntoCart"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+            <parameter name="body" force="true">%
+                {
+                    "cartItem": {
+                        "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",
+                        "sku": "BH-080",
+                        "qty": "1"
+                    }
+                }   
+            %</parameter>
+        </data>
+    </route>
+    <route url="/V1/external-cart/get-cart-url/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartUrl"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/add-to-cart/" method="POST">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="addToCart"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+        <data>
+            <parameter name="body" force="false">%
+                {
+                    "cartItem": {
+                        "sku": "BH-080",
+                        "qty": "1"
+                    }
+                }   
+            %</parameter>
+        </data>
+    </route>
+    <!--
+        Customer Routes
+    -->
+    <route url="/V1/external-cart/log-in/" method="POST">
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="customerLogIn"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+        <data>
+            <parameter name="username" force="true">%username%</parameter>
+            <parameter name="password" force="true">%password%</parameter>
+        </data>
+    </route>
+    <route url="/V1/external-cart/get-customer-info/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerData"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>

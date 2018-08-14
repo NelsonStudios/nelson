@@ -1,0 +1,414 @@
+body.catalog-product-view {
+    overflow-x: hidden;
+    font-family: @font-family-name__verb;
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product.media {
+                        .gallery-placeholder {
+                            .fotorama-item {
+                                .fotorama__wrap {
+                                    .fotorama__stage {
+                                        .fotorama__fullscreen-icon {
+                                            color: @fecon-theme-color;
+                                            display: none;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .product-info-main {
+                        .prev-next-products {
+                            margin-right: 30px;
+                            margin-top: 13px;
+                            .product-prev {
+                                padding-right: 15px;
+                            }
+                            .product-nav {
+                                .product-pop.theme-border-color {
+                                    z-index: 99;
+                                    border-color: @fecon-theme-color !important; /* Override another property with !important*/
+                                    &:before {
+                                        border-bottom-color: @fecon-theme-color;
+                                    }
+                                }
+                            }
+                        }
+                        .page-title-wrapper {
+                            .page-title {
+                                padding-bottom: 15px;
+                                span {
+                                    font-size: 45px;
+                                }
+                            }
+                        }
+                        .product-reviews-summary {
+                            .reviews-actions {
+                                .action.view {
+                                    padding-left: 15px;
+                                }
+                                &:before {
+                                    letter-spacing: 9px;
+                                    font-size: 25px;
+                                }
+                            }
+                            .rating-summary {
+                                margin-bottom: 15px;
+                                margin-right: 0px;
+                                width: 160px;
+                                .rating-result {
+                                    height: 23px;
+                                    width: 100%;
+                                    &:before {
+                                        font-size: 25px;
+                                        height: 17px;
+                                        margin-top: 5px;
+                                        margin-left: 1px;
+                                        letter-spacing: 9px;
+                                    }
+                                    span {
+                                        &:before {
+                                            color: @fecon-theme-color;
+                                            font-size: 25px;
+                                            height: 17px;
+                                            margin-top: 5px;
+                                            margin-left: 1px;
+                                            letter-spacing: 9px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-info-price {
+                            position: relative;
+                            .price-final_price {
+                                padding-top: 105px;
+                            }
+                            .product-info-stock-sku {
+                                color: @color-gray-lighten4;
+                                top: 30px;
+                                left: -80px;
+                                position: absolute;
+                                font-size: 18px;
+                                .product.attribute.sku {
+                                    text-align: left;
+                                }
+                            }
+                            .price-box {
+                                span.price-container {
+                                    .price-wrapper {
+                                        span.price {
+                                            font-family: @font-family-name__verb;
+                                            font-size: 45px;
+                                            font-weight: 600;
+                                            color: @color-black;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        margin-left: 5px;
+                                        .moved-add-to-links {
+                                            margin-left: 70px;
+                                            margin-bottom: 15px;
+                                            a {
+                                                color: @fecon-theme-color;
+                                                border: none;
+                                            }
+                                        }
+                                        .field.qty {
+                                            margin-bottom: 36px;
+                                            .control {
+                                                label.qty-label {
+                                                    margin-left: 18px;
+                                                    font-size: 18px;
+                                                    color: @color-gray-lighten4;
+                                                }
+                                                width: 190px;
+                                                margin-left: 0;
+                                                select {
+                                                    font-family: @font-family-name__verb;
+                                                    border: 1px solid @fecon-theme-color;
+                                                    color: @fecon-theme-color;
+                                                    width: 86px !important;
+                                                    font-size: 24px;
+                                                    font-weight: 600;
+                                                    padding-left: 7px;
+                                                    padding-top: 5px;
+                                                }
+                                                span.icon-down-chevron {
+                                                    pointer-events: none;
+                                                    background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 45%;
+                                                    padding: 15px 15px 15px 27px;
+                                                    margin-left: -45px;
+                                                }
+                                            }
+                                            .qty-changer {
+                                                a {
+                                                    i {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .actions {
+                                            display: block;
+                                            button {
+                                                margin-bottom: 0;
+                                                font-size: 23px;
+                                                padding-top: 4px;
+                                                width: auto;
+                                                height: 55px;
+                                                font-weight: 600;
+                                                &:before {
+                                                    content: none;
+                                                }
+                                            }
+                                            #instant-purchase {
+                                                padding-top: 20px;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .product-social-links {
+                            margin-left: 5px;
+                            padding-top: 0;
+                        }
+                    }
+                    .product.media {
+                        .gallery-placeholder {
+                            .fotorama-item {
+                                .fotorama__wrap {
+                                    .fotorama__stage {
+                                        background: transparent;
+                                        border: none;
+                                    }
+                                }    
+                            }
+                        }    
+                    }
+                    .product.info.detailed {
+                        position: relative;
+                        margin: auto;
+                        width: 65%;
+                        margin-left: 24%;
+                        .gray-line {
+                            border-top: 2px solid @color-gray-lighten5;
+                            width: 146%;
+                            top: 41px;
+                            left: -325px;
+                            position: absolute;
+                        }
+                        .product.data.items 
+                            > .item.title.active 
+                                > .switch, .product.data.items 
+                                    > .item.title.active 
+                                        > .switch:focus, .product.data.items 
+                                            > .item.title.active 
+                                                > .switch:hover {
+                            border-bottom: 4px solid @fecon-theme-color;
+                            
+                        }
+                        .product.data.items {
+                            .data.item.title, .data.item.content {
+                                background-color: transparent;
+                                border: none;
+                                a {
+                                    border-top: none;
+                                    color: @color-black;
+                                    font-size: 26px;
+                                    background-color: transparent;
+                                    span.counter {
+                                        color: @color-black;
+                                        &:before, &:after {
+                                            color: @fecon-theme-color;
+                                        }
+                                    }
+                                }
+                                .block.review-add {
+                                    .block-content {
+                                        form {
+                                            .fieldset {
+                                                .legend.review-legend {
+                                                    font-size: 18px;
+                                                    color: @fecon-theme-color;
+                                                    strong {
+                                                        margin-left: 10px;
+                                                        display: inline-block;
+                                                    }
+                                                }
+                                            }
+                                            .actions-toolbar {
+                                                .actions-primary, .primary {
+                                                    button {
+                                                        height: 45px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                ul#about-list {
+                                    list-style: none;
+                                    margin-left: 0;
+                                    padding-left: 0;
+                                    li {
+                                        a.view-all-link {
+                                            padding-top: 20px;
+                                            padding-bottom: 10px;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Fix only for Firefox */
+@supports (display: -moz-grid) {
+    body.catalog-product-view {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field.qty {
+                                            margin-bottom: 36px;
+                                            .control {
+                                                    select {
+                                                        padding-left: 0px;
+                                                        width: 76px !important;
+                                                        padding-right: 20%;
+                                                    }
+                                                    span.icon-down-chevron {
+                                                        padding: 12px 15px 14px 27px;
+                                                        //13px 15px 15px 27px; FF 61 on High Sierra
+                                                        margin-left: -30px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/* Fix only for Firefox - Using Mac OS X */
+@supports (-moz-osx-font-smoothing:auto) { 
+    body.catalog-product-view {
+    .page-wrapper {
+        main#maincontent {
+            .columns {
+                .column.main {
+                    .product-info-main {
+                        .product-add-form {
+                            form {
+                                .box-tocart {
+                                    .fieldset {
+                                        .field.qty {
+                                            .control {
+                                                    span.icon-down-chevron {
+                                                        padding: 13px 15px 15px 27px; //FF 61 on High Sierra
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/* Fix only for Edge */
+@supports (-ms-ime-align: auto) {
+    body.catalog-product-view {
+        .header.content {
+            .minicart-wrapper {
+                a.action.showcart {
+                    .shopping-cart {
+                        top: -49px !important;
+                    }
+                }
+            }
+        }
+        .page-wrapper {
+            main#maincontent {
+                .columns {
+                    .column.main {
+                        .product-info-main {
+                            .product-add-form {
+                                form {
+                                    .box-tocart {
+                                        .fieldset {
+                                            .field.qty {
+                                                .control {
+                                                    span.icon-down-chevron {
+                                                        padding-top: 12px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@supports (-webkit-overflow-scrolling: touch) {
+    body.catalog-product-view {
+        .page-wrapper {
+            main#maincontent {
+                .columns {
+                    .column.main {
+                        .product-info-main {
+                            .product-add-form {
+                                form {
+                                    .box-tocart {
+                                        .fieldset {
+                                            .field.qty {
+                                                .control {
+                                                    span.icon-down-chevron {
+                                                        padding: 14px 15px 14px 27px;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

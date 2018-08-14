@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Fecon_SytelineIntegration::syteline_integration" title="Syteline Integration" module="Fecon_SytelineIntegration" sortOrder="0" resource="Fecon_SytelineIntegration::config_fecon_sytelineintegration" parent="Fecon::fecon_top_level"/>
+        <add id="Fecon_SytelineIntegration::syteline_submissions" title="Cart Submissions" module="Fecon_SytelineIntegration" sortOrder="10" action="fecon_sytelineintegration/submission/index" resource="Fecon_SytelineIntegration::config_fecon_sytelineintegration" parent="Fecon_SytelineIntegration::syteline_integration"/>
+        <add id="Fecon_SytelineIntegration::syteline_configuration" title="Configuration" module="Fecon_SytelineIntegration" sortOrder="20" action="adminhtml/system_config/edit/section/syteline_integration" resource="Fecon_SytelineIntegration::config_fecon_sytelineintegration" parent="Fecon_SytelineIntegration::syteline_integration"/>
+    </menu>
+</config>

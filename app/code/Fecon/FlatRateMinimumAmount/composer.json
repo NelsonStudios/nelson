@@ -1,0 +1,25 @@
+{
+    "name": "fecon/module-flatrateminimumamount",
+    "description": "Enable Flat Rate when minimum amount",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "fecon/module-backendconfig": "1.0.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\FlatRateMinimumAmount\\": ""
+        }
+    }
+}

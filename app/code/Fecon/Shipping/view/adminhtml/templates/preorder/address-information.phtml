@@ -1,0 +1,12 @@
+<?php
+/**
+ * @var $block \Fecon\Shipping\Block\Adminhtml\Preorder\Edit\AddressInformation
+ */
+?>
+
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= /* @escapeNotVerified */ __('Address Information') ?></span>
+    </div>
+    <?= $block->getAddressHtml() ?>
+</section>

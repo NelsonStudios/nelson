@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="ApiTest" xsi:type="object">Fecon\SytelineIntegration\Console\Command\ApiTest</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Fecon\SytelineIntegration\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Fecon\SytelineIntegration\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">sytelineLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Fecon\SytelineIntegration\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Fecon\SytelineIntegration\Api\SubmissionRepositoryInterface" type="Fecon\SytelineIntegration\Model\SubmissionRepository"/>
+    <preference for="Fecon\SytelineIntegration\Api\Data\SubmissionInterface" type="Fecon\SytelineIntegration\Model\Submission"/>
+    <preference for="Fecon\SytelineIntegration\Api\Data\SubmissionSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Fecon\SytelineIntegration\Model\ResourceModel\Submission\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">fecon_sytelineintegration_submission</argument>
+            <argument name="resourceModel" xsi:type="string">Fecon\SytelineIntegration\Model\ResourceModel\Submission\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="fecon_sytelineintegration_submission_grid_data_source" xsi:type="string">Fecon\SytelineIntegration\Model\ResourceModel\Submission\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Model\Service\OrderService">
+        <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Sales_Model_Service_OrderService" type="Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Service\OrderService"/>
+    </type>
+</config>

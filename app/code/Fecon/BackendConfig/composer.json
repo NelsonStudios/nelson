@@ -1,0 +1,23 @@
+{
+    "name": "fecon/module-backendconfig",
+    "description": "Add backend config tab",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\BackendConfig\\": ""
+        }
+    }
+}

@@ -5,7 +5,7 @@ namespace DevPhase\Feeds\Block;
 /**
  * Description of VideoWidget
  *
- * @author Xuan Villagran <xuan@serfe.com>
+ * @author  <fecon.com>
  */
 class VideoWidget extends \Magento\Framework\View\Element\Template
 {

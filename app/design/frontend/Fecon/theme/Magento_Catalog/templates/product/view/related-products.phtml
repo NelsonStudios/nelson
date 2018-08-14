@@ -1,0 +1,55 @@
+<div class="related-products-section">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="filterproduct-title-related"><span class="content related-products-title hide">Related Products</span></h2>
+        <div id="new_product" class="owl-bottom-narrow">
+          <?php 
+            echo $this->getLayout()
+              ->createBlock('Fecon\Filterproducts\Block\Home\RelatedList')
+              ->setTemplate('custom_owl_related_list.phtml')
+              ->toHtml();
+            ?>
+        </div>
+        <script type="text/javascript">
+          require([
+            'jquery',
+            'owl.carousel/owl.carousel.min'
+          ], function ($) {
+            $("#new_product .owl-carousel").owlCarousel({
+              autoplay: false,
+              autoplayTimeout: 5000,
+              autoplayHoverPause: true,
+              loop: true,
+              navRewind: true,
+              margin: 0,
+              nav: false,
+              navText: ["<em class='porto-icon-left-open-huge'></em>","<em class='porto-icon-right-open-huge'></em>"],
+              dots: false,
+              responsive: {
+                0: {
+                  items:1
+                },
+                540: {
+                  items:1
+                },
+                640: {
+                  items:2
+                },
+                768: {
+                  items:2
+                },
+                992: {
+                  items:4
+                },
+                1200: {
+                  items:5
+                }
+              }
+            });
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</div>

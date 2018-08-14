@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-    <menu>
-        <add id="Serfe_FlatRateMinimumAmount::shipping_configurations" title="Shipping Configurations" module="Serfe_FlatRateMinimumAmount" sortOrder="10" resource="Magento_Backend::content" parent="Serfe::serfe_top_level"/>
-        <add id="Serfe_FlatRateMinimumAmount::flat_rate_configurations" title="Flat Rate Minimum Amount" module="Serfe_FlatRateMinimumAmount" sortOrder="10" action="adminhtml/system_config/edit/section/serfe_flat_rate" resource="Magento_Backend::content" parent="Serfe_FlatRateMinimumAmount::shipping_configurations"/>
-    </menu>
-</config>

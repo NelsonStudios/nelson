@@ -1,0 +1,24 @@
+{
+    "name": "fecon/module-porto",
+    "description": "Modifications to Smartwave_Porto module",
+    "require": {
+      "smartwave/module-porto": "2.2.1"
+    },
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\Porto\\": ""
+        }
+    }
+}
