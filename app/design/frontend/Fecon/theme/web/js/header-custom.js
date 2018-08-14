@@ -30,18 +30,8 @@ function($) {
         });
       }
     }
-    /* Hack to detect windows 10 & Edge to fix style issue */
-    if (navigator.userAgent.indexOf("Edge") !== -1 && 
-    navigator.userAgent.indexOf("Windows") !== -1) {
-      if($('body').width() > 767) {
-        $('.shopping-cart').css({
-          'top': '-49px'
-        });
-      }
-    }
-    /* Hack to detect windows 10 & Firefox to fix style issue */
-    if (navigator.userAgent.indexOf("Firefox") !== -1 && 
-    navigator.userAgent.indexOf("Windows") !== -1) {
+    /* Hack to detect Edge or Firefox under windows 10 to fix style issue */
+    if ((navigator.userAgent.indexOf("Edge") !== -1 || navigator.userAgent.indexOf("Firefox")) && navigator.userAgent.indexOf("Windows") !== -1) {
       if($('body').width() > 767) {
         $('.shopping-cart').css({
           'top': '-49px'
