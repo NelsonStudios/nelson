@@ -25,7 +25,30 @@ body.blog-category-view {
                         padding: 30px;
                         background: transparent;
                         .post-holder {
-                            .post-header {
+                            .post-header, .post-footer {
+                                .post-info {
+                                    .item.post-posed-date {
+                                        span {
+                                            .porto-icon-calendar {
+                                                color: @fecon-theme-color;
+                                                font-size: 14px;
+                                            }
+                                        }
+                                        color: @color-gray-darken9;
+                                        font-size: 11px;
+                                    }
+                                    .item.post-categories {
+                                        span {
+                                            .porto-icon-folder-open {
+                                                color: @fecon-theme-color;
+                                                font-size: 14px;
+                                            }
+                                        }
+                                        a {
+                                            font-size: 12px;
+                                        }
+                                    }
+                                }
                                 h2.post-title {
                                     color: @fecon-theme-color !important;
                                     a.post-item-link {
