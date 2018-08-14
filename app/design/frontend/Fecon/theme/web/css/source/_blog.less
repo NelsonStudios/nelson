@@ -3,7 +3,7 @@ body.blog-post-view,
 body.blog-archive-view,
 body.blog-search-index {
     .page-wrapper {
-        .page-main {
+        main#maincontent {
             .page-title-wrapper {
                 h1.page-title {
                     color: @fecon-theme-color;
@@ -11,15 +11,13 @@ body.blog-search-index {
             }
             .columns {
                 .column.main {
+                    width: 75%;
+                    display: inline-block;
                     .post-view, .post-list-wrapper {
-                        box-shadow: 6px 10px 49px @color-gray-darken1;
-                        border: none;
+                        border: 1px solid @color-gray-lighten5;
                         border-top: 4px solid @fecon-theme-color;
-                        border-radius: 4px;
                         padding: 30px;
-                        background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
-                        linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
-                        repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+                        background: transparent;
                         .post-holder {
                             .post-header {
                                 h2.post-title {
@@ -38,7 +36,7 @@ body.blog-search-index {
                                 }
                             }
                             .post-content {
-                                color: @color-white;
+                                color: @color-gray-darken9;
                                 .post-description {
                                     .post-text-hld {
                                         font-size: 16px;
@@ -50,9 +48,10 @@ body.blog-search-index {
                                         }
                                     }
                                     a.post-read-more {
-                                        text-decoration: none;
-                                        color: @fecon-theme-color;
+                                        background: @fecon-theme-color;
                                         border: 1px solid @fecon-theme-color;
+                                        text-decoration: none;
+                                        color: @color-white;
                                         cursor: pointer;
                                         font-weight: 600;
                                         padding: 7px 15px;
@@ -62,7 +61,9 @@ body.blog-search-index {
                                         font-weight: 400;
                                         line-height: 22px;
                                         &:hover {
-                                            color: @color-white;
+                                            background: @color-white;
+                                            color: @fecon-theme-color;
+                                            border: 1px solid @fecon-theme-color;
                                         }
                                     }
                                 }
@@ -78,7 +79,7 @@ body.blog-search-index {
                                     padding-top: 20px;
                                     #post-comments {
                                         .c-count {
-                                            color: @color-white;
+                                            color: @color-gray-darken9;
                                         }
                                         .c-reply.cf {
                                             .c-replyform {
@@ -90,12 +91,12 @@ body.blog-search-index {
                                         .c-comment {
                                             .c-post {
                                                 .p-name, .p-text, .p-actions {
-                                                    color: @color-white;
+                                                    color: @color-gray-darken9;
                                                     a.reply-action {
                                                         color: @fecon-theme-color;
                                                     }
                                                     span.publish-date {
-                                                        color: @color-white;
+                                                        color: @color-gray-darken9;
                                                     }
                                                 }
                                                 .p-name {
@@ -110,17 +111,25 @@ body.blog-search-index {
                                 }
                             }
                             .post-footer  {
-                                color: @color-white;
+                                color: @color-gray-darken9;
                             }
                         }
                     }
                 }
                 .sidebar-additional {
+                    display: inline-block;
                     .widget.block {
+                        .block-title {
+                            strong {
+                                font-size: 18px; 
+                                color: @color-gray-lighten3;
+                            }
+                        }
                         .block-content {
                             ul {
                                 li {
                                     a.post-item-link {
+                                        font-size: 16px;
                                         color: @fecon-theme-color;
                                     }
                                 }
