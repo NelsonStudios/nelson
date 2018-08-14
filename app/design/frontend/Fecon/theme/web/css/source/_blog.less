@@ -1,7 +1,8 @@
 body.blog-index-index,
 body.blog-post-view,
 body.blog-archive-view,
-body.blog-search-index {
+body.blog-search-index,
+body.blog-category-view {
     .page-wrapper {
         main#maincontent {
             .page-title-wrapper {
@@ -11,6 +12,11 @@ body.blog-search-index {
             }
             .columns {
                 .column.main {
+                    .category-content {
+                        padding: 5px 0px 10px 2px;
+                        font-size: 14px;
+                        color: @color-gray-darken9;
+                    }
                     width: 75%;
                     display: inline-block;
                     .post-view, .post-list-wrapper {
@@ -123,6 +129,14 @@ body.blog-search-index {
                             strong {
                                 font-size: 18px; 
                                 color: @color-gray-lighten3;
+                            }
+                        }
+                        ul.accordion {
+                            li {
+                                a {
+                                   font-size: 14px;
+                                   color: @fecon-theme-color;
+                                }
                             }
                         }
                         .block-content {
