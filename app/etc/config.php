@@ -11,6 +11,7 @@ return array (
     'Magento_Eav' => 1,
     'Fecon_AskAnExpert' => 1,
     'Fecon_BackendConfig' => 1,
+    'Fecon_CustomCustomerLogin' => 1,
     'Fecon_ExternalCart' => 1,
     'Fecon_Filterproducts' => 1,
     'Fecon_FlatRateMinimumAmount' => 1,
