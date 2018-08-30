@@ -47,8 +47,10 @@ define([
           }
         }
       }, 500);
-      /* Load custom font Verb on iframe */
-      $("iframe.goog-te-menu-frame").contents().find("head").append("<style>@font-face { font-family: Verb; src: url('/media/fonts/VerbRegular/VerbRegular.ttf'); } </style>");
+      setTimeout(function() {
+        /* Load custom font Verb on iframe */
+        $("iframe.goog-te-menu-frame").contents().find("head").append("<style>@font-face { font-family: Verb; src: url('/media/fonts/VerbRegular/VerbRegular.ttf'); } </style>");
+      });
       interval = translateLoaded(3000);
       // RESTYLE THE DROPDOWN MENU
       $('#google_translate_element').on("click", function () {
@@ -63,8 +65,7 @@ define([
           'text-transform': 'uppercase',
           'font-weight': '600',
           'font-size': '14px',
-          'font-family': 'Verb',
-          'width':'100%'
+          'font-family': 'Verb'
         });
         // Change menu's padding
         $("iframe.goog-te-menu-frame").contents().find('.goog-te-menu2-item-selected').css ('display', 'none');
@@ -81,9 +82,9 @@ define([
 
         // Change hover effects
         $("iframe.goog-te-menu-frame").contents().find(".goog-te-menu2-item div").hover(function () {
-          $(this).css('background-color', '#00AA73').find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'background-color': '#00AA73'});
+          $(this).find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'text-decoration': 'underline'});
         }, function () {
-          $(this).css('background-color', '#201D16').find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'background-color': '#201D16'});
+          $(this).find('span.text').css({'font-family': 'Verb', 'color': '#FFF', 'text-decoration': 'none'});
         });
 
         // Change Google's default blue border
