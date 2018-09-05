@@ -38,6 +38,51 @@ body {
             .columns {
                 .column.main {
                     #layer-product-list {
+                        .toolbar-products {
+                            .pages {
+                                float: none;
+                                strong.label.pages-label {
+                                    display: none;
+                                }
+                                .items.pages-items {
+                                    list-style: none;
+                                    .item {
+                                        a.page {
+                                            span {
+                                               font-size: 20px;
+                                               color: @fecon-theme-color; 
+                                            }
+                                            span.label {
+                                                display: none;
+                                            }
+                                        }
+                                        border: 1px solid @fecon-theme-color;
+                                        width: 55px;
+                                        height: 55px;
+                                        padding-top: 12px;
+                                        display: inline-block;
+                                        margin-left: 10px;
+                                        background: @color-white;
+                                    }
+                                    .item.current {
+                                        border: 1px solid @fecon-theme-color;
+                                        background: @fecon-theme-color;
+                                        .page {
+                                            span {
+                                                font-size: 20px;
+                                                color: @color-white;        
+                                            }
+                                            .label {
+                                                display: none;
+                                            }
+                                        }
+                                    }
+                                    .pages-item-previous,.pages-item-next {
+                                        display:none ;
+                                    }
+                                }
+                            }
+                        }
                         .products.wrapper {
                             .product-items {
                                 li.product-item {
@@ -47,6 +92,7 @@ body {
                                     .product-item-info {
                                         border: 1px solid @color-gray-lighten1;
                                         .product-item-photo {
+                                            height: 432px;
                                             width: 75%;
                                             margin: 0 auto;
                                         }
