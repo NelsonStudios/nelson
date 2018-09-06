@@ -21,63 +21,7 @@ $_attributeValue = 'Packaging wrapped out';
  */
 ?>
 <?php if ($_code == 'documentation'): ?>
-<h3 class="mid-red-upper">GENERAL</h3>
-<table id="tab2-table"  class="table abs-table-striped">
-    <tbody>
-        <tr class="">
-            <td>Base Machine Weight</td>
-            <td>10,379 lbs                                                     | 4707 kg</td>
-        </tr>
-        <tr class="">
-            <td>Overall Length x Width x Height</td>
-            <td>194: x 73” x 94”                                                     | 4298mm x 1,854mm x 2,387mm</td>
-        </tr>
-        <tr class="">
-            <td>Engine Make/Model</td>
-            <td>Kubota Diesel </td>
-        </tr>
-        <tr class="">
-            <td>Horsepower</td>
-            <td>46hp                                                     | 34.3kw</td>
-        </tr>
-        <tr class="">
-            <td>Maximum RPM</td>
-            <td>2800 </td>
-        </tr>
-        <tr class="">
-            <td>Hydrostatic Transmission</td>
-            <td>2 Speed </td>
-        </tr>
-        <tr class="">
-            <td>Travel Speed (low/hi)</td>
-            <td>0/7mpg                                                     | 0/11.3 kph</td>
-        </tr>
-        <tr class="">
-            <td>Rubber Track Width</td>
-            <td>14”                                                     | 355mm</td>
-        </tr>
-        <tr class="">
-            <td>Rubber Track Ground Contact</td>
-            <td>78” x 14”                                                     | 198mm x 355mm</td>
-        </tr>
-        <tr class="">
-            <td>Ground Clearance</td>
-            <td>12”                                                     | 304mm</td>
-        </tr>
-        <tr class="">
-            <td>Gradeability</td>
-            <td>25 degree </td>
-        </tr>
-        <tr class="">
-            <td>Counter Rotating Tracks</td>
-            <td>Yes </td>
-        </tr>
-        <tr class="">
-            <td>Swing Lower Rolls</td>
-            <td>Yes </td>
-        </tr>
-    </tbody>
-</table>
+    <?php echo $_product->getDocumentation(); ?>
 <?php else: ?>
 <ul id="about-list">
             <li>
