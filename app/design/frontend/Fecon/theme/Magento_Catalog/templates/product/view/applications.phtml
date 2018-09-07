@@ -14,28 +14,8 @@ $_attributeValue = 'Packaging wrapped out';
     </div>
 <?php endif; ?>
 
-<?php
-/**
- * HARCODED VALUES BEGIN:
- * PLEASE DELETE THE FOLLOWING HTML WHEN documentation ATTRIBUTE IS CREATED
- */
-?>
 <?php if ($_code == 'documentation'): ?>
     <?php echo $_product->getDocumentation(); ?>
-<?php else: ?>
-<ul id="about-list">
-            <li>
-
-                  <div class="about-image">
-                        <img src="https://www.fecon.com/media/1538/seismic_explor_960x190.jpg">
-                    </div>
-                    <a class="view-all-link red float-left clear" href="https://www.fecon.com/drilling/applications/">Seismic Exploration</a>
-                     <p class="float-left">When it comes to drilling shallow depth shot holes for seismic exploration, productivity is measured by holes drilled per day. Often these holes are 20-30 feet in depth, spread out across varying conditions that could be flat, hilly, soft or hard ground, farm fields, or land covered in brush or trees, or rocks. Fecon manufactures the EX300S which is configured to have what the crew needs where it is needed with as few steps as possible to maximize drill time.</p>
-            </li>
-</ul>
+<?php else if ($_code == 'applications'): ?>
+    <?php echo $_product->getApplications(); ?>
 <?php endif; ?>
-
-<?php
-/**
- * HARCODED VALUES END
- */
