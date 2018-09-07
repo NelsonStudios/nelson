@@ -16,6 +16,6 @@ $_attributeValue = 'Packaging wrapped out';
 
 <?php if ($_code == 'documentation'): ?>
     <?php echo $_product->getDocumentation(); ?>
-<?php else if ($_code == 'applications'): ?>
+<?php elseif ($_code == 'applications'): ?>
     <?php echo $_product->getApplications(); ?>
 <?php endif; ?>
