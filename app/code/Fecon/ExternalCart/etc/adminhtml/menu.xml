@@ -3,7 +3,7 @@
     <menu>
         <add 
             id="Fecon_ExternalCart::ExternalCart" 
-            title="Ask An Expert" 
+            title="External Cart" 
             module="Fecon_ExternalCart" 
             sortOrder="50" 
             parent="Fecon::fecon_top_level" 
