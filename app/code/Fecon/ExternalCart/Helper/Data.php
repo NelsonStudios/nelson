@@ -173,6 +173,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $settings['endpointsPaths']['quoteCartItemRepositoryV1Save'] = $settings['endpointsPaths']['quoteCartItemRepositoryV1'] . 'Save';
 
         if($isCustomer) {
+            //TODO: remove harcoded access token (make a setting)
             $settings['opts']['stream_context'] = stream_context_create([
                 'http' => [
                     'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')

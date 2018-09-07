@@ -76,14 +76,17 @@ class Customer implements CustomerInterface {
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession       
-     * @param \Magento\Customer\Model\SessionFactory             $customerSession   
-     * @param \Magento\Framework\App\Request\Http                $request           
-     * @param \Fecon\ExternalCart\Helper\Data                    $externalCartHelper
+     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession       
+     * @param \Magento\Customer\Model\SessionFactory                    $customerSession   
+     * @param \Magento\Customer\Model\Customer                          $customerModel
+     * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection,
+     * @param \Magento\Framework\App\Request\Http                       $request           
+     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper
      */
     public function __construct(
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
         \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
     ) { 
@@ -95,6 +98,7 @@ class Customer implements CustomerInterface {
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
+        $this->customerCollection = $customerCollection;
         $this->request = $request;
 
         $this->protocol = $this->cartHelper->protocol();
@@ -183,5 +187,31 @@ class Customer implements CustomerInterface {
     public function getCustomerToken() {
         $this->coreSession->start();
         return $this->coreSession->getCustomerId();
+    }
+    /**
+     * Get the customer data customer
+     *
+     * @api
+     * @param  string $documotoCustomerId The customerId to save.
+     * @return string $customerData
+     */
+    public function getCustomerByDocumotoId($documotoCustomerId) {
+        //$documotoCustomerId = $this->request->getParam('customerId');// Enable for testing.
+        try {
+            $collection = $this->customerCollection
+              ->addAttributeToSelect(array('id', 'firstname', 'customer_id',  'email'))
+              ->addAttributeToFilter('customer_id', array('eq' => $documotoCustomerId))
+              ->load();
+        } catch(\Excepetion $e) {
+            return $e->getMessage();
+        }
+        
+        if(count($collection->getData()) === 1) {
+            return $collection->getData();
+        } else {
+            throw new \Exception(
+                __('Error, there\'re multiple users with same id.')
+            );
+        }
     }
 }

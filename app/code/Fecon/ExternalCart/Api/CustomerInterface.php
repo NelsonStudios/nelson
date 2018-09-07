@@ -31,7 +31,7 @@ interface CustomerInterface
      */
     public function getCustomerData();
     /**
-     * Set the token of the recently created customer customer
+     * Set the token of the recently created customer
      *
      * @api
      * @param  string $customerId The customerId to save.
@@ -45,4 +45,12 @@ interface CustomerInterface
      * @return string $token of created customer cart or empty array otherwise.
      */
     public function getCustomerToken();
+    /**
+     * Get the customer data customer
+     *
+     * @api
+     * @param  string $documotoCustomerId The documotoCustomerId to save.
+     * @return string $customerData
+     */
+    public function getCustomerByDocumotoId($documotoCustomerId);
 }

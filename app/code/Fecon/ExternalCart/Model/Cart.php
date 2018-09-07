@@ -108,6 +108,7 @@ class Cart implements CartInterface {
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\App\Request\Http $request,
+        \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
     ) {
         $this->cartHelper = $externalCartHelper;
@@ -118,6 +119,7 @@ class Cart implements CartInterface {
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
+        $this->customerModel = $customerModel;
         $this->request = $request;
 
         $this->protocol = $this->cartHelper->protocol();
@@ -327,6 +329,32 @@ class Cart implements CartInterface {
         }
         if(!empty($settings['opts'])) {
             $this->opts = $settings['opts'];
+        }
+    }
+    /**
+     * submitCart function check: https://tracker.serfe.com/view.php?id=52950#c442215
+     *  Steps to get this working
+     *   - Check if user exists, if not return error response
+     *   - Perform user autologin in order to address the products to the user
+     *   - Add products
+     *     - If product doesn't exist send admin notification (email)
+     *     - Return error reponse
+     */
+    public function submitCart() {
+        $postData = $this->request->getPost();
+        // Transforn post data from body into an array to easily handle data.
+        $cartData = $this->cartHelper->jsonDecode($postData['body']);
+        $customerAddressData = [
+            'BillTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'],
+            'ShipTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo']
+        ];
+        $shippingCartData = [
+            'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
+        ];
+        if(!empty($postData)) {
+            $customerData = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
+            print_r($customerData);
+            exit;
         }
     }
 }

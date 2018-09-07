@@ -149,6 +149,7 @@ class Index extends \Magento\Framework\App\Action\Action
         if(!empty($cartId) || !empty($customerToken)) {
             /**
              * Get wsdl endpoint names based on guest or non-guest customers.
+             * TODO: remove harcoded access token
              */
             $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
             $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
@@ -218,6 +219,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
     /**
      * Load customer by email
+     * TODO: Move this to customer model.
      *
      * @param string $email
      * @return boolean
@@ -235,6 +237,7 @@ class Index extends \Magento\Framework\App\Action\Action
     }
     /**
      * makeUserLogin auto login user.
+     * TODO: Move this to customer model.
      * 
      * This maybe look redundant, first get by email then load by id, but since is not 
      * loaded correctly we need to make that additional step.
