@@ -53,4 +53,14 @@ interface CustomerInterface
      * @return string $customerData
      */
     public function getCustomerByDocumotoId($documotoCustomerId);
+    /**
+     * Set the customer address
+     *
+     * @api
+     * @param  string $customerId The customerId to search.
+     * @param  string $customerAddressData The customerAddressData to save.
+     * @param  string $addressType The addressType to save.
+     * @return boolean true on success or flase of failure.
+     */
+    public function setCustomerAddress($customerData, $customerAddressData, $addressType);
 }

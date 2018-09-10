@@ -293,7 +293,12 @@ class Cart implements CartInterface {
      */
     private function _addProduct($postData, $updateCartId = false) {
         $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartItemRepositoryV1, (($this->opts)? $this->opts : [] ));
-        $cartItemData = $this->cartHelper->jsonDecode($postData['body'], 1);
+
+        if(!is_array($postData['body'])) {
+            $cartItemData = $this->cartHelper->jsonDecode($postData['body'], 1);
+        } else {
+            $cartItemData = $postData['body'];
+        }
         if($updateCartId) {
             /* Update cartId in body post data */
             $cartItemData['cartItem']['quoteId'] = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
@@ -303,6 +308,7 @@ class Cart implements CartInterface {
             'cartItem' => $cartItemData['cartItem']
         ];
         try {
+            //TOOD: if product doesn't exist on Magento return error.
             $productAdded = $client->{$this->quoteCartItemRepositoryV1Save}($productData);
             if($updateCartId) {
                 $productAdded->result->cartId = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
@@ -332,17 +338,21 @@ class Cart implements CartInterface {
         }
     }
     /**
-     * submitCart function check: https://tracker.serfe.com/view.php?id=52950#c442215
+     * submitCart function | check: https://tracker.serfe.com/view.php?id=52950#c442215
      *  Steps to get this working
      *   - Check if user exists, if not return error response
-     *   - Perform user autologin in order to address the products to the user
-     *   - Add products
-     *     - If product doesn't exist send admin notification (email)
-     *     - Return error reponse
+     *     - Check if user has billing and/or shipping address, if it has: update, if not: create a new one.
+     *   - Perform user autologin in order to add the products to the customer.
+     *   - Get quote id for the logged-in customer.
+     *   - Then add products
+     *     - If product doesn't exist, send admin notification (email)
+     *     - Return error response.
      */
     public function submitCart() {
         $postData = $this->request->getPost();
-        // Transforn post data from body into an array to easily handle data.
+        $productDataMap = ['quoteId' => '27', 'body' => ['cartItem' => []]];
+        $productsAdded = [];
+        // Transform post data from body into an array to easily handle the data.
         $cartData = $this->cartHelper->jsonDecode($postData['body']);
         $customerAddressData = [
             'BillTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'],
@@ -352,9 +362,67 @@ class Cart implements CartInterface {
             'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
         ];
         if(!empty($postData)) {
+            // Get customer data
             $customerData = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
-            print_r($customerData);
+            // Set/update billing address
+            $billingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'BillTo');
+            // Set/update shipping address
+            $shippingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'ShipTo');
+            // Make customer autologin
+            $this->cartHelper->makeUserLogin($customerData[0]['email']);
+            // Get quote id before add products into the cart
+            $token = $this->getCartToken();
+            if(empty($token)) {
+                $token = $this->createCartToken();
+            }
+
+            // $localAccessToken = 'fd35xyhc2cun28w39prottpekbvrv12e';
+            // $stagingAccessToken = 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km';
+            // $quoteId = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/'. $customerData[0]['entity_id'] .'/carts', $stagingAccessToken, 'GET');
+            /* Without this param we'll not be able to get logged in customer cart. */
+            // $productDataMap['quoteId'] = $quoteId;
+            // Add products
+            foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
+                $productDataMap['body']['cartItem'] = [
+                    'sku' => $productData['PartNumber'],
+                    'qty' => $productData['Quantity']
+                ];
+                /* TODO: check why _addProduct is not returning error when product doesn't exist */
+                array_push($productsAdded, $this->_addProduct($productDataMap, true));
+            }
+            echo '<pre>';
+            print_r($productsAdded);
+            echo '</pre>';
             exit;
+            if(!empty($productsAdded)) {
+                foreach ($productsAdded as $key => $product) {
+                    $p = json_decode($product);
+                    if(!empty($p) && !is_object($p)) {
+                        $response = ['body' => [
+                                'ErpResponse' => [
+                                    'Success' => 'false',
+                                    'Message' => $p,
+                                    'ReferenceNumber' => 'N/A',    
+                                    'ExternalOrderID' => 'false'
+                                ]
+                            ]
+                        ];
+                        // Breakpoint here and return error
+                        return $response;
+                    }
+                }
+                $response = ['body' => [
+                        'ErpResponse' => [
+                            'Success' => 'true',
+                            'Message' => 'Cart submitted successfully.',
+                            'ReferenceNumber' => $productDataMap['quoteId'],    
+                            'ExternalOrderID' => 'false'
+                        ]
+                    ]
+                ];
+                /* Return success response */
+                return $response;
+            }
         }
     }
 }
