@@ -95,24 +95,17 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\ResponseFactory $responseFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->responseFactory = $responseFactory;
-        $this->storeManager = $storeManager;
+        
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
-        $this->customerSession = $customerSession;
-        $this->customerRepository = $customerRepository;
-        $this->customerFactory = $customerFactory;
         $this->request = $request;
         $this->cartHelper = $externalCartHelper;
         $this->messageManager = $messageManager;
@@ -149,6 +142,7 @@ class Index extends \Magento\Framework\App\Action\Action
         if(!empty($cartId) || !empty($customerToken)) {
             /**
              * Get wsdl endpoint names based on guest or non-guest customers.
+             * TODO: remove harcoded access token
              */
             $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
             $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
@@ -164,7 +158,7 @@ class Index extends \Magento\Framework\App\Action\Action
                     if(!empty($customerInfo['id'])) {
                         $requestData = ['customerId' => $customerInfo['id']];
                         /* Perform user login */
-                        $this->makeUserLogin($customerInfo['email']);
+                        $this->cartHelper->makeUserLogin($customerInfo['email']);
                     }
                 }
             } else {
@@ -214,39 +208,5 @@ class Index extends \Magento\Framework\App\Action\Action
         );
         $this->responseFactory->create()->setRedirect($redirectPath)->sendResponse(); 
         return;
-    }
-
-    /**
-     * Load customer by email
-     *
-     * @param string $email
-     * @return boolean
-     */
-    private function getCustomerByEmail($email)
-    {
-        $websiteId = $this->storeManager->getStore()->getWebsiteId();
-        try {
-            $customer = $this->customerRepository->get($email, $websiteId);
-        } catch (\Exception $ex) {
-            $customer = false;
-        }
-
-        return $customer;
-    }
-    /**
-     * makeUserLogin auto login user.
-     * 
-     * This maybe look redundant, first get by email then load by id, but since is not 
-     * loaded correctly we need to make that additional step.
-     * 
-     * @return void
-     */
-    private function makeUserLogin($customerEmail) {
-        //Load customer first by id
-        $customer = $this->getCustomerByEmail($customerEmail);
-        $customerId = $customer->getId();
-        //Then since repository does not return the correct type, so we need to load the customer
-        $customer = $this->customerFactory->create()->load($customerId);
-        $this->customerSession->setCustomerAsLoggedIn($customer);
     }
 }

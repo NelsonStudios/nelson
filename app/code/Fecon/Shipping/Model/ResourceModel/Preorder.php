@@ -11,18 +11,28 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected $customerHelper;
 
     /**
+     * Email Helper
+     *
+     * @var \Fecon\Shipping\Helper\EmailHelper 
+     */
+    protected $emailHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
      * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Helper\EmailHelper $emailHelper
      * @param string $connectionName
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
+        \Fecon\Shipping\Helper\EmailHelper $emailHelper,
         $connectionName = null
     ) {
         $this->customerHelper = $customerHelper;
+        $this->emailHelper = $emailHelper;
         parent::__construct($context, $connectionName);
     }
 
@@ -47,5 +57,21 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         }
 
         parent::_beforeSave($object);
+    }
+
+    /**
+     * Perform actions after object save
+     *
+     * @param \Magento\Framework\Model\AbstractModel|\Magento\Framework\DataObject $object
+     * @return $this
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function _afterSave(\Magento\Framework\Model\AbstractModel $object)
+    {
+//        if ($object->getData(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE) === 0) {
+            $preorderId = $object->getData(\Fecon\Shipping\Api\Data\PreorderInterface::PREORDER_ID);
+            $this->emailHelper->sendAdminNotificationEmail($preorderId);
+//        }
+        return parent::_afterDelete($object);
     }
 }

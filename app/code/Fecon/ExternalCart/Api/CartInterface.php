@@ -88,4 +88,60 @@ interface CartInterface
      * @throws \SoapFault response
      */
     public function addToCart();
+    /**
+     * Function to add products into guest cart.
+     * 
+     * @api
+     * @param  $body The body json data that should looks like:
+     *
+     * {
+     *   "GetCart": {
+     *     "ErpSendShoppingCartRequest": {
+     *       "BillTo": {
+     *         "SiteAddress": {
+     *           "CustomerId": "",
+     *           "Line1": "",
+     *           "City": "",
+     *           "State": "",
+     *           "Zipcode": "",
+     *           "Country": ""
+     *         }
+     *       },
+     *       "ShipTo": {
+     *         "SiteAddress": {
+     *           "CustomerId": "",
+     *           "Line1": "",
+     *           "City": "",
+     *           "State": "",
+     *           "Zipcode": "",
+     *           "Country": ""
+     *         }
+     *       },
+     *       "Comments": "",
+     *       "DocumotoERPTransactionType": "",
+     *       "DocumotoERPTransactionStatus": "",
+     *       "ShoppingCartLines": {
+     *         "ShoppingCartLine": [
+     *           {
+     *           "PartNumber": "",
+     *           "Quantity": "",
+     *           "UOM": "",
+     *           "Line": ""
+     *           },
+     *           {
+     *           "PartNumber": "",
+     *           "Quantity": "",
+     *           "UOM": "",
+     *           "Line": ""
+     *           }
+     *         ]
+     *       }
+     *     }
+     *   }
+     * }
+     * 
+     * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
+     * @throws \SoapFault response
+     */
+    public function submitCart();
 }

@@ -38,10 +38,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\AuthorizationInterface $authorize,
-        \Magento\Framework\Json\Helper\Data $jsonHelper
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Customer\Model\CustomerFactory $customerFactory
     ) {
         $this->authorize = $authorize;
         $this->jsonHelper = $jsonHelper;
+        $this->storeManager = $storeManager;
+        $this->customerSession = $customerSession;
+        $this->customerRepository = $customerRepository;
+        $this->customerFactory = $customerFactory;
         parent::__construct($context);
     }
     /**
@@ -173,6 +181,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $settings['endpointsPaths']['quoteCartItemRepositoryV1Save'] = $settings['endpointsPaths']['quoteCartItemRepositoryV1'] . 'Save';
 
         if($isCustomer) {
+            //TODO: remove harcoded access token (make a setting)
             $settings['opts']['stream_context'] = stream_context_create([
                 'http' => [
                     'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
@@ -180,5 +189,40 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ]);
         }
         return $settings;
+    }
+    /**
+     * Load customer by email
+     * TODO: Move this to customer model.
+     *
+     * @param string $email
+     * @return boolean
+     */
+    private function getCustomerByEmail($email)
+    {
+        $websiteId = $this->storeManager->getStore()->getWebsiteId();
+        try {
+            $customer = $this->customerRepository->get($email, $websiteId);
+        } catch (\Exception $ex) {
+            $customer = false;
+        }
+
+        return $customer;
+    }
+    /**
+     * makeUserLogin auto login user.
+     * TODO: Move this to customer model.
+     * 
+     * This maybe look redundant, first get by email then load by id, but since is not 
+     * loaded correctly we need to make that additional step.
+     * 
+     * @return void
+     */
+    public function makeUserLogin($customerEmail) {
+        //Load customer first by id
+        $customer = $this->getCustomerByEmail($customerEmail);
+        $customerId = $customer->getId();
+        //Then since repository does not return the correct type, so we need to load the customer
+        $customer = $this->customerFactory->create()->load($customerId);
+        $this->customerSession->setCustomerAsLoggedIn($customer);
     }
 }
