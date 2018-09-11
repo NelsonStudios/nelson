@@ -2,6 +2,8 @@
 
 namespace Fecon\Shipping\Model\ResourceModel;
 
+use Fecon\Shipping\Api\Data\PreorderInterface;
+
 class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
@@ -51,8 +53,13 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($object->dataHasChangedFor(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_PRICE)) {
-            $object->setData(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
+        $status = (int) $object->getData(PreorderInterface::STATUS);
+        if (
+            $object->dataHasChangedFor(PreorderInterface::SHIPPING_PRICE) &&
+            ($status === PreorderInterface::STATUS_NEW)
+        ) {
+            $object->setData(PreorderInterface::IS_AVAILABLE, 1);
+            $object->setData(PreorderInterface::STATUS, PreorderInterface::STATUS_PENDING);
             $this->customerHelper->addOrderTokenToCustomer($object->getCustomerId());
         }
 
@@ -68,10 +75,12 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _afterSave(\Magento\Framework\Model\AbstractModel $object)
     {
-//        if ($object->getData(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE) === 0) {
-            $preorderId = $object->getData(\Fecon\Shipping\Api\Data\PreorderInterface::PREORDER_ID);
+        $status = (int) $object->getData(PreorderInterface::STATUS);
+        if ($status === PreorderInterface::STATUS_NEW) {
+            $preorderId = $object->getData(PreorderInterface::PREORDER_ID);
             $this->emailHelper->sendAdminNotificationEmail($preorderId);
-//        }
-        return parent::_afterDelete($object);
+        }
+
+        return parent::_afterSave($object);
     }
 }
