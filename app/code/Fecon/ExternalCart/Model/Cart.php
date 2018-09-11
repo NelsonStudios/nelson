@@ -237,7 +237,7 @@ class Cart implements CartInterface {
     public function getCartUrl() {
         $cartId = $this->getCartToken();
         $customerToken = $this->customerSession->getData('loggedInUserToken');
-        if(!empty($cartId) && $customerToken) { //It's a customerToken
+        if(!empty($customerToken)) { //It's a customerToken
             return $this->origin . '/externalcart/cart/?customerToken=' . $customerToken;
         } else if(!empty($cartId)) {
             //Make sure user is logged out.
@@ -376,6 +376,7 @@ class Cart implements CartInterface {
             // Set/update shipping address
             $shippingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'ShipTo');
             // Make customer autologin
+            /* Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail */
             $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $this->customerToken, 'GET');
             if(!empty($customerData)) { 
                 $customerInfo = $this->cartHelper->jsonDecode($customerData);
@@ -403,9 +404,6 @@ class Cart implements CartInterface {
                     $q = $this->quoteFactory->create()->load($quoteId);
                     /* Load in checkout session as guest */
                     $this->checkoutSession->setQuoteId($quoteId);
-                    /* Redirect to cart page */
-                    // $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
-                    // return;
                 } else {
                     throw new \Exception(
                         __('Error, there\'s no cart id.')
@@ -456,8 +454,5 @@ class Cart implements CartInterface {
                 return $response;
             }
         }
-    }
-    private function makeResponse() {
-
     }
 }
