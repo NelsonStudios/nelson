@@ -80,31 +80,32 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function sendAdminNotificationEmail($preorderId)
     {
-        $params = array('preorder_id' => $preorderId);
-
-        $url = $this->backendUrl->getUrl("fecon_shipping/preorder/edit", $params);
+        $url = $this->backendUrl->getUrl("admin/index/index");
         $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
         
         $templateVars = array(
             'store' => $this->storeManager->getStore(),
-            'url' => $url
+            'url' => $url,
+            'preorderId' => $preorderId
         );
         $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $to = array($this->scopeConfig->getValue(self::ADMIN_EMAIL_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-        $from = [
-            'name' => $name,
-            'email' => $email
-        ];
-        $this->inlineTranslation->suspend();
-        
-        $transport = $this->transportBuilder->setTemplateIdentifier('notify_admin')
-            ->setTemplateOptions($templateOptions)
-            ->setTemplateVars($templateVars)
-            ->setFrom($from)
-            ->addTo($to)
-            ->getTransport();
-        $transport->sendMessage();
-        $this->inlineTranslation->resume();
+        if ($to) {
+            $from = [
+                'name' => $name,
+                'email' => $email
+            ];
+            $this->inlineTranslation->suspend();
+
+            $transport = $this->transportBuilder->setTemplateIdentifier('notify_admin')
+                ->setTemplateOptions($templateOptions)
+                ->setTemplateVars($templateVars)
+                ->setFrom($from)
+                ->addTo($to)
+                ->getTransport();
+            $transport->sendMessage();
+            $this->inlineTranslation->resume();
+        }
     }
 }
