@@ -11,6 +11,10 @@
                 <field id="name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
                     <label>Method Name</label>
                 </field>
+                <field id="fulfillment_email_address" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="25" translate="label" type="text">
+                    <label>Fulfillment Email Address</label>
+                    <validate>validate-email</validate>
+                </field>
                 <field id="price" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
                     <label>Price</label>
                     <validate>validate-number validate-zero-or-greater</validate>
