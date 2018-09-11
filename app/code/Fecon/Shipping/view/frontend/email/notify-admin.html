@@ -8,18 +8,17 @@ body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif;
 @-->
 {{template config_path="design/email/header_template"}}
 
-<table class="button" width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-        <td>
-            <table class="inner-wrapper" border="0" cellspacing="0" cellpadding="0" align="center">
-                <tr>
-                    <td align="center">
-                        There's a new shipping quote request for review: {{var url}}
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+
+<div>
+    <p>There's a new shipping quote request for review.</p>
+    <p>To set the price please follow these instructions:</p>
+    <ol>
+        <li>Go to the backend <a href="{{var url}}" target="_blank"><span>Login Page</span></a></li>
+        <li>Click on the left menu the Fecon section</li>
+        <li>Click on the <b>Preorder</b> option</li>
+        <li>In the grid, search for the Preorder with ID <b>{{var preorderId}}</b></li>
+        <li>Once you find the new Preorder, click on the <b>Edit</b> option (in Actions column)</li>
+    </ol>
+</div>
 
 {{template config_path="design/email/footer_template"}}
