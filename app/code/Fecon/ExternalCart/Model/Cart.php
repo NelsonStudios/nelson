@@ -107,6 +107,7 @@ class Cart implements CartInterface {
     public function __construct(
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
         \Magento\Customer\Model\Session $customerSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
@@ -119,6 +120,7 @@ class Cart implements CartInterface {
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
+        $this->checkoutSession = $checkoutSession;
         $this->customerModel = $customerModel;
         $this->request = $request;
 
@@ -378,12 +380,10 @@ class Cart implements CartInterface {
             if(empty($token)) {
                 $token = $this->createCartToken();
             }
-
-            // $localAccessToken = 'fd35xyhc2cun28w39prottpekbvrv12e';
-            $stagingAccessToken = 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km';
-            $quoteId = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/'. $customerData[0]['entity_id'] .'/carts', $stagingAccessToken, 'GET');
+            /* Get current quote */
+            $quote = $this->checkoutSession->getQuote();
             /* Without this param we'll not be able to add products into the logged-in customer cart. */
-            $productDataMap['quoteId'] = $quoteId;
+            $productDataMap['quoteId'] = $quote->getId();
             // Add products
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
