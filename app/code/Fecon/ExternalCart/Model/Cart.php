@@ -374,16 +374,27 @@ class Cart implements CartInterface {
             // Set/update shipping address
             $shippingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'ShipTo');
             // Make customer autologin
-            $this->cartHelper->makeUserLogin($customerData[0]['email']);
+            $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $this->customerToken, 'GET');
+            if(!empty($customerData)) { 
+                $customerInfo = $this->cartHelper->jsonDecode($customerData);
+                echo '<pre>';
+                print_r($customerInfo);
+                echo '</pre>';
+                exit;
+                if(!empty($customerInfo['id'])) {
+                    $requestData = ['customerId' => $customerInfo['id']];
+                    /* Perform user login */
+                    $this->cartHelper->makeUserLogin($customerInfo['email']);
+                }
+            }
             // Get quote id before add products into the cart
             $token = $this->getCartToken();
             if(empty($token)) {
                 $token = $this->createCartToken();
             }
             /* Get current quote */
-            $quote = $this->checkoutSession->getQuote();
             /* Without this param we'll not be able to add products into the logged-in customer cart. */
-            $productDataMap['quoteId'] = $quote->getId();
+            $productDataMap['quoteId'] = $this->checkoutSession->getQuote()->getId();
             // Add products
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
