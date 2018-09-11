@@ -56,4 +56,12 @@ class Edit extends \Fecon\Shipping\Controller\Adminhtml\Preorder
         $resultPage->getConfig()->getTitle()->prepend($model->getId() ? $model->getTitle() : __('New Preorder'));
         return $resultPage;
     }
+
+    /**
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed("Fecon_Shipping::Preorder_update");
+    }
 }
