@@ -7,7 +7,7 @@ namespace Fecon\Shipping\Ui\Component\Listing\Column;
  *
  * 
  */
-class Status extends \Magento\Ui\Component\Listing\Columns\Column
+class Availability extends \Magento\Ui\Component\Listing\Columns\Column
 {
     const AVAILABLE = 'Available';
     const NOT_AVAILABLE = 'Not available';
