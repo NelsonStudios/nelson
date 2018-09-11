@@ -109,7 +109,14 @@
                 </item>
             </argument>
         </column>
-        <column name="is_available" class="Fecon\Shipping\Ui\Component\Listing\Column\Status">
+        <column name="status" class="Fecon\Shipping\Ui\Component\Listing\Column\Status">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" translate="true" xsi:type="string">Status</item>
+                </item>
+            </argument>
+        </column>
+        <column name="is_available" class="Fecon\Shipping\Ui\Component\Listing\Column\Availability">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Fecon\Shipping\Model\Preorder\StatusList</item>
                 <item name="config" xsi:type="array">
