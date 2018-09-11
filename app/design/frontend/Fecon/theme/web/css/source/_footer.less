@@ -1,6 +1,7 @@
 .page-wrapper {
-    .page-footer {
+  .page-footer {
         .footer {
+          padding: 0 12px;
             border-top: 6px solid @minicart-green;
             .footer-top, .footer-middle, .footer-bottom {
                 background-color: @color-black;
@@ -83,15 +84,21 @@
                                 width: 144px;
                                 margin-bottom: 35px;
                                 background: transparent;
-                                border: 1px solid @minicart-green;
-                                padding-top: 12px;
-                                padding-bottom: 12px;
-                                margin-right: 40px;
                                 text-align: center;
                                 a {
+                                  border: 1px solid @minicart-green;
+                                  background: transparent;
                                    font-size: 11px;
+                                   padding-top: 12px;
+                                   padding-bottom: 12px;
                                    text-transform: uppercase;
                                    color: @minicart-green;
+
+                                   &:hover {
+                                     background-color: @minicart-green;
+                                     color: white;
+                                     text-decoration: none;
+                                   }
                                 }
                             }
                             .footer-logo {
