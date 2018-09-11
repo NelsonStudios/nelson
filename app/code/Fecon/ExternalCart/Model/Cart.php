@@ -108,6 +108,7 @@ class Cart implements CartInterface {
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
@@ -121,6 +122,7 @@ class Cart implements CartInterface {
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
+        $this->quoteFactory = $quoteFactory;
         $this->customerModel = $customerModel;
         $this->request = $request;
 
@@ -384,13 +386,37 @@ class Cart implements CartInterface {
                 }
             }
             // Get quote id before add products into the cart
-            $token = $this->getCartToken();
-            if(empty($token)) {
-                $token = $this->createCartToken();
+            /* byPass Authorization access for internal use only */
+            $opts['stream_context'] = stream_context_create([
+                'http' => [
+                    'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                ]
+            ]);
+            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
+            try {
+                /* Get quote */
+                $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
+                if(!empty($cartInfo->result->id)) {
+                    $quoteId = $cartInfo->result->id;
+                    unset($cartInfo);
+                    /* Load quote */
+                    $q = $this->quoteFactory->create()->load($quoteId);
+                    /* Load in checkout session as guest */
+                    $this->checkoutSession->setQuoteId($quoteId);
+                    /* Redirect to cart page */
+                    // $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
+                    // return;
+                } else {
+                    throw new \Exception(
+                        __('Error, there\'s no cart id.')
+                    );
+                }
+            } catch(\SoapFault $e) {
+                return $e->getMessage();
             }
             /* Get current quote */
             /* Without this param we'll not be able to add products into the logged-in customer cart. */
-            $productDataMap['quoteId'] = $this->checkoutSession->getQuote()->getId();
+            $productDataMap['quoteId'] = $quoteId;
             // Add products
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
@@ -430,5 +456,8 @@ class Cart implements CartInterface {
                 return $response;
             }
         }
+    }
+    private function makeResponse() {
+
     }
 }
