@@ -15,6 +15,11 @@ interface PreorderInterface
     const CREATED_AT = 'created_at';
     const PREORDER_ID = 'preorder_id';
     const ADDRESS_ID = 'address_id';
+    const STATUS = 'status';
+    const STATUS_NEW = 1;
+    const STATUS_PENDING = 2;
+    const STATUS_COMPLETED = 3;
+    const STATUS_CANCELED = 4;
 
 
     /**
