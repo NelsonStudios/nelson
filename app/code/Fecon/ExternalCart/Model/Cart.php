@@ -350,7 +350,7 @@ class Cart implements CartInterface {
      */
     public function submitCart() {
         $postData = $this->request->getPost();
-        $productDataMap = ['quoteId' => '27', 'body' => ['cartItem' => []]];
+        $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
         $productsAdded = [];
         // Transform post data from body into an array to easily handle the data.
         $cartData = $this->cartHelper->jsonDecode($postData['body']);
@@ -377,10 +377,10 @@ class Cart implements CartInterface {
             }
 
             // $localAccessToken = 'fd35xyhc2cun28w39prottpekbvrv12e';
-            // $stagingAccessToken = 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km';
-            // $quoteId = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/'. $customerData[0]['entity_id'] .'/carts', $stagingAccessToken, 'GET');
+            $stagingAccessToken = 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km';
+            $quoteId = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/'. $customerData[0]['entity_id'] .'/carts', $stagingAccessToken, 'GET');
             /* Without this param we'll not be able to get logged in customer cart. */
-            // $productDataMap['quoteId'] = $quoteId;
+            $productDataMap['quoteId'] = $quoteId;
             // Add products
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
@@ -390,18 +390,14 @@ class Cart implements CartInterface {
                 /* TODO: check why _addProduct is not returning error when product doesn't exist */
                 array_push($productsAdded, $this->_addProduct($productDataMap, true));
             }
-            echo '<pre>';
-            print_r($productsAdded);
-            echo '</pre>';
-            exit;
             if(!empty($productsAdded)) {
                 foreach ($productsAdded as $key => $product) {
                     $p = json_decode($product);
-                    if(!empty($p) && !is_object($p)) {
+                    if(empty($p) || (!empty($p) && !is_object($p))) {
                         $response = ['body' => [
                                 'ErpResponse' => [
                                     'Success' => 'false',
-                                    'Message' => $p,
+                                    'Message' => $product,
                                     'ReferenceNumber' => 'N/A',    
                                     'ExternalOrderID' => 'false'
                                 ]
