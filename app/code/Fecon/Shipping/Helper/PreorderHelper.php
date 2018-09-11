@@ -2,10 +2,10 @@
 
 namespace Fecon\Shipping\Helper;
 
+use Fecon\Shipping\Api\Data\PreorderInterface;
+
 /**
  * Helper to create PreorderHelper from quote's data
- *
- * 
  */
 class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -103,11 +103,11 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
 
         $preorderData = [
-            \Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE => false,
-            \Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID => $customerId,
-            \Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD => $shippingMethod,
-            \Fecon\Shipping\Api\Data\PreorderInterface::QUOTE_ID => $quoteId,
-            \Fecon\Shipping\Api\Data\PreorderInterface::ADDRESS_ID => $addressId
+            PreorderInterface::IS_AVAILABLE => false,
+            PreorderInterface::CUSTOMER_ID => $customerId,
+            PreorderInterface::SHIPPING_METHOD => $shippingMethod,
+            PreorderInterface::QUOTE_ID => $quoteId,
+            PreorderInterface::ADDRESS_ID => $addressId
         ];
 
         return $preorderData;
@@ -125,10 +125,10 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerId = $this->customerSession->getCustomer()->getId();
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorderCollection
-            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE);
+            ->addFieldToFilter(PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE);
         if ($shippingCode) {
-            $preorderCollection->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
+            $preorderCollection->addFieldToFilter(PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode]);
         }
         $preorderCollectionSize = $preorderCollection->getSize();
 
@@ -150,9 +150,9 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerId = $this->customerSession->getCustomer()->getId();
         $preorderCollection = $this->preorderCollectionFactory->create();
         $preorder = $preorderCollection
-            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
-            ->addFieldToFilter(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
+            ->addFieldToFilter(PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
+            ->addFieldToFilter(PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
             ->getLastItem();
 
         return $preorder->getId();
@@ -173,5 +173,32 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $preorder;
+    }
+
+    /**
+     * Marks a Preorder entity as complete (change status)
+     *
+     * @param \Magento\Quote\Model\Quote $quote
+     * @return \Fecon\Shipping\Model\Preorder|false
+     */
+    public function completePreorder($quote)
+    {
+        $shippingMethod = $quote->getShippingAddress()->getShippingMethod();
+        $preorder = $this->getPreorderByShippingCode($shippingMethod);
+        if ($preorder) {
+            $preorder->setData(PreorderInterface::STATUS, PreorderInterface::STATUS_COMPLETED);
+            $preorder->setData(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::NOT_AVAILABLE);
+
+            try {
+                $updated = $this->preorderRepository->save($preorder);
+                $customerId = $preorder->getData(PreorderInterface::CUSTOMER_ID);
+                $this->customerHelper->clearOrderTokenToCustomer($customerId);
+            } catch (\Exception $exc) {
+                $this->_logger->error($exc->getMessage());
+                $updated = false;
+            }
+        }
+
+        return $updated;
     }
 }

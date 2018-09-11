@@ -246,7 +246,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $login = false;
         $customer = $this->customerFactory->create()->load($customerId);
-        if ($customer->getOrderToken() == $token) {
+        if (($customer->getOrderToken() == $token) && (!empty($token))) {
             $this->session->setCustomerAsLoggedIn($customer);
             $login = true;
         }
@@ -306,5 +306,23 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $name;
+    }
+
+    /**
+     * Clear a order token for customer
+     *
+     * @param string $customerId
+     * @return void
+     */
+    public function clearOrderTokenToCustomer($customerId)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $token = null;
+        $datetime = null;
+        $customerData = $customer->getDataModel();
+        $customerData->setCustomAttribute('order_token', $token);
+        $customerData->setCustomAttribute('order_token_created_at', $datetime);
+        $customer->updateData($customerData);
+        $customer->save();
     }
 }
