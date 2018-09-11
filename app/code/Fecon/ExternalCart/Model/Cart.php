@@ -349,8 +349,11 @@ class Cart implements CartInterface {
      *     - Return error response.
      */
     public function submitCart() {
+        /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
         $postData = $this->request->getPost();
+        /* Request array structure to send to Magento 2 Rest API */
         $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
+        /* Array with result of products added or error */
         $productsAdded = [];
         // Transform post data from body into an array to easily handle the data.
         $cartData = $this->cartHelper->jsonDecode($postData['body']);
@@ -379,7 +382,7 @@ class Cart implements CartInterface {
             // $localAccessToken = 'fd35xyhc2cun28w39prottpekbvrv12e';
             $stagingAccessToken = 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km';
             $quoteId = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/'. $customerData[0]['entity_id'] .'/carts', $stagingAccessToken, 'GET');
-            /* Without this param we'll not be able to get logged in customer cart. */
+            /* Without this param we'll not be able to add products into the logged-in customer cart. */
             $productDataMap['quoteId'] = $quoteId;
             // Add products
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
@@ -387,7 +390,7 @@ class Cart implements CartInterface {
                     'sku' => $productData['PartNumber'],
                     'qty' => $productData['Quantity']
                 ];
-                /* TODO: check why _addProduct is not returning error when product doesn't exist */
+                /* User should be logged-in in order the validation for product works, otherwise another error will be triggered. */
                 array_push($productsAdded, $this->_addProduct($productDataMap, true));
             }
             if(!empty($productsAdded)) {
