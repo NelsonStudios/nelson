@@ -377,10 +377,6 @@ class Cart implements CartInterface {
             $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $this->customerToken, 'GET');
             if(!empty($customerData)) { 
                 $customerInfo = $this->cartHelper->jsonDecode($customerData);
-                echo '<pre>';
-                print_r($customerInfo);
-                echo '</pre>';
-                exit;
                 if(!empty($customerInfo['id'])) {
                     $requestData = ['customerId' => $customerInfo['id']];
                     /* Perform user login */
