@@ -20,7 +20,8 @@
                 </tr>
             </thead>
             <?php $items = $block->getItems(); ?>
-                    
+            <?php if ($items): ?>
+
                 <tbody>
                     <?php $i = 0;
                     foreach ($items as $item): ?>
@@ -58,6 +59,7 @@
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
+            <?php endif; ?>
         </table>
     </div>
 
