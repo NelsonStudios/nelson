@@ -1,4 +1,9 @@
 <?php
+/**
+ * Contributor company: Fecon.
+ * Contributor Author : <fecon.com>
+ * Date: 2018/08/02
+ */
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CartInterface;
@@ -85,6 +90,12 @@ class Cart implements CartInterface {
      */
     protected $port;
     /**
+     * $port 
+     * 
+     * @var string
+     */
+    protected $access_token;
+    /**
      * The "full domain" with protocol + domain + port
      * @var string
      */
@@ -100,8 +111,11 @@ class Cart implements CartInterface {
      * Constructor
      * 
      * @param \Magento\Framework\Session\SessionManagerInterface $coreSession       
-     * @param \Magento\Customer\Model\SessionFactory             $customerSession   
+     * @param \Magento\Customer\Model\Session                    $customerSession   
+     * @param \Magento\Checkout\Model\Session                    $checkoutSession   
+     * @param \Magento\Quote\Model\QuoteFactory                  $quoteFactory      
      * @param \Magento\Framework\App\Request\Http                $request           
+     * @param \Fecon\ExternalCart\Model\Customer                 $customerModel     
      * @param \Fecon\ExternalCart\Helper\Data                    $externalCartHelper
      */
     public function __construct(
@@ -129,6 +143,7 @@ class Cart implements CartInterface {
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
+        $this->access_token = $this->cartHelper->access_token();
 
         if(!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
@@ -312,7 +327,6 @@ class Cart implements CartInterface {
             'cartItem' => $cartItemData['cartItem']
         ];
         try {
-            //TOOD: if product doesn't exist on Magento return error.
             $productAdded = $client->{$this->quoteCartItemRepositoryV1Save}($productData);
             if($updateCartId) {
                 $productAdded->result->cartId = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
@@ -351,6 +365,10 @@ class Cart implements CartInterface {
      *   - Then add products
      *     - If product doesn't exist, send admin notification (email)
      *     - Return error response.
+     *     
+     * @param  $body The body json data that should looks like:
+     *         - See iterface for more information.
+     * @return mixed $response json response or exteption.
      */
     public function submitCart() {
         /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
@@ -390,7 +408,7 @@ class Cart implements CartInterface {
             /* byPass Authorization access for internal use only */
             $opts['stream_context'] = stream_context_create([
                 'http' => [
-                    'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                    'header' => sprintf('Authorization: Bearer %s', $this->access_token)
                 ]
             ]);
             $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
