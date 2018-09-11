@@ -1,4 +1,9 @@
 <?php
+/**
+ * Contributor company: Fecon.
+ * Contributor Author : <fecon.com>
+ * Date: 2018/08/02
+ */
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CustomerInterface;
@@ -285,7 +290,7 @@ class Customer implements CustomerInterface {
             ->setFirstname($customerData['firstname'])
             ->setLastname($customerData['lastname']);
             //Magento require a phone number value, but is not coming in request from Documoto, we must set a default value:
-            //TODO: confirm with Matt.
+            //TODO: confirm with Matt, note https://tracker.serfe.com/view.php?id=56329#c444092
             $address->setTelephone('0');
 
         if(!empty($customerAddressData[$addressType]['SiteAddress']['Line1'])

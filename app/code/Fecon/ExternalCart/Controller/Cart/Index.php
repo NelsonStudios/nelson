@@ -66,6 +66,12 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $port;
     /**
+     * $port 
+     * 
+     * @var string
+     */
+    protected $access_token;
+    /**
      * The "full domain" with protocol + domain + port
      * @var string
      */
@@ -85,13 +91,13 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\App\Action\Context       $context        
-     * @param \Magento\Framework\App\ResponseFactory      $responseFactory
-     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory   
-     * @param \Magento\Framework\App\Request\Http         $request        
-     * @param \Magento\Checkout\Model\Session             $checkoutSession
-     * @param \Fecon\ExternalCart\Helper\Data             $externalCartHelper      
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager 
+     * @param \Magento\Framework\App\Action\Context       $context           
+     * @param \Magento\Framework\App\ResponseFactory      $responseFactory   
+     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory      
+     * @param \Magento\Framework\App\Request\Http         $request           
+     * @param \Magento\Checkout\Model\Session             $checkoutSession   
+     * @param \Fecon\ExternalCart\Helper\Data             $externalCartHelper
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager    
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -113,6 +119,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
+        $this->access_token = $this->cartHelper->access_token();
 
         if(!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
@@ -142,14 +149,13 @@ class Index extends \Magento\Framework\App\Action\Action
         if(!empty($cartId) || !empty($customerToken)) {
             /**
              * Get wsdl endpoint names based on guest or non-guest customers.
-             * TODO: remove harcoded access token
              */
             $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
             $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
             if($customerToken) {
                 $this->opts['stream_context'] = stream_context_create([
                     'http' => [
-                        'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                        'header' => sprintf('Authorization: Bearer %s', $this->access_token)
                     ]
                 ]);
                 $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');

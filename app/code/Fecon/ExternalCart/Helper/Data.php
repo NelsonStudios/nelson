@@ -1,5 +1,9 @@
 <?php
- 
+/**
+ * Contributor company: Fecon.
+ * Contributor Author : <fecon.com>
+ * Date: 2018/08/02
+ */
 namespace Fecon\ExternalCart\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
@@ -7,6 +11,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const PROTOCOL = 'externalcart/active_display/protocol';
     const HOSTNAME = 'externalcart/active_display/hostname';
     const PORT = 'externalcart/active_display/port';
+    const ACCESS_TOKEN = 'externalcart/active_display/access_token';
 
     /**
      * $authorize 
@@ -31,9 +36,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\AuthorizationInterface          $authorize
-     * @param \Magento\Framework\Json\Helper\Data                $jsonHelper
-     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\App\Helper\Context             $context            [description]
+     * @param \Magento\Framework\AuthorizationInterface         $authorize          [description]
+     * @param \Magento\Framework\Json\Helper\Data               $jsonHelper         [description]
+     * @param \Magento\Store\Model\StoreManagerInterface        $storeManager       [description]
+     * @param \Magento\Customer\Model\Session                   $customerSession    [description]
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository [description]
+     * @param \Magento\Customer\Model\CustomerFactory           $customerFactory    [description]
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -85,6 +94,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::PORT,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * access token 
+     * 
+     * @return string port config value
+     */
+    public function access_token()
+    {
+        return $this->scopeConfig->getValue(
+            self::ACCESS_TOKEN,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -184,7 +205,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             //TODO: remove harcoded access token (make a setting)
             $settings['opts']['stream_context'] = stream_context_create([
                 'http' => [
-                    'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                    'header' => sprintf('Authorization: Bearer %s', $this->access_token())
                 ]
             ]);
         }
@@ -192,7 +213,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * Load customer by email
-     * TODO: Move this to customer model.
      *
      * @param string $email
      * @return boolean
@@ -210,7 +230,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * makeUserLogin auto login user.
-     * TODO: Move this to customer model.
      * 
      * This maybe look redundant, first get by email then load by id, but since is not 
      * loaded correctly we need to make that additional step.
