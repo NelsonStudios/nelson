@@ -13,6 +13,14 @@
 	overflow: hidden;
 	position: relative;
 }
+.htmlsitemap-container .top-sitemap-container a,
+.htmlsitemap-container .top-sitemap-container a:visited,
+.htmlsitemap-container .top-sitemap-container a:focus {
+  color: #333;
+}
+.htmlsitemap-container .top-sitemap-container a:hover {
+  color: #2daa77;
+}
 .htmlsitemap-container .products-container{
 	clear: both;
 }
@@ -43,7 +51,7 @@
 	height:36px;
 	width:36px;
 	background:#7e807e;
-	color:#fff;
+	color:#000;
 	line-height:36px;
 	text-align:center;
 }
@@ -174,7 +182,7 @@ li{
 	width: 33.33%;
 	float: left;
 	box-sizing: border-box;
-	padding-left: 20px;
+  padding: 0;
 }
 /*chrome*/
 .htmlsitemap-container .sitemap-section:not(*:root){
@@ -229,11 +237,9 @@ _::-moz-svg-foreign-content, :root .category-item.level-1{
 		width: 50%;
 	}
 	.sitemap-section.products-container li:nth-child(3n+1),.cmspages-container-inner .cms-page-list .cms-item:nth-child(3n+1){
-		padding-left: 20px;
 		clear: none;
 	}
 	.sitemap-section.products-container li:nth-child(2n+1),.cmspages-container-inner .cms-page-list .cms-item:nth-child(2n+1){
-		padding-left: 0px;
 		clear: left;
 	}
 	.sitemap-section.products-container li, .cmspages-container-inner .cms-page-list .cms-item{
