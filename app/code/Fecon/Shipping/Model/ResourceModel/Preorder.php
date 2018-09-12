@@ -75,8 +75,8 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _afterSave(\Magento\Framework\Model\AbstractModel $object)
     {
-        $status = (int) $object->getData(PreorderInterface::STATUS);
-        if ($status === PreorderInterface::STATUS_NEW) {
+        $status = $object->getData(PreorderInterface::STATUS);
+        if ($status === null) { // This is a hack, when the $object is just created the getData(status) returns null (just this one time)
             $preorderId = $object->getData(PreorderInterface::PREORDER_ID);
             $this->emailHelper->sendAdminNotificationEmail($preorderId);
         }
