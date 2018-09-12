@@ -79,6 +79,8 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         if ($status === null) { // This is a hack, when the $object is just created the getData(status) returns null (just this one time)
             $preorderId = $object->getData(PreorderInterface::PREORDER_ID);
             $this->emailHelper->sendAdminNotificationEmail($preorderId);
+            $customerId = $object->getData(PreorderInterface::CUSTOMER_ID);
+            $this->customerHelper->notifyCustomer($customerId);
         }
 
         return parent::_afterSave($object);

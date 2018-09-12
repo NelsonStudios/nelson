@@ -54,12 +54,7 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'customer' => $customer,
             'token' => $token
         );
-        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $from = [
-            'name' => $name,
-            'email' => $email
-        ];
+        $from = $this->getFromSupportIdentity();
         $this->inlineTranslation->suspend();
         $to = array($customer->getEmail());
         $transport = $this->transportBuilder->setTemplateIdentifier('quote_available')
@@ -88,14 +83,9 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'url' => $url,
             'preorderId' => $preorderId
         );
-        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $to = array($this->scopeConfig->getValue(self::ADMIN_EMAIL_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
         if ($to) {
-            $from = [
-                'name' => $name,
-                'email' => $email
-            ];
+            $from = $this->getFromSupportIdentity();
             $this->inlineTranslation->suspend();
 
             $transport = $this->transportBuilder->setTemplateIdentifier('notify_admin')
@@ -107,5 +97,48 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $transport->sendMessage();
             $this->inlineTranslation->resume();
         }
+    }
+
+    /**
+     * Send notification of new preorder to customer
+     *
+     * @param \Magento\Customer\Model\Customer $customer
+     */
+    public function sendCustomerNotificationEmail($customer)
+    {
+        $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
+        
+        $templateVars = array(
+            'store' => $this->storeManager->getStore(),
+            'customer' => $customer
+        );
+        $from = $this->getFromSupportIdentity();
+        $this->inlineTranslation->suspend();
+        $to = array($customer->getEmail());
+        $transport = $this->transportBuilder->setTemplateIdentifier('customer_notification')
+            ->setTemplateOptions($templateOptions)
+            ->setTemplateVars($templateVars)
+            ->setFrom($from)
+            ->addTo($to)
+            ->getTransport();
+        $transport->sendMessage();
+        $this->inlineTranslation->resume();
+    }
+
+    /**
+     * Return configured support email and name
+     *
+     * @return array
+     */
+    protected function getFromSupportIdentity()
+    {
+        $email = $this->scopeConfig->getValue('trans_email/ident_support/email', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $name  = $this->scopeConfig->getValue('trans_email/ident_support/name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $from = [
+            'name' => $name,
+            'email' => $email
+        ];
+
+        return $from;
     }
 }
