@@ -402,7 +402,6 @@ class Cart implements CartInterface {
             /* Get customer token otherwise we can't add products into cart as a valid logged-in user 
              * Verified: entity_id is the customer id.
              */
-            $this->customerToken = null;
             if(empty($this->customerToken) && !empty($customerData['entity_id'])) {
                 /* Instance tokenModelFactory */
                 $customerToken = $this->tokenModelFactory->create();
@@ -456,13 +455,12 @@ class Cart implements CartInterface {
              * !Without this param we'll not be able to add products into the logged-in customer cart. 
              */
             $productDataMap['quoteId'] = $quoteId;
-            /* Add products 
-             * TODO: check with Matt, if we need to map PartNumber with sku or will exist a different sku.
-             * https://tracker.serfe.com/view.php?id=56329#c444092
+            /* 
+             * Add products 
              */
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
-                    'sku' => $productData['PartNumber'],
+                    'sku' => (!empty($productData['Sku'])? $productData['Sku'] : $productData['PartNumber']),
                     'qty' => $productData['Quantity']
                 ];
                 /* User should be logged-in in order the validation for product works, otherwise another error will be triggered. */
@@ -481,7 +479,7 @@ class Cart implements CartInterface {
                                 ]
                             ]
                         ];
-                        /* Breakpoint here and return error */
+                        /* Breakpoint here and return error response */
                         return $response;
                     }
                 }
