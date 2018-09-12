@@ -1,6 +1,9 @@
 <div class="iwd_opc_column iwd_opc_payment_column">
     <div class="iwd_opc_alternative_column">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Payment Method'"></div>
+        <!-- ko ifnot: isPaymentMethodsAvailable()  -->
+        <p class="manual-shipping-warn">Payment for this shipping method is not available. To continue with your order you'll have to request a quote for shipping. An account for you will be created automatically if you don't have one.</p>
+        <!--/ko-->
         <div class="iwd_opc_column_content" tabindex="-1" data-bind="iwdBlockLoader: isLoading">
             <!-- ko if: (quoteIsVirtual) -->
             <!-- ko foreach: getRegion('customer-email') -->
