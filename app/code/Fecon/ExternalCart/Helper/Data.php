@@ -12,8 +12,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const HOSTNAME = 'externalcart/active_display/hostname';
     const PORT = 'externalcart/active_display/port';
     const ACCESS_TOKEN = 'externalcart/active_display/access_token';
-    const XML_PATH_EMAIL_SENDER = 'externalcart/active_display/email_sender';
-    const XML_PATH_EMAIL_RECIPIENT = 'externalcart/active_display/email_recipient';
+    const XML_PATH_EMAIL_SENDER = 'externalcart/email/email_sender';
+    const XML_PATH_EMAIL_RECIPIENT = 'externalcart/email/email_recipient';
+    const XML_PATH_EMAIL_TEMPLATE = 'externalcart/email/email_template';
     /**
      * @var \Magento\Framework\Mail\Template\TransportBuilder
      */
@@ -148,6 +149,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_EMAIL_RECIPIENT,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * email template 
+     * 
+     * @return string email_template config value
+     */
+    public function email_template()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_EMAIL_TEMPLATE,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -294,17 +307,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function sendAdminErrorNotification($errorMsg) {
         try {
-            $error = false;
             $sender = [
                 'name' => 'External Cart Notification',
-                'email' => (!empty($this->email_sender())? $this->email_sender() : 'test@devphase.io'),
+                'email' => (!empty($this->email_sender())? $this->email_sender() : 'test@devphase.io')
             ];
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $transport = $this->transportBuilder
-            ->setTemplateIdentifier('externalcart_email_email_template') 
+            ->setTemplateIdentifier($this->email_template()) 
             ->setTemplateOptions(
                 [
-                    'area' => \Magento\Framework\App\Area::AREA_FRONTEND, 
+                    'area' => \Magento\Framework\App\Area::AREA_ADMINHTML, 
                     'store' => $this->storeManager->getStore()->getStoreId(),
                 ]
             )
@@ -319,7 +330,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             throw new \Exception(
                 __('Error, sending admin error notification email: '. $e->getMessage())
             );
-            return;
         }
     }
 }
