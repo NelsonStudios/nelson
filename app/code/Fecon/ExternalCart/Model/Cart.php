@@ -123,6 +123,7 @@ class Cart implements CartInterface {
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
@@ -137,6 +138,7 @@ class Cart implements CartInterface {
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
         $this->quoteFactory = $quoteFactory;
+        $this->tokenModelFactory = $tokenModelFactory;
         $this->customerModel = $customerModel;
         $this->request = $request;
 
@@ -373,39 +375,59 @@ class Cart implements CartInterface {
     public function submitCart() {
         /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
         $postData = $this->request->getPost();
-        /* Request array structure to send to Magento 2 Rest API */
-        $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
-        /* Array with result of products added or error */
-        $productsAdded = [];
-        // Transform post data from body into an array to easily handle the data.
-        $cartData = $this->cartHelper->jsonDecode($postData['body']);
-        $customerAddressData = [
-            'BillTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'],
-            'ShipTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo']
-        ];
-        $shippingCartData = [
-            'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
-        ];
         if(!empty($postData)) {
-            // Get customer data
-            $customerData = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
-            // Set/update billing address
-            $billingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'BillTo');
-            // Set/update shipping address
-            $shippingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'ShipTo');
-            // Make customer autologin
-            /* Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail */
-            $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $this->customerToken, 'GET');
-            if(!empty($customerData)) { 
-                $customerInfo = $this->cartHelper->jsonDecode($customerData);
-                if(!empty($customerInfo['id'])) {
-                    $requestData = ['customerId' => $customerInfo['id']];
-                    /* Perform user login */
-                    $this->cartHelper->makeUserLogin($customerInfo['email']);
-                }
+            /* Request array structure to send to Magento 2 Rest API */
+            $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
+            /* Array with result of products added or error */
+            $productsAdded = [];
+            /* Transform post data from body into an array to easily handle the data. */
+            $cartData = $this->cartHelper->jsonDecode($postData['body']);
+            $customerAddressData = [
+                'BillTo' => (!empty($cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'])? $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'] : ''),
+                'ShipTo' => (!empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo'])? $cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo'] : '')
+            ];
+            /* Validation for shopping cart, check if there're products to add into the Magento cart, if not throw an exception */
+            if(empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine'])) {
+                throw new \Exception(
+                    __('Error, empty ShoppingCartLine no products to add.')
+                );
             }
-            // Get quote id before add products into the cart
-            /* byPass Authorization access for internal use only */
+            $shippingCartData = [
+                'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
+            ];
+            /* Get customer data */
+            $customerDataRaw = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
+            $customerData = $customerDataRaw[0];
+            unset($customerDataRaw);
+            /* Get customer token otherwise we can't add products into cart as a valid logged-in user 
+             * Verified: entity_id is the customer id.
+             */
+            $this->customerToken = null;
+            if(empty($this->customerToken) && !empty($customerData['entity_id'])) {
+                /* Instance tokenModelFactory */
+                $customerToken = $this->tokenModelFactory->create();
+                /* Create customer token based on customer id */
+                $this->customerToken = $customerToken->createCustomerToken($customerData['entity_id'])->getToken();
+                /* Set customer token in session (max 1 hour by default) */
+                $this->customerSession->setData('loggedInUserToken', $this->customerToken);
+            }
+            /* Set/update billing address */
+            $billingAddress = $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'BillTo');
+            /* Set/update shipping address */
+            $shippingAddress = $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'ShipTo');
+            
+            /* Make customer autologin 
+             * Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail 
+             */
+            if(!empty($customerData['entity_id'])) {
+                $requestData = ['customerId' => $customerData['entity_id']];
+                /* Perform user login */
+                $this->cartHelper->makeUserLogin($customerData['email']);
+            }
+            unset($customerData);
+            /* Get quote id before add products into the cart
+             * byPass Authorization access for internal use only 
+             */
             $opts['stream_context'] = stream_context_create([
                 'http' => [
                     'header' => sprintf('Authorization: Bearer %s', $this->access_token)
@@ -414,13 +436,13 @@ class Cart implements CartInterface {
             $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
             try {
                 /* Get quote */
-                $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
+                $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); /* If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {
                     $quoteId = $cartInfo->result->id;
                     unset($cartInfo);
                     /* Load quote */
                     $q = $this->quoteFactory->create()->load($quoteId);
-                    /* Load in checkout session as guest */
+                    /* Load in checkout session */
                     $this->checkoutSession->setQuoteId($quoteId);
                 } else {
                     throw new \Exception(
@@ -430,10 +452,14 @@ class Cart implements CartInterface {
             } catch(\SoapFault $e) {
                 return $e->getMessage();
             }
-            /* Get current quote */
-            /* Without this param we'll not be able to add products into the logged-in customer cart. */
+            /* Get current quote 
+             * !Without this param we'll not be able to add products into the logged-in customer cart. 
+             */
             $productDataMap['quoteId'] = $quoteId;
-            // Add products
+            /* Add products 
+             * TODO: check with Matt, if we need to map PartNumber with sku or will exist a different sku.
+             * https://tracker.serfe.com/view.php?id=56329#c444092
+             */
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
                     'sku' => $productData['PartNumber'],
@@ -455,7 +481,7 @@ class Cart implements CartInterface {
                                 ]
                             ]
                         ];
-                        // Breakpoint here and return error
+                        /* Breakpoint here and return error */
                         return $response;
                     }
                 }

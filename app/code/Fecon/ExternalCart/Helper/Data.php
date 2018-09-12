@@ -36,13 +36,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\App\Helper\Context             $context            [description]
-     * @param \Magento\Framework\AuthorizationInterface         $authorize          [description]
-     * @param \Magento\Framework\Json\Helper\Data               $jsonHelper         [description]
-     * @param \Magento\Store\Model\StoreManagerInterface        $storeManager       [description]
-     * @param \Magento\Customer\Model\Session                   $customerSession    [description]
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository [description]
-     * @param \Magento\Customer\Model\CustomerFactory           $customerFactory    [description]
+     * @param \Magento\Framework\App\Helper\Context             $context           
+     * @param \Magento\Framework\AuthorizationInterface         $authorize         
+     * @param \Magento\Framework\Json\Helper\Data               $jsonHelper        
+     * @param \Magento\Store\Model\StoreManagerInterface        $storeManager      
+     * @param \Magento\Customer\Model\Session                   $customerSession   
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Customer\Model\CustomerFactory           $customerFactory   
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -202,7 +202,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $settings['endpointsPaths']['quoteCartItemRepositoryV1Save'] = $settings['endpointsPaths']['quoteCartItemRepositoryV1'] . 'Save';
 
         if($isCustomer) {
-            //TODO: remove harcoded access token (make a setting)
             $settings['opts']['stream_context'] = stream_context_create([
                 'http' => [
                     'header' => sprintf('Authorization: Bearer %s', $this->access_token())
