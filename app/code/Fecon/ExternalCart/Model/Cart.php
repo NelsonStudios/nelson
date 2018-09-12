@@ -360,9 +360,11 @@ class Cart implements CartInterface {
     /**
      * submitCart function | check: https://tracker.serfe.com/view.php?id=52950#c442215
      *  Steps to get this working
-     *   - Check if user exists, if not return error response
-     *     - Check if user has billing and/or shipping address, if it has: update, if not: create a new one.
-     *   - Perform user autologin in order to add the products to the customer.
+     *   - Check if customer exists, if not return error response.
+     *     - Check if customer has billing and/or shipping address, if it has: update, if not: create a new one.
+     *   - Get customer token in order to perform further requests.
+     *   - Set Magento API REST endpoints for logged-in customers.
+     *   - Perform customer autologin in order to add the products to the customer cart.
      *   - Get quote id for the logged-in customer.
      *   - Then add products
      *     - If product doesn't exist, send admin notification (email)
@@ -388,9 +390,12 @@ class Cart implements CartInterface {
             ];
             /* Validation for shopping cart, check if there're products to add into the Magento cart, if not throw an exception */
             if(empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine'])) {
+                $errMsg = 'Error, empty ShoppingCartLine no products to add.';
+                $this->cartHelper->sendAdminErrorNotification($errMsg);
                 throw new \Exception(
-                    __('Error, empty ShoppingCartLine no products to add.')
+                    __($errMsg)
                 );
+
             }
             $shippingCartData = [
                 'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
@@ -409,6 +414,8 @@ class Cart implements CartInterface {
                 $this->customerToken = $customerToken->createCustomerToken($customerData['entity_id'])->getToken();
                 /* Set customer token in session (max 1 hour by default) */
                 $this->customerSession->setData('loggedInUserToken', $this->customerToken);
+                /* If we not set endpoints for logged-in customer, this will fail on first execution time */
+                $this->setEndpoints($this->customerToken);
             }
             /* Set/update billing address */
             $billingAddress = $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'BillTo');
