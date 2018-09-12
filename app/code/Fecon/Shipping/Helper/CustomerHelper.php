@@ -188,9 +188,11 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customer->addData($customerData);
         try {
             $customer->save();
+            $customer->sendNewAccountEmail();
             $newCustomer = $customer;
         } catch (\Exception $exc) {
             $newCustomer = false;
+            $this->_logger->error('Error creating user in CustomerHelper, error: ' . $exc->getMessage());
         }
 
         return $newCustomer;
@@ -324,5 +326,17 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerData->setCustomAttribute('order_token_created_at', $datetime);
         $customer->updateData($customerData);
         $customer->save();
+    }
+
+    /**
+     * Send customer instructions to continue with his order
+     *
+     * @param string $customerId
+     * @return void
+     */
+    public function notifyCustomer($customerId)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $this->emailHelper->sendCustomerNotificationEmail($customer);
     }
 }
