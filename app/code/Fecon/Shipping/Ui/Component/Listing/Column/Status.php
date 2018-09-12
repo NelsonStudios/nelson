@@ -5,9 +5,7 @@ namespace Fecon\Shipping\Ui\Component\Listing\Column;
 use Fecon\Shipping\Api\Data\PreorderInterface;
 
 /**
- * Description of Status
- *
- * @author Xuan Villagran <xuan@serfe.com>
+ * Status data source
  */
 class Status extends \Magento\Ui\Component\Listing\Columns\Column
 {
