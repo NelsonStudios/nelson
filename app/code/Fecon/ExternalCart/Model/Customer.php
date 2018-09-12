@@ -329,8 +329,10 @@ class Customer implements CustomerInterface {
                 ->setSaveInAddressBook('1');
             }
         } else {
+            $errorMsg = 'Error, there\'s an error validating customer '. (($addressType === 'BillTo')? 'billing' : 'shipping') .' address. Data sent was: ' . json_encode($customerAddressData[$addressType]['SiteAddress']) . ' data could not be empty.';
+            $this->cartHelper->sendAdminErrorNotification($errorMsg);
             throw new \Exception(
-                __('Error, there\'s an error validating customer '. (($addressType === 'BillTo')? 'billing' : 'shipping') .' address. Data sent was: ' . json_encode($customerAddressData[$addressType]['SiteAddress']) . ' data could not be empty.')
+                __($errorMsg)
             );
         }
         

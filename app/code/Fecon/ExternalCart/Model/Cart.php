@@ -335,6 +335,7 @@ class Cart implements CartInterface {
             }
             return $this->cartHelper->jsonResponse($productAdded->result); //Return cartInfo result object with cart information.
         } catch(\SoapFault $e) {
+            $this->cartHelper->sendAdminErrorNotification($e->getMessage());
             return $e->getMessage() . nl2br("\n Are you sure this is the correct cartId?", false);
         }
     }
@@ -485,7 +486,8 @@ class Cart implements CartInterface {
                                 ]
                             ]
                         ];
-                        /* Breakpoint here and return error response */
+                        /* Breakpoint here and return error response and send via email */
+                        $this->cartHelper->sendAdminErrorNotification($product);
                         return $response;
                     }
                 }
