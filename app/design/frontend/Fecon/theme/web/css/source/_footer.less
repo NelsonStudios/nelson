@@ -5,13 +5,17 @@
           padding: 0 12px;
             border-top: 6px solid @minicart-green;
             .footer-top, .footer-middle, .footer-bottom {
-                background-color: @color-black;                
+                background-color: @color-black;
             }
             .footer-middle {
                 .container {
                     width: 65%;
                     margin-left: 84px;
                     margin-right: 84px;
+                    @media screen and (max-width: @screen__xs) {
+                      width: 98%;
+                      margin: 0 auto;
+                    }
                     .row {
                         .left-block-1 {
                             padding-right: 0;
@@ -107,6 +111,9 @@
                                 padding-left: 200px;
                                 padding-bottom: 50px;
                                 margin-left: -37px;
+                                @media screen and (max-width: @screen__xs) {
+                                    margin-left: -10px;
+                                }
                             }
                         }
                     }
@@ -115,6 +122,9 @@
             .footer-bottom {
                 .container {
                     margin-left: 85px;
+                    @media screen and (max-width: @screen__xs) {
+                        margin-left: 4px;
+                    }
                     .custom-block {
                         .row {
                             .block-bottom {

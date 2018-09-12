@@ -12,7 +12,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const HOSTNAME = 'externalcart/active_display/hostname';
     const PORT = 'externalcart/active_display/port';
     const ACCESS_TOKEN = 'externalcart/active_display/access_token';
-
+    const XML_PATH_EMAIL_SENDER = 'externalcart/active_display/email_sender';
+    const XML_PATH_EMAIL_RECIPIENT = 'externalcart/active_display/email_recipient';
+    /**
+     * @var \Magento\Framework\Mail\Template\TransportBuilder
+     */
+    protected $transportBuilder;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+    /**
+     * @var \Magento\Framework\Escaper
+     */
+    protected $_escaper;
     /**
      * $authorize 
      * 
@@ -25,7 +38,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\Json\Helper\Data
      */
     protected $jsonHelper;
-
     /**
      * $customerToken
      * 
@@ -36,18 +48,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\App\Helper\Context             $context           
-     * @param \Magento\Framework\AuthorizationInterface         $authorize         
-     * @param \Magento\Framework\Json\Helper\Data               $jsonHelper        
-     * @param \Magento\Store\Model\StoreManagerInterface        $storeManager      
-     * @param \Magento\Customer\Model\Session                   $customerSession   
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Customer\Model\CustomerFactory           $customerFactory   
+     * @param \Magento\Framework\App\Helper\Context              $context           
+     * @param \Magento\Framework\AuthorizationInterface          $authorize         
+     * @param \Magento\Framework\Json\Helper\Data                $jsonHelper        
+     * @param \Magento\Framework\Mail\Template\TransportBuilder  $transportBuilder  
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig       
+     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager      
+     * @param \Magento\Customer\Model\Session                    $customerSession   
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface  $customerRepository
+     * @param \Magento\Customer\Model\CustomerFactory            $customerFactory   
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\AuthorizationInterface $authorize,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -55,6 +71,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     ) {
         $this->authorize = $authorize;
         $this->jsonHelper = $jsonHelper;
+        $this->transportBuilder = $transportBuilder;
+        $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
         $this->customerRepository = $customerRepository;
@@ -100,12 +118,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * access token 
      * 
-     * @return string port config value
+     * @return string access_token config value
      */
     public function access_token()
     {
         return $this->scopeConfig->getValue(
             self::ACCESS_TOKEN,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * email sender 
+     * 
+     * @return string email_sender config value
+     */
+    public function email_sender()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_EMAIL_SENDER,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * email recipient 
+     * 
+     * @return string email_recipient config value
+     */
+    public function email_recipient()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_PATH_EMAIL_RECIPIENT,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -147,11 +189,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * 
      * @param  string $origin The origin with protocol + domain + port
      * @param  string $endpointPath The endpoint path when the request need to be performed.
-     * @param  string $loggedInUserToken The user token if there's a logged-in customer or the Authorization access-token.
+     * @param  string $accessToken The user token if there's a logged-in customer or the Authorization access-token.
      * @param  string $type The method type like "POST", "GET", etc
      * @return string $response The response result from curl request or error message.               
      */
-    public function makeCurlRequest($origin, $endpointPath, $loggedInUserToken, $type) {
+    public function makeCurlRequest($origin, $endpointPath, $accessToken, $type) {
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $origin . $endpointPath,
@@ -162,7 +204,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => $type,
           CURLOPT_HTTPHEADER => array(
-            "Authorization: Bearer " . $loggedInUserToken, //This is the logged-in user Bearer do not confuse with access token.
+            "Authorization: Bearer " . $accessToken, 
             "cache-control: no-cache"
           ),
         ));
@@ -171,7 +213,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         curl_close($curl);
 
         if ($err) {
-          return "cURL Error #:" . $err;
+          return "cURL Error #: " . $err;
         } else {
           return $response;
         }
@@ -242,5 +284,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         //Then since repository does not return the correct type, so we need to load the customer
         $customer = $this->customerFactory->create()->load($customerId);
         $this->customerSession->setCustomerAsLoggedIn($customer);
+    }
+    /**
+     * sendAdminErrorNotification function
+     * Send an admin notification in case of error.
+     * 
+     * @param  string $errorMsg [description]
+     * @return mixed true on success | Exception on failure.
+     */
+    public function sendAdminErrorNotification($errorMsg) {
+        try {
+            $error = false;
+            $sender = [
+                'name' => 'External Cart Notification',
+                'email' => (!empty($this->email_sender())? $this->email_sender() : 'test@devphase.io'),
+            ];
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $transport = $this->transportBuilder
+            ->setTemplateIdentifier('externalcart_email_email_template') 
+            ->setTemplateOptions(
+                [
+                    'area' => \Magento\Framework\App\Area::AREA_FRONTEND, 
+                    'store' => $this->storeManager->getStore()->getStoreId(),
+                ]
+            )
+            ->setTemplateVars(['data' => $errorMsg])
+            ->setFrom($sender)
+            ->addTo($this->email_recipient())
+            ->getTransport();
+
+            $transport->sendMessage();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception(
+                __('Error, sending admin error notification email: '. $e->getMessage())
+            );
+            return;
+        }
     }
 }

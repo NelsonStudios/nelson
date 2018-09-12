@@ -111,12 +111,15 @@ class Customer implements CustomerInterface {
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession       
-     * @param \Magento\Customer\Model\SessionFactory                    $customerSession   
-     * @param \Magento\Customer\Model\Customer                          $customerModel
-     * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection,
-     * @param \Magento\Framework\App\Request\Http                       $request           
-     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper
+     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession           
+     * @param \Magento\Customer\Model\Session                           $customerSession       
+     * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection    
+     * @param \Magento\Customer\Model\AddressFactory                    $customerAddressFactory
+     * @param \Magento\Customer\Model\CustomerFactory                   $customerFactory       
+     * @param \Magento\Directory\Model\CountryFactory                   $countryFactory        
+     * @param \Magento\Directory\Model\RegionFactory                    $regionFactory         
+     * @param \Magento\Framework\App\Request\Http                       $request               
+     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper    
      */
     public function __construct(
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
@@ -210,7 +213,7 @@ class Customer implements CustomerInterface {
         return false;
     }
     /**
-     * Set the token of the recently created customer customer
+     * Set the token of the recently created customer
      *
      * @api
      * @param  string $customerId The customerId to save.
@@ -290,7 +293,7 @@ class Customer implements CustomerInterface {
             ->setFirstname($customerData['firstname'])
             ->setLastname($customerData['lastname']);
             //Magento require a phone number value, but is not coming in request from Documoto, we must set a default value:
-            //TODO: confirm with Matt, note https://tracker.serfe.com/view.php?id=56329#c444092
+            //Confirmed with Matt, note https://tracker.serfe.com/view.php?id=56329#c444298
             $address->setTelephone('0');
 
         if(!empty($customerAddressData[$addressType]['SiteAddress']['Line1'])
@@ -316,7 +319,6 @@ class Customer implements CustomerInterface {
 
             /**
              * Check address type and save in address book.
-             * @var [type]
              */
             if($addressType === 'BillTo') {
                 $address->setIsDefaultBilling('1')

@@ -7,25 +7,32 @@
             <resource>Fecon_ExternalCart::externalcart</resource>
             <group id="active_display" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>External Cart Settings</label>
-                
-                 <field id="protocol" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="protocol" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>External Cart Protocol</label>
                     <comment>This config is to set protocol (E.g: "https://").</comment>
                 </field>
-
-                 <field id="hostname" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="hostname" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>External Cart Hostname</label>
                     <comment>This config is to set hostname (E.g: "localhost").</comment>
                 </field>
-
-                 <field id="port" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="port" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>External Cart Port</label>
                     <comment>This config is to set port (E.g: "8080").</comment>
                 </field>
-
                 <field id="access_token" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>API - Access token</label>
                     <comment>This config is to set API access token (E.g: "fd35xyhc2cun28w39prottpekbvrv12e").</comment>
+                </field>
+            </group>
+            <group id="email" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Email Notification Options</label>
+                <field id="email_recipient" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Send Emails To</label>
+                    <validate>validate-email</validate>
+                </field>
+                <field id="email_sender" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
                 </field>
             </group>
         </section>
