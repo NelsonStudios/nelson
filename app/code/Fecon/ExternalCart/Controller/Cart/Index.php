@@ -66,6 +66,12 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $port;
     /**
+     * $port 
+     * 
+     * @var string
+     */
+    protected $access_token;
+    /**
      * The "full domain" with protocol + domain + port
      * @var string
      */
@@ -85,34 +91,27 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      * 
-     * @param \Magento\Framework\App\Action\Context       $context        
-     * @param \Magento\Framework\App\ResponseFactory      $responseFactory
-     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory   
-     * @param \Magento\Framework\App\Request\Http         $request        
-     * @param \Magento\Checkout\Model\Session             $checkoutSession
-     * @param \Fecon\ExternalCart\Helper\Data             $externalCartHelper      
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager 
+     * @param \Magento\Framework\App\Action\Context       $context           
+     * @param \Magento\Framework\App\ResponseFactory      $responseFactory   
+     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory      
+     * @param \Magento\Framework\App\Request\Http         $request           
+     * @param \Magento\Checkout\Model\Session             $checkoutSession   
+     * @param \Fecon\ExternalCart\Helper\Data             $externalCartHelper
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager    
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\ResponseFactory $responseFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->responseFactory = $responseFactory;
-        $this->storeManager = $storeManager;
+        
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
-        $this->customerSession = $customerSession;
-        $this->customerRepository = $customerRepository;
-        $this->customerFactory = $customerFactory;
         $this->request = $request;
         $this->cartHelper = $externalCartHelper;
         $this->messageManager = $messageManager;
@@ -120,6 +119,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
+        $this->access_token = $this->cartHelper->access_token();
 
         if(!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
@@ -155,7 +155,7 @@ class Index extends \Magento\Framework\App\Action\Action
             if($customerToken) {
                 $this->opts['stream_context'] = stream_context_create([
                     'http' => [
-                        'header' => sprintf('Authorization: Bearer %s', 'j2u1n6bqmtj6w0kfqf3m25m33qv1e8km')
+                        'header' => sprintf('Authorization: Bearer %s', $this->access_token)
                     ]
                 ]);
                 $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
@@ -164,7 +164,7 @@ class Index extends \Magento\Framework\App\Action\Action
                     if(!empty($customerInfo['id'])) {
                         $requestData = ['customerId' => $customerInfo['id']];
                         /* Perform user login */
-                        $this->makeUserLogin($customerInfo['email']);
+                        $this->cartHelper->makeUserLogin($customerInfo['email']);
                     }
                 }
             } else {
@@ -214,39 +214,5 @@ class Index extends \Magento\Framework\App\Action\Action
         );
         $this->responseFactory->create()->setRedirect($redirectPath)->sendResponse(); 
         return;
-    }
-
-    /**
-     * Load customer by email
-     *
-     * @param string $email
-     * @return boolean
-     */
-    private function getCustomerByEmail($email)
-    {
-        $websiteId = $this->storeManager->getStore()->getWebsiteId();
-        try {
-            $customer = $this->customerRepository->get($email, $websiteId);
-        } catch (\Exception $ex) {
-            $customer = false;
-        }
-
-        return $customer;
-    }
-    /**
-     * makeUserLogin auto login user.
-     * 
-     * This maybe look redundant, first get by email then load by id, but since is not 
-     * loaded correctly we need to make that additional step.
-     * 
-     * @return void
-     */
-    private function makeUserLogin($customerEmail) {
-        //Load customer first by id
-        $customer = $this->getCustomerByEmail($customerEmail);
-        $customerId = $customer->getId();
-        //Then since repository does not return the correct type, so we need to load the customer
-        $customer = $this->customerFactory->create()->load($customerId);
-        $this->customerSession->setCustomerAsLoggedIn($customer);
     }
 }

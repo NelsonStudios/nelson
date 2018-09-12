@@ -1,9 +1,11 @@
 .page-wrapper {
-    .page-footer {
+  .page-footer {
         .footer {
+          background-color: @color-black;
+          padding: 0 12px;
             border-top: 6px solid @minicart-green;
             .footer-top, .footer-middle, .footer-bottom {
-                background-color: @color-black;
+                background-color: @color-black;                
             }
             .footer-middle {
                 .container {
@@ -83,19 +85,25 @@
                                 width: 144px;
                                 margin-bottom: 35px;
                                 background: transparent;
-                                border: 1px solid @minicart-green;
-                                padding-top: 12px;
-                                padding-bottom: 12px;
-                                margin-right: 40px;
                                 text-align: center;
                                 a {
-                                   font-size: 11px;
+                                  border: 1px solid @minicart-green;
+                                  background: transparent;
+                                   padding: 12px;
                                    text-transform: uppercase;
                                    color: @minicart-green;
+
+                                   &:hover {
+                                     background-color: @minicart-green;
+                                     color: white;
+                                     text-decoration: none;
+                                   }
                                 }
                             }
                             .footer-logo {
-                                background: url('../images/fecon_footer_logo.png') no-repeat;
+                                background: url('../images/fecon_footer_logo.png') no-repeat;/*older browser*/
+                                background-image: url('../images/fecon-letters.svg');
+                                background-size: contain;
                                 padding-left: 200px;
                                 padding-bottom: 50px;
                                 margin-left: -37px;
@@ -122,8 +130,8 @@
                                     }
                                 }
                             }
-                        } 
-                    }   
+                        }
+                    }
                 }
             }
         }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Contributor company: Fecon.
+ * Contributor Author : <fecon.com>
+ * Date: 2018/08/02
+ */
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CartInterface;
@@ -85,6 +90,12 @@ class Cart implements CartInterface {
      */
     protected $port;
     /**
+     * $port 
+     * 
+     * @var string
+     */
+    protected $access_token;
+    /**
      * The "full domain" with protocol + domain + port
      * @var string
      */
@@ -100,14 +111,20 @@ class Cart implements CartInterface {
      * Constructor
      * 
      * @param \Magento\Framework\Session\SessionManagerInterface $coreSession       
-     * @param \Magento\Customer\Model\SessionFactory             $customerSession   
+     * @param \Magento\Customer\Model\Session                    $customerSession   
+     * @param \Magento\Checkout\Model\Session                    $checkoutSession   
+     * @param \Magento\Quote\Model\QuoteFactory                  $quoteFactory      
      * @param \Magento\Framework\App\Request\Http                $request           
+     * @param \Fecon\ExternalCart\Model\Customer                 $customerModel     
      * @param \Fecon\ExternalCart\Helper\Data                    $externalCartHelper
      */
     public function __construct(
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
         \Magento\Customer\Model\Session $customerSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
+        \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
     ) {
         $this->cartHelper = $externalCartHelper;
@@ -118,11 +135,15 @@ class Cart implements CartInterface {
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
+        $this->checkoutSession = $checkoutSession;
+        $this->quoteFactory = $quoteFactory;
+        $this->customerModel = $customerModel;
         $this->request = $request;
 
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
+        $this->access_token = $this->cartHelper->access_token();
 
         if(!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
@@ -231,7 +252,7 @@ class Cart implements CartInterface {
     public function getCartUrl() {
         $cartId = $this->getCartToken();
         $customerToken = $this->customerSession->getData('loggedInUserToken');
-        if(!empty($cartId) && $customerToken) { //It's a customerToken
+        if(!empty($customerToken)) { //It's a customerToken
             return $this->origin . '/externalcart/cart/?customerToken=' . $customerToken;
         } else if(!empty($cartId)) {
             //Make sure user is logged out.
@@ -291,7 +312,12 @@ class Cart implements CartInterface {
      */
     private function _addProduct($postData, $updateCartId = false) {
         $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartItemRepositoryV1, (($this->opts)? $this->opts : [] ));
-        $cartItemData = $this->cartHelper->jsonDecode($postData['body'], 1);
+
+        if(!is_array($postData['body'])) {
+            $cartItemData = $this->cartHelper->jsonDecode($postData['body'], 1);
+        } else {
+            $cartItemData = $postData['body'];
+        }
         if($updateCartId) {
             /* Update cartId in body post data */
             $cartItemData['cartItem']['quoteId'] = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
@@ -327,6 +353,124 @@ class Cart implements CartInterface {
         }
         if(!empty($settings['opts'])) {
             $this->opts = $settings['opts'];
+        }
+    }
+    /**
+     * submitCart function | check: https://tracker.serfe.com/view.php?id=52950#c442215
+     *  Steps to get this working
+     *   - Check if user exists, if not return error response
+     *     - Check if user has billing and/or shipping address, if it has: update, if not: create a new one.
+     *   - Perform user autologin in order to add the products to the customer.
+     *   - Get quote id for the logged-in customer.
+     *   - Then add products
+     *     - If product doesn't exist, send admin notification (email)
+     *     - Return error response.
+     *     
+     * @param  $body The body json data that should looks like:
+     *         - See iterface for more information.
+     * @return mixed $response json response or exteption.
+     */
+    public function submitCart() {
+        /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
+        $postData = $this->request->getPost();
+        /* Request array structure to send to Magento 2 Rest API */
+        $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
+        /* Array with result of products added or error */
+        $productsAdded = [];
+        // Transform post data from body into an array to easily handle the data.
+        $cartData = $this->cartHelper->jsonDecode($postData['body']);
+        $customerAddressData = [
+            'BillTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'],
+            'ShipTo' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo']
+        ];
+        $shippingCartData = [
+            'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
+        ];
+        if(!empty($postData)) {
+            // Get customer data
+            $customerData = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
+            // Set/update billing address
+            $billingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'BillTo');
+            // Set/update shipping address
+            $shippingAddress = $this->customerModel->setCustomerAddress($customerData[0], $customerAddressData, 'ShipTo');
+            // Make customer autologin
+            /* Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail */
+            $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $this->customerToken, 'GET');
+            if(!empty($customerData)) { 
+                $customerInfo = $this->cartHelper->jsonDecode($customerData);
+                if(!empty($customerInfo['id'])) {
+                    $requestData = ['customerId' => $customerInfo['id']];
+                    /* Perform user login */
+                    $this->cartHelper->makeUserLogin($customerInfo['email']);
+                }
+            }
+            // Get quote id before add products into the cart
+            /* byPass Authorization access for internal use only */
+            $opts['stream_context'] = stream_context_create([
+                'http' => [
+                    'header' => sprintf('Authorization: Bearer %s', $this->access_token)
+                ]
+            ]);
+            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
+            try {
+                /* Get quote */
+                $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
+                if(!empty($cartInfo->result->id)) {
+                    $quoteId = $cartInfo->result->id;
+                    unset($cartInfo);
+                    /* Load quote */
+                    $q = $this->quoteFactory->create()->load($quoteId);
+                    /* Load in checkout session as guest */
+                    $this->checkoutSession->setQuoteId($quoteId);
+                } else {
+                    throw new \Exception(
+                        __('Error, there\'s no cart id.')
+                    );
+                }
+            } catch(\SoapFault $e) {
+                return $e->getMessage();
+            }
+            /* Get current quote */
+            /* Without this param we'll not be able to add products into the logged-in customer cart. */
+            $productDataMap['quoteId'] = $quoteId;
+            // Add products
+            foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
+                $productDataMap['body']['cartItem'] = [
+                    'sku' => $productData['PartNumber'],
+                    'qty' => $productData['Quantity']
+                ];
+                /* User should be logged-in in order the validation for product works, otherwise another error will be triggered. */
+                array_push($productsAdded, $this->_addProduct($productDataMap, true));
+            }
+            if(!empty($productsAdded)) {
+                foreach ($productsAdded as $key => $product) {
+                    $p = json_decode($product);
+                    if(empty($p) || (!empty($p) && !is_object($p))) {
+                        $response = ['body' => [
+                                'ErpResponse' => [
+                                    'Success' => 'false',
+                                    'Message' => $product,
+                                    'ReferenceNumber' => 'N/A',    
+                                    'ExternalOrderID' => 'false'
+                                ]
+                            ]
+                        ];
+                        // Breakpoint here and return error
+                        return $response;
+                    }
+                }
+                $response = ['body' => [
+                        'ErpResponse' => [
+                            'Success' => 'true',
+                            'Message' => 'Cart submitted successfully.',
+                            'ReferenceNumber' => $productDataMap['quoteId'],    
+                            'ExternalOrderID' => 'false'
+                        ]
+                    ]
+                ];
+                /* Return success response */
+                return $response;
+            }
         }
     }
 }

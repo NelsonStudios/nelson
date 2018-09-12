@@ -148,5 +148,6 @@ return array (
     'Fecon_Porto' => 1,
     'Smartwave_Socialfeeds' => 1,
     'Temando_Shipping' => 1,
+    'Vsourz_HtmlSitemap' => 1,
   ),
 );

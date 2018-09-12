@@ -67,6 +67,12 @@
             %</parameter>
         </data>
     </route>
+    <route url="/V1/external-cart/submit-cart/" method="POST">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="submitCart"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
     <!--
         Customer Routes
     -->
@@ -82,6 +88,12 @@
     </route>
     <route url="/V1/external-cart/get-customer-info/" method="GET">
         <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerData"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/external-cart/get-documoto-customer/" method="GET">
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerByDocumotoId"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
