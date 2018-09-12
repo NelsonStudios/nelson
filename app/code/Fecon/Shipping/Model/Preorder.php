@@ -191,4 +191,42 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     {
         return $this->setData(self::SHIPPING_PRICE, $shippingPrice);
     }
+
+    /**
+     * Set status
+     * @param string $status
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setStatus($status)
+    {
+        return $this->setData(self::STATUS, $status);
+    }
+
+    /**
+     * Get status
+     * @return int
+     */
+    public function getStatus()
+    {
+        return (int) $this->getData(self::STATUS);
+    }
+
+    /**
+     * Get cart_data
+     * @return string|null
+     */
+    public function getCartData()
+    {
+        return $this->getData(self::CART_DATA);
+    }
+
+    /**
+     * Set cart_data
+     * @param string $cartData
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setCartData($cartData)
+    {
+        return $this->setData(self::CART_DATA, $cartData);
+    }
 }

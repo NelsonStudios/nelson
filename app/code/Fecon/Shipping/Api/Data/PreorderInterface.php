@@ -20,6 +20,7 @@ interface PreorderInterface
     const STATUS_PENDING = 2;
     const STATUS_COMPLETED = 3;
     const STATUS_CANCELED = 4;
+    const CART_DATA = 'cart_data';
 
 
     /**
@@ -138,4 +139,30 @@ interface PreorderInterface
      * @return \Fecon\Shipping\Api\Data\PreorderInterface
      */
     public function setShippingPrice($shippingPrice);
+
+    /**
+     * Set status
+     * @param string $status
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setStatus($status);
+
+    /**
+     * Get status
+     * @return int
+     */
+    public function getStatus();
+
+    /**
+     * Set cart_data
+     * @param string $cartData
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setCartData($cartData);
+
+    /**
+     * Get cart_data
+     * @return string|null
+     */
+    public function getCartData();
 }
