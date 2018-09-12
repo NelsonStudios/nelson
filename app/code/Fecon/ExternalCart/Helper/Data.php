@@ -295,13 +295,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function sendAdminErrorNotification($errorMsg) {
         try {
             $error = false;
-
             $sender = [
                 'name' => 'External Cart Notification',
                 'email' => (!empty($this->email_sender())? $this->email_sender() : 'test@devphase.io'),
             ];
-
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE; 
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $transport = $this->transportBuilder
             ->setTemplateIdentifier('externalcart_email_email_template') 
             ->setTemplateOptions(

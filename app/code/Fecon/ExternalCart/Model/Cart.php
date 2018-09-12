@@ -395,7 +395,6 @@ class Cart implements CartInterface {
                 throw new \Exception(
                     __($errMsg)
                 );
-
             }
             $shippingCartData = [
                 'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
