@@ -139,6 +139,7 @@ return array (
     'Dotdigitalgroup_Email' => 1,
     'Magento_WishlistAnalytics' => 1,
     'Mageplaza_Core' => 1,
+    'Mageplaza_GoogleRecaptcha' => 1,
     'Mageplaza_LayeredNavigation' => 1,
     'Shopial_Facebook' => 1,
     'Smartwave_Core' => 1,
