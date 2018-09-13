@@ -24,16 +24,7 @@ define(
                     this._super();
                     var self = this;
                     var options = $.parseJSON(localStorage.getItem('columns'));
-                    var newOptions = [];
-                    newOptions.push({label: $t('Select A Column'), value: ''});
-                    _.each(
-                        options,
-                        function (value) {
-                            newOptions.push({label: value, value: value});
-                        }
-                    );
-                    this.setOptions(newOptions);
-
+                    self.updateOptions(options);
                     return this;
                 },
                 initConfig: function (config) {
@@ -44,7 +35,19 @@ define(
                 },
                 normalizeData: function (value) {
                     return utils.isEmpty(value) ? '' : value;
-                }
+                },
+                updateOptions: function (options) {
+                    var newOptions = [];
+                    newOptions.push({label: $t('Select A Column'), value: ''});
+                    _.each(
+                        options,
+                        function (value) {
+                            newOptions.push({label: value, value: value});
+                        }
+                    );
+
+                    this.setOptions(newOptions);
+                },
             }
         )
     }

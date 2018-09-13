@@ -23,18 +23,30 @@ trait General
         if ($debugData instanceof \Magento\Framework\Phrase) {
             $text = $debugData->__toString();
         }
-        $this->_logger->info($text);
+
+        switch ($type) {
+        case 'error':
+            $this->_logger->error($text);
+            break;
+        case 'warning':
+            $this->_logger->warning($text);
+            break;
+        default:
+            $this->_logger->info($text);
+        }
+
+
         if ($output) {
             switch ($type) {
-                case 'error':
-                    $debugData = '<error>' . $text . '</error>';
-                    break;
-                case 'info':
-                    $debugData = '<info>' . $text . '</info>';
-                    break;
-                default:
-                    $debugData = '<comment>' . $text . '</comment>';
-                    break;
+            case 'error':
+                $text = '<error>' . $text . '</error>';
+                break;
+            case 'info':
+                $text = '<info>' . $text . '</info>';
+                break;
+            default:
+                $text = '<comment>' . $text . '</comment>';
+                break;
             }
             $output->writeln($text);
         }
@@ -112,7 +124,7 @@ trait General
                     if (!$this->isAttributeParticular($columnName)) {
                         if (trim($columnName) == '') {
                             $emptyHeaderColumns[] = $columnNumber;
-                        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/', $columnName)) {
+                        } elseif (!preg_match('/^[a-z][a-z0-9_\:]*$/', $columnName)) {
                             $invalidColumns[] = $columnName;
                         } elseif ($this->needColumnCheck && !in_array($columnName, $this->getValidColumnNames())) {
                             $invalidAttributes[] = $columnName;
@@ -183,5 +195,84 @@ trait General
     public function getParameters()
     {
         return $this->_parameters;
+    }
+
+    /**
+     * Apply filter to collection and add not skipped attributes to select.
+     *
+     * @param \Magento\Eav\Model\Entity\Collection\AbstractCollection $collection
+     * @return \Magento\Eav\Model\Entity\Collection\AbstractCollection
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function _prepareEntityCollection(\Magento\Eav\Model\Entity\Collection\AbstractCollection $collection)
+    {
+        if (!isset(
+                $this->_parameters[\Magento\ImportExport\Model\Export::FILTER_ELEMENT_GROUP]
+            ) || !is_array(
+                $this->_parameters[\Magento\ImportExport\Model\Export::FILTER_ELEMENT_GROUP]
+            )
+        ) {
+            $exportFilter = [];
+        } else {
+            $exportFilter = $this->_parameters[\Magento\ImportExport\Model\Export::FILTER_ELEMENT_GROUP];
+        }
+
+        $exportAttrCodes = $this->_getExportAttrCodes();
+
+        foreach ($this->filterAttributeCollection($this->getAttributeCollection()) as $attribute) {
+            $attrCode = $attribute->getAttributeCode();
+
+            // filter applying
+            if (isset($exportFilter[$attrCode])) {
+                $attrFilterType = \Magento\ImportExport\Model\Export::getAttributeFilterType($attribute);
+
+                if (\Magento\ImportExport\Model\Export::FILTER_TYPE_SELECT == $attrFilterType) {
+                    if (is_scalar($exportFilter[$attrCode])) {
+                        if ($exportFilter[$attrCode] == 0) {
+                            $collection->addAttributeToFilter([
+                                ['attribute' => $attrCode, 'eq' => $exportFilter[$attrCode]],
+                                ['attribute' => $attrCode, 'null' => 1],
+                            ]);
+                        } else {
+                            $collection->addAttributeToFilter($attrCode, ['eq' => $exportFilter[$attrCode]]);
+                        }
+                    }
+                } elseif (\Magento\ImportExport\Model\Export::FILTER_TYPE_INPUT == $attrFilterType) {
+                    if (is_scalar($exportFilter[$attrCode]) && trim($exportFilter[$attrCode])) {
+                        $collection->addAttributeToFilter($attrCode, ['like' => "%{$exportFilter[$attrCode]}%"]);
+                    }
+                } elseif (\Magento\ImportExport\Model\Export::FILTER_TYPE_DATE == $attrFilterType) {
+                    if (is_array($exportFilter[$attrCode]) && count($exportFilter[$attrCode]) == 2) {
+                        $from = array_shift($exportFilter[$attrCode]);
+                        $to = array_shift($exportFilter[$attrCode]);
+
+                        if (is_scalar($from) && !empty($from)) {
+                            $date = (new \DateTime($from))->format('m/d/Y');
+                            $collection->addAttributeToFilter($attrCode, ['from' => $date, 'date' => true]);
+                        }
+                        if (is_scalar($to) && !empty($to)) {
+                            $date = (new \DateTime($to))->format('m/d/Y');
+                            $collection->addAttributeToFilter($attrCode, ['to' => $date, 'date' => true]);
+                        }
+                    }
+                } elseif (\Magento\ImportExport\Model\Export::FILTER_TYPE_NUMBER == $attrFilterType) {
+                    if (is_array($exportFilter[$attrCode]) && count($exportFilter[$attrCode]) == 2) {
+                        $from = array_shift($exportFilter[$attrCode]);
+                        $to = array_shift($exportFilter[$attrCode]);
+
+                        if (is_numeric($from)) {
+                            $collection->addAttributeToFilter($attrCode, ['from' => $from]);
+                        }
+                        if (is_numeric($to)) {
+                            $collection->addAttributeToFilter($attrCode, ['to' => $to]);
+                        }
+                    }
+                }
+            }
+            if (in_array($attrCode, $exportAttrCodes)) {
+                $collection->addAttributeToSelect($attrCode);
+            }
+        }
+        return $collection;
     }
 }

@@ -7,60 +7,36 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Firebear_ImportExport:etc/di_export.xsd">
     <entity name="order" label="Order" model="Firebear\ImportExport\Model\Export\Order">
-        <item name="orders" label="Order" model="\Magento\Sales\Model\Order" collection="Magento\Sales\Model\ResourceModel\Order\CollectionFactory" main_field="entity_id">
-            <field name="state" type="select" delete="1"/>
-            <field name="status" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\Status\Options"/>
+        <item name="sales_order" label="Order" model="\Magento\Sales\Model\Order" main_field="entity_id">
+			<field name="status" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\Status\Options"/>
             <field name="store_id" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\StoreId\Options"/>
             <field name="store_currency_code" type="select" model="\Magento\Config\Model\Config\Source\Locale\Currency"/>
-        </item>
-        <item name="orders_item" label="Items of Order" model="\Magento\Sales\Model\Order\Item" collection="Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory" parent="orders" parent_field="order_id" main_field="item_id">
-            <field name="store_id" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\StoreId\Options"/>
+		</item>
+        <item name="sales_order_item" label="Items of Order" model="\Magento\Sales\Model\Order\Item" parent="sales_order" parent_field="order_id" main_field="item_id">
             <field name="product_type" type="select" model="\Magento\Catalog\Model\Product\Type"/>
-            <field name="product_options" type="select" delete="1"/>
-        </item>
-        <item name="orders_address" label="Addresses" model="\Magento\Sales\Model\Order\Address" collection="Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory" parent="orders" parent_field="parent_id" main_field="entity_id">
+		</item>	
+        <item name="sales_order_address" label="Addresses" model="\Magento\Sales\Model\Order\Address" parent="sales_order" parent_field="parent_id" main_field="entity_id">
             <field name="country_id" type="select" model="\Magento\Directory\Model\Config\Source\Country"/>
             <field name="address_type" type="select" model="\Firebear\ImportExport\Model\Export\Order\Address\Fields\AddressType\Options"/>
-        </item>
-        <item name="orders_payment" label="Payments" model="\Magento\Sales\Model\Order\Payment" collection="Magento\Sales\Model\ResourceModel\Order\Payment\CollectionFactory" parent="orders" parent_field="parent_id" main_field="entity_id">
-            <field name="additional_information" type="select" delete="1"/>
-			<field name="payments_transaction" type="select" delete="1"/>
-        </item>
-		<item name="payments_transaction" label="Payments Transaction" model="\Magento\Sales\Model\Order\Payment\Transaction" collection="Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory" parent="orders_payment" parent_field="payment_id" main_field="transaction_id"/>
-        <item name="shipments" label="Shipments" model="\Magento\Sales\Model\Order\Shipment" collection="Magento\Sales\Model\ResourceModel\Order\Shipment\CollectionFactory" parent="orders" parent_field="order_id" main_field="entity_id">
-            <field name="store_id" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\StoreId\Options"/>
-            <field name="shipments_item" type="select" delete="1"/>
-			<field name="shipments_comment" type="select" delete="1"/>
-			<field name="shipments_track" type="select" delete="1"/>
-        </item>
-        <item name="shipments_item" label="Item of Shipment" model="\Magento\Sales\Model\Order\Shipment\Item" collection="Magento\Sales\Model\ResourceModel\Order\Shipment\Item\CollectionFactory" parent="shipments" parent_field="parent_id" main_field="entity_id"/>
-		<item name="shipments_comment" label="Comments of Shipment" model="\Magento\Sales\Model\Order\Shipment\Comment" collection="Magento\Sales\Model\ResourceModel\Order\Shipment\Comment\CollectionFactory" parent="shipments" parent_field="parent_id" main_field="entity_id"/>
-		<item name="shipments_track" label="Tracks of Shipment" model="\Magento\Sales\Model\Order\Shipment\Track" collection="Magento\Sales\Model\ResourceModel\Order\Shipment\Track\CollectionFactory" parent="shipments" parent_field="parent_id" main_field="entity_id"/>		
-        <item name="invoices" label="Invoices" model="\Magento\Sales\Model\Order\Invoice" collection="Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory" parent="orders" parent_field="order_id" main_field="entity_id">
-            <field name="store_id" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\StoreId\Options"/>
-            <field name="store_currency_code" type="select" model="\Magento\Config\Model\Config\Source\Locale\Currency"/>
-            <field name="order_currency_code" type="select" model="\Magento\Config\Model\Config\Source\Locale\Currency"/>
-            <field name="base_currency_code" type="select" model="\Magento\Config\Model\Config\Source\Locale\Currency"/>
-            <field name="global_currency_code" type="select" model="\Magento\Config\Model\Config\Source\Locale\Currency"/>
-            <field name="invoices_item" type="select" delete="1"/>
-			<field name="invoices_comment" type="select" delete="1"/>
-        </item>
-        <item name="invoices_item" label="Item of Invoice" model="\Magento\Sales\Model\Order\Invoice\Item" collection="Magento\Sales\Model\ResourceModel\Order\Invoice\Item\CollectionFactory" parent="invoices" parent_field="parent_id" main_field="entity_id"/>
-		<item name="invoices_comment" label="Comments of Invoice" model="\Magento\Sales\Model\Order\Invoice\Comment" collection="Magento\Sales\Model\ResourceModel\Order\Invoice\Comment\CollectionFactory" parent="invoices" parent_field="parent_id" main_field="entity_id"/>        
-		<item name="creditmemos" label="Credit Memos" model="\Magento\Sales\Model\Order\Creditmemo" collection="Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory" parent="orders" parent_field="order_id" main_field="entity_id">
-            <field name="store_id" type="select" model="\Firebear\ImportExport\Model\Export\Order\Fields\StoreId\Options"/>
-            <field name="creditmemos_item" type="select" delete="1"/>
-			<field name="creditmemos_comment" type="select" delete="1"/>
-        </item>
-        <item name="creditmemos_item" label="Items of Credit Memo" model="\Magento\Sales\Model\Order\Creditmemo\Item" collection="Magento\Sales\Model\ResourceModel\Order\Creditmemo\Item\CollectionFactory" parent="creditmemos" parent_field="parent_id" main_field="entity_id"/>
-		<item name="creditmemos_comment" label="Comments of Credit Memo" model="\Magento\Sales\Model\Order\Creditmemo\Comment" collection="Magento\Sales\Model\ResourceModel\Order\Creditmemo\Comment\CollectionFactory" parent="creditmemos" parent_field="parent_id" main_field="entity_id"/>
-        <item name="status_history" label="Status History" model="\Magento\Sales\Model\Order\Status\History" collection="Magento\Sales\Model\ResourceModel\Order\Status\History\CollectionFactory" parent="orders" parent_field="parent_id" main_field="entity_id"/>
-		<item name="taxs" label="Tax" model="\Magento\Sales\Model\Order\Tax" collection="Magento\Sales\Model\ResourceModel\Order\Tax\CollectionFactory" parent="orders" parent_field="order_id" main_field="tax_id">
-            <field name="taxs_item" type="select" delete="1"/>
-        </item>			
-		<item name="taxs_item" label="Tax Items" model="\Magento\Sales\Model\Order\Tax\Item" collection="Firebear\ImportExport\Model\ResourceModel\Sales\Order\Tax\Item\CollectionFactory" parent="taxs" parent_field="tax_id" main_field="tax_id"/>
-    </entity>
+        </item>		
+        <item name="sales_order_payment" label="Payments" model="\Magento\Sales\Model\Order\Payment" parent="sales_order" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_payment_transaction" label="Payments Transaction" model="\Magento\Sales\Model\Order\Payment\Transaction" parent="sales_order_payment" parent_field="payment_id" main_field="transaction_id"/>
+        <item name="sales_shipment" label="Shipments" model="\Magento\Sales\Model\Order\Shipment" parent="sales_order" parent_field="order_id" main_field="entity_id"/>
+        <item name="sales_shipment_item" label="Item of Shipment" model="\Magento\Sales\Model\Order\Shipment\Item" parent="sales_shipment" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_shipment_comment" label="Comments of Shipment" model="\Magento\Sales\Model\Order\Shipment\Comment" parent="sales_shipment" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_shipment_track" label="Tracks of Shipment" model="\Magento\Sales\Model\Order\Shipment\Track" parent="sales_shipment" parent_field="parent_id" main_field="entity_id"/>		
+        <item name="sales_invoice" label="Invoices" model="\Magento\Sales\Model\Order\Invoice" parent="sales_order" parent_field="order_id" main_field="entity_id"/>
+        <item name="sales_invoice_item" label="Item of Invoice" model="\Magento\Sales\Model\Order\Invoice\Item" parent="sales_invoice" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_invoice_comment" label="Comments of Invoice" model="\Magento\Sales\Model\Order\Invoice\Comment" parent="sales_invoice" parent_field="parent_id" main_field="entity_id"/>        
+		<item name="sales_creditmemo" label="Credit Memos" model="\Magento\Sales\Model\Order\Creditmemo" parent="sales_order" parent_field="order_id" main_field="entity_id"/>
+        <item name="sales_creditmemo_item" label="Items of Credit Memo" model="\Magento\Sales\Model\Order\Creditmemo\Item" parent="sales_creditmemo" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_creditmemo_comment" label="Comments of Credit Memo" model="\Magento\Sales\Model\Order\Creditmemo\Comment" parent="sales_creditmemo" parent_field="parent_id" main_field="entity_id"/>
+        <item name="sales_order_status_history" label="Status History" model="\Magento\Sales\Model\Order\Status\History" parent="sales_order" parent_field="parent_id" main_field="entity_id"/>
+		<item name="sales_order_tax" label="Tax" model="\Magento\Sales\Model\Order\Tax" parent="sales_order" parent_field="order_id" main_field="tax_id"/>			
+		<item name="sales_order_tax_item" label="Tax Items" model="\Magento\Sales\Model\Order\Tax\Item" parent="sales_order_tax" parent_field="tax_id" main_field="tax_id"/>
+		</entity>
     <entity name="catalog_category" label="Categories" model="Firebear\ImportExport\Model\Export\Category"/>
     <entity name="cms_page" label="CMS Page" model="Firebear\ImportExport\Model\Export\CmsPage"/>
     <entity name="cms_block" label="CMS Block" model="Firebear\ImportExport\Model\Export\CmsBlock"/>
+	<entity name="attribute" label="Attribute" model="Firebear\ImportExport\Model\Export\Attribute"/>
 </config>

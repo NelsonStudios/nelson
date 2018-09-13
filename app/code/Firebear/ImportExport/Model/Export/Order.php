@@ -3,169 +3,254 @@
  * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
-
 namespace Firebear\ImportExport\Model\Export;
 
-use Magento\ImportExport\Model\Import;
-use \Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
+use Firebear\ImportExport\Traits\Export\Entity as EntityTrait;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\Store;
+use Magento\ImportExport\Model\Export\AbstractEntity;
+use Magento\ImportExport\Model\Export\Factory as ExportFactory;
+use Magento\ImportExport\Model\ResourceModel\CollectionByPagesIteratorFactory;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory as StatusCollectionFactory;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Psr\Log\LoggerInterface;
+use Firebear\ImportExport\Model\Export\Dependencies\Config as ExportConfig;
+use Firebear\ImportExport\Model\Source\Factory as SourceFactory;
+use Firebear\ImportExport\Model\ExportJob\Processor;
+use Firebear\ImportExport\Helper\Data as Helper;
+use Firebear\ImportExport\Traits\General as GeneralTrait;
 
-class Order extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
+/**
+ * Order export adapter
+ */
+class Order extends AbstractEntity
 {
-    use \Firebear\ImportExport\Traits\General;
-
-    const ORDERS = 'orders';
-
-    const ITEM = 'item';
-
-    const SEPARATOR = '|';
+    use GeneralTrait;
+    use EntityTrait;
 
     /**
+     * Console Output
+     *
+     * @var \Symfony\Component\Console\Output\ConsoleOutput
+     */
+    protected $_output;
+    
+    /**
+     * Logger Interface
+     *
      * @var \Psr\Log\LoggerInterface
      */
     protected $_logger;
-
+    
     /**
-     * @var \Magento\Sales\Model\OrderFactory
+     * Orders whose data is exported
+     *
+     * @var \Magento\Sales\Model\ResourceModel\Order\Collection
      */
-    private $factory;
-
-    protected $entityCollectionFactory;
-
-    protected $entityCollection;
-
-    protected $itemsPerPage = null;
-
-    protected $headerColumns = [];
-
+    protected $_orderCollection;
+	
     /**
+     * Resource Model
+     *
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    protected $_resourceModel;
+	
+    /**
+     * DB connection
+     *
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    protected $_connection;
+    
+    /**
+     * Header columns
+     *
+     * @var array
+     */    
+    protected $_headerColumns = [];
+	
+    /**
+     * Item export data
+     *
+     * @var array
+     */      
+    protected $_exportData = [];
+	
+    /**
+     * Export config data
+     *
+     * @var array
+     */     
+	protected $_exportConfig;
+	
+    /**
+     * Source Factory
+     *
      * @var \Firebear\ImportExport\Model\Source\Factory
      */
-    protected $createFactory;
-
-    protected $children;
-
+    protected $_sourceFactory;
+	
     /**
+     * Helper
+     *
      * @var \Firebear\ImportExport\Helper\Data
      */
-    protected $helper;
-
+    protected $_helper;
+    
     /**
-     * @var ConsoleOutput
-     */
-    protected $output;
-
-    protected $_debugMode;
-
-    protected $joined = true;
-
-    protected $counts;
-
-    protected $main;
-
-    protected $addFields = [];
-
-    /**
-     * Json Format Column Names
+     * Describe table
      *
      * @var array
-     */
-    protected $jsonField = [
-        'product_options',
-        'additional_information'
-    ];
-
+     */    
+    protected $_describeTable = [];
+    
     /**
-     * Blob Format Column Names
+     * Prefix data
      *
      * @var array
-     */
-    protected $blobField = [
-        'shipping_label'
+     */    
+    protected $_prefixData = [
+		'sales_order_item' => 'item',
+		'sales_order_address' => 'address',
+		'sales_order_payment' => 'payment',
+		'sales_payment_transaction' => 'transaction',
+		'sales_shipment' => 'shipment',
+		'sales_shipment_item' => 'shipment_item',
+		'sales_shipment_comment' => 'shipment_comment',
+		'sales_shipment_track' => 'shipment_track',
+		'sales_invoice' => 'invoice',
+		'sales_invoice_item' => 'invoice_item',
+		'sales_invoice_comment' => 'invoice_comment',
+		'sales_creditmemo' => 'creditmemo',		
+		'sales_creditmemo_item' => 'creditmemo_item',
+		'sales_creditmemo_comment' => 'creditmemo_comment',
+		'sales_order_status_history' => 'status_history',
+		'sales_order_tax' => 'tax',
+		'sales_order_tax_item' => 'tax_item',			
     ];
-
+    
     /**
-     * Ignore Column Names
+     * Default values
      *
      * @var array
-     */
-    protected $ignoreField = [
-        'parent_item'
-    ];
-
-    /**
-     * No Escape Column Names
-     *
-     * @var array
-     */
-    protected $noEscapeField = [
-        'invoices_comment',
-        'shipments_comment',
-        'creditmemos_comment',
-        'payments_transaction',
-        'creditmemos_item',
-        'invoices_item',
-        'shipments_item',
-        'shipments_track',
-        'taxs_item'
-    ];
-
+     */    
+    protected $_default = [];
+    
     /**
      * Order Status Collection
      *
      * @var \Magento\Sales\Model\ResourceModel\Order\Status\Collection
      */
-    protected $statusCollection;
-
+    protected $_statusCollection;
+    
     /**
      * Order Statuses Label
      *
      * @var array
      */
     protected $_status;
-
+    
     /**
-     * Order constructor.
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
-     * @param \Magento\Eav\Model\Config $config
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Firebear\ImportExport\Model\Source\Factory $createFactory
-     * @param StatusCollectionFactory $statusCollectionFactory
-     * @param Dependencies\Config $configDi
+     * Initialize export
+	 *
+     * @param LoggerInterface $logger
+     * @param ConsoleOutput $output
+     * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param ExportFactory $collectionFactory
+     * @param CollectionByPagesIteratorFactory $resourceColFactory
+     * @param OrderCollectionFactory $orderColFactory
+     * @param ResourceConnection $resource
+     * @param ExportConfig $exportConfig
+     * @param SourceFactory $sourceFactory
+     * @param Helper $helper
+     * @param StatusCollectionFactory $statusCollectionFactory     
+     * @param array $data
      */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Eav\Model\Config $config,
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Firebear\ImportExport\Model\Source\Factory $createFactory,
-        \Firebear\ImportExport\Model\Export\Dependencies\Config $configDi,
-        \Firebear\ImportExport\Helper\Data $helper,
-        StatusCollectionFactory $statusCollectionFactory,
-        ConsoleOutput $output
+        LoggerInterface $logger,
+        ConsoleOutput $output,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
+        ExportFactory $collectionFactory,
+        CollectionByPagesIteratorFactory $resourceColFactory,
+        OrderCollectionFactory $orderColFactory,
+		ResourceConnection $resource,
+		ExportConfig $exportConfig,
+		SourceFactory $sourceFactory,
+		Helper $helper,
+		StatusCollectionFactory $statusCollectionFactory,
+        array $data = []
     ) {
         $this->_logger = $logger;
-        $this->createFactory = $createFactory;
-        $this->children = $configDi->get();
-        $this->helper = $helper;
-        $this->output = $output;
-        $this->_debugMode = $helper->getDebugMode();
-        $this->statusCollection = $statusCollectionFactory->create();
-
+        $this->_output = $output;
+		$this->_resourceModel = $resource;
+		$this->_exportConfig = $exportConfig->get();
+		$this->_sourceFactory = $sourceFactory;
+		$this->_helper = $helper;
+		$this->_statusCollection = $statusCollectionFactory->create();
+        $this->_orderCollection = $data['order_collection'] ?? $orderColFactory->create();
+		$this->_connection = $resource->getConnection();
+        
         parent::__construct(
-            $localeDate,
-            $config,
-            $resource,
-            $storeManager
+            $scopeConfig,
+            $storeManager,
+            $collectionFactory,
+            $resourceColFactory
         );
+		
+		$this->_initStores();
     }
 
     /**
-     * Retrieve Shipment Ids Map
+     * Retrieve entity type code
+     *
+     * @return string
+     */
+    public function getEntityTypeCode()
+    {
+        return 'order';
+    }
+
+    /**
+     * Retrieve adapter name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return __('Orders');
+    }
+
+    /**
+     * Retrieve header columns
+     *
+     * @return array
+     */
+    public function _getHeaderColumns()
+    {
+        return $this->_customHeadersMapping(
+			$this->_headerColumns
+		);
+    }
+
+    /**
+     * Retrieve orders collection
+     *
+     * @return \Magento\Sales\Model\ResourceModel\Order\Collection
+     */
+    protected function _getEntityCollection()
+    {
+        return $this->_orderCollection;
+    }
+    
+    /**
+     * Retrieve order statuses
      *
      * @param string $status
      * @return string
@@ -174,7 +259,7 @@ class Order extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
     {
         if (null === $this->_status) {
             $this->_status = [];
-            foreach ($this->statusCollection as $item) {
+            foreach ($this->_statusCollection as $item) {
                 $this->_status[$item->getStatus()] = $item->getLabel();
             }
         }
@@ -184,891 +269,216 @@ class Order extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
     }
 
     /**
-     * @return string
+     * Export process
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getEntityTypeCode()
-    {
-        return 'order';
-    }
-
-    /**
-     * @return \Magento\Framework\Phrase
-     */
-    public function getName()
-    {
-        return __('Orders');
-    }
-
-    /**
-     * @return mixed
-     */
-    public function _getHeaderColumns()
-    {
-        return $this->customHeadersMapping($this->headerColumns);
-    }
-
-    /**
-     * @param bool $resetCollection
-     * @return \Magento\Sales\Model\ResourceModel\Order\Collection
-     */
-    protected function _getEntityCollection($resetCollection = false)
-    {
-        if ($resetCollection || empty($this->entityCollection)) {
-            $this->entityCollection = $this->entityCollectionFactory->create();
-        }
-
-        return $this->entityCollection;
-    }
-
-    /**
-     * @param $model
-     * @return mixed
-     */
-    protected function _getEntityCollectionSecond($model)
-    {
-
-        return $model->create();
-    }
-
     public function export()
     {
         //Execution time may be very long
         set_time_limit(0);
         if (!isset($this->_parameters['behavior_data']['deps'])) {
-            $this->addLogWriteln(__('You have not selected items'), $this->output);
+            $this->addLogWriteln(__('You have not selected items'), $this->_output);
             return false;
         }
-        $this->counts = 0;
-        $deps = $this->_parameters['behavior_data']['deps'];
-        $collections = [];
-        $this->addLogWriteln(__('Begin Export'), $this->output);
-        $this->addLogWriteln(__('Scope Data'), $this->output);
-
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'catalog_category' || !isset($type['fields'])) {
-                continue;
-            }
-            foreach ($type['fields'] as $name => $values) {
-                if (in_array($name, $deps)) {
-                    if ($this->main == null) {
-                        $this->main = $name;
-                    }
-                    if ($name != $this->main) {
-                        $this->addFields[] = $name;
-                        if (in_array($values['parent'] . "_" . $name, $this->addFields)) {
-                            $searchKey = array_search($name, $this->addFields);
-                            unset($this->addFields[$searchKey]);
-                        }
-                    }
-                    $model = $this->createFactory->create($values['collection']);
-                    $object = [
-                        'model' => $model,
-                        'main_field' => $values['main_field'],
-                        'parent' => $values['parent'],
-                        'parent_field' => $values['parent_field'],
-                        'children' => [],
-                        'delete' => []
-                    ];
-                    if (isset($values['fields']) && $name != $this->main) {
-                        foreach ($values['fields'] as $fieldKey => $fieldValue) {
-                            if (isset($fieldValue['delete']) && $fieldValue['delete'] == 1) {
-                                $this->addFields[] = $name . "_" . $fieldKey;
-                                $object['delete'][] = $fieldKey;
-                            }
-                        }
-                    }
-                    if ($values['parent'] && in_array($values['parent'], $deps)) {
-                        $this->searchChildren($values['parent'], $name, $collections, $object);
-                    } else {
-                        $collections[$name] = $object;
-                    }
-                }
-            }
-        }
-
-        if ($this->_parameters['behavior_data']['file_format'] == 'xml') {
-            $this->joined = false;
-        }
-
-        $writer = $this->getWriter();
-        foreach ($collections as $key => $collection) {
-            $this->runCollection($key, $collection, $writer);
-        }
-
-        return [$writer->getContents(), $this->counts];
+        $this->addLogWriteln(__('Begin Export'), $this->_output);
+        $this->addLogWriteln(__('Scope Data'), $this->_output);
+           
+        $collection = $this->_getEntityCollection();
+        $this->_prepareEntityCollection($collection);
+        $this->_exportCollectionByPages($collection);
+        // create export file 
+        return [
+			$this->getWriter()->getContents(), 
+			$this->_processedEntitiesCount, 
+			$this->lastEntityId
+		];
     }
 
     /**
-     * @param $parent
-     * @param $name
-     * @param $collections
-     * @param $object
-     * @return bool
+     * Export one item
+     *
+     * @param \Magento\Framework\Model\AbstractModel $item
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function searchChildren($parent, $name, &$collections, $object)
+    public function exportItem($item)
     {
-        if (isset($collections[$parent])) {
-            $collections[$parent]['children'][$name] = $object;
-            return true;
-        }
-        foreach ($collections as &$child) {
-            $this->searchChildren($parent, $name, $child['children'], $object);
-        }
+		foreach ($this->_getExportData($item) as $row) {
+			$this->getWriter()->writeRow($row);
+		}
+		$this->_processedEntitiesCount++;
     }
-
+	
     /**
-     * @param $key
-     * @param $collection
-     * @param $writer
-     */
-    public function runCollection($key, $collection, $writer)
-    {
-        $page = 0;
-        $this->entityCollectionFactory = $collection['model'];
-
-        while (true) {
-            ++$page;
-            $entityCollection = $this->_getEntityCollection(true);
-            $entityCollection = $this->prepareEntityCollection($entityCollection, $key);
-            $this->paginateCollection($page, $this->getItemsPerPage());
-            if ($entityCollection->getSize() == 0) {
-                break;
-            }
-            $exportData = $this->getExportData(
-                $key,
-                isset($collection['children']) ? $collection['children'] : [],
-                isset($collection['main_field']) ? $collection['main_field'] : '',
-                $entityCollection,
-                1
-            );
-            if ($page == 1) {
-                $writer->setHeaderCols($this->_getHeaderColumns());
-            }
-            $this->addLogWriteln(__('Write to Source'), $this->output);
-            foreach ($exportData as $dataRow) {
-                $writer->writeRow($this->customFieldsMapping($dataRow));
-                $this->counts++;
-            }
-            if ($entityCollection->getCurPage() >= $entityCollection->getLastPageNumber()) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * @param $key
-     * @param $collection
-     * @return string
-     */
-    public function runCollectionSecond($key, $collection, $parents, $level)
-    {
-
-        $text = [];
-        $page = 0;
-        $array[self::ITEM] = [];
-        while (true) {
-            ++$page;
-            $entityCollection = $this->_getEntityCollectionSecond($collection['model']);
-            $entityCollection = $this->prepareEntityCollection($entityCollection, $key);
-            if (!empty($parents)) {
-                foreach ($parents as $field => $value) {
-                    $entityCollection->addFieldToFilter($field, $value);
-                }
-            }
-            $this->paginateCollection($page, $this->getItemsPerPage());
-            if ($entityCollection->getSize() == 0) {
-                break;
-            }
-            $exportData = $this->getExportData(
-                $key,
-                isset($collection['children']) ? $collection['children'] : [],
-                isset($collection['main_field']) ? $collection['main_field'] : '',
-                $entityCollection,
-                ++$level
-            );
-
-            foreach ($exportData as $kk => $dataRow) {
-                $getData = $this->getRow($dataRow, $level);
-                if ($this->joined) {
-                    $text[] = $getData;
-                } else {
-                    $array[] = [self::ITEM => $getData];
-                }
-            }
-            if ($entityCollection->getCurPage() >= $entityCollection->getLastPageNumber()) {
-                break;
-            }
-        }
-        if (!$this->joined) {
-            $text = $array;
-        }
-
-        return $text;
-    }
-
-    /**
+     * Get export data for collection
+     *
+     * @param \Magento\Framework\Model\AbstractModel $item	 
      * @return array
      */
-    protected function getExportData($key, $children, $mainField, $collection, $level)
+    protected function _getExportData($item)
     {
-        $behaviors = $this->_parameters['behavior_data'];
-        $exportData = [];
-        try {
-            $rawData = $this->collectRawData($key, $collection);
-
-            foreach ($rawData as $mainKey => $dataRow) {
-                if ($dataRow) {
-                    if (isset($dataRow['store_name'])) {
-                        $dataRow['store_name'] = str_replace("\n", " ", $dataRow['store_name']);
-                    }
-                    if ($key == 'orders') {
-                        $dataRow['status_label'] = isset($dataRow['status'])
-                            ? $this->_getStatusLabel($dataRow['status'])
-                            : '';
-                    }
-                    if (!empty($children)) {
-                        foreach ($children as $keySecond => $collectSecond) {
-                            $parents = [];
-                            if (isset($collectSecond['parent'])) {
-                                $code = $this->getChangeCode($key);
-                                if ($collectSecond['parent'] == $key) {
-                                    $parents[$collectSecond['parent_field']] = $dataRow[$code];
-                                }
-                            }
-                            $dataRow[$keySecond] = $this->runCollectionSecond(
-                                $keySecond,
-                                $collectSecond,
-                                $parents,
-                                $level
-                            );
-
-                        }
-                    }
-                    $insert = 0;
-                    if ($this->joined) {
-                        $inRecord = 0;
-                        $deps = array_keys($children);
-                        foreach ($children as $keySecond => $collectSecond) {
-                            if (sizeof($dataRow[$keySecond]) > 0) {
-                                $anotherFields = array_diff($deps, [$keySecond]);
-                                $insert++;
-                                $tempData = $dataRow;
-                                $newData = $dataRow;
-
-                                foreach ($anotherFields as $field) {
-                                    $tempData[$field] = "";
-                                }
-                                $temp = $dataRow[$keySecond];
-
-                                $newData = $this->emptyArray($newData);
-                                if (isset($dataRow[$mainField])) {
-                                    $newData[$mainField] = $dataRow[$mainField];
-                                }
-                                foreach ($temp as $keyLast => $itemLast) {
-                                    if (isset($collectSecond['delete']) && sizeof($collectSecond['delete']) > 0) {
-                                        foreach ($collectSecond['delete'] as $fieldDelete) {
-                                            if (empty($itemLast[$fieldDelete])) {
-                                                continue;
-                                            }
-                                            $tempDelete = $itemLast[$fieldDelete];
-                                            $tempData[$keySecond . "_" . $fieldDelete] = $tempDelete;
-                                            $newData[$keySecond . "_" . $fieldDelete] = $tempDelete;
-                                            $anotherFields[] = $keySecond . "_" . $fieldDelete;
-                                            unset($itemLast[$fieldDelete]);
-                                        }
-                                    }
-                                    $val = implode($behaviors['multiple_value_separator'],
-                                        $this->changeData($itemLast));
-                                    if (!$inRecord) {
-                                        $tempData[$keySecond] = $val;
-                                        $exportData[] = $this->checkColumns($tempData, $key);
-                                        $inRecord++;
-                                    } else {
-                                        $newData[$keySecond] = $val;
-                                        $exportData[] = $this->checkColumns($newData, $key);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!$insert) {
-
-                        $exportData[] = $this->checkColumns($dataRow, $key);
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            $this->addLogWriteln($e->getMessage(), $this->output, 'error');
-            $this->_logger->critical($e);
+        $orderId = $item->getId();
+		$deps = $this->_parameters['behavior_data']['deps'];
+		$children = $this->_exportConfig['order']['fields'] ?? [];
+		$this->lastEntityId = $orderId;
+		
+        if (!count($this->_default) && !$this->_isNested()) {
+			$tables = array_keys($this->_prefixData);
+			foreach ($tables as $table) {
+				if (!in_array($table, $deps)) {
+					continue;
+				}
+				if (empty($this->_describeTable[$table])) {
+					$this->_describeTable[$table] = $this->_connection->describeTable(
+						$this->_resourceModel->getTableName($table)
+					);
+				}
+				$prefix = $this->_prefixData[$table] ?? $table;
+				$row = [];
+				foreach (array_keys($this->_describeTable[$table]) as $column) {
+					$row[$prefix . ':' . $column] = '';
+				}
+				$row = $this->_updateData($row, $table);
+				$this->_default = array_merge($this->_default, $row);
+			}
         }
+        
+        $exportData = $item->toArray();
+        unset($exportData['store_name']);
+        
+		$exportData['status_label'] = isset($exportData['status'])
+			? $this->_getStatusLabel($exportData['status'])
+			: '';        
+        
+		$exportData = $this->_updateData($exportData, 'sales_order');
+		$this->_exportData = [0 => array_merge($exportData, $this->_default)];
+		
 
-        return $exportData;
+		foreach ($children as $table => $param) {
+			if ($param['parent'] == 'sales_order' && in_array($table, $deps)) {
+				$this->_prepareChildEntity([$orderId], $table, $param['parent_field'], $param['main_field']);
+			}
+		}
+        return $this->_exportData;
     }
-
+    
+    protected function _isNested()
+    {
+		return in_array(
+			$this->_parameters['behavior_data']['file_format'], 
+			['xml', 'json']
+		);
+    }
+    
     /**
+     * Prepare child entity
+     *
+     * @param int $entityIds
+     * @param string $table
+     * @param int $parentIdField
+     * @param int $entityIdField	 
+     * @return void
+     */
+    protected function _prepareChildEntity($entityIds, $table, $parentIdField, $entityIdField)
+    {
+		$rowId = 0;
+        $select = $this->_connection->select()->from(
+            $this->_resourceModel->getTableName($table)
+        )->where(
+            $parentIdField . ' IN (?)',
+            $entityIds
+        );       
+        $stmt = $this->_connection->query($select);
+		
+		$prefix = $this->_prefixData[$table] ?? $table;
+		$entityIds = [];
+		
+        if ($this->_isNested()) {
+			$exportData = [];
+			while ($row = $stmt->fetch()) {
+				$entityIds[] = $row[$entityIdField];
+				$exportData[] = ['item' => $this->_updateData($row, $table)];
+			}
+			$this->_exportData[0][$prefix] = $exportData;
+        } 
+        else {
+			while ($row = $stmt->fetch()) {
+				$itemRow = [];
+				$entityIds[] = $row[$entityIdField];
+				$row = $this->_updateData($row, $table);
+				
+				foreach ($row as $column => $value) {
+					$itemRow[$prefix . ':' . $column] = $value;
+				}
+				
+				$exportData = $this->_exportData[$rowId] ?? [];
+				$this->_exportData[$rowId] = array_merge($exportData, $itemRow);
+				$rowId++;
+			}        
+        }
+        if (!count($entityIds)) {
+			return;
+        }
+		$deps = $this->_parameters['behavior_data']['deps'];
+		$children = $this->_exportConfig['order']['fields'] ?? [];
+		foreach ($children as $childTable => $param) {
+			if ($param['parent'] == $table && in_array($table, $deps)) {
+				$this->_prepareChildEntity($entityIds, $childTable, $param['parent_field'], $param['main_field']);
+			}
+		}		
+    }
+    
+    /**
+     * Retrieve headers mapping
+     *
+     * @param array $rowData
      * @return array
      */
-    public function getAttributeCollection()
-    {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getFieldsForExport()
-    {
-        $options = [];
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'order') {
-                foreach ($type['fields'] as $name => $values) {
-                    $model = $this->createFactory->create($values['model']);
-                    $options[$name] = [
-                        'label' => __($values['label']),
-                        'optgroup-name' => $name,
-                        'value' => []
-                    ];
-                    $fields = $this->getChildHeaders($model);
-                    foreach ($fields as $field) {
-                        $options[$name]['value'][] = [
-                            'label' => $field,
-                            'value' => $field
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFieldsForFilter()
-    {
-        $options = [];
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'order') {
-                foreach ($type['fields'] as $name => $values) {
-                    $model = $this->createFactory->create($values['model']);
-                    $fields = $this->getChildHeaders($model);
-                    $mergeFields = [];
-                    if (isset($values['fields'])) {
-                        $mergeFields = $values['fields'];
-                    }
-                    foreach ($fields as $field) {
-                        if (isset($mergeFields[$field]) && $mergeFields[$field]['delete']) {
-                            continue;
-                        }
-                        $options[$name][] = [
-                            'label' => $field,
-                            'value' => $field
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFieldColumns()
-    {
-        $options = [];
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'order') {
-                foreach ($type['fields'] as $name => $values) {
-                    $mergeFields = [];
-                    if (isset($values['fields'])) {
-                        $mergeFields = $values['fields'];
-                    }
-                    $model = $this->createFactory->create($values['model']);
-                    $fields = $this->describeTable($model);
-                    foreach ($fields as $key => $field) {
-                        $type = $this->helper->convertTypesTables($field['DATA_TYPE']);
-                        $select = [];
-                        if (isset($mergeFields[$key])) {
-                            if (!$mergeFields[$key]['delete']) {
-                                $type = $mergeFields[$key]['type'];
-                                $select = $mergeFields[$key]['options'];
-                            }
-                        }
-                        $options[$name][] = ['field' => $key, 'type' => $type, 'select' => $select];
-                    }
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    protected function getTableColumns()
-    {
-        $options = [];
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'catalog_category' || !isset($type['fields']) || !isset($type['fields'])) {
-                continue;
-            }
-            foreach ($type['fields'] as $name => $values) {
-                $model = $this->createFactory->create($values['model']);
-                $fields = $this->describeTable($model);
-                foreach ($fields as $key => $field) {
-                    $type = $this->helper->convertTypesTables($field['DATA_TYPE']);
-                    $options[$name][$key] = ['type' => $type];
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getHeaders()
-    {
-        return array_keys($this->describeTable());
-    }
-
-    /**
-     * @param null $model
-     * @return array
-     */
-    protected function describeTable($model = null)
-    {
-
-        if ($model) {
-            $resource = $model->getResource();
-        } else {
-            $resource = $this->factory->create()->getResource();
-        }
-        $table = $resource->getMainTable();
-        $fields = $resource->getConnection()->describeTable($table);
-
-        return $fields;
-    }
-
-    /**
-     * @return array
-     */
-    protected function collectRawData($key, $collection)
-    {
-        $instr = $this->scopeFields($key);
-        $allFields = $this->_parameters['all_fields'];
-        $data = [];
-
-        foreach ($collection as $itemId => $item) {
-            $temp = null;
-            if (!$allFields) {
-                $temp = $this->changedColumns($item->getData(), $instr);
-            } else {
-                $temp = $this->addPartColumns($item, $instr, $key);
-            }
-            if ($key == $this->main) {
-                foreach ($this->addFields as $field) {
-                    $temp[$field] = '';
-                }
-            }
-            $data[] = $temp;
-        }
-
-        $collection->clear();
-
-        return $data;
-    }
-
-    /**
-     * @param $key
-     * @return mixed|string
-     */
-    protected function getChangeCode($key)
-    {
-        $newCode = '';
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'catalog_category' || !isset($type['fields'])) {
-                continue;
-            }
-            foreach ($type['fields'] as $name => $values) {
-                if ($name == $key) {
-                    $newCode = $values['main_field'];
-                }
-            }
-        }
-        $instr = $this->scopeFields($key);
-
-        $keyCode = $this->getKeyFromList($instr['list'], $newCode);
-        if ($keyCode !== false && isset($instr['replaces'][$keyCode])) {
-            $newCode = $instr['replaces'][$keyCode];
-        }
-
-        return $newCode;
-    }
-
-    /**
-     * @param $key
-     * @return array
-     */
-    protected function scopeFields($key)
-    {
-        $deps = $this->_parameters['dependencies'];
-        $numbers = [];
-        foreach ($deps as $ki => $dep) {
-            if ($dep == $key) {
-                $numbers[] = $ki;
-            }
-        }
-
-        $listCodes = $this->filterCodes($numbers, $this->_parameters['list']);
-        $replaces = $this->filterCodes($numbers, $this->_parameters['replace_code']);
-        $replacesValues = $this->filterCodes($numbers, $this->_parameters['replace_value']);
-        $instr = [
-            'list' => $listCodes,
-            'replaces' => $replaces,
-            'replacesValues' => $replacesValues
-        ];
-
-        return $instr;
-    }
-
-    /**
-     * @param $list
-     * @param $search
-     * @return false|int|string
-     */
-    protected function getKeyFromList($list, $search)
-    {
-        return array_search($search, $list);
-    }
-
-    /**
-     * @param $numbers
-     * @param $list
-     * @return array
-     */
-    protected function filterCodes($numbers, $list)
-    {
-        $array = [];
-
-        foreach ($list as $ki => $item) {
-            if (in_array($ki, $numbers)) {
-                $array[$ki] = $item;
-            }
-        }
-
-        return $array;
-    }
-
-    /**
-     * @param $data
-     * @return array
-     */
-    protected function changedColumns($data, $instr)
-    {
-        $newData = [];
-        foreach ($data as $code => $value) {
-            if (in_array($code, $instr['list'])) {
-                $ki = $this->getKeyFromList($instr['list'], $code);
-                $newCode = $code;
-                if ($ki !== false && isset($instr['replaces'][$ki])) {
-                    $newCode = $instr['replaces'][$ki];
-                }
-                $newData[$newCode] = $value;
-                if ($ki !== false && isset($instr['replacesValues'][$ki])
-                    && !empty($instr['replacesValues'][$ki])) {
-                    $newData[$newCode] = $instr['replacesValues'][$ki];
-                }
-            } else {
-                $newData[$code] = $value;
-            }
-        }
-
-        return $newData;
-    }
-
-    /**
-     * @param $item
-     * @return array
-     */
-    protected function addPartColumns($item, $instr, $key)
-    {
-        $newData = [];
-        $reqCode = "";
-        foreach ($this->children as $typeName => $type) {
-            if ($typeName == 'catalog_category' || !isset($type['fields'])) {
-                continue;
-            }
-            foreach ($type['fields'] as $name => $values) {
-                if ($name == $key) {
-                    $reqCode = $values['main_field'];
-                }
-            }
-        }
-        if (!in_array($reqCode, $instr['list'])) {
-            $newData[$reqCode] = $item->getData($reqCode);
-        }
-
-        foreach ($instr['list'] as $k => $code) {
-            $newCode = $code;
-            if (isset($instr['replaces'][$k])) {
-                $newCode = $instr['replaces'][$k];
-            }
-            $newData[$newCode] = $item->getData($code);
-
-            if (isset($instr['replacesValues'][$k])
-                && !empty($instr['replacesValues'][$k])) {
-                $newData[$newCode] = $instr['replacesValues'][$k];
-            }
-        }
-
-        return $newData;
-    }
-
-    /**
-     * @param $data
-     * @param $key
-     * @return mixed
-     */
-    protected function checkColumns($data, $key)
-    {
-        $deps = $this->_parameters['dependencies'];
-        $instr = $this->scopeFields($key);
-        $allFields = $this->_parameters['all_fields'];
-        if ($allFields) {
-            foreach ($data as $code => $value) {
-                if (!in_array($code, $instr['replaces']) && !in_array($code, $deps)) {
-                    unset($data[$code]);
-                }
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param $rowData
-     * @return mixed
-     */
-    protected function customHeadersMapping($rowData)
+    protected function _customHeadersMapping($rowData)
     {
         foreach ($rowData as $key => $fieldName) {
             if (isset($this->_fieldsMap[$fieldName])) {
                 $rowData[$key] = $this->_fieldsMap[$fieldName];
             }
         }
-
         return $rowData;
-    }
-
+    }    
+    
     /**
-     * @param $page
-     * @param $pageSize
+     * Apply filter to collection
+     *
+     * @param AbstractCollection $collection
+     * @return AbstractCollection
      */
-    protected function paginateCollection($page, $pageSize)
+    protected function _prepareEntityCollection(AbstractCollection $collection)
     {
-        $this->_getEntityCollection()->setPage($page, $pageSize);
-    }
+		if (isset($this->_parameters['last_entity_id']) && 
+			$this->_parameters['last_entity_id'] > 0 && 
+			$this->_parameters['enable_last_entity_id'] > 0
+		) {
+			$collection->addFieldToFilter(
+				'entity_id', ['gt' => $this->_parameters['last_entity_id']]
+			);
+		}
 
-    /**
-     * @return int|null
-     */
-    protected function getItemsPerPage()
-    {
-        if ($this->itemsPerPage === null) {
-            $memoryLimit = trim(ini_get('memory_limit'));
-            $lastMemoryLimitLetter = strtolower($memoryLimit[strlen($memoryLimit) - 1]);
-            switch ($lastMemoryLimitLetter) {
-                case 'g':
-                    $memoryLimit *= 1024;
-                // fall-through intentional
-                case 'm':
-                    $memoryLimit *= 1024;
-                // fall-through intentional
-                case 'k':
-                    $memoryLimit *= 1024;
-                    break;
-                default:
-                    // minimum memory required by Magento
-                    $memoryLimit = 250000000;
-            }
-
-            // Tested one product to have up to such size
-            $memoryPerProduct = 100000;
-            // Decrease memory limit to have supply
-            $memoryUsagePercent = 0.8;
-            // Minimum Products limit
-            $minProductsLimit = 500;
-            // Maximal Products limit
-            $maxProductsLimit = 5000;
-
-            $this->itemsPerPage = (int)
-                ($memoryLimit * $memoryUsagePercent - memory_get_usage(true)) / $memoryPerProduct;
-            if ($this->itemsPerPage < $minProductsLimit) {
-                $this->itemsPerPage = $minProductsLimit;
-            }
-            if ($this->itemsPerPage > $maxProductsLimit) {
-                $this->itemsPerPage = $maxProductsLimit;
-            }
-        }
-
-        return $this->itemsPerPage;
-    }
-
-    /**
-     * @param $rowData
-     * @return mixed
-     */
-    protected function customFieldsMapping($rowData)
-    {
-        if ($this->joined) {
-            foreach ($rowData as $key => $value) {
-                if (is_array($value)) {
-                    $rowData[$key] = $this->optionRowToCellString($value);
-                }
-            }
-        }
-
-        return $rowData;
-    }
-
-    /**
-     * @return array
-     */
-    public function toOptionArray()
-    {
-        $options = [];
-        foreach ($this->children as $key => $child) {
-            $options[] = ['label' => $child['name'], 'value' => $key];
-        }
-
-        return $options;
-    }
-
-    /**
-     * @param $model
-     * @return array
-     */
-    public function getChildHeaders($model)
-    {
-        return array_keys($this->describeTable($model));
-    }
-
-    /**
-     * @param array $data
-     * @return string
-     */
-    protected function getColumns(array $data)
-    {
-        $behaviors = $this->_parameters['behavior_data'];
-        $columns = [];
-        if ($data) {
-            foreach ($data as $key => $item) {
-                $columns[$key] = false;
-            }
-        }
-
-        return implode($behaviors['multiple_value_separator'], array_keys($columns));
-    }
-
-    /**
-     * @param array $data
-     * @param array $level
-     * @return string
-     */
-    public function getRow(array $data, $level)
-    {
-        $rows = [];
-        if ($this->joined) {
-            foreach ($data as $key => $value) {
-                /* json format */
-                if (is_array($value) && in_array($key, $this->jsonField)) {
-                    $json = json_encode($value);
-                    $rows[$key] = $level > 2 ? rawurlencode($json) : $json;
-                } elseif ($value && in_array($key, $this->blobField)) { /* binary format */
-                    $rows[$key] = rawurlencode(base64_encode($value));
-                } elseif (is_array($value)) { /* base array */
-                    $rows[$key] = $this->optionRowToCellString($value);
-                } elseif (is_object($value) && in_array($key, $this->ignoreField)) { /* disable children object */
-                    continue;
-                } elseif (is_object($value)) { /* base object */
-                    $rows[$key] = $this->optionRowToCellString($value->getData());
-                } elseif ($value && $level > 1 && !in_array($key, $this->noEscapeField)) { /* no escape */
-                    $rows[$key] = rawurlencode($value);
-                } else { /* other */
-                    if (!$value) {
-                        $value = "";
-                    }
-                    $rows[$key] = $value;
-                }
-            }
-        } else {
-            foreach ($data as $key => $value) {
-                /* json format */
-                if (is_array($value) && in_array($key, $this->jsonField)) {
-                    $rows[$key] = json_encode($value);
-                } elseif ($value && in_array($key, $this->blobField)) { /* binary format */
-                    $rows[$key] = base64_encode($value);
-                } elseif (is_array($value)) {  /* base array */
-                    $rows[$key] = $value;
-                } elseif (is_object($value) && in_array($key, $this->ignoreField)) { /* disable children object */
-                    continue;
-                } elseif (is_object($value)) { /* base object */
-                    $rows[$key] = $value->getData();
-                } else { /* other */
-                    if (!$value) {
-                        $value = "";
-                    }
-                    $rows[$key] = $value;
-                }
-            }
-        }
-        return $rows;
-    }
-
-    /**
-     * @param $option
-     * @return string
-     */
-    protected function optionRowToCellString($option)
-    {
-        $result = [];
-
-        foreach ($option as $key => $value) {
-            if (!is_array($value)) {
-                $value = rawurlencode($value);
-                $result[] = $key . ImportProduct::PAIR_NAME_VALUE_SEPARATOR . $value;
-            } else {
-                $result[] = $key . "=[" . $this->optionRowToCellString($value) . "]";
-            }
-        }
-
-        return implode(Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR, $result);
-    }
-
-    /**
-     * @param $collection
-     * @param $entity
-     * @return mixed
-     */
-    protected function prepareEntityCollection($collection, $entity)
-    {
-        if (!isset($this->_parameters[\Firebear\ImportExport\Model\ExportJob\Processor::EXPORT_FILTER_TABLE])
-            || !is_array($this->_parameters[\Firebear\ImportExport\Model\ExportJob\Processor::EXPORT_FILTER_TABLE])) {
+        if (!isset($this->_parameters[Processor::EXPORT_FILTER_TABLE]) || 
+			!is_array($this->_parameters[Processor::EXPORT_FILTER_TABLE])) {
             $exportFilter = [];
         } else {
-            $exportFilter = $this->_parameters[\Firebear\ImportExport\Model\ExportJob\Processor::EXPORT_FILTER_TABLE];
+            $exportFilter = $this->_parameters[Processor::EXPORT_FILTER_TABLE];
         }
+		
         $filters = [];
+		$entity = 'sales_order';
         foreach ($exportFilter as $data) {
             if ($data['entity'] == $entity) {
                 $filters[$data['field']] = $data['value'];
             }
         }
-
-        $fields = $this->getTableColumns();
+		
+		$fields = $this->getTableColumns();
         foreach ($filters as $key => $value) {
             if (isset($fields[$entity][$key])) {
                 $type = $fields[$entity][$key]['type'];
@@ -1106,37 +516,283 @@ class Order extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                     }
                 }
             }
-        }
-
+        }		
         return $collection;
-    }
-
+    } 
+	
     /**
-     * @param $data
-     * @return mixed
+     * @return array
      */
-    public function emptyArray($data)
+    public function getFieldsForExport()
     {
-        foreach ($data as $key => $value) {
-            $data[$key] = "";
+        $options = [];
+        foreach ($this->_exportConfig as $typeName => $type) {
+            if ($typeName == 'order') {
+                foreach ($type['fields'] as $name => $values) {
+                    $model = $this->_sourceFactory->create($values['model']);
+                    $options[$name] = [
+                        'label' => __($values['label']),
+                        'optgroup-name' => $name,
+                        'value' => []
+                    ];
+                    $fields = $this->getChildHeaders($model);
+                    foreach ($fields as $field) {
+                        $options[$name]['value'][] = [
+                            'label' => $field,
+                            'value' => $field
+                        ];
+                    }
+                }
+            }
         }
-
-        return $data;
+        return $options;
     }
+	
+    /**
+     * @return array
+     */
+    public function getFieldsForFilter()
+    {
+        $options = [];
+        foreach ($this->_exportConfig as $typeName => $type) {
+            if ($typeName == 'order') {
+				foreach ($type['fields'] as $name => $values) {
+                    $model = $this->_sourceFactory->create($values['model']);
+                    $fields = $this->getChildHeaders($model);
+                    $mergeFields = [];
+                    if (isset($values['fields'])) {
+                        $mergeFields = $values['fields'];
+                    }
+                    foreach ($fields as $field) {
+                        if (isset($mergeFields[$field]) && $mergeFields[$field]['delete']) {
+                            continue;
+                        }
+                        $options[$name][] = [
+                            'label' => $field,
+                            'value' => $field
+                        ];
+                    }
+                }
+            }
+        }
+        return $options;
+    } 
+	
+    protected function getTableColumns()
+    {
+        $options = [];
+        foreach ($this->_exportConfig as $typeName => $type) {
+            if ($typeName == 'catalog_category' || !isset($type['fields']) || !isset($type['fields'])) {
+                continue;
+            }
+            foreach ($type['fields'] as $name => $values) {
+                $model = $this->_sourceFactory->create($values['model']);
+                $fields = $this->describeTable($model);
+                foreach ($fields as $key => $field) {
+                    $type = $this->_helper->convertTypesTables($field['DATA_TYPE']);
+                    $options[$name][$key] = ['type' => $type];
+                }
+            }
+        }
+        return $options;
+    }
+	
+    /**
+     * @return array
+     */
+    public function getFieldColumns()
+    {
+        $options = [];
+        foreach ($this->_exportConfig as $typeName => $type) {
+            if ($typeName == 'order') {
+                foreach ($type['fields'] as $name => $values) {
+                    $mergeFields = [];
+                    if (isset($values['fields'])) {
+                        $mergeFields = $values['fields'];
+                    }
+                    $model = $this->_sourceFactory->create($values['model']);
+                    $fields = $this->describeTable($model);
+                    foreach ($fields as $key => $field) {
+                        $type = $this->_helper->convertTypesTables($field['DATA_TYPE']);
+                        $select = [];
+                        if (isset($mergeFields[$key])) {
+                            if (!$mergeFields[$key]['delete']) {
+                                $type = $mergeFields[$key]['type'];
+                                $select = $mergeFields[$key]['options'];
+                            }
+                        }
+                        $options[$name][] = ['field' => $key, 'type' => $type, 'select' => $select];
+                    }
+                }
+            }
+        }
+        return $options;
+    }
+	
+    /**
+     * @param $model
+     * @return array
+     */
+    public function getChildHeaders($model)
+    {
+        return array_keys($this->describeTable($model));
+    }
+    
+    /**
+     * @param null $model
+     * @return array
+     */
+    protected function describeTable($model = null)
+    {
+        if ($model) {
+            $resource = $model->getResource();
+        } else {
+            $resource = $this->factory->create()->getResource();
+        }
+        $table = $resource->getMainTable();
+        $fields = $resource->getConnection()->describeTable($table);
 
+        return $fields;
+    }
+	
+    /**
+     * @return array
+     */
+    protected function _updateData($data, $table)
+    {
+		if (empty($this->_describeTable[$table])) {
+			$this->_describeTable[$table] = $this->_connection->describeTable(
+				$this->_resourceModel->getTableName($table)
+			);
+		}
+		
+		$info = $this->_describeTable[$table];
+		foreach ($data as $field => $value) {
+			$dataType = $info[$field]['DATA_TYPE'] ?? null;
+			if (in_array($dataType, ['blob', 'mediumblob', 'tinyblob', 'longblob'])) {
+				$data[$field] = base64_encode($value);
+			}
+		}
+        
+        $instr = $this->_scopeFields($table);
+        $allFields = $this->_parameters['all_fields'];
+		if (!$allFields) {
+			return $this->_changedColumns($data, $instr);
+		}
+		return $this->_addPartColumns($data, $instr, $table);
+    }
+	
+    /**
+     * @param $key
+     * @return array
+     */
+    protected function _scopeFields($table)
+    {
+        $deps = $this->_parameters['dependencies'];
+        $numbers = [];
+        foreach ($deps as $ki => $dep) {
+            if ($dep == $table) {
+                $numbers[] = $ki;
+            }
+        }
+        $listCodes = $this->_filterCodes($numbers, $this->_parameters['list']);
+        $replaces = $this->_filterCodes($numbers, $this->_parameters['replace_code']);
+        $replacesValues = $this->_filterCodes($numbers, $this->_parameters['replace_value']);
+        $instr = [
+            'list' => $listCodes,
+            'replaces' => $replaces,
+            'replacesValues' => $replacesValues
+        ];
+        return $instr;
+    }
+	
+    /**
+     * @param $numbers
+     * @param $list
+     * @return array
+     */
+    protected function _filterCodes($numbers, $list)
+    {
+        $array = [];
+        foreach ($list as $ki => $item) {
+            if (in_array($ki, $numbers)) {
+                $array[$ki] = $item;
+            }
+        }
+        return $array;
+    }
+	
     /**
      * @param $data
      * @return array
      */
-    public function changeData($data)
+    protected function _changedColumns($data, $instr)
     {
-
-        $str = [];
-        foreach ($data as $key => $value) {
-            $str[] = $key . "=" . $value;
+        $newData = [];
+        foreach ($data as $code => $value) {
+            if (in_array($code, $instr['list'])) {
+                $ki = $this->_getKeyFromList($instr['list'], $code);
+                $newCode = $code;
+                if ($ki !== false && isset($instr['replaces'][$ki])) {
+                    $newCode = $instr['replaces'][$ki];
+                }
+                $newData[$newCode] = $value;
+                if ($ki !== false && isset($instr['replacesValues'][$ki])
+                    && !empty($instr['replacesValues'][$ki])) {
+                    $newData[$newCode] = $instr['replacesValues'][$ki];
+                }
+            } else {
+                $newData[$code] = $value;
+            }
+        }
+        return $newData;
+    }
+	
+    /**
+     * @param $list
+     * @param $search
+     * @return false|int|string
+     */
+    protected function _getKeyFromList($list, $search)
+    {
+        return array_search($search, $list);
+    }
+	
+    /**
+     * @param $item
+     * @return array
+     */
+    protected function _addPartColumns($data, $instr, $table)
+    {
+        $newData = [];
+        $reqCode = "";
+        foreach ($this->_exportConfig as $typeName => $type) {
+            if ($typeName == 'catalog_category' || !isset($type['fields'])) {
+                continue;
+            }
+            foreach ($type['fields'] as $name => $values) {
+                if ($name == $table) {
+                    $reqCode = $values['main_field'];
+                }
+            }
+        }
+        if (!in_array($reqCode, $instr['list'])) {
+            $newData[$reqCode] = $data[$reqCode];
         }
 
-        return $str;
+        foreach ($instr['list'] as $k => $code) {
+            $newCode = $code;
+            if (isset($instr['replaces'][$k])) {
+                $newCode = $instr['replaces'][$k];
+            }
+            $newData[$newCode] = $data[$code];
 
-    }
+            if (isset($instr['replacesValues'][$k])
+                && !empty($instr['replacesValues'][$k])) {
+                $newData[$newCode] = $instr['replacesValues'][$k];
+            }
+        }
+
+        return $newData;
+    }   
 }

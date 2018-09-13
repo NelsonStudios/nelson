@@ -36,6 +36,11 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
     protected $entityProducts;
 
     /**
+     * @var \Magento\Framework\App\ProductMetadata
+     */
+    protected $productMetadata;
+
+    /**
      * AdvancedPricing constructor.
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param \Magento\ImportExport\Helper\Data $importExportData
@@ -58,6 +63,7 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
      * @param \Firebear\ImportExport\Helper\Data $helper
      * @param LoggerInterface $logger
      * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data
+     * @param \Magento\Framework\App\ProductMetadata $productMetadata
      */
     public function __construct(
         \Magento\Framework\Json\Helper\Data $jsonHelper,
@@ -80,7 +86,8 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
         \Symfony\Component\Console\Output\ConsoleOutput $output,
         \Firebear\ImportExport\Helper\Data $helper,
         LoggerInterface $logger,
-        \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData
+        \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData,
+        \Magento\Framework\App\ProductMetadata $productMetadata
     ) {
         parent::__construct(
             $jsonHelper,
@@ -101,6 +108,7 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
             $websiteValidator,
             $tierPriceValidator
         );
+        $this->productMetadata = $productMetadata;
         $this->_logger = $logger;
         $this->output = $output;
         $this->_debugMode = $helper->getDebugMode();
@@ -164,7 +172,7 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
             foreach ($bunch as $rowNum => $rowData) {
                 $rowData = $this->joinIdenticalyData($rowData);
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('sku: %1 is not valited', $rowData[self::COL_SKU]), $this->output, 'info');
+                    $this->addLogWriteln(__('price from sku: %1 is not valited', $rowData[self::COL_SKU]), $this->output, 'info');
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -191,10 +199,13 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
                         'value' => $rowData[self::COL_TIER_PRICE],
                         'website_id' => $this->getWebsiteId($rowData[self::COL_TIER_PRICE_WEBSITE])
                     ];
-                    if (isset($rowData[self::COL_TIER_PRICE_TYPE])) {
-                        $array['value'] = $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_FIXED
-                            ? $rowData[self::COL_TIER_PRICE] : 0;
-                        $array['percentage_value'] = $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_PERCENT;
+                    if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
+                        if (isset($rowData[self::COL_TIER_PRICE_TYPE])) {
+                            $array['value'] = $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_FIXED
+                                ? $rowData[self::COL_TIER_PRICE] : 0;
+                            $array['percentage_value'] = $rowData[self::COL_TIER_PRICE_TYPE] === self::TIER_PRICE_TYPE_PERCENT
+                                ? $rowData[self::COL_TIER_PRICE] : null;
+                        }
                     }
                     $tierPrices[$rowSku][] = $array;
 
@@ -203,7 +214,7 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Import\
                 $endTime = $time[0] + $time[1];
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
-                $this->addLogWriteln(__('sku: %1 .... %2s', $sku, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(__('price from sku: %1 .... %2s', $sku, $totalTime), $this->output, 'info');
             }
             $this->getEntities($listSku);
             if (\Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $behavior) {

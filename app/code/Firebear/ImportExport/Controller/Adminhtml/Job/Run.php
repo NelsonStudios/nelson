@@ -63,22 +63,19 @@ class Run extends JobController
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->jsonFactory->create();
         $result = false;
-        $count = 0;
-        if ($this->getRequest()->isAjax()) {
+        if ($this->getRequest()->isAjax()
+            && $this->getRequest()->getParam('file')
+            && $this->getRequest()->getParam('id')
+        ) {
             try {
-                $pattern = '/({.+})/i';
-                preg_match($pattern, $this->getRequest()->getContent(), $json);
-                if (isset($json[0])) {
-                    session_write_close();
-                    ignore_user_abort(true);
-                    set_time_limit(0);
-                    ob_implicit_flush();
-                    $data = $this->jsonDecoder->decode($json[0]);
-                    $id = $data['id'];
-                    $file = $data['file'];
-                    $this->helper->getProcessor()->inConsole = 0;
-                    $result = $this->helper->runImport($id, $file);
-                }
+                session_write_close();
+                ignore_user_abort(true);
+                set_time_limit(0);
+                ob_implicit_flush();
+                $id = $this->getRequest()->getParam('id');
+                $file = $this->getRequest()->getParam('file');
+                $this->helper->getProcessor()->inConsole = 0;
+                $result = $this->helper->runImport($id, $file);
             } catch (\Exception $e) {
                 $result = false;
             }

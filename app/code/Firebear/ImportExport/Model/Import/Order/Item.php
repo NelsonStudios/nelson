@@ -77,7 +77,7 @@ class Item extends AbstractAdapter
      */       
 	const ERROR_ENTITY_ID_IS_EMPTY = 'orderItemIdIsEmpty';
 	const ERROR_ORDER_ID_IS_EMPTY = 'orderItemOrderIdIsEmpty';
-	const ERROR_PRODUCT_ID_IS_EMPTY = 'orderItemProductIdIsEmpty';	
+	const ERROR_COLUMN_SKU_IS_EMPTY = 'orderItemSkuIsEmpty';	
     const ERROR_DUPLICATE_ENTITY_ID = 'duplicateOrderItemId';	
 	
     /**
@@ -88,7 +88,7 @@ class Item extends AbstractAdapter
     protected $_messageTemplates = [
         self::ERROR_DUPLICATE_ENTITY_ID => 'Order Item item_id is found more than once in the import file',
         self::ERROR_ORDER_ID_IS_EMPTY => 'Order Item order_id is empty',
-        self::ERROR_PRODUCT_ID_IS_EMPTY => 'Order Item product_id is empty',
+        self::ERROR_COLUMN_SKU_IS_EMPTY => 'Order Item product sku is empty',
         self::ERROR_ENTITY_ID_IS_EMPTY => 'Order Item entity_id is empty'
     ];
     
@@ -107,27 +107,10 @@ class Item extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['orders_item'])) {
-			return false;
-		}		
-		$options = $this->_getProductOptions($rowData);
-		$rowData = $this-> _explodeField($rowData['orders_item']);
-		$rowData[self::COLUMN_PRODUCT_OPTIONS] = $options;
-
-		return $rowData;
-    }
-
-    /**
-     * Retrieve The Product Options
-     *
-     * @param array $rowData
-     * @return array|bool
-     */
-    protected function _getProductOptions(array $rowData)
-    {
-		return isset($rowData['orders_item_product_options'])
-			? $rowData['orders_item_product_options']
-			: null;
+		$rowData = $this->_extractField($rowData, 'item');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;
     }
     
     /**
@@ -139,13 +122,13 @@ class Item extends AbstractAdapter
     protected function _getExistEntityId(array $rowData)
     {
         $bind = [
-			':product_id' => $rowData[self::COLUMN_PRODUCT_ID],
+			':sku' => $rowData[self::COLUMN_SKU],
 			':product_options' => $rowData[self::COLUMN_PRODUCT_OPTIONS],
 			':order_id' => $this->_getOrderId($rowData)
 		];
         $select = $this->_connection->select();
         $select->from($this->getMainTable(), 'item_id')
-			->where('product_id = :product_id')
+			->where('sku = :sku')
 			->where('product_options = :product_options')
 			->where('order_id = :order_id');
 
@@ -177,10 +160,7 @@ class Item extends AbstractAdapter
             }
         }
         
-        $productId = null;
-        if (!empty($rowData[self::COLUMN_SKU])) {
-			$productId = $this->getProductIdBySku($rowData[self::COLUMN_SKU]) ?: null;
-        }         
+		$productId = $this->getProductIdBySku($rowData[self::COLUMN_SKU]) ?: null;      
 
         $newEntity = false;
         $entityId = $this->_getExistEntityId($rowData);
@@ -202,7 +182,8 @@ class Item extends AbstractAdapter
 			self::COLUMN_ORDER_ID => $orderId,
             self::COLUMN_ENTITY_ID => $entityId,
             self::COLUMN_PARENT_ITEM_ID => $parentItemId,
-            self::COLUMN_PRODUCT_ID => $productId
+            self::COLUMN_PRODUCT_ID => $productId,
+			self::COLUMN_SKU => $rowData[self::COLUMN_SKU]
         ];
 		/* prepare data */
 		$entityRow = $this->_prepareEntityRow($entityRow, $rowData);
@@ -231,8 +212,8 @@ class Item extends AbstractAdapter
 				$this->addRowError(self::ERROR_ORDER_ID_IS_EMPTY, $rowNumber);
 			} 
 			
-			if (empty($rowData[self::COLUMN_PRODUCT_ID])) {
-				$this->addRowError(self::ERROR_PRODUCT_ID_IS_EMPTY, $rowNumber);
+			if (empty($rowData[self::COLUMN_SKU])) {
+				$this->addRowError(self::ERROR_COLUMN_SKU_IS_EMPTY, $rowNumber);
 			} 
         }
     }

@@ -47,12 +47,12 @@
         <attribute code="website" reference="_product_websites" />
         <description label="1. Click 'Load Map Attributes' button to map attributes automatically."/>
         <description label="1. 2. Fill missing value for RED dropdown. This problem occurs when your file uses custom column names for required columns."/>
-        <link suffix="" label="Download Sample File For Magento 1"/>
-        <link suffix="-bundle-products" label="Download Sample File For Bundle Products in Magento 1"/>
-        <link suffix="-downloadable-products" label="Download Sample File For Downloadable Products in Magento 1"/>
+        <link entity="catalog_product" suffix="" label="Download Sample File For Magento 1"/>
+        <link entity="catalog_product" suffix="-bundle-products" label="Download Sample File For Bundle Products in Magento 1"/>
+        <link entity="catalog_product" suffix="-downloadable-products" label="Download Sample File For Downloadable Products in Magento 1"/>
     </platform>
     <platform name="magento2" label="Magento 2">
-        <link suffix="" label="Download Sample File For Magento 2"/>
+        <link entity="catalog_product" suffix="" label="Download Sample File For Magento 2"/>
     </platform>
     <platform name="shopify" label="Shopify" model="Firebear\ImportExport\Model\Source\Platform\Shopify">
         <attribute code="Variant SKU" reference="sku" />

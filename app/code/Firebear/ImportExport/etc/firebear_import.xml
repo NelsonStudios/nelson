@@ -22,6 +22,8 @@
             behaviorModel="Magento\ImportExport\Model\Source\Import\Behavior\Basic"/>
 	<entity name="order" label="Orders" model="Firebear\ImportExport\Model\Import\Order" 
 			behaviorModel="Firebear\ImportExport\Model\Source\Import\Behavior\Order"/>
+	<entity name="attribute" label="Attributes" model="Firebear\ImportExport\Model\Import\Attribute" 
+			behaviorModel="Firebear\ImportExport\Model\Source\Import\Behavior\Order"/>			
     <!-- Adding Entity CART PRICE RULE -->
     <entity name="cart_price_rule" label="Cart Price Rule" model="Firebear\ImportExport\Model\Import\CartPriceRule"
             behaviorModel="Firebear\ImportExport\Model\Source\Import\Behavior\CartPriceRule"/>

@@ -38,6 +38,7 @@
     </xs:complexType>
 
     <xs:complexType name="linkDeclaration">
+        <xs:attribute name="entity" type="xs:string" use="required"/>
         <xs:attribute name="suffix" type="xs:string" use="optional"/>
         <xs:attribute name="label" type="xs:string" use="required"/>
     </xs:complexType>

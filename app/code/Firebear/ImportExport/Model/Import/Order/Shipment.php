@@ -73,11 +73,11 @@ class Shipment extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['shipments'])) {
-			return false;
+		$rowData = $this->_extractField($rowData, 'shipment');
+		if (!empty($rowData['shipping_label'])) {
+			$rowData['shipping_label'] = base64_decode($rowData['shipping_label']);
 		}
-		$rowData = $this-> _explodeField($rowData['shipments']);
-		return ($rowData && !$this->isEmptyRow($rowData)) 
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
 			? $rowData 
 			: false;		
     }

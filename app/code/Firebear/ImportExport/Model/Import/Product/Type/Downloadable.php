@@ -6,11 +6,52 @@
 
 namespace Firebear\ImportExport\Model\Import\Product\Type;
 
+use Magento\Framework\File\Uploader;
+use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
+
 /**
  * Class Downloadable
  */
 class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Product\Type\Downloadable
 {
+    /**
+     * Array of cached import link
+     *
+     * @var array
+     */
+    protected $importLink = [];
+	
+    /**
+     * Validation links option
+     *
+     * @param array $rowData
+     * @return bool
+     */
+    protected function isRowValidLink(array $rowData)
+    {
+		$result = parent::isRowValidLink($rowData);
+		if (!$result && !empty($rowData[self::COL_DOWNLOADABLE_LINKS])) {
+			$rowSku = strtolower($rowData[ImportProduct::COL_SKU]);
+			$option = $this->prepareLinkData($rowData[self::COL_DOWNLOADABLE_LINKS]);
+			$option = $option[0];
+			$key = md5(
+				$option['link_url']. 
+				$option['link_file'] . 
+				$option['link_type'] . 
+				$option['sample_url'] . 
+				$option['sample_file'] . 
+				$option['sample_type'] . 
+				$rowSku
+			);
+			if (isset($this->importLink[$key])) {			
+				$this->_entityModel->addRowError(__('Duplicated downloadable_links attribute.'), $this->rowNum);
+				return true;
+			}
+			$this->importLink[$key] = true;
+		}		
+        return $result;
+    }
+	
     /**
      * Get fill data options with key link
      *
@@ -83,11 +124,23 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
     protected function uploadDownloadableFiles($fileName, $type = 'links', $renameFileOff = false)
     {
         try {
-            if ($this->_entityModel->getSourceType()) {
-                  $dispersionPath = \Magento\Framework\File\Uploader::getDispretionPath($fileName);
-                  $imageSting = mb_strtolower($dispersionPath . '/' . preg_replace('/[^a-z0-9\._-]+/i', '', $fileName));
-                  $this->_entityModel->getSourceType()->importImage($fileName, $imageSting);
-                  $res['file'] = $this->_entityModel->getSourceType()->getCode() . $imageSting;
+            if ($this->_entityModel->getSourceType()
+                && !in_array(
+                    $this->_entityModel->getSourceType()->getCode(),
+                    ['url', 'google']
+                )
+            ) {
+                $dispersionPath = Uploader::getDispretionPath($fileName);
+                $imageSting = mb_strtolower(
+                    $dispersionPath . '/'
+                        . preg_replace('/[^a-z0-9\._-]+/i', '', $fileName)
+                );
+                $this->_entityModel
+                    ->getSourceType()
+                    ->importImage($fileName, $imageSting);
+                $res['file'] = $this->_entityModel
+                    ->getSourceType()
+                    ->getCode() . $imageSting;
             } else {
                 $res = $this->uploaderHelper->getUploader(
                     $type,
@@ -98,7 +151,8 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
             return $res['file'];
         } catch (\Exception $e) {
             $this->_entityModel->addRowError(
-                $this->_messageTemplates[self::ERROR_MOVE_FILE] . '. ' . $e->getMessage(),
+                $this->_messageTemplates[self::ERROR_MOVE_FILE] . '. '
+                    . $e->getMessage(),
                 $this->rowNum
             );
 

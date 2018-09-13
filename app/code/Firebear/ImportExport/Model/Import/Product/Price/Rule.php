@@ -302,7 +302,6 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
                     $productCollection->addIdFilter($this->_productsFilter);
                 }
                 $this->getConditions()->collectValidatedAttributes($productCollection);
-
                 $this->_resourceIterator->walk(
                     $productCollection->getSelect(),
                     [[$this, 'callbackValidateProduct']],

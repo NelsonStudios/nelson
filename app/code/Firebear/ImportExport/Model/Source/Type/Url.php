@@ -41,6 +41,7 @@ class Url extends AbstractType
             if ($this->getFormatFile()) {
                 $fileName .= "." . strtolower($this->getFormatFile());
             }
+            $fileName = str_replace("%", "_", $fileName);
             $this->directory->writeFile(
                 $this->directory->getRelativePath($this->getImportPath() . '/' . $fileName),
                 $read->readAll()
@@ -76,6 +77,7 @@ class Url extends AbstractType
                 $url = str_replace($matches[0], '', $url);
             }
         }
+
         if ($url) {
             try {
                 $driver = $this->getProperDriverCode($matches);

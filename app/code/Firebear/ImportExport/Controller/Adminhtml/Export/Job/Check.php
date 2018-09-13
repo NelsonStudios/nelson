@@ -74,8 +74,8 @@ class Check extends JobController
             $formData = $this->getRequest()->getParam('form_data');
             $exportData = [];
             foreach ($formData as $data) {
-                $exData = explode('+', $data);
-                $exportData[$exData[0]] = $exData[1];
+                $exData = strstr($data, '+', true);
+                $exportData[$exData] = substr($data, strpos($data, '+') + 1);
             }
             $entity = $exportData['export_source_entity'];
             $source = $this->helper->getSourceModelByType($exportData['export_source_entity']);

@@ -22,14 +22,15 @@ class Xslt
         if (!@class_exists('\XSLTProcessor')) {
             throw new LocalizedException(__('The XSLTProcessor class could not be found. This means your PHP installation is missing XSL features.'));
         }
-
         $xmlDoc = new \DOMDocument();
-        $xmlDoc->loadXML($file, LIBXML_NOWARNING);
+
+        $xmlDoc->loadXML($file, LIBXML_COMPACT | LIBXML_PARSEHUGE | LIBXML_NOWARNING);
 
         $xslDoc = new \DOMDocument();
-        $xslDoc->loadXML($xsl, LIBXML_NOWARNING);
+        $xslDoc->loadXML($xsl, LIBXML_COMPACT | LIBXML_PARSEHUGE | LIBXML_NOWARNING);
 
         $proc = new \XSLTProcessor();
+        $proc->registerPHPFunctions();
         $proc->importStylesheet($xslDoc);
         try {
             $newDom = $proc->transformToDoc($xmlDoc);

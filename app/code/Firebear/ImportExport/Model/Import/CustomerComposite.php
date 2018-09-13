@@ -72,7 +72,8 @@ class CustomerComposite extends MagentoCustomer
         LoggerInterface $logger,
         \Firebear\ImportExport\Model\ResourceModel\Import\CustomerComposite\DataFactory $importFireData,
         array $data = []
-    ) {
+    )
+    {
         parent::__construct(
             $string,
             $scopeConfig,
@@ -94,12 +95,14 @@ class CustomerComposite extends MagentoCustomer
         $data['data_source_model'] = $importFireData->create(
             [
                 'arguments' => [
-                    'entity_type'         => 'address',
+                    'entity_type' => 'address',
                     'customer_attributes' => $this->_customerAttributes,
                 ],
             ]
         );
         $this->_addressEntity = $fireImportAddress->create(['data' => $data]);
+        $this->fireImportAddress = $fireImportAddress->create();
+        $this->fireImportCustomer = $fireImportCustomer->create();
         unset($data['data_source_model']);
         $this->_dataSourceModel = $importFireData->create();
     }
@@ -121,6 +124,145 @@ class CustomerComposite extends MagentoCustomer
         $this->_logger = $logger;
         $this->_customerEntity->setLogger($logger);
     }
+
+    protected function _importData()
+    {
+        $oldEmail = [];
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
+            $entitiesToCreate = [];
+            $entitiesToUpdate = [];
+            $entitiesToDelete = [];
+            $attributesToSave = [];
+            $newRows = [];
+            $updateRows = [];
+            $attributes = [];
+            $defaults = [];
+            $deleteRowIds = [];
+
+            foreach ($bunch as $rowNumber => $rowData) {
+                $time = explode(" ", microtime());
+                $startTime = $time[0] + $time[1];
+                $email = $rowData['email'];
+                $rowData = $this->joinIdenticalyData($rowData);
+
+                if (in_array($email, $oldEmail)) {
+                    unset($rowData[$email]);
+                    continue;
+                } else {
+                    array_push($oldEmail, $email);
+                }
+                $website = $rowData[Customer::COLUMN_WEBSITE];
+                if (isset($this->_newCustomers[strtolower($rowData[Customer::COLUMN_EMAIL])][$website])) {
+                    continue;
+                }
+                $rowData = $this->customChangeData($rowData);
+                if (!$this->validateRow($rowData, $rowNumber)) {
+                    $this->addLogWriteln(__('customer with email: %1 is not valided', $email), $this->output, 'info');
+                    continue;
+                }
+                if ($this->fireImportAddress->_isOptionalAddressEmpty($rowData) || !$this->validateRow($rowData, $rowNumber)) {
+                    $this->addLogWriteln(__('address with email: %1 is not valided', $email), $this->output, 'info');
+                    continue;
+                }
+
+                if ($this->getErrorAggregator()->hasToBeTerminated()) {
+                    $this->getErrorAggregator()->addRowToSkip($rowNumber);
+                    continue;
+                }
+
+                if ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_DELETE) {
+                    $entitiesToDelete[] = $this->_getCustomerId(
+                        $rowData[Customer::COLUMN_EMAIL],
+                        $rowData[Customer::COLUMN_WEBSITE]
+                    );
+                    $deleteRowIds[] = $rowData[Address::COLUMN_ADDRESS_ID];
+                } elseif ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE
+                    || $this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND) {
+                    $processedData = $this->fireImportCustomer->_prepareDataForUpdate($rowData);
+                    
+                    $entitiesToCreate = array_merge($entitiesToCreate, $processedData[Customer::ENTITIES_TO_CREATE_KEY]);
+                    $lastEntity = $processedData[Customer::ENTITIES_TO_CREATE_KEY][0] ?? null;
+                    if ($lastEntity) {
+						$rowData['parent_id'] = $lastEntity['entity_id'];
+						$this->fireImportAddress->setCustomerId(
+							$lastEntity['email'],
+							$lastEntity['website_id'],
+							$lastEntity['entity_id']
+						);
+                    } 
+                    
+                    $entitiesToUpdate = array_merge($entitiesToUpdate, $processedData[Customer::ENTITIES_TO_UPDATE_KEY]);
+                    foreach ($processedData[Customer::ATTRIBUTES_TO_SAVE_KEY] as $tableName => $customerAttributes) {
+                        if (!isset($attributesToSave[$tableName])) {
+                            $attributesToSave[$tableName] = [];
+                        }
+                        $attributesToSave[$tableName] =
+                            array_diff_key($attributesToSave[$tableName], $customerAttributes)
+                            + $customerAttributes;
+                    }
+                    $addUpdateResult = $this->fireImportAddress->_prepareDataForUpdate($rowData);
+                    if ($addUpdateResult['entity_row_new']) {
+                        $newRows[] = $addUpdateResult['entity_row_new'];
+                    }
+                    if ($addUpdateResult['entity_row_update']) {
+                        $updateRows[] = $addUpdateResult['entity_row_update'];
+                    }
+                    $attributes = $this->fireImportAddress->_mergeEntityAttributes($addUpdateResult['attributes'], $attributes);
+                    $defaults = $this->fireImportAddress->_mergeEntityAttributes($addUpdateResult['defaults'], $defaults);
+                }
+                $time = explode(" ", microtime());
+                $endTime = $time[0] + $time[1];
+                $totalTime = $endTime - $startTime;
+                $totalTime = round($totalTime, 5);
+
+                $this->addLogWriteln(__('customer_composite with email: %1 .... %2s', $email, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(__('address_composite with email: %1 .... %2s', $email, $totalTime), $this->output, 'info');
+            }
+            try {
+                $this->updateItemsCounterStats($entitiesToCreate, $entitiesToUpdate, $entitiesToDelete);
+
+                /**
+                 * Save prepared data
+                 */
+
+                if ($entitiesToCreate || $entitiesToUpdate) {
+                    $this->fireImportCustomer->_saveCustomerEntities($entitiesToCreate, $entitiesToUpdate);
+                }
+                if ($attributesToSave) {
+                    $this->fireImportCustomer->_saveCustomerAttributes($attributesToSave);
+                }
+                if ($entitiesToDelete) {
+                    $this->fireImportCustomer->_deleteCustomerEntities($entitiesToDelete);
+                }
+                $this->updateItemsCounterStats($newRows, $updateRows, $deleteRowIds);
+                if ($newRows || $updateRows) {
+                    $this->fireImportAddress->_saveAddressEntities(
+                        $newRows,
+                        $updateRows
+                    );
+                }
+                if ($attributes) {
+                    $this->fireImportAddress->_saveAddressAttributes(
+                        $attributes
+                    );
+                }
+                if ($defaults) {
+                    $this->fireImportAddress->_saveCustomerDefaults(
+                        $defaults
+                    );
+                }
+
+                if ($deleteRowIds) {
+                    $this->fireImportAddress->_deleteAddressEntities($deleteRowIds);
+                }
+            } catch (\Exception $e) {
+                $this->addLogWriteln($e->getMessage(), $this->output, 'error');
+            }
+        }
+
+        return true;
+    }
+
 
     protected function _saveValidatedBunches()
     {

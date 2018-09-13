@@ -38,14 +38,19 @@ class Converter implements ConverterInterface
                 }
             }
             $depends = '';
+            $apiDepends = '';
             if ($typeNode->attributes->getNamedItem('depends')) {
                 $depends = $typeNode->attributes->getNamedItem('depends')->nodeValue;
+            }
+            if ($typeNode->attributes->getNamedItem('api')) {
+                $apiDepends = $typeNode->attributes->getNamedItem('api')->nodeValue;
             }
             $result[$typeName] = [
                 'label' => $typeLabel,
                 'model' => $typeModel,
                 'sort_order' => $sortOrder,
-                'depends' => $depends
+                'depends' => $depends,
+                'api' => $apiDepends
             ];
 
             foreach ($typeNode->childNodes as $childNode) {
@@ -72,6 +77,12 @@ class Converter implements ConverterInterface
                         ? $childNode->attributes->getNamedItem('template')->nodeValue : '',
                     'url' => ($childNode->attributes->getNamedItem('url'))
                         ? $childNode->attributes->getNamedItem('url')->nodeValue : '',
+                    'options' => ($childNode->attributes->getNamedItem('options'))
+                        ? $childNode->attributes->getNamedItem('options')->nodeValue : '',
+                    'source_options' => ($childNode->attributes->getNamedItem('source_options'))
+                        ? $childNode->attributes->getNamedItem('source_options')->nodeValue : '',
+                    'formElement' => ($childNode->attributes->getNamedItem('formElement'))
+                        ? $childNode->attributes->getNamedItem('formElement')->nodeValue : '',
                 ];
             }
         }

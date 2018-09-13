@@ -32,10 +32,14 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
     protected $registry;
 
 
+    protected $defaults = [];
+
     /**
      * @var \Magento\CatalogImportExport\Model\Import\Proxy\Product\ResourceModelFactory
      */
     protected $resourceFactory;
+
+    protected $manager;
 
     /**
      * Configurable constructor.
@@ -58,7 +62,8 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $_productColFac,
         \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory,
-        \Magento\CatalogImportExport\Model\Import\Proxy\Product\ResourceModelFactory $resourceModelFactory
+        \Magento\CatalogImportExport\Model\Import\Proxy\Product\ResourceModelFactory $resourceModelFactory,
+        \Magento\Framework\Module\Manager $moduleManager
     ) {
         parent::__construct(
             $attrSetColFac,
@@ -73,6 +78,7 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
         $this->_messageTemplates[self::ERROR_INVALID_PRICE_CORRECTION] = 'Super attribute price correction value is invalid';
         $this->attributeFactory = $attributeFactory;
         $this->resourceFactory = $resourceModelFactory;
+        $this->manager = $moduleManager;
     }
 
     /**
@@ -82,30 +88,32 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
      */
     protected function _isParticularAttributesValid(array $rowData, $rowNum)
     {
-
         $options = $this->registry->registry('firebear_create_attr');
         if (!empty($rowData['_super_attribute_code'])) {
             $superAttrCode = $rowData['_super_attribute_code'];
-            if (!$this->_isAttributeSuper($superAttrCode)) {
-                $this->_entityModel->addRowError(__('Attribute with code "%1" is not super.', $superAttrCode), $rowNum);
-                return false;
-            } elseif (isset($rowData['_super_attribute_option']) && $rowData['_super_attribute_option'] !== '') {
-                $optionKey = strtolower($rowData['_super_attribute_option']);
-                if (!empty($options) && isset($options[$superAttrCode])) {
-                    $this->_superAttributes[$superAttrCode]['options'] = $options[$superAttrCode];
-                }
+            if (!$superAttrCode == 'default') {
+                if (!$this->_isAttributeSuper($superAttrCode)) {
+                    $this->_entityModel->addRowError(__('Attribute with code "%1" is not super.', $superAttrCode),
+                        $rowNum);
+                    return false;
+                } elseif (isset($rowData['_super_attribute_option']) && $rowData['_super_attribute_option'] !== '') {
+                    $optionKey = strtolower($rowData['_super_attribute_option']);
+                    if (!empty($options) && isset($options[$superAttrCode])) {
+                        $this->_superAttributes[$superAttrCode]['options'] = $options[$superAttrCode];
+                    }
 
-                if (!isset($this->_superAttributes[$superAttrCode]['options'][$optionKey])) {
-                    if (!$this->createAttributeValues($superAttrCode, $optionKey)) {
-                        $this->_entityModel->addRowError(self::ERROR_INVALID_OPTION_VALUE, $rowNum);
+                    if (!isset($this->_superAttributes[$superAttrCode]['options'][$optionKey])) {
+                        if (!$this->createAttributeValues($superAttrCode, $optionKey)) {
+                            $this->_entityModel->addRowError(self::ERROR_INVALID_OPTION_VALUE, $rowNum);
+                            return false;
+                        }
+                    }
+
+                    if (!empty($rowData['super_attribute_price_corr'])
+                        && !$this->_isPriceCorr($rowData['super_attribute_price_corr'])) {
+                        $this->_entityModel->addRowError(self::ERROR_INVALID_PRICE_CORRECTION, $rowNum);
                         return false;
                     }
-                }
-
-                if (!empty($rowData['super_attribute_price_corr'])
-                    && !$this->_isPriceCorr($rowData['super_attribute_price_corr'])) {
-                    $this->_entityModel->addRowError(self::ERROR_INVALID_PRICE_CORRECTION, $rowNum);
-                    return false;
                 }
             }
         }
@@ -158,6 +166,7 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
                         $this->_productData = null;
                         continue;
                     }
+
                     $this->_collectSuperData($rowData);
                 }
             }
@@ -241,4 +250,146 @@ class Configurable extends \Magento\ConfigurableImportExport\Model\Import\Produc
 
         return false;
     }
+
+    protected function _deleteData()
+    {
+        parent::_deleteData();
+        if ($this->manager->isEnabled('Firebear_ConfigurableProducts')) {
+            $linkTable = $this->_resource->getTableName('icp_catalog_product_default_super_link');
+            if (($this->_entityModel->getBehavior() == \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND)
+                && !empty($this->_productSuperData['product_id'])
+            ) {
+                error_log("da2222");
+                $quoted = $this->connection->quoteInto('IN (?)', [$this->_productSuperData['product_id']]);
+                $this->connection->delete($linkTable, "parent_id {$quoted}");
+            }
+        }
+        return $this;
+    }
+
+    /**
+     *  Collected link data insertion.
+     *
+     * @return $this
+     * @throws \Zend_Db_Exception
+     */
+    protected function _insertData()
+    {
+        parent::_insertData();
+        if ($this->manager->isEnabled('Firebear_ConfigurableProducts')) {
+            if (!empty($this->defaults)) {
+                $linkTable = $this->_resource->getTableName('icp_catalog_product_default_super_link');
+                $list = $this->_superAttributesData['super_link'];
+                foreach ($list as $key => $element) {
+                    if (!in_array($element['product_id'], $this->defaults)) {
+                        unset($list[$key]);
+                    }
+                }
+                if ($list) {
+                    $this->connection->insertOnDuplicate($linkTable, $list);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function _parseVariations($rowData)
+    {
+        $additionalRows = [];
+        if (!isset($rowData['configurable_variations'])) {
+            return $additionalRows;
+        }
+        $variations = explode(ImportProduct::PSEUDO_MULTI_LINE_SEPARATOR, $rowData['configurable_variations']);
+        foreach ($variations as $variation) {
+            $fieldAndValuePairsText = explode($this->_entityModel->getMultipleValueSeparator(), $variation);
+            $additionalRow = [];
+            $fieldAndValuePairs = [];
+            foreach ($fieldAndValuePairsText as $nameAndValue) {
+                $nameAndValue = explode(ImportProduct::PAIR_NAME_VALUE_SEPARATOR, $nameAndValue);
+                if (!empty($nameAndValue)) {
+                    $value = isset($nameAndValue[1]) ? trim($nameAndValue[1]) : '';
+                    $fieldName  = trim($nameAndValue[0]);
+                    if ($fieldName) {
+                        $fieldAndValuePairs[$fieldName] = $value;
+                    }
+                }
+            }
+
+            if (!empty($fieldAndValuePairs['sku'])) {
+                $position = 0;
+                $additionalRow['_super_products_sku'] = strtolower($fieldAndValuePairs['sku']);
+                unset($fieldAndValuePairs['sku']);
+                $additionalRow['display'] = isset($fieldAndValuePairs['display']) ? $fieldAndValuePairs['display'] : 1;
+                unset($fieldAndValuePairs['display']);
+                if (isset($fieldAndValuePairs['default'])) {
+                    $additionalRow['default'] = $fieldAndValuePairs['default'];
+                }
+                foreach ($fieldAndValuePairs as $attrCode => $attrValue) {
+                        $additionalRow['_super_attribute_code'] = $attrCode;
+                        $additionalRow['_super_attribute_option'] = $attrValue;
+                        $additionalRow['_super_attribute_position'] = $position;
+                        $additionalRows[] = $additionalRow;
+                        $additionalRow = [];
+                        $position += 1;
+                }
+            }
+        }
+
+        return $additionalRows;
+    }
+
+    protected function _loadSkuSuperAttributeValues($bunch, $newSku, $oldSku)
+    {
+        if ($this->_superAttributes) {
+            $attrSetIdToName = $this->_entityModel->getAttrSetIdToName();
+
+            $productIds = [];
+            foreach ($bunch as $rowData) {
+                $dataWithExtraVirtualRows = $this->_parseVariations($rowData);
+                if (!empty($dataWithExtraVirtualRows)) {
+                    array_unshift($dataWithExtraVirtualRows, $rowData);
+                } else {
+                    $dataWithExtraVirtualRows[] = $rowData;
+                }
+                foreach ($dataWithExtraVirtualRows as $data) {
+                    if (!empty($data['_super_products_sku'])) {
+                        if (isset($newSku[$data['_super_products_sku']])) {
+                            if (isset($data['default']) && $data['default']) {
+                                $this->defaults[] = $newSku[$data['_super_products_sku']][$this->getProductEntityLinkField()];
+                            }
+                            $productIds[] = $newSku[$data['_super_products_sku']][$this->getProductEntityLinkField()];
+                        } elseif (isset($oldSku[$data['_super_products_sku']])) {
+                            if (isset($data['default']) && $data['default']) {
+                                $this->defaults[] = $oldSku[$data['_super_products_sku']][$this->getProductEntityLinkField()];
+                            }
+                            $productIds[] = $oldSku[$data['_super_products_sku']][$this->getProductEntityLinkField()];
+                        }
+                    }
+                }
+            }
+
+            foreach ($this->_productColFac->create()->addFieldToFilter(
+                'type_id',
+                $this->_productTypesConfig->getComposableTypes()
+            )->addFieldToFilter(
+                $this->getProductEntityLinkField(),
+                ['in' => $productIds]
+            )->addAttributeToSelect(
+                array_keys($this->_superAttributes)
+            ) as $product) {
+                $attrSetName = $attrSetIdToName[$product->getAttributeSetId()];
+
+                $data = array_intersect_key($product->getData(), $this->_superAttributes);
+                foreach ($data as $attrCode => $value) {
+                    $attrId = $this->_superAttributes[$attrCode]['id'];
+                    $productId = $product->getData($this->getProductEntityLinkField());
+                    $this->_skuSuperAttributeValues[$attrSetName][$productId][$attrId] = $value;
+                }
+            }
+        }
+
+        return $this;
+    }
+
 }

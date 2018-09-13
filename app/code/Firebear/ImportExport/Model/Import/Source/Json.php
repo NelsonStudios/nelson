@@ -129,7 +129,7 @@ class Json extends \Magento\ImportExport\Model\Import\AbstractSource
                 continue;
             }
             $value = $data;
-            if (strpos($value, "'") !== false) {
+            if (is_string($value) && strpos($value, "'") !== false) {
                 $this->_foundWrongQuoteFlag = true;
             }
             $parsed[$name] = $value;

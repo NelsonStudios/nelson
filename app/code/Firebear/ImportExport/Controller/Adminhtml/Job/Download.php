@@ -85,6 +85,8 @@ class Download extends Job
     {
         $type = $this->getRequest()->getParam('type');
         $source = $this->getRequest()->getParam('source');
+        $entity = $this->getRequest()->getParam('entity');
+
         switch ($type) {
             case 'magento1':
                 $outputFile = $this->getFile('catalog_product_magento1.' . $source);

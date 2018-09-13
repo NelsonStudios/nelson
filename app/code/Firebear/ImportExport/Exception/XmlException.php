@@ -33,7 +33,7 @@ class XmlException extends \Magento\Framework\Exception\LocalizedException
         if ($x > 0) {
             parent::__construct(__($this->errorMessage));
         } else {
-            parent::__construct(_("Unknown Error XmlException"));
+            parent::__construct(__("Unknown Error XmlException"));
         }
     }
 

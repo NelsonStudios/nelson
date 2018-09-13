@@ -92,11 +92,15 @@ define(
                             };
                             var type = registry.get(self.ns + '.' + self.ns + '.source_data_map_container.platforms');
                             var locale = registry.get(self.ns + '.' + self.ns + '.general.language');
+                            var jobId = registry.get(self.ns + '.' + self.ns + '.general.entity_id');
                             if (type.value()) {
                                 data['type'] = type.value();
                             }
                             if (locale.value()) {
                                 data['language'] = locale.value();
+                            }
+                            if (jobId.value()) {
+                                data['job_id'] = jobId.value();
                             }
 
                             jQuery.ajax(
@@ -116,6 +120,18 @@ define(
                                             localStorage.setItem('columns', JSON.stringify(result.columns));
                                             localStorage.setItem('options', JSON.stringify(result.options));
                                             localStorage.setItem('map', JSON.stringify(result.map));
+
+                                            /**
+                                             * Update "Attribute / column name on file" field
+                                             * options after validate new file
+                                             */
+                                            self.updateConfigurableOptions(result.columns);
+
+                                            var configurableSwitch = registry.get(self.ns + '.' + self.ns + '.configurable.configurable_switch');
+                                            if (configurableSwitch) {
+                                                configurableSwitch.onUpdate();
+                                            }
+
                                             if ("update" in self) {
                                                 if (self.update == 1) {
                                                     var object = reg.get('import_job_form.import_job_form.source_data_map_container.source_data_map');
@@ -161,6 +177,12 @@ define(
                 }
                 return form.promise();
             },
+            updateConfigurableOptions: function(options) {
+                var element = registry.get(this.ns + '.' + this.ns + '.configurable.configurable_field');
+                if (element) {
+                    element.updateOptions(options);
+                }
+            }
         }
     }
 );

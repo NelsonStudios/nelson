@@ -6,11 +6,10 @@
 
 namespace Firebear\ImportExport\Console\Command;
 
+use Magento\Backend\App\Area\FrontNameResolver;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Magento\Backend\App\Area\FrontNameResolver;
-use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Command prints list of available currencies
@@ -48,6 +47,7 @@ class ExportJobRunCommand extends ExportJobAbstractCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -92,7 +92,7 @@ class ExportJobRunCommand extends ExportJobAbstractCommand
                         );
                     } else {
                         $this->addLogComment(
-                            $result,
+                            $result[0],
                             $output,
                             'error'
                         );
@@ -118,5 +118,25 @@ class ExportJobRunCommand extends ExportJobAbstractCommand
                 'error'
             );
         }
+    }
+
+    /**
+     * @param $jobId
+     * @param $lastEntityId
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function updateLastEntityId($jobId, $lastEntityId)
+    {
+        $exportJob = $this->repository->getById($jobId);
+        $sourceData = $this->jsonDecoder->decode($exportJob->getExportSource());
+        $sourceData = array_merge(
+            $sourceData,
+            [
+                'last_entity_id' => $lastEntityId
+            ]
+        );
+        $sourceData = $this->jsonEncoder->encode($sourceData);
+        $exportJob->setExportSource($sourceData);
+        $this->repository->save($exportJob);
     }
 }

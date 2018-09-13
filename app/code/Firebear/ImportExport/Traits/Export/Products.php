@@ -18,7 +18,15 @@ trait Products
         $stockItemRows =  $this->fieldsCatalogInventory();
         $this->setHeaderColumns(1, $stockItemRows);
         $this->_headerColumns = $this->rowCustomizer->addHeaderColumns($this->_headerColumns);
-
+        $subOptions = [];
+        if (isset($this->_attributeColFactory)) {
+            $attributeCollection = $this->_attributeColFactory->create()->addVisibleFilter()
+                ->setOrder('attribute_code', \Magento\Framework\Data\Collection\AbstractDb::SORT_ORDER_ASC);
+            foreach ($attributeCollection as $attribute) {
+                $subOptions[] = $attribute->getAttributeCode();
+            }
+            $this->_headerColumns = array_merge($this->_headerColumns, $subOptions);
+        }
         return array_unique($this->_headerColumns);
     }
 }

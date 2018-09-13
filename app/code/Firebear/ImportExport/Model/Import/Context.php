@@ -14,7 +14,6 @@ use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorI
 use Magento\ImportExport\Model\ResourceModel\Helper as ResourceHelper;
 use Psr\Log\LoggerInterface;
 use Firebear\ImportExport\Model\ResourceModel\Import\Data as DataSourceModel;
-use Firebear\ImportExport\Model\Import\Order\FieldProcessor;
 
 /**
  * Import Adapter Context
@@ -82,14 +81,7 @@ class Context
      *
      * @var \Psr\Log\LoggerInterface
      */
-    protected $logger;
-    
-    /**
-     * Field Processor
-     *
-     * @var \Firebear\ImportExport\Model\Import\Order\FieldProcessor
-     */
-    protected $_fieldProcessor;    
+    protected $logger;  
 	
     /**
      * Initialize Context
@@ -102,8 +94,7 @@ class Context
      * @param ResourceHelper $resourceHelper
      * @param StringUtils $string 
      * @param ProcessingErrorAggregatorInterface $errorAggregator     
-     * @param Logger $logger
-     * @param FieldProcessor $fieldProcessor     
+     * @param Logger $logger   
      */
     public function __construct(
         JsonHelper $jsonHelper,
@@ -114,8 +105,7 @@ class Context
         ResourceHelper $resourceHelper,
         StringUtils $string,
         ProcessingErrorAggregatorInterface $errorAggregator,
-        LoggerInterface $logger,
-        FieldProcessor $fieldProcessor		
+        LoggerInterface $logger	
     ) {
         $this->jsonHelper = $jsonHelper;
         $this->importExportData = $importExportData;
@@ -125,8 +115,7 @@ class Context
         $this->resourceHelper = $resourceHelper;
         $this->string = $string;
         $this->errorAggregator = $errorAggregator;
-        $this->logger = $logger;
-        $this->_fieldProcessor = $fieldProcessor;		
+        $this->logger = $logger;		
     }
     
     /**
@@ -217,15 +206,5 @@ class Context
     public function getLogger()
     {
         return $this->logger;
-    }
-	
-    /**
-     * Retrieve Field Processor
-     *
-     * @return \Firebear\ImportExport\Model\Import\Order\FieldProcessor
-     */
-    public function getFieldProcessor()
-    {
-        return $this->_fieldProcessor;
     }	    
 }

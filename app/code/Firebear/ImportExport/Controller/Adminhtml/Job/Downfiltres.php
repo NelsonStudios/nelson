@@ -135,7 +135,7 @@ class Downfiltres extends JobController
             if (in_array($type, [\Magento\ImportExport\Model\Export::FILTER_TYPE_SELECT, 'multiselect'])) {
                 if ($optionsAttr = $item->getSource()->getAllOptions()) {
                     foreach ($optionsAttr as $option) {
-                        if (!empty($option['value'])) {
+                        if (isset($option['value'])) {
                             $select[] = ['label' => $option['label'], 'value' => $option['value']];
                         }
                     }

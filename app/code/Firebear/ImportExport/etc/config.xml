@@ -25,6 +25,9 @@
                     <csv>Firebear\ImportExport\Model\Export\Adapter\Csv</csv>
                 </adapter>
             </entities>
+            <page_size>
+                <attribute>5000</attribute>
+            </page_size>			
         </firebear_importexport>
     </default>
 </config>

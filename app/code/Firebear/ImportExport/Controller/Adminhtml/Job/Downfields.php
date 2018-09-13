@@ -70,8 +70,8 @@ class Downfields extends JobController
             $entity = $this->getRequest()->getParam('entity');
 
             if ($entity) {
-                $list = $this->loadList();
-                $options = $list[$entity];
+                $list = $this->loadList($entity);
+                $options = $list[$entity] ?? '';
             }
 
             return $resultJson->setData($options);
@@ -81,25 +81,49 @@ class Downfields extends JobController
     /**
      * @return array
      */
-    protected function loadList()
+    protected function loadList($entity)
     {
         $entities = $this->entity->toOptionArray();
+
         $options  = [];
         foreach ($entities as $item) {
-            $childs = [];
-            if ($item['value']) {
-                $fields = $this->export->create()->setData(['entity' => $item['value']])->getFields();
-                foreach ($fields as $field) {
-                    if (!isset($field['optgroup-name'])) {
-                        $childs[] = ['value' => $field, 'label' => $field];
-                    } else {
-                        $options[$field['optgroup-name']] = $field['value'];
+            if (isset($item['fields'])) {
+                foreach ($item['fields'] as $entityName => $field) {
+                    if ($entity != $entityName) {
+                        continue;
                     }
+                    $options = $this->prepareFields($item['value']);
                 }
-                if (!isset($options[$item['value']])) {
-                    $options[$item['value']] = $childs;
-                }
+            } elseif (isset($item['value']) && $entity == $item['value']) {
+                $options = $this->prepareFields($entity);
             }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param string $entity
+     *
+     * @return array
+     */
+    protected function prepareFields($entity)
+    {
+        $options = [];
+        $childs = [];
+        $fields = $this->export
+            ->create()
+            ->setData(['entity' => $entity])
+            ->getFields();
+        foreach ($fields as $field) {
+            if (!isset($field['optgroup-name'])) {
+                $childs[] = ['value' => $field, 'label' => $field];
+            } else {
+                $options[$field['optgroup-name']] = $field['value'];
+            }
+        }
+        if (!isset($options[$entity])) {
+            $options[$entity] = $childs;
         }
 
         return $options;

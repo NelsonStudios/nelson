@@ -42,6 +42,41 @@ class Sftp extends AbstractType
     }
 
     /**
+     * Prepare and return SFTP client
+     *
+     * @return \Firebear\ImportExport\Model\Filesystem\Io\Ftp
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function _getSourceClient()
+    {
+        if (!$this->getClient()) {
+            if ($this->getData('host')
+                && $this->getData('port')
+                && $this->getData('username')
+                && $this->getData('password')) {
+                $settings = $this->getData();
+            } else {
+                $settings = $this->scopeConfig->getValue(
+                    'firebear_importexport/sftp',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
+            }
+            $settings['passive'] = true;
+            try {
+                $connection = $this->factory->create(self::SFTP_SOURCE);
+                $connection->open(
+                    $settings
+                );
+                $this->client = $connection;
+            } catch (\Exception $e) {
+                throw new  \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+            }
+        }
+
+        return $this->getClient();
+    }
+
+    /**
      * Download remote images to temporary media directory
      *
      * @param $importImage
@@ -89,41 +124,6 @@ class Sftp extends AbstractType
     }
 
     /**
-     * Prepare and return SFTP client
-     *
-     * @return \Firebear\ImportExport\Model\Filesystem\Io\Ftp
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function _getSourceClient()
-    {
-        if (!$this->getClient()) {
-            if ($this->getData('host')
-                && $this->getData('port')
-                && $this->getData('username')
-                && $this->getData('password')) {
-                $settings = $this->getData();
-            } else {
-                $settings = $this->scopeConfig->getValue(
-                    'firebear_importexport/sftp',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                );
-            }
-            $settings['passive'] = true;
-            try {
-                $connection = $this->factory->create(self::SFTP_SOURCE);
-                $connection->open(
-                    $settings
-                );
-                $this->client = $connection;
-            } catch (\Exception $e) {
-                throw new  \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
-            }
-        }
-
-        return $this->getClient();
-    }
-
-    /**
      * @param $model
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -139,7 +139,15 @@ class Sftp extends AbstractType
             $path = AbstractType::EXPORT_DIR . "/" . $name;
             if ($this->writeFile($path)) {
                 if ($client = $this->_getSourceClient()) {
-                    $sourceFilePath = $this->getData('file_path');
+                    $fileFormat = $model->getFileFormat();
+                    $currentDate = "";
+                    if ($this->getData('date_format')) {
+                        $format = $this->getData('date_format') ?? 'Y-m-d-hi';
+                        $currentDate = "-" . $this->timezone->date()->format($format);
+                    }
+                    $info = pathinfo($this->getData('file_path'));
+                    $sourceFilePath =  $info['dirname'] . '/' . $info['filename'] . $currentDate . '.' . $info['extension'];
+
                     $filePath = $this->directory->getAbsolutePath($path);
                     $result = $client->write($sourceFilePath, $filePath);
                     if (!$result) {

@@ -24,8 +24,12 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
 
     protected $keysAdditional;
 
+    /** @var \Magento\Framework\App\ObjectManager  */
+    protected $moduleManager;
+
     /**
      * Product constructor.
+     *
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
      * @param \Magento\Eav\Model\Config $config
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -43,6 +47,7 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
      * @param \Magento\Catalog\Model\Product\LinkTypeProvider $linkTypeProvider
      * @param \Magento\CatalogImportExport\Model\Export\RowCustomizerInterface $rowCustomizer
      * @param Product\Additional $additional
+     * @param \Magento\Framework\Module\Manager $moduleManager
      * @param array $dateAttrCodes
      */
     public function __construct(
@@ -62,7 +67,8 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
         \Magento\CatalogImportExport\Model\Export\Product\Type\Factory $_typeFactory,
         \Magento\Catalog\Model\Product\LinkTypeProvider $linkTypeProvider,
         \Magento\CatalogImportExport\Model\Export\RowCustomizerInterface $rowCustomizer,
-        \Firebear\ImportExport\Model\Export\Product\Additional $additional,
+        Product\Additional $additional,
+        \Magento\Framework\Module\Manager $moduleManager,
         array $dateAttrCodes = []
     ) {
         parent::__construct(
@@ -85,6 +91,33 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
             $dateAttrCodes
         );
         $this->additional = $additional;
+        $this->moduleManager = $moduleManager;
+    }
+
+    /**
+     * @param $productIds
+     * @return array
+     */
+    protected function getMageStoreInventoryStocks($productIds)
+    {
+        if (empty($productIds)) {
+            return [];
+        }
+        $warehouseData = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magestore\InventorySuccess\Api\Warehouse\WarehouseStockRegistryInterface::class);
+        $warehouseData = $warehouseData->getStocksWarehouses($productIds)->getData();
+        $stockItemRows = [];
+        foreach ($warehouseData as $stockItemRow) {
+            $productId = $stockItemRow['product_id'];
+            unset(
+                $stockItemRow['item_id'],
+                $stockItemRow['product_id'],
+                $stockItemRow['low_stock_date'],
+                $stockItemRow['stock_id'],
+                $stockItemRow['stock_status_changed_auto']
+            );
+            $stockItemRows[$productId] = $stockItemRow;
+        }
+        return $stockItemRows;
     }
 
     /**
@@ -98,7 +131,13 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
             $multirawData = $this->collectMultirawData();
 
             $productIds = array_keys($rawData);
-            $stockItemRows = $this->prepareCatalogInventory($productIds);
+
+            if ($this->moduleManager->isEnabled('Magestore_InventorySuccess')) {
+                $stockItemRows = $this->getMageStoreInventoryStocks($productIds);
+            } else {
+                $stockItemRows = $this->prepareCatalogInventory($productIds);
+            }
+
             $this->rowCustomizer->prepareData(
                 $this->_prepareEntityCollection($this->_entityCollectionFactory->create()),
                 $productIds
@@ -108,7 +147,7 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
             $prevData = [];
             foreach ($rawData as $productId => $productData) {
                 foreach ($productData as $storeId => $dataRow) {
-                    if ($storeId == Store::DEFAULT_STORE_ID && isset($stockItemRows[$productId])) {
+                    if (isset($stockItemRows[$productId])) {
                         $dataRow = array_merge($dataRow, $stockItemRows[$productId]);
                     }
                     $this->appendMultirowData($dataRow, $multirawData);
@@ -145,7 +184,8 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
     }
 
     /**
-     * @return string
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function export()
     {
@@ -162,6 +202,14 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
             $entityCollection = $this->_getEntityCollection(true);
             $entityCollection->setOrder('entity_id', 'asc');
             $entityCollection->setStoreId(Store::DEFAULT_STORE_ID);
+            if (isset($this->_parameters['last_entity_id'])
+                && $this->_parameters['last_entity_id'] > 0
+                && $this->_parameters['enable_last_entity_id'] > 0
+            ) {
+                $entityCollection->addFieldToFilter(
+                    'entity_id', ['gt' => $this->_parameters['last_entity_id']]
+                );
+            }
             $this->_prepareEntityCollection($entityCollection);
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
@@ -172,6 +220,9 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
                 $writer->setHeaderCols($this->_getHeaderColumns());
             }
             foreach ($exportData as $dataRow) {
+                if ($this->_parameters['enable_last_entity_id'] > 0) {
+                    $this->lastEntityId = $dataRow['product_id'];
+                }
                 $writer->writeRow($this->_customFieldsMapping($dataRow));
                 $counts++;
             }
@@ -180,7 +231,7 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
             }
         }
 
-        return [$writer->getContents(), $counts];
+        return [$writer->getContents(), $counts, $this->lastEntityId];
     }
 
     protected function scopeHeader()
@@ -371,9 +422,12 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
              * @var int $itemId
              * @var ProductEntity $item
              */
-            foreach ($this->_storeIdToCode as $storeId => $storeCode) {
-                $addtionalFields = [];
+            foreach ($this->getStores() as $storeId => $storeCode) {
+                if (!isset($itemByStore[$storeId])) {
+                    continue;
+                }
                 $item = $itemByStore[$storeId];
+                $addtionalFields = [];
                 $additionalAttributes = [];
                 $productLinkId = $item->getData($this->getProductEntityLinkField());
                 foreach ($this->_getExportAttrCodes() as $code) {
@@ -549,8 +603,11 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
         $data = [];
 
         $collection = $this->_getEntityCollection();
-        foreach (array_keys($this->_storeIdToCode) as $storeId) {
-            $collection->setStoreId($storeId);
+
+        foreach (array_keys($this->getStores()) as $storeId) {
+            $collection->clear();
+            $collection->addStoreFilter($storeId);
+
             foreach ($collection as $itemId => $item) {
                 $data[$itemId][$storeId] = $item;
             }
@@ -565,14 +622,20 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
         return isset($this->_parameters['divided_additional']) && $this->_parameters['divided_additional'];
     }
 
-    private function appendMultirowData(&$dataRow, &$multiRawData)
+    /**
+     * @param array $dataRow
+     * @param array $multiRawData
+     *
+     * @return array|null
+     */
+    protected function appendMultirowData(&$dataRow, &$multiRawData)
     {
         $productId = $dataRow['product_id'];
         $productLinkId = $dataRow['product_link_id'];
         $storeId = $dataRow['store_id'];
         $sku = $dataRow[self::COL_SKU];
 
-        unset($dataRow['product_id']);
+//        unset($dataRow['product_id']);
         unset($dataRow['product_link_id']);
         unset($dataRow['store_id']);
         unset($dataRow[self::COL_SKU]);
@@ -661,5 +724,30 @@ class Product extends \Magento\CatalogImportExport\Model\Export\Product
         $dataRow[self::COL_SKU] = $sku;
 
         return $dataRow;
+    }
+
+    /**
+     * Filter by stores
+     *
+     * @return array
+     */
+    protected function getStores()
+    {
+        $stores = [];
+        if (
+            isset($this->_parameters['behavior_data']['store_ids'])
+            && is_array($this->_parameters['behavior_data']['store_ids'])
+        ) {
+            $storeIds = $this->_parameters['behavior_data']['store_ids'];
+            foreach ($this->_storeIdToCode as $id => $code) {
+                if (in_array($id, $storeIds)) {
+                    $stores[$id] = $code;
+                }
+            }
+        } else {
+            $stores = $this->_storeIdToCode;
+        }
+
+        return $stores;
     }
 }

@@ -86,10 +86,10 @@ class Item extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['taxs_taxs_item'])) {
-			return false;
-		}
-		return $this-> _explodeField($rowData['taxs_taxs_item']);
+		$rowData = $this->_extractField($rowData, 'tax_item');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;
     }
 	
     /**

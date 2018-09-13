@@ -171,7 +171,6 @@ class PriceConditions extends Generic implements TabInterface
             $fieldsetId,
             []
         )->setRenderer($renderer);
-
         $fieldset->addField(
             'conditions',
             'text',
@@ -185,7 +184,6 @@ class PriceConditions extends Generic implements TabInterface
         )
             ->setRule($model)
             ->setRenderer($this->conditions);
-
         $form->setValues($model->getData());
         $this->setConditionFormName($model->getConditions(), $formName, $conditionsFieldSetId);
 
@@ -202,7 +200,6 @@ class PriceConditions extends Generic implements TabInterface
     {
         $conditions->setFormName($formName);
         $conditions->setJsFormObject($jsFormName);
-
         if ($conditions->getConditions() && is_array($conditions->getConditions())) {
             foreach ($conditions->getConditions() as $condition) {
                 $this->setConditionFormName($condition, $formName, $jsFormName);

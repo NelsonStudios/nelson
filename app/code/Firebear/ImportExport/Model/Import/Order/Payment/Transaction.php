@@ -108,10 +108,13 @@ class Transaction extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['orders_payment_payments_transaction'])) {
-			return false;
-		}		
-		return $this-> _explodeField($rowData['orders_payment_payments_transaction']);
+		$rowData = $this->_extractField($rowData, 'transaction');
+		if (!empty($rowData['additional_information'])) {
+			$rowData['additional_information'] = base64_decode($rowData['additional_information']);
+		}			
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;	
     }
     
     /**

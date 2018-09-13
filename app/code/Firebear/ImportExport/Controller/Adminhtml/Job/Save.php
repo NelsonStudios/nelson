@@ -47,6 +47,8 @@ class Save extends JobController
 
     protected $additionalFields = [
         'platforms',
+        'clear_attribute_value',
+        'remove_product_association',
         'type_file',
         'configurable_switch',
         'configurable_create',

@@ -39,4 +39,16 @@
         <field name="file_path" id="file_path" label="Url" type="text" required="true" notice="The file must match import file format." validation="no-whitespace url2" component="Firebear_ImportExport/js/form/import-google-path-file"/>
         <field name="import_images_file_dir" id="file_import_images_file_dir" label="Images File Directory" type="text" notice="Use relative path to Magento installation, e.g. var/import/images/"/>
     </type>
+    <type name="rest" label="REST API" modelInstance="Firebear\ImportExport\Model\Source\Type\Rest" exists="\RestClient" sortOrder="70" depends="json,xml" api="1">
+        <field name="request_url" id="request_url" label="API Call URL" type="text" required="true" notice="API Call URL" validation="no-whitespace url2"/>
+        <field name="request_method" id="request_method" label="Request Method" type="text" required="true" formElement="select" component="Firebear_ImportExport/js/form/import-rest-select" options="Firebear\ImportExport\Model\Job\Source\RestMethod" source_options="Firebear\ImportExport\Model\Job\Source\RestMethod"/>
+        <field name="request_options" id="request_options" label="JSON Options" type="text" required="true" notice="JSON Options" validation="validate-no-empty required-entry" component="Firebear_ImportExport/js/form/import-rest-textarea"/>
+        <field name="request_body" id="request_body" label="JSON Body Request" type="text" required="false" notice="JSON Body Request"  component="Firebear_ImportExport/js/form/import-rest-textarea"/>
+    </type>
+    <type name="soap" label="SOAP API" modelInstance="Firebear\ImportExport\Model\Source\Type\SOAP" sortOrder="80" depends="xml" api="1">
+        <field name="soap_version" id="soap_version" label="SOAP Version" type="text" required="true" formElement="select" component="Firebear_ImportExport/js/form/import-soap-select" options="Firebear\ImportExport\Model\Job\Source\SoapVersion" source_options="Firebear\ImportExport\Model\Job\Source\SoapVersion"/>
+        <field name="request_url" id="request_url" label="Web Service Url" type="text" required="true" notice="Web Service Url" validation="no-whitespace url2"/>
+        <field name="soap_call" id="soap_call" label="Call Function" type="text" required="true" notice="End point of Request" validation="no-whitespace"/>
+        <field name="options" id="options" label="SOAP Options" type="text" required="false" notice="SOAP Options" component="Firebear_ImportExport/js/form/import-rest-textarea"/>
+    </type>
 </config>

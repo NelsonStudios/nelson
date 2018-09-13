@@ -108,10 +108,10 @@ class Mapvalidate extends JobController
             $sourceType = $this->getRequest()->getParam('source_type');
             $importData = [];
             foreach ($formData as $data) {
-                $exData = explode('+', $data);
-                $index = str_replace($sourceType . '[', '', $exData[0]);
+                $index = strstr($data, '+', true);
+                $index = str_replace($sourceType . '[', '', $index);
                 $index = str_replace(']', '', $index);
-                $importData[$index] = $exData[1];
+                $importData[$index] = substr($data, strpos($data, '+') + 1);
             }
             $importData['records'] = $this->jsonDecoder->decode($importData['records']);
             $importData['platforms'] = $type;
@@ -138,11 +138,8 @@ class Mapvalidate extends JobController
             }
             $this->helper->revertLocale();
 
-            return $resultJson->setData(
-                [
-                    'error' => $messages
-                ]
-            );
+            $data = count($messages) ? ['error' => $messages] : [];
+            return $resultJson->setData($data);
         }
     }
 }

@@ -48,7 +48,13 @@ class Options implements \Magento\Framework\Option\ArrayInterface
         }
         $data = $this->diExport->get();
         foreach ($data as $typeName => $type) {
-            $options[] = ['value' => $typeName, 'label' => $type['label']];
+            $option = ['value' => $typeName, 'label' => $type['label']];
+
+            if (isset($type['fields'])) {
+                $option['fields'] = $type['fields'];
+            }
+
+            $options[] = $option;
         }
 
         return $options;

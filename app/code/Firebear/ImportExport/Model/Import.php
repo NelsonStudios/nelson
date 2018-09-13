@@ -84,6 +84,18 @@ class Import extends \Magento\ImportExport\Model\Import
 
     protected $importFireData;
 
+    public $outputModel;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Io\File
+     */
+    protected $file;
+
+    /**
+     * @var \Magento\Framework\Filesystem\File\WriteFactory
+     */
+    protected $fileWrite;
+
     /**
      * Import constructor.
      * @param Source\ConfigInterface $config
@@ -133,6 +145,9 @@ class Import extends \Magento\ImportExport\Model\Import
         \Firebear\ImportExport\Model\Source\Platform\Config $configPlatforms,
         \Magento\Framework\FilesystemFactory $filesystemFactory,
         \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData,
+        \Magento\Framework\Filesystem\Io\File $file,
+        \Magento\Framework\Filesystem\File\WriteFactory $fileWrite,
+        \Firebear\ImportExport\Model\Output\Xslt $modelOutput,
         Config $typeConfig,
         ConsoleOutput $output,
         array $data = []
@@ -148,6 +163,9 @@ class Import extends \Magento\ImportExport\Model\Import
         $this->filesystemFactory = $filesystemFactory;
         $this->typeConfig = $typeConfig;
         $this->importFireData = $importFireData;
+        $this->outputModel = $modelOutput;
+        $this->file = $file;
+        $this->fileWrite = $fileWrite;
         parent::__construct(
             $logger,
             $filesystem,
@@ -434,6 +452,7 @@ class Import extends \Magento\ImportExport\Model\Import
                 }
             }
             if ($result) {
+                $another = 1;
                 $source = Adapter::findAdapterFor(
                     $this->getTypeClass($sourceData['type_file']),
                     $this->uploadSource(),
@@ -444,9 +463,41 @@ class Import extends \Magento\ImportExport\Model\Import
                 return $errorMessage;
             }
         } else {
+            $another = 0;
             $source = Adapter::findAdapterFor(
                 $this->getTypeClass($sourceData['type_file']),
                 $sourceData['file_path'],
+                $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
+                $sourceData[Import::FIELD_FIELD_SEPARATOR]
+            );
+        }
+        if (isset($sourceData['type_file']) && $sourceData['type_file'] == 'xml' && $sourceData['xml_switch']) {
+            $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
+            if ($another) {
+                $file = $result;
+            } else {
+                $file = $directory->getAbsolutePath() . "/" . $sourceData['file_path'];
+            }
+            $dest = $this->file->read($file);
+            try {
+                $result = $this->outputModel->convert($dest, $sourceData['xslt']);
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage());
+            }
+
+            $pathInfo = pathinfo($file);
+            $destFile = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
+            // $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
+            $file = $this->fileWrite->create(
+                $destFile,
+                \Magento\Framework\Filesystem\DriverPool::FILE,
+                "w+"
+            );
+            $file->write($result);
+            $file->close();
+            $source = Adapter::findAdapterFor(
+                $this->getTypeClass($sourceData['type_file']),
+                $destFile,
                 $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
                 $sourceData[Import::FIELD_FIELD_SEPARATOR]
             );

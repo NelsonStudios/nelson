@@ -77,10 +77,10 @@ class Address extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['orders_address'])) {
-			return false;
-		}		
-		return $this-> _explodeField($rowData['orders_address']);
+		$rowData = $this->_extractField($rowData, 'address');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;		
     }
     
     /**

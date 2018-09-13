@@ -8,14 +8,13 @@ namespace Firebear\ImportExport\Logger;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
-use Psr\Log\LoggerInterface;
 
 /**
  * Web UI Logger
  *
  * @package Magento\Setup\Model
  */
-class Logger implements LoggerInterface
+class Logger
 {
 
     /**
@@ -44,10 +43,11 @@ class Logger implements LoggerInterface
      *
      * @var bool
      */
-    private $isInline = false;
+    protected $isInline = false;
 
     /**
      * Constructor
+     *
      * @param Filesystem $filesystem
      * @param string $logFile
      */
@@ -59,11 +59,23 @@ class Logger implements LoggerInterface
         }
     }
 
+    /**
+     * Get log file name
+     *
+     * @return null|string
+     */
     public function getFileName()
     {
         return $this->logFile;
     }
 
+    /**
+     * Set log file name
+     *
+     * @param $file
+     *
+     * @return $this
+     */
     public function setFileName($file)
     {
         $this->logFile = '/firebear/' . $file . '.log';
@@ -76,68 +88,85 @@ class Logger implements LoggerInterface
         return $this;
     }
 
-    public function emergency($message, array $context = [])
+    /**
+     * Write critical message
+     *
+     * @param $message
+     */
+    public function critical($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'critical');
     }
 
-    public function alert($message, array $context = [])
+    /**
+     * Write error message
+     *
+     * @param $message
+     */
+    public function error($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'error');
     }
 
-    public function critical($message, array $context = [])
+    /**
+     * Write warning message
+     *
+     * @param $message
+     */
+    public function warning($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'warning');
     }
 
-    public function error($message, array $context = [])
+    /**
+     * Write info message
+     *
+     * @param       $message
+     */
+    public function info($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'info');
     }
 
-    public function warning($message, array $context = [])
+    /**
+     * Write debug message
+     *
+     * @param $message
+     */
+    public function debug($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'debug');
     }
 
-    public function notice($message, array $context = [])
+    /**
+     * Write success message
+     *
+     * @param $message
+     */
+    public function success($message)
     {
         $this->terminateLine();
-        $this->writeToFile($message);
-    }
-
-    public function info($message, array $context = [])
-    {
-        $this->terminateLine();
-        $this->writeToFile($message);
-    }
-
-    public function debug($message, array $context = [])
-    {
-        $this->terminateLine();
-        $this->writeToFile($message);
-    }
-
-    public function log($level, $message, array $context = [])
-    {
-        $this->terminateLine();
-        $this->writeToFile($message);
+        $this->writeToFile($message, 'success');
     }
 
     /**
      * Write the message to file
      *
      * @param string $message
+     * @param string $type
+     *
      * @return void
      */
-    private function writeToFile($message)
+    protected function writeToFile($message, $type = 'info')
     {
+        if ($type) {
+            $message = '<span class="console-' . $type . '">' . $message . '</span>';
+        }
         $this->directory->writeFile($this->logFile, $message . "\r\n", 'a+');
     }
 
@@ -179,7 +208,7 @@ class Logger implements LoggerInterface
      *
      * @return void
      */
-    private function terminateLine()
+    protected function terminateLine()
     {
         if ($this->isInline) {
             $this->writeToFile('<br>');

@@ -54,16 +54,27 @@ class File extends AbstractType
     {
         $result = true;
         $errors = [];
+        $file = '';
         try {
             $this->setExportModel($model);
             $data = $model->getData(\Firebear\ImportExport\Model\ExportJob\Processor::EXPORT_SOURCE);
-            $this->writeFile($data['file_path']);
+            $currentDate = "";
+            if ($data['date_format']) {
+                $format = $data['date_format'] ?? 'Y-m-d-hi';
+                $currentDate = "-" . $this->timezone->date()->format($format);
+            }
+            $info = pathinfo($data['file_path']);
+            $file =  $info['dirname'] . '/' . $info['filename'] . $currentDate;
+            if (isset($info['extension'])) {
+                $file .=  '.' . $info['extension'];
+            }
+            $this->writeFile($file);
         } catch (\Exception $e) {
             $errors[] = $e->getMessage();
             $result = false;
             $errors[] = __('Folder for import / export don\'t have enough permissions! Please set 775');
         }
 
-        return [$result, $data['file_path'], $errors];
+        return [$result, $file, $errors];
     }
 }

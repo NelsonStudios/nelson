@@ -104,7 +104,7 @@ class Grouped extends \Magento\GroupedImportExport\Model\Import\Product\Type\Gro
                             $rowData[Product::COL_TYPE] = $productData['type_id'];
                         }
                     }
-                    if (!empty($productData)) {
+                    if (!empty($productData) && $linkedProductId) {
                         $productId = $productData[$this->getProductEntityLinkField()];
                         $linksData['product_ids'][$productId] = true;
                         $linksData['relation'][] = ['parent_id' => $productId, 'child_id' => $linkedProductId];

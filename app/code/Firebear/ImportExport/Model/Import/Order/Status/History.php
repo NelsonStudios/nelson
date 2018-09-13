@@ -64,11 +64,8 @@ class History extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['status_history'])) {
-			return false;
-		}	
-		$rowData = $this-> _explodeField($rowData['status_history']);
-		return ($rowData && !$this->isEmptyRow($rowData)) 
+		$rowData = $this->_extractField($rowData, 'status_history');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
 			? $rowData 
 			: false;
     }

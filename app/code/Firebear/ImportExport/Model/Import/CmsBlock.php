@@ -348,7 +348,7 @@ class CmsBlock extends AbstractEntity
                 $rowData = $this->joinIdenticalyData($rowData);
                 $rowData = $this->customChangeData($rowData);
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('name: %1 is not valided', $rowData['title']), $this->output, 'info');
+                    $this->addLogWriteln(__('block with name: %1 is not valided', $rowData['title']), $this->output, 'info');
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -394,7 +394,7 @@ class CmsBlock extends AbstractEntity
                 $endTime = $time[0] + $time[1];
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
-                $this->addLogWriteln(__('name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(__('block with name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
             }
             $this->eventManager->dispatch(
                 'cms_blocks_bunch_save_after',

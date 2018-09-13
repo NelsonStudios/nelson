@@ -143,6 +143,8 @@ class Data extends AbstractHelper
      * @var \Firebear\ImportExport\Model\Source\Factory
      */
     protected $factory;
+    /** @var \Magento\Framework\Json\DecoderInterface  */
+    protected $jsonDecoder;
 
     /**
      * Data constructor.
@@ -159,6 +161,9 @@ class Data extends AbstractHelper
      * @param Timezone $timezone
      * @param Filesystem $filesystem
      * @param \Firebear\ImportExport\Model\ResourceModel\Import\DataFactory $dataFactory
+     * @param \Firebear\ImportExport\Model\Source\Platform\Config $configPlatforms
+     * @param Factory $factory
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
         Context $context,
@@ -175,7 +180,8 @@ class Data extends AbstractHelper
         Filesystem $filesystem,
         \Firebear\ImportExport\Model\ResourceModel\Import\DataFactory $dataFactory,
         \Firebear\ImportExport\Model\Source\Platform\Config $configPlatforms,
-        \Firebear\ImportExport\Model\Source\Factory $factory
+        \Firebear\ImportExport\Model\Source\Factory $factory,
+        \Magento\Framework\Json\DecoderInterface $jsonDecoder
     ) {
         $this->sourceFactory = $sourceFactory;
         $this->configSource = $configSource;
@@ -193,6 +199,7 @@ class Data extends AbstractHelper
         $this->dataFactory = $dataFactory;
         $this->platforms = $configPlatforms->get();
         $this->factory = $factory;
+        $this->jsonDecoder = $jsonDecoder;
 
         parent::__construct($context);
     }
@@ -304,14 +311,18 @@ class Data extends AbstractHelper
     public function runExport($id, $file)
     {
         try {
+            $res = [];
             $history = $this->createExportHistory($id, $file, 'admin');
             $this->exProcessor->debugMode = $this->getDebugMode();
             $this->exProcessor->setLogger($this->logger);
             $result = $this->exProcessor->process($id);
+            $exportJob = $this->exProcessor->getJobModel($id);
+            $sourceData = $this->jsonDecoder->decode($exportJob->getExportSource());
+            $res = [$result, $sourceData['last_entity_id']];
             $date = $this->timeZone->date();
             $timeStamp = $date->getTimestamp();
             $history->setFinishedAt($timeStamp);
-            $this->setResultProcessor($result);
+            $this->setResultProcessor($res);
             $this->historyExRepository->save($history);
         } catch (\Exception $e) {
             $this->addLogComment(

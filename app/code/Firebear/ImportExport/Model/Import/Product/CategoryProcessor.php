@@ -53,8 +53,9 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
                     $separator,
                     $rowData[\Firebear\ImportExport\Model\Import\Product::COL_CATEGORY]
                 );
+
                 foreach ($catData as $cData) {
-                    if ($cData == '/') {
+                    if ($cData == '/' || $cData == '') {
                         continue;
                     }
                     $secondCategory = null;
@@ -96,23 +97,20 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
         if (!($parentCategory = $this->getCategoryById($parentId))) {
             $parentCategory = $this->categoryFactory->create()->load($parentId);
         }
-
-        $entityRowsIn = [
-            'attribute_set_id' => $category->getDefaultAttributeSetId(),
-            'parent_id' => $parentId,
-            'created_at' => $this->localeDate->date()->format(DateTime::DATETIME_PHP_FORMAT),
-            'updated_at' => $this->localeDate->date()->format(DateTime::DATETIME_PHP_FORMAT),
-            'path' => $parentCategory->getPath(),
-            'level' => $parentCategory->getLevel() + 1,
-            'name' => $name
-        ];
-        $id = $this->saveCategoryEntity(
-            $entityRowsIn
-        );
-        $category = $this->categoryFactory->create()->load($id);
-        $this->categoriesCache[$id] = $category;
-
-        return $id;
+        $category->setPath($parentCategory->getPath());
+        $category->setParentId($parentId);
+        $category->setName($name);
+        $category->setIsActive(true);
+        $category->setIncludeInMenu(true);
+        $category->setAttributeSetId($category->getDefaultAttributeSetId());
+        try {
+            $category->save();
+            $this->categoriesCache[$category->getId()] = $category;
+        } catch (\Exception $e) {
+            $this->addFailedCategory($category, $e);
+        }
+		
+        return $category->getId();
     }
 
     /**

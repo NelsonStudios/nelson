@@ -1,0 +1,22 @@
+{
+    "name": "fecon/module-customcustomerlogin",
+    "description": "Execute needed Documoto extra actions/valdiation after customer login",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Fecon\\CustomCustomerLogin\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

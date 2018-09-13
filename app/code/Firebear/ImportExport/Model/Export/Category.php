@@ -7,6 +7,7 @@
 
 namespace Firebear\ImportExport\Model\Export;
 
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\ImportExport\Model\Import;
 use \Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
@@ -233,7 +234,14 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
             $entityCollection = $this->_getEntityCollection(true);
             $entityCollection->setOrder('entity_id', 'asc');
             $this->_prepareEntityCollection($entityCollection);
-
+            if (isset($this->_parameters['last_entity_id'])
+                && $this->_parameters['last_entity_id'] > 0
+                && $this->_parameters['enable_last_entity_id'] > 0
+            ) {
+                $entityCollection->addFieldToFilter(
+                    'entity_id', ['gt' => $this->_parameters['last_entity_id']]
+                );
+            }
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
                 break;
@@ -243,6 +251,9 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 $writer->setHeaderCols($this->_getHeaderColumns());
             }
             foreach ($exportData as $dataRow) {
+                if ($this->_parameters['enable_last_entity_id'] > 0) {
+                    $this->lastEntityId = $dataRow['entity_id'];
+                }
                 $dd = $this->_customFieldsMapping($dataRow);
                 $writer->writeRow($dd);
                 $counts++;
@@ -253,7 +264,7 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
             }
         }
 
-        return [$writer->getContents(), $counts];
+        return [$writer->getContents(), $counts, $this->lastEntityId];
     }
 
     protected function getExportData()
@@ -339,6 +350,7 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 }
             }
             $data[$itemId]['image'] = $item->getImageUrl();
+            $data[$itemId]['entity_id'] = $item->getEntityId();
         }
 
         return $data;
@@ -462,7 +474,8 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
     public function getParentCategories($category)
     {
         if ($category->getId() > $this->_storeManager->getStore()->getRootCategoryId()) {
-            $list = $category->getPathInStore() . "," . $this->_storeManager->getStore()->getRootCategoryId();
+            $path = implode(',', array_reverse($category->getPathIds()));
+            $list = $path;
             $categories = array_reverse(explode(',', $list));
             /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $categories */
             $collection = $this->entityCollectionFactory->create();

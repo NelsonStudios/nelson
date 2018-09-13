@@ -26,3 +26,31 @@ div.debug {
 .admin__fieldset > .admin__field > .specialFire {
     width: calc( (100%) * 0.9 );
 }
+.console-emergency {
+
+}
+.console-alert {
+
+}
+.console-critical {
+    font-weight: bold;
+}
+.console-critical,
+.console-error {
+    color: #ec4c28;
+}
+.console-warning {
+    color: #da971b;
+}
+.console-notice {
+
+}
+.console-info {
+
+}
+.console-debug {
+
+}
+.console-log {
+
+}

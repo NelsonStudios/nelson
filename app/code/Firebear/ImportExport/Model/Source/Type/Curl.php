@@ -12,12 +12,12 @@ use Magento\Framework\Filesystem\DriverPool;
  * Class Url
  * @package Firebear\ImportExport\Model\Source\Type
  */
-class Url extends AbstractType
+class Curl extends AbstractType
 {
     /**
      * @var string
      */
-    protected $code = 'url';
+    protected $code = 'curl';
 
     /**
      * @var string
