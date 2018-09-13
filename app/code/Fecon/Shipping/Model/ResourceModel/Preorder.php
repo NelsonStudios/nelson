@@ -2,6 +2,8 @@
 
 namespace Fecon\Shipping\Model\ResourceModel;
 
+use Fecon\Shipping\Api\Data\PreorderInterface;
+
 class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
@@ -11,18 +13,28 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected $customerHelper;
 
     /**
+     * Email Helper
+     *
+     * @var \Fecon\Shipping\Helper\EmailHelper 
+     */
+    protected $emailHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
      * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Fecon\Shipping\Helper\EmailHelper $emailHelper
      * @param string $connectionName
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
+        \Fecon\Shipping\Helper\EmailHelper $emailHelper,
         $connectionName = null
     ) {
         $this->customerHelper = $customerHelper;
+        $this->emailHelper = $emailHelper;
         parent::__construct($context, $connectionName);
     }
 
@@ -41,11 +53,36 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($object->dataHasChangedFor(\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_PRICE)) {
-            $object->setData(\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE, 1);
+        $status = (int) $object->getData(PreorderInterface::STATUS);
+        if (
+            $object->dataHasChangedFor(PreorderInterface::SHIPPING_PRICE) &&
+            ($status === PreorderInterface::STATUS_NEW)
+        ) {
+            $object->setData(PreorderInterface::IS_AVAILABLE, 1);
+            $object->setData(PreorderInterface::STATUS, PreorderInterface::STATUS_PENDING);
             $this->customerHelper->addOrderTokenToCustomer($object->getCustomerId());
         }
 
         parent::_beforeSave($object);
+    }
+
+    /**
+     * Perform actions after object save
+     *
+     * @param \Magento\Framework\Model\AbstractModel|\Magento\Framework\DataObject $object
+     * @return $this
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function _afterSave(\Magento\Framework\Model\AbstractModel $object)
+    {
+        $status = $object->getData(PreorderInterface::STATUS);
+        if ($status === null) { // This is a hack, when the $object is just created the getData(status) returns null (just this one time)
+            $preorderId = $object->getData(PreorderInterface::PREORDER_ID);
+            $this->emailHelper->sendAdminNotificationEmail($preorderId);
+            $customerId = $object->getData(PreorderInterface::CUSTOMER_ID);
+            $this->customerHelper->notifyCustomer($customerId);
+        }
+
+        return parent::_afterSave($object);
     }
 }

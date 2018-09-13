@@ -5,6 +5,7 @@
     </head>
     <body>
         <referenceContainer name="content">
+            <referenceBlock name="product.attributes" remove="true" />
             <referenceContainer name="sidebar.additional" remove="true" />
             <block class="Magento\Catalog\Block\Product\ProductList\Related" name="related-carousel" template="Magento_Catalog::product/view/related-products.phtml">
                 <arguments>
@@ -18,14 +19,14 @@
                     <argument name="title" translate="true" xsi:type="string">Features</argument>
                 </arguments>
             </referenceBlock>
-            <block class="Magento\Catalog\Block\Product\View\Description" name="specsifications.tab" template="Magento_Catalog::product/view/applications.phtml" group="detailed_info">
+            <block class="Magento\Catalog\Block\Product\View\Description" name="documentation.tab" template="Magento_Catalog::product/view/applications.phtml" group="detailed_info">
                 <arguments>
-                    <argument name="at_call" xsi:type="string">getSpecsifications</argument>
-                    <argument name="at_code" xsi:type="string">specsifications</argument>
-                    <argument name="css_class" xsi:type="string">specsifications</argument>
-                    <argument name="at_label" xsi:type="string">specsifications</argument>
-                    <argument name="add_attribute" xsi:type="string">itemprop="specsifications"</argument>
-                    <argument name="title" translate="true" xsi:type="string">Specs</argument>
+                    <argument name="at_call" xsi:type="string">getDocumentation</argument>
+                    <argument name="at_code" xsi:type="string">documentation</argument>
+                    <argument name="css_class" xsi:type="string">documentation</argument>
+                    <argument name="at_label" xsi:type="string">documentation</argument>
+                    <argument name="add_attribute" xsi:type="string">itemprop="documentation"</argument>
+                    <argument name="title" translate="true" xsi:type="string">Documentation</argument>
                 </arguments>
             </block>
             <block class="Magento\Catalog\Block\Product\View\Description" name="applications.tab" template="Magento_Catalog::product/view/applications.phtml" group="detailed_info">

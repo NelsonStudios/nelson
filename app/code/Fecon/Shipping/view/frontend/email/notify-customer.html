@@ -1,0 +1,15 @@
+<!--@subject {{trans "Shipping quote requested in %store_name" store_name=$store.getFrontendName()}} @-->
+<!--@vars
+{"store url=\"\"":"Store Url",
+"skin url=\"images/logo_email.gif\" _area='frontend'":"Email Logo Image"}
+@-->
+<!--@styles
+body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+@-->
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">Hi {{trans "%name," name=$customer.name}}</p>
+<p>We've received your quote request, now all you have to do it's wait until the shipping price for your order is set up.</p>
+<p>As soon as it is ready we'll send you an email to continue with your order.</p>
+
+{{template config_path="design/email/footer_template"}}

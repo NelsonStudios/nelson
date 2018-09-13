@@ -8,8 +8,6 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 /**
  * InstallSchema class
- *
- * 
  */
 class InstallSchema implements InstallSchemaInterface
 {

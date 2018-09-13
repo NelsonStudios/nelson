@@ -1,0 +1,20 @@
+/*
+    Hack to hide prices in cart page
+*/
+
+.checkout-cart-index {
+    label[for*=method_manualshipping] {
+        .price {
+            display: none;
+        }
+    }
+}
+
+/*
+    White color for manual shipping warning regarding payment methods an account
+*/
+#checkout {
+    .manual-shipping-warn {
+        color: @color-white;
+    }
+}

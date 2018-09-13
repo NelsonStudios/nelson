@@ -111,6 +111,46 @@ body.catalog-product-view {
                         }
                         .product-add-form {
                             form {
+                                .product-options-wrapper {
+                                    padding-bottom: 0;
+                                    .fieldset {
+                                        margin-left: 6px;
+                                        .field {
+                                            .label {
+                                                font-size: 20px;
+                                            }
+                                            margin-bottom: 36px;
+                                            .control {
+                                                width: 190px;
+                                                margin-left: 0;
+                                                select {
+                                                    height: 43px;
+                                                    font-family: @font-family-name__verb;
+                                                    border: 1px solid @fecon-theme-color;
+                                                    color: @fecon-theme-color;
+                                                    width: 313px !important;
+                                                    font-size: 24px;
+                                                    font-weight: 600;
+                                                    padding-left: 7px;
+                                                    padding-top: 5px;
+                                                }
+                                                span.icon-down-chevron {
+                                                    pointer-events: none;
+                                                    background: @fecon-theme-color url('../images/down-chevron-white.png') no-repeat 49% 45%;
+                                                    padding: 15px 15px 15px 27px;
+                                                    margin-left: -45px;
+                                                }
+                                            }
+                                            .qty-changer {
+                                                a {
+                                                    i {
+                                                        color: @fecon-theme-color;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 .box-tocart {
                                     .fieldset {
                                         margin-left: 5px;

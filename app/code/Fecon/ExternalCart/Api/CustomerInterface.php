@@ -1,7 +1,7 @@
 <?php
 /**
  * Contributor company: Fecon.
- * Contributor Author : Bruno <bruno@serfe.com>
+ * Contributor Author : <fecon.com>
  * Date: 2018/08/02
  */
 namespace Fecon\ExternalCart\Api;
@@ -31,7 +31,7 @@ interface CustomerInterface
      */
     public function getCustomerData();
     /**
-     * Set the token of the recently created customer customer
+     * Set the token of the recently created customer
      *
      * @api
      * @param  string $customerId The customerId to save.
@@ -45,4 +45,22 @@ interface CustomerInterface
      * @return string $token of created customer cart or empty array otherwise.
      */
     public function getCustomerToken();
+    /**
+     * Get the customer data customer
+     *
+     * @api
+     * @param  string $documotoCustomerId The documotoCustomerId to save.
+     * @return string $customerData
+     */
+    public function getCustomerByDocumotoId($documotoCustomerId);
+    /**
+     * Set the customer address
+     *
+     * @api
+     * @param  string $customerId The customerId to search.
+     * @param  string $customerAddressData The customerAddressData to save.
+     * @param  string $addressType The addressType to save.
+     * @return boolean true on success or flase of failure.
+     */
+    public function setCustomerAddress($customerData, $customerAddressData, $addressType);
 }

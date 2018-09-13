@@ -2,15 +2,17 @@
 
 namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
+use Fecon\Shipping\Api\Data\PreorderInterface;
+
 /**
- * Data source for Preorder status in backend grid
- *
- * 
+ * Status data source
  */
 class Status extends \Magento\Ui\Component\Listing\Columns\Column
 {
-    const AVAILABLE = 'Available';
-    const NOT_AVAILABLE = 'Not available';
+    const STATUS_NEW = 'NEW';
+    const STATUS_PENDING = 'PENDING';
+    const STATUS_COMPLETED = 'COMPLETED';
+    const STATUS_CANCELED = 'CANCELED';
 
     /**
      * Prepare Data Source
@@ -22,9 +24,22 @@ class Status extends \Magento\Ui\Component\Listing\Columns\Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $isAvailable = $item[\Fecon\Shipping\Api\Data\PreorderInterface::IS_AVAILABLE];
-                $availability = $isAvailable ? $this::AVAILABLE : $this::NOT_AVAILABLE;
-                $item[$this->getData('name')] = $availability;
+                $statusRaw = $item[PreorderInterface::STATUS];
+                switch ($statusRaw) {
+                    case PreorderInterface::STATUS_NEW:
+                        $status = self::STATUS_NEW;
+                        break;
+                    case PreorderInterface::STATUS_PENDING:
+                        $status = self::STATUS_PENDING;
+                        break;
+                    case PreorderInterface::STATUS_COMPLETED:
+                        $status = self::STATUS_COMPLETED;
+                        break;
+                    case PreorderInterface::STATUS_CANCELED:
+                        $status = self::STATUS_CANCELED;
+                        break;
+                }
+                $item[$this->getData('name')] = $status;
             }
         }
 

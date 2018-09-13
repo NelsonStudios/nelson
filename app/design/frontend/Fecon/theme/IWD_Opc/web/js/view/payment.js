@@ -267,19 +267,26 @@ define(
                     email: quote.guestEmail
                 };
                 if (shippingValidator.validate() && emailValidator.validate()) {
-                    fullScreenLoader.startLoader();
-                    $.ajax({
-                        url: '/preorder/order/create',
-                        type: 'POST',
-                        data: data,
-                        dataType: 'json',
-                        success: function( data, textStatus, jQxhr ) {
+                    var shippingAddress = registry.get('checkout.steps.shipping-step.shippingAddress');
+                        shippingAddress.setShippingInformation().done(function () {
+                            localStorage.setItem('custom_attributes',JSON.stringify(shippingAddress.source.shippingAddress));
+                            fullScreenLoader.startLoader();
+                            $.ajax({
+                                url: '/preorder/order/create',
+                                type: 'POST',
+                                data: data,
+                                dataType: 'json',
+                                success: function( data, textStatus, jQxhr ) {
+                                    fullScreenLoader.stopLoader();
+                                    if (data.success === true) {
+                                        window.location.href = urlBuilder.build("preorder/order/success");;
+                                    }
+                                }
+                            });
+                        }).fail(function () {
+                            self.isPlaceOrderActionAllowed(true);
                             fullScreenLoader.stopLoader();
-                            if (data.success === true) {
-                                window.location.href = urlBuilder.build("preorder/order/success");;
-                            }
-                        }
-                    });
+                        });
                 }
             }
         });

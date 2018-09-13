@@ -4,6 +4,7 @@
 namespace Fecon\Shipping\Controller\Adminhtml\Preorder;
 
 use Magento\Framework\Exception\LocalizedException;
+use Fecon\Shipping\Api\Data\PreorderInterface;
 
 class Save extends \Magento\Backend\App\Action
 {
@@ -38,6 +39,11 @@ class Save extends \Magento\Backend\App\Action
             $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Preorder no longer exists.'));
+                return $resultRedirect->setPath('*/*/');
+            }
+            $status = (int) $model->getStatus();
+            if ($status !== PreorderInterface::STATUS_NEW && $status !== PreorderInterface::STATUS_PENDING) {
+                $this->messageManager->addErrorMessage(__('You cannot edit the shipping price of a Preorder that has a Canceled or Complete status.'));
                 return $resultRedirect->setPath('*/*/');
             }
         

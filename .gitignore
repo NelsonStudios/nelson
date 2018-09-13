@@ -60,6 +60,7 @@ atlassian*
 /pub/static/*
 !/pub/static/.htaccess
 /pub/media/porto/configed_css/
+/pub/media/email/*
 
 /var/*
 !/var/.htaccess

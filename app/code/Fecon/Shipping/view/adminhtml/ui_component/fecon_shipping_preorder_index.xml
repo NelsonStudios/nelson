@@ -10,14 +10,15 @@
             <item name="deps" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_grid_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">fecon_shipping_preorder_columns</item>
-        <item name="buttons" xsi:type="array">
+            <!-- I leave this below commented out in case is needed in the future -->
+<!--        <item name="buttons" xsi:type="array">
             <item name="add" xsi:type="array">
                 <item name="name" xsi:type="string">add</item>
                 <item name="label" translate="true" xsi:type="string">Add new Preorder</item>
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">*/*/new</item>
             </item>
-        </item>
+        </item>-->
     </argument>
     <dataSource name="fecon_shipping_preorder_grid_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
@@ -109,7 +110,14 @@
                 </item>
             </argument>
         </column>
-        <column name="is_available" class="Fecon\Shipping\Ui\Component\Listing\Column\Status">
+        <column name="status" class="Fecon\Shipping\Ui\Component\Listing\Column\Status">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" translate="true" xsi:type="string">Status</item>
+                </item>
+            </argument>
+        </column>
+        <column name="is_available" class="Fecon\Shipping\Ui\Component\Listing\Column\Availability">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Fecon\Shipping\Model\Preorder\StatusList</item>
                 <item name="config" xsi:type="array">

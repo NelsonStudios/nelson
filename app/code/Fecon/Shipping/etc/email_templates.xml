@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
     <template id="quote_available" label="Quote Available" file="quote-available.html" type="html" module="Fecon_Shipping" area="frontend"/>
+    <template id="notify_admin" label="Notify Admin" file="notify-admin.html" type="html" module="Fecon_Shipping" area="frontend"/>
+    <template id="customer_notification" label="Notify Customer" file="notify-customer.html" type="html" module="Fecon_Shipping" area="frontend"/>
 </config>

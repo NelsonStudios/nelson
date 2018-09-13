@@ -4,8 +4,6 @@ namespace Fecon\Shipping\Observer\Payment;
 
 /**
  * Observer to check if payment is available
- *
- * 
  */
 class MethodIsActive implements \Magento\Framework\Event\ObserverInterface
 {

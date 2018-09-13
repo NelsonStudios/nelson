@@ -69,11 +69,16 @@ class Products extends \Magento\Backend\Block\Template
      */
     public function getItems()
     {
+        $items = null;
         $preorder = $this->coreRegistry->registry('fecon_shipping_preorder');
-        $quoteId = $preorder->getData(PreorderInterface::QUOTE_ID);
-        $quote = $this->quoteRepository->get($quoteId);
+        $status = (int) $preorder->getData(\Fecon\Shipping\Api\Data\PreorderInterface::STATUS);
+        if ($status !== \Fecon\Shipping\Api\Data\PreorderInterface::STATUS_COMPLETED) {
+            $quoteId = $preorder->getData(PreorderInterface::QUOTE_ID);
+            $quote = $this->quoteRepository->get($quoteId);
+            $items = $quote->getItems();
+        }
 
-        return $quote->getItems();
+        return $items;
     }
 
     /**

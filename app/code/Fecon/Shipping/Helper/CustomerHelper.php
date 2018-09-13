@@ -188,9 +188,11 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customer->addData($customerData);
         try {
             $customer->save();
+            $customer->sendNewAccountEmail();
             $newCustomer = $customer;
         } catch (\Exception $exc) {
             $newCustomer = false;
+            $this->_logger->error('Error creating user in CustomerHelper, error: ' . $exc->getMessage());
         }
 
         return $newCustomer;
@@ -246,7 +248,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $login = false;
         $customer = $this->customerFactory->create()->load($customerId);
-        if ($customer->getOrderToken() == $token) {
+        if (($customer->getOrderToken() == $token) && (!empty($token))) {
             $this->session->setCustomerAsLoggedIn($customer);
             $login = true;
         }
@@ -306,5 +308,35 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $name;
+    }
+
+    /**
+     * Clear a order token for customer
+     *
+     * @param string $customerId
+     * @return void
+     */
+    public function clearOrderTokenToCustomer($customerId)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $token = null;
+        $datetime = null;
+        $customerData = $customer->getDataModel();
+        $customerData->setCustomAttribute('order_token', $token);
+        $customerData->setCustomAttribute('order_token_created_at', $datetime);
+        $customer->updateData($customerData);
+        $customer->save();
+    }
+
+    /**
+     * Send customer instructions to continue with his order
+     *
+     * @param string $customerId
+     * @return void
+     */
+    public function notifyCustomer($customerId)
+    {
+        $customer = $this->customerFactory->create()->load($customerId);
+        $this->emailHelper->sendCustomerNotificationEmail($customer);
     }
 }

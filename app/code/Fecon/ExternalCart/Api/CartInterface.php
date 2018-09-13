@@ -1,7 +1,7 @@
 <?php
 /**
  * Contributor company: Fecon.
- * Contributor Author :  <fecon.com>
+ * Contributor Author : <fecon.com>
  * Date: 2018/08/02
  */
 namespace Fecon\ExternalCart\Api;
@@ -88,4 +88,79 @@ interface CartInterface
      * @throws \SoapFault response
      */
     public function addToCart();
+    /**
+     * Function to add products into guest cart.
+     * 
+     * @api
+     * @param  $body The body json data that should looks like:
+     * 
+     * Request structure: 
+     * 
+     * {
+     *   "GetCart": {
+     *     "ErpSendShoppingCartRequest": {
+     *       "BillTo": {
+     *         "SiteAddress": {
+     *           "CustomerId": "",
+     *           "Line1": "",
+     *           "City": "",
+     *           "State": "",
+     *           "Zipcode": "",
+     *           "Country": ""
+     *         }
+     *       },
+     *       "ShipTo": {
+     *         "SiteAddress": {
+     *           "CustomerId": "",
+     *           "Line1": "",
+     *           "City": "",
+     *           "State": "",
+     *           "Zipcode": "",
+     *           "Country": ""
+     *         }
+     *       },
+     *       "Comments": "",
+     *       "DocumotoERPTransactionType": "",
+     *       "DocumotoERPTransactionStatus": "",
+     *       "ShoppingCartLines": {
+     *         "ShoppingCartLine": [
+     *           {
+     *           "PartNumber": "",
+     *           "Quantity": "",
+     *           "UOM": "",
+     *           "Line": ""
+     *           },
+     *           {
+     *           "PartNumber": "",
+     *           "Quantity": "",
+     *           "UOM": "",
+     *           "Line": ""
+     *           }
+     *         ]
+     *       }
+     *     }
+     *   }
+     * }
+     *
+     * Response structure: 
+     * [
+     *   {
+     *     "ErpResponse": {
+     *       "Success": "true | false",
+     *       "Message": "Cart submitted successfully.| Error message (*Possible errors)",
+     *       "ReferenceNumber": cartId number | quote id number,
+     *       "ExternalOrderID": "false" (always false since we're currently not generating any order)
+     *     }
+     *   }
+     * ]
+     *
+     * *Possible errors:
+     *   - Requested product doesn't exist 
+     *   - Request does not match any route. (Check Authorization header)
+     *   - %fieldName is a required field (Check if user was logged-in correctly through the Magento API)
+     * 
+     * @return \Fecon\ExternalCart\Api\CartInterface $response object with response information (Documoto style).
+     * @throws \Exception response
+     */
+    public function submitCart();
 }
