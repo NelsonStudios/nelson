@@ -84,8 +84,8 @@ class Xml extends AbstractSource
             "SimpleXMLIterator"
         );
 
-        if (!$this->reader) {
-            throw new XmlException(libxml_get_errors());
+        if (false === $this->reader) {
+            throw new \XmlException(libxml_get_errors());
         }
 
         $this->reader->rewind();

@@ -35,6 +35,8 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     protected $jsonFactory;
 
     protected $additionalFields = [
+        'enable_last_entity_id',
+        'last_entity_id',
         'language',
         'divided_additional'
     ];
@@ -64,7 +66,8 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     }
 
     /**
-     * @return $this
+     * @return \Magento\Backend\Model\View\Result\Redirect|\Magento\Framework\Controller\Result\Json
+     * @throws LocalizedException
      */
     public function execute()
     {
@@ -187,6 +190,7 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 
     /**
      * @param $data
+     * @return
      */
     public function validSourceData($data)
     {
@@ -256,6 +260,7 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 
     /**
      * @param $data
+     * @return
      */
     public function validSourceFilter($data)
     {

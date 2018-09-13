@@ -295,7 +295,7 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                     $rowData['store_labels'] = $scope;
                 }
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('name: %1 is not valided', $rowData['name']), $this->output, 'info');
+                    $this->addLogWriteln(__('rule with name: %1 is not valided', $rowData['name']), $this->output, 'info');
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -344,7 +344,7 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                 $endTime = $time[0] + $time[1];
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
-                $this->addLogWriteln(__('name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(__('rule with name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
             }
         }
         return $this;

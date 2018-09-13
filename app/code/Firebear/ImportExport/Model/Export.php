@@ -6,10 +6,12 @@
 
 namespace Firebear\ImportExport\Model;
 
+use Firebear\ImportExport\Api\ExportJobRepositoryInterface;
+use Firebear\ImportExport\Model\Source\Type\File\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Store\Model\ScopeInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use \Firebear\ImportExport\Model\Source\Type\File\Config;
 
 class Export extends \Magento\ImportExport\Model\Export
 {
@@ -34,43 +36,95 @@ class Export extends \Magento\ImportExport\Model\Export
      * @var Config
      */
     protected $fireExportConfig;
-
+    /** @var bool */
     protected $_debugMode;
-
-    protected $xslt;
+    /** @var ExportJobRepositoryInterface */
+    protected $exportJobRepository;
+    /** @var \Magento\Framework\Json\EncoderInterface  */
+    protected $encoder;
+    /** @var \Magento\Framework\Json\DecoderInterface  */
+    protected $decoder;
 
     /**
      * Export constructor.
      *
-     * @param \Psr\Log\LoggerInterface                           $logger
-     * @param \Magento\Framework\Filesystem                      $filesystem
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\Filesystem $filesystem
      * @param \Magento\ImportExport\Model\Export\ConfigInterface $exportConfig
-     * @param \Magento\ImportExport\Model\Export\Entity\Factory  $entityFactory
-     * @param \Magento\ImportExport\Model\Export\Adapter\Factory $exportAdapterFac
-     * @param ScopeConfigInterface                               $scopeConfig
-     * @param array                                              $data
+     * @param \Magento\ImportExport\Model\Export\Entity\Factory $entityFactory
+     * @param Export\Adapter\Factory $exportAdapterFac
+     * @param \Firebear\ImportExport\Helper\Data $helper
+     * @param ConsoleOutput $output
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Export\Dependencies\Config $configExDi
+     * @param Config $fireExportConfig
+     * @param \Magento\Framework\Json\DecoderInterface $decoder
+     * @param \Magento\Framework\Json\EncoderInterface $encoder
+     * @param ExportJobRepositoryInterface $exportJobRepository
+     * @param array $data
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\ImportExport\Model\Export\ConfigInterface $exportConfig,
         \Magento\ImportExport\Model\Export\Entity\Factory $entityFactory,
-        \Magento\ImportExport\Model\Export\Adapter\Factory $exportAdapterFac,
+        \Firebear\ImportExport\Model\Export\Adapter\Factory $exportAdapterFac,
         \Firebear\ImportExport\Helper\Data $helper,
         ConsoleOutput $output,
         ScopeConfigInterface $scopeConfig,
         \Firebear\ImportExport\Model\Export\Dependencies\Config $configExDi,
         \Firebear\ImportExport\Model\Source\Type\File\Config $fireExportConfig,
-        \Firebear\ImportExport\Model\Output\Xslt $xslt,
+        \Magento\Framework\Json\DecoderInterface $decoder,
+        \Magento\Framework\Json\EncoderInterface $encoder,
+        ExportJobRepositoryInterface $exportJobRepository,
         array $data = []
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->configExDi = $configExDi;
         $this->output = $output;
         $this->fireExportConfig = $fireExportConfig;
-        parent::__construct($logger, $filesystem, $exportConfig, $entityFactory, $exportAdapterFac, $data = []);
+        $this->_exportConfig = $exportConfig;
+        $this->_entityFactory = $entityFactory;
+        $this->_exportAdapterFac = $exportAdapterFac;
+        $this->_logger = $logger;
+        $this->_varDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
+		$this->_data = $data;
         $this->_debugMode = $helper->getDebugMode();
-        $this->xslt = $xslt;
+        $this->exportJobRepository = $exportJobRepository;
+        $this->decoder = $decoder;
+        $this->encoder = $encoder;
+    }
+
+    /**
+     * @param mixed $debugData
+     * @return $this
+     */
+    public function addLogComment($debugData)
+    {
+
+        if (is_array($debugData)) {
+            $this->_logTrace = array_merge($this->_logTrace, $debugData);
+        } else {
+            $this->_logTrace[] = $debugData;
+        }
+
+        if (is_scalar($debugData)) {
+            $this->_logger->debug($debugData);
+            $this->output->writeln($debugData);
+        } else {
+            foreach ($debugData as $message) {
+                if ($message instanceof \Magento\Framework\Phrase) {
+                    $this->output->writeln($message->__toString());
+                    $this->_logger->debug($message->__toString());
+                } else {
+                    $this->output->writeln($message);
+                    $this->_logger->debug($message);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -112,12 +166,31 @@ class Export extends \Magento\ImportExport\Model\Export
         if (isset($this->_data[self::FILTER_ELEMENT_GROUP])) {
             $this->addLogComment(__('Begin export of %1', $this->getEntity()));
 
-            list($result, $count) = $this->_getEntityAdapter()->setLogger($this->_logger)->setWriter($this->_getWriter())->export();
-           if ($this->_data['file_format'] == 'xml' && isset($this->_data['xml_switch']) && $this->_data['xml_switch']) {
-                $result = $this->xslt->convert($result, $this->_data['xslt']);
-           }
-           // $countRows = substr_count(trim($result), $this->getExpersion());
-            $countRows = $count;
+            $countRows = 0;
+            $lastEntityId = 0;
+            $exportData = $this->_getEntityAdapter()
+                ->setLogger($this->_logger)
+                ->setWriter($this->_getWriter())
+                ->export();
+            $result = $exportData[0];
+            if (isset($exportData[1])) {
+                $countRows = (int)$exportData[1];
+            }
+            if (isset($exportData[2])) {
+                $lastEntityId = (int)$exportData[2];
+            }
+            $exportJob = $this->exportJobRepository
+                ->getById($this->getData('job_id'));
+            $sourceData = $this->decoder->decode($exportJob->getExportSource());
+            $sourceData = array_merge(
+                $sourceData,
+                [
+                    'last_entity_id' => $lastEntityId
+                ]
+            );
+            $sourceData = $this->encoder->encode($sourceData);
+            $exportJob->setExportSource($sourceData);
+            $this->exportJobRepository->save($exportJob);			
             if (!$countRows) {
                 $this->addLogComment([__('There is no data for the export.')]);
                
@@ -161,7 +234,10 @@ class Export extends \Magento\ImportExport\Model\Export
             $fileFormats = $data['export'];
             if (isset($fileFormats[$this->getFileFormat()])) {
                 try {
-                    $this->_writer = $this->_exportAdapterFac->create($fileFormats[$this->getFileFormat()]['model']);
+                    $this->_writer = $this->_exportAdapterFac->create(
+						$fileFormats[$this->getFileFormat()]['model'], 
+						['data' => $this->_data]
+					);
                 } catch (\Exception $e) {
                     $this->_logger->critical($e);
                     throw new \Magento\Framework\Exception\LocalizedException(
@@ -180,73 +256,21 @@ class Export extends \Magento\ImportExport\Model\Export
                 throw new \Magento\Framework\Exception\LocalizedException(__('Please correct the file format.'));
             }
         }
-        if (in_array($this->getData('file_format'), ['csv', 'txt'])) {
-            if ($data = $this->getData('behavior_data')) {
-                if (isset($data['separator'])) {
-                    $this->_writer->setDelimeter($data['separator']);
-                }
-                if ($this->getData('file_format') == 'csv') {
-                    if (isset($data['enclosure'])) {
-                        $this->_writer->setEnclosure($data['enclosure']);
-                    }
-                }
-            }
-        }
-
         return $this->_writer;
     }
 
     /**
-     * @return string
-     */
-    public function getExpersion()
-    {
-        $str = PHP_EOL;
-        if ($this->getData('file_format') == 'xml') {
-            $str = '<item>';
-        }
-
-        return $str;
-    }
-
-    /**
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * Retrieve entity field for export
+     *
+     * @return array
      */
     public function getFields()
     {
-        return $this->_getEntityAdapter()->getFieldsForExport();
-    }
-
-    /**
-     * @param mixed $debugData
-     * @return $this
-     */
-    public function addLogComment($debugData)
-    {
-     
-        if (is_array($debugData)) {
-            $this->_logTrace = array_merge($this->_logTrace, $debugData);
-        } else {
-            $this->_logTrace[] = $debugData;
-        }
-  
-        if (is_scalar($debugData)) {
-            $this->_logger->debug($debugData);
-            $this->output->writeln($debugData);
-        } else {
-            foreach ($debugData as $message) {
-                if ($message instanceof \Magento\Framework\Phrase) {
-                    $this->output->writeln($message->__toString());
-                    $this->_logger->debug($message->__toString());
-                } else {
-                    $this->output->writeln($message);
-                    $this->_logger->debug($message);
-                }
-            }
-        }
-
-        return $this;
+        $adapter = $this->_getEntityAdapter();
+		// @todo replace for interface check Firebear\ImportExport\Model\Export\EntityInterface
+		return method_exists($adapter, 'getFieldsForExport')
+			? $adapter->getFieldsForExport()
+			: []; // [] from custom adapters
     }
 
     /**

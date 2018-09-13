@@ -207,7 +207,7 @@ abstract class AbstractType extends DataObject
             $fileName = array_pop($newPath);
             $path = implode("/", $newPath);
             if (!$dir->isExist($path)) {
-                $directory = $this->writeFactory->create($path);
+                $directory = $this->writeFactory->create($dir->getAbsolutePath($path));
                 $directory->create();
             }
             $path = $dir->getAbsolutePath() . $path . "/";

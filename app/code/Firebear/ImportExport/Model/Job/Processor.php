@@ -6,26 +6,23 @@
 
 namespace Firebear\ImportExport\Model\Job;
 
-use Firebear\ImportExport\Ui\Component\Grid\Column\JobActions;
+use Firebear\ImportExport\Model\Import\Adapter;
+use Firebear\ImportExport\Model\Source\Type\File\Config;
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ObjectManagerFactory;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Json\DecoderInterface;
+use Magento\ImportExport\Controller\Adminhtml\ImportResult;
 use Magento\ImportExport\Model\History;
 use Magento\ImportExport\Model\Import;
-use Firebear\ImportExport\Model\Import\Adapter;
-use Magento\Store\Api\StoreResolverInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Psr\Log\LoggerInterface;
-use Magento\Framework\App\RequestInterface;
+use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregator;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Firebear\ImportExport\Model\Source\Type\File\Config;
-use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
-use Magento\ImportExport\Controller\Adminhtml\ImportResult;
-use Magento\Backend\App\Area\FrontNameResolver;
 
 /**
  * Import Job Processor.
@@ -34,152 +31,118 @@ use Magento\Backend\App\Area\FrontNameResolver;
 class Processor
 {
     /**
+     * @var
+     */
+    public $strategy;
+    public $errorsCount;
+    public $debugMode;
+    public $inConsole;
+    public $reindex;
+    public $outputModel;
+    /**
      * @var \Firebear\ImportExport\Model\JobFactory
      */
     protected $jobFactory;
-
     /**
      * @var \Magento\ImportExport\Model\HistoryFactory
      */
     protected $importHistoryFactory;
-
     /**
      * @var \Firebear\ImportExport\Model\ImportFactory
      */
     protected $importFactory;
-
     /**
      * @var ObjectManagerFactory
      */
     protected $objectManagerFactory;
-
     /**
      * @var \Magento\Framework\FilesystemFactory
      */
     protected $filesystemFactory;
-
     /**
      * Object Manager
      *
      * @var \Magento\Framework\ObjectManagerInterface
      */
     protected $objectManager;
-
     /**
      * @var DecoderInterface $jsonDecoder
      */
     protected $jsonDecoder;
-
     /**
      * @var \Magento\Framework\App\State
      */
     protected $state;
-
     /**
      * @var Import
      */
     protected $importModel;
-
     /**
      * @var LoggerInterface
      */
     protected $logger;
-
     /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
-
     /**
      * @var StoreManagerInterface
      */
     protected $storeResolver;
-
     /**
      * @var \Firebear\ImportExport\Model\Job
      */
     protected $job;
-
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone
      */
     protected $timezone;
-
     /**
      * @var UrlInterface
      */
     protected $backendUrl;
-
     /**
      * @var RequestInterface
      */
     protected $request;
-
-    /**
-     * @var
-     */
-    public $strategy;
-
-    public $errorsCount;
-
     /**
      * @var History
      */
     protected $importHistoryModel;
-
     /**
      * Application
      *
      * @var \Magento\Framework\App\AreaList
      */
     protected $areaList;
-
     /**
      * @var \Magento\Framework\Locale\ResolverInterface
      */
     protected $locale;
-
     protected $source;
-
     protected $typeSource;
-
     /**
      * @var Config
      */
     protected $typeConfig;
-
     protected $localeLocal;
-
     /**
      * @var \Magento\Backend\App\ConfigInterface
      */
     protected $backendConfig;
-
     /**
      * @var \Magento\Backend\Model\Locale\Manager
      */
     protected $manager;
-
     /**
      * @var \Firebear\ImportExport\Model\Import\ProcessingErrorAggregator
      */
     protected $errorAggregator;
-
     /**
      * @var \Magento\Indexer\Model\IndexerFactory
      */
     protected $indexFactory;
-
     protected $indCollFactory;
-
-    public $debugMode;
-
-    public $inConsole;
-
-    public $reindex;
-
-    public $outputModel;
-
     /**
      * @var \Magento\Framework\Filesystem\Io\File
      */
@@ -266,43 +229,58 @@ class Processor
     }
 
     /**
-     * Get current timezone object.
-     * We can't define timezone in constructor according to db lock timeout
-     * when run job from console.
-     *
-     * @return \Magento\Framework\Stdlib\DateTime\Timezone|mixed
+     * @param $jobId
+     * @return mixed
      */
-    public function getTimezone()
+    public function processScope($jobId, $file)
     {
-        return $this->timezone;
-    }
+        $totalTime = 0;
+        $result = false;
+        if (!$this->inConsole) {
+            $this->output = null;
+        }
+        try {
+            $data = $this->prepareJob($jobId);
+            if (!$this->inConsole) {
+                $data['output'] = null;
+            }
 
-    /**
-     * Get import model
-     *
-     * @return Import|mixed
-     */
-    public function getImportModel()
-    {
-        if (!$this->importModel) {
-            $this->importModel = $this->importFactory->create();
+            $data['file'] = $file;
+            $this->strategy = $data['validation_strategy'];
+            $this->errorsCount = $data['allowed_error_count'];
+            $this->reindex = $data['reindex'];
+            if (isset($data['type_file'])) {
+                $this->setTypeSource($data['type_file']);
+            }
+
+            if (!$this->inConsole) {
+                $this->getImportModel()->setOutput(null);
+            }
+
+            $validationResult = $this->dataValidate($data, $jobId);
+            $area = $this->areaList->getArea($this->state->getAreaCode());
+
+            $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
+        } catch (\Exception $e) {
+            $this->addLogComment(
+                'Job #' . $jobId . ' can\'t be imported. Check if job exist',
+                $this->output,
+                'error'
+            );
+            $this->addLogComment(
+                $e->getMessage(),
+                $this->output,
+                'error'
+            );
+            $this->revertLocale();
+
+            return false;
         }
 
-        return $this->importModel;
-    }
+        $this->revertLocale();
 
-    /**
-     * Get import history model
-     *
-     * @return History|mixed
-     */
-    public function getImportHistoryModel()
-    {
-        if (!$this->importHistoryModel) {
-            $this->importHistoryModel = $this->importHistoryFactory->create();
-        }
-
-        return $this->importHistoryModel;
+        return ($this->strategy == 'validation-skip-errors') ? true
+            : !$this->getImportModel()->getErrorAggregator()->hasToBeTerminated();
     }
 
     /**
@@ -372,23 +350,118 @@ class Processor
     }
 
     /**
-     * @param $data
-     * @return mixed
+     * Get import model
+     *
+     * @return Import|mixed
      */
-    public function prepareDataFromAjax($data)
+    public function getImportModel()
+    {
+        if (!$this->importModel) {
+            $this->importModel = $this->importFactory->create();
+        }
+
+        return $this->importModel;
+    }
+
+    /**
+     * @param $local
+     */
+    public function changeLocal($local)
     {
 
-        $mapAttributesData = [];
-        foreach ($data['records'] as $map) {
-            $mapAttributesData[] = [
-                'system' => $map['source_data_system'],
-                'import' => $map['source_data_import'],
-                'default' => $map['source_data_replace']
-            ];
+        $this->setLocal($this->locale->getLocale());
+        if (!$this->inConsole) {
+            $this->backendConfig->setValue('general/locale/code', $local);
+            $this->locale->setLocale($local);
+            $this->manager->create()->switchBackendInterfaceLocale($this->locale->getLocale());
+        } else {
+            $this->locale->setLocale($local);
+            $this->translator->setLocale($local)->loadData(null, true);
         }
-        $data['records'] = $mapAttributesData;
 
-        return $data;
+        $area = $this->areaList->getArea($this->state->getAreaCode());
+        $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
+    }
+
+    /**
+     * @param $local
+     * @return $this
+     */
+    public function setLocal($local)
+    {
+        $this->localeLocal = $local;
+
+        return $this;
+    }
+
+    /**
+     * @param $debugData
+     * @param OutputInterface|null $output
+     * @param null $type
+     * @return $this
+     */
+    public function addLogComment($debugData, OutputInterface $output = null, $type = null)
+    {
+        if (!empty($this->logger->getFilename())) {
+            $this->logger->info($debugData);
+        }
+        if ($output) {
+            switch ($type) {
+                case 'error':
+                    $debugData = '<error>' . $debugData . '</error>';
+                    break;
+                case 'info':
+                    $debugData = '<info>' . $debugData . '</info>';
+                    break;
+                default:
+                    $debugData = '<comment>' . $debugData . '</comment>';
+                    break;
+            }
+            $output->writeln($debugData);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @param $jobId
+     *
+     * @return bool|int
+     */
+    public function dataValidate($data, $jobId)
+    {
+        $validationResult = 0;
+        try {
+            $validationResult = $this->validate($data);
+        } catch (\Exception $e) {
+            $this->getImportModel()->getErrorAggregator()->addError(
+                $e->getCode(),
+                ProcessingError::ERROR_LEVEL_CRITICAL,
+                null,
+                null,
+                $e->getMessage()
+            );
+            $this->getImportModel()->addLogComment($e->getMessage());
+            $summary = '<b>' . $e->getMessage() . '</b><br />';
+            $importHistoryModel = $this->getImportHistoryModel();
+            $importHistoryModel->load($importHistoryModel->getLastItemId());
+            $date = $this->getTimezone()->formatDateTime(
+                $this->getTimezone()->date(),
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::MEDIUM,
+                null,
+                null
+            );
+            $summary .= '<i>' . $date . '</i><br />';
+            $summary .= 'Job: #' . $jobId;
+            $importHistoryModel->setSummary($summary);
+            $importHistoryModel->setExecutionTime(History::IMPORT_FAILED);
+            $importHistoryModel->save();
+            $validationResult = false;
+        }
+
+        return $validationResult;
     }
 
     /**
@@ -405,45 +478,18 @@ class Processor
         if (!$this->inConsole) {
             $this->getImportModel()->setOutput(null);
         }
-        $lastModifiedAt = strtotime($this->job->getFileUpdatedAt());
-        $modified = $this->checkModified($this->getImportModel(), $lastModifiedAt);
-        $another = 0;
+
         if ($data['import_source'] != 'file') {
             $destFile = $this->getImportModel()->uploadSource();
-            $another = 1;
+            //   $another = 1;
         } else {
             $destFile = $data['file_path'];
         }
 
         if (isset($data['type_file']) && $data['type_file'] == 'xml' && $data['xml_switch']) {
-            $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
-            if ($another) {
-                $file = $destFile;
-            } else {
-                $file = $directory->getAbsolutePath() . "/" . $destFile;
-            }
-            $dest = $this->file->read($file);
-            try {
-                $result = $this->outputModel->convert($dest, $data['xslt']);
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
-            }
-
-            $pathInfo = pathinfo($destFile);
-            if ($another) {
-                $destFile = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
-            } else {
-                $destFile = $directory->getAbsolutePath() . "/" . $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
-            }
-           // $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
-            $file = $this->fileWrite->create(
-                $destFile,
-                \Magento\Framework\Filesystem\DriverPool::FILE,
-                "w+"
-            );
-            $file->write($result);
-            $file->close();
+            $destFile = $this->applyXsltTemplate($destFile, $data);
         }
+
         $source = Adapter::findAdapterFor(
             $this->getTypeClass(),
             $destFile,
@@ -486,6 +532,49 @@ class Processor
     }
 
     /**
+     * Apply XSLT template and save result to new xml file.
+     *
+     * @param $destFile
+     * @param $data
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function applyXsltTemplate($destFile, $data)
+    {
+        $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
+        $file = $destFile;
+        if (strpos($destFile, $directory->getAbsolutePath()) === false) {
+            $file = $directory->getAbsolutePath() . "/" . $destFile;
+        }
+        $dest = $this->file->read($file);
+        try {
+            $result = $this->outputModel->convert($dest, $data['xslt']);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+        $pathInfo = pathinfo($destFile);
+
+        if (strpos($destFile, $directory->getAbsolutePath()) === false) {
+            $destFile = $directory->getAbsolutePath() . "/" . $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
+        } else {
+            $destFile = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
+        }
+
+        // $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
+        $file = $this->fileWrite->create(
+            $destFile,
+            \Magento\Framework\Filesystem\DriverPool::FILE,
+            "w+"
+        );
+        $file->write($result);
+        $file->close();
+
+        return $destFile;
+    }
+
+    /**
      * Check file modified date.
      *
      * @param Import $importModel
@@ -503,58 +592,87 @@ class Processor
     }
 
     /**
-     * @param $jobId
      * @return mixed
      */
-    public function processScope($jobId, $file)
+    public function getTypeClass()
     {
-        $totalTime = 0;
-        $result = false;
+        $data = $this->typeConfig->get();
+        $types = $data['import'];
+        $value = current($types);
+        $model = $value['model'];
+        if (isset($types[$this->getTypeSource()])) {
+            $model = $types[$this->getTypeSource()]['model'];
+        }
+
+        return $model;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTypeSource()
+    {
+        return $this->typeSource;
+    }
+
+    /**
+     * @param $type
+     * @return $this
+     */
+    public function setTypeSource($type)
+    {
+        $this->typeSource = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get import history model
+     *
+     * @return History|mixed
+     */
+    public function getImportHistoryModel()
+    {
+        if (!$this->importHistoryModel) {
+            $this->importHistoryModel = $this->importHistoryFactory->create();
+        }
+
+        return $this->importHistoryModel;
+    }
+
+    /**
+     * Get current timezone object.
+     * We can't define timezone in constructor according to db lock timeout
+     * when run job from console.
+     *
+     * @return \Magento\Framework\Stdlib\DateTime\Timezone|mixed
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    public function revertLocale()
+    {
+        $this->locale->setLocale($this->getLocal());
         if (!$this->inConsole) {
-            $this->output = null;
+            $this->backendConfig->setValue('general/locale/code', $this->getLocal());
+            $this->locale->setLocale($this->getLocal());
+            $this->manager->create()->switchBackendInterfaceLocale($this->getLocal());
+        } else {
+            $this->locale->setLocale($this->getLocal());
+            $this->translator->setLocale($this->getLocal())->loadData(null, true);
         }
-        try {
-            $data = $this->prepareJob($jobId);
-            if (!$this->inConsole) {
-                $data['output'] = null;
-            }
+        $area = $this->areaList->getArea($this->state->getAreaCode());
+        $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
+    }
 
-            $data['file'] = $file;
-            $this->strategy = $data['validation_strategy'];
-            $this->errorsCount = $data['allowed_error_count'];
-            $this->reindex = $data['reindex'];
-            if (isset($data['type_file'])) {
-                $this->setTypeSource($data['type_file']);
-            }
-
-            if (!$this->inConsole) {
-                $this->getImportModel()->setOutput(null);
-            }
-
-            $validationResult = $this->dataValidate($data, $jobId);
-            $area = $this->areaList->getArea($this->state->getAreaCode());
-
-            $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
-        } catch (\Exception $e) {
-            $this->addLogComment(
-                'Job #' . $jobId . ' can\'t be imported. Check if job exist',
-                $this->output,
-                'error'
-            );
-            $this->addLogComment(
-                $e->getMessage(),
-                $this->output,
-                'error'
-            );
-            $this->revertLocale();
-
-            return false;
-        }
-
-        $this->revertLocale();
-
-        return ($this->strategy == 'validation-skip-errors') ? true
-            : !$this->getImportModel()->getErrorAggregator()->hasToBeTerminated();
+    /**
+     * @return null
+     */
+    public function getLocal()
+    {
+        return $this->localeLocal;
     }
 
     /**
@@ -562,8 +680,9 @@ class Processor
      * @param $job
      * @param $offset
      * @param $error
-     * @param $show
+     * @param int $show
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function processImport($file, $job, $offset, $error, $show = 1)
     {
@@ -605,6 +724,32 @@ class Processor
     }
 
     /**
+     * @param int $skip
+     *
+     * @throws \Exception
+     */
+    protected function scopeMessages($skip = 0)
+    {
+        if ($this->getImportModel()->getErrorAggregator()->hasToBeTerminated()) {
+            $messages = [
+                __('Maximum error count has been reached or system error is occurred!')
+            ];
+
+            foreach ($this->getImportModel()->getErrorAggregator()->getAllErrors() as $error) {
+                $messages[] = $error->getErrorMessage();
+                if ($skip) {
+                    $this->addLogComment($error->getErrorMessage(), $this->output, 'error');
+                }
+            }
+            if (!$skip) {
+                throw new \Exception(
+                    implode(PHP_EOL, $messages)
+                );
+            }
+        }
+    }
+
+    /**
      * @param $file
      * @param $job
      * @return bool
@@ -621,6 +766,18 @@ class Processor
         }
 
         return true;
+    }
+
+    public function reindex()
+    {
+        $this->addLogComment(__('Running REINDEX'), $this->output, 'info');
+        $indexerCollection = $this->indCollFactory->create();
+        $indexers = $indexerCollection->getItems();
+        foreach ($indexers as $item) {
+            $this->addLogComment(__('REINDEX %1', $item->getTitle()), $this->output, 'info');
+            $item->reindexAll();
+        }
+        $this->addLogComment(__('REINDEX completed'), $this->output, 'info');
     }
 
     /**
@@ -730,73 +887,6 @@ class Processor
     }
 
     /**
-     * @param $data
-     * @param $jobId
-     *
-     * @return bool|int
-     */
-    public function dataValidate($data, $jobId)
-    {
-        $validationResult = 0;
-        try {
-            $validationResult = $this->validate($data);
-        } catch (\Exception $e) {
-            $this->getImportModel()->getErrorAggregator()->addError(
-                $e->getCode(),
-                ProcessingError::ERROR_LEVEL_CRITICAL,
-                null,
-                null,
-                $e->getMessage()
-            );
-            $this->getImportModel()->addLogComment($e->getMessage());
-            $summary = '<b>' . $e->getMessage() . '</b><br />';
-            $importHistoryModel = $this->getImportHistoryModel();
-            $importHistoryModel->load($importHistoryModel->getLastItemId());
-            $date = $this->getTimezone()->formatDateTime(
-                $this->getTimezone()->date(),
-                \IntlDateFormatter::MEDIUM,
-                \IntlDateFormatter::MEDIUM,
-                null,
-                null
-            );
-            $summary .= '<i>' . $date . '</i><br />';
-            $summary .= 'Job: #' . $jobId;
-            $importHistoryModel->setSummary($summary);
-            $importHistoryModel->setExecutionTime(History::IMPORT_FAILED);
-            $importHistoryModel->save();
-            $validationResult = false;
-        }
-
-        return $validationResult;
-    }
-
-    /**
-     * @param int $skip
-     *
-     * @throws \Exception
-     */
-    protected function scopeMessages($skip = 0)
-    {
-        if ($this->getImportModel()->getErrorAggregator()->hasToBeTerminated()) {
-            $messages = [
-                __('Maximum error count has been reached or system error is occurred!')
-            ];
-
-            foreach ($this->getImportModel()->getErrorAggregator()->getAllErrors() as $error) {
-                $messages[] = $error->getErrorMessage();
-                if ($skip) {
-                    $this->addLogComment($error->getErrorMessage(), $this->output, 'error');
-                }
-            }
-            if (!$skip) {
-                throw new \Exception(
-                    implode(PHP_EOL, $messages)
-                );
-            }
-        }
-    }
-
-    /**
      * Get columns names from first row.
      *
      * @param \Firebear\ImportExport\Model\Job $job
@@ -810,6 +900,16 @@ class Processor
             return [];
         }
         $data = is_object($job) ? $this->prepareJob($job->getId()) : $job;
+        if (isset($data['job_id'])) {
+            $jobId = (int)$data['job_id'];
+            $jobModel = $this->jobFactory->create();
+            $jobModel->load($jobId);
+            $sourceData = $this->jsonDecoder->decode($jobModel->getSourceData());
+            if (isset($sourceData['xml_switch']) && $sourceData['xml_switch'] && $jobModel->getXslt()) {
+                $data['xml_switch'] = 1;
+                $data['xslt'] = $jobModel->getXslt();
+            }
+        }
         $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
         if (!$this->inConsole) {
             $this->getImportModel()->setOutput(null);
@@ -830,10 +930,18 @@ class Processor
                     $errorMessage = __('Unable to open your file. Please make sure File Path is correct.');
                 }
             }
+            $destFile = $this->getImportModel()->uploadSource();
+            if (
+                isset($data['type_file']) && $data['type_file'] == 'xml'
+                && isset($data['xml_switch']) && $data['xml_switch']
+            ) {
+                $destFile = $this->applyXsltTemplate($destFile, $data);
+            }
+
             if ($result) {
                 $source = Adapter::findAdapterFor(
                     $this->getTypeClass(),
-                    $this->getImportModel()->uploadSource(),
+                    $destFile,
                     $directory,
                     $data[Import::FIELD_FIELD_SEPARATOR]
                 );
@@ -843,9 +951,19 @@ class Processor
                 return is_array($job) ? $errorMessage : [];
             }
         } else {
+
+            $destFile = $data['file_path'];
+
+            if (
+                isset($data['type_file']) && $data['type_file'] == 'xml'
+                && isset($data['xml_switch']) && $data['xml_switch']
+            ) {
+                $destFile = $this->applyXsltTemplate($destFile, $data);
+            }
+
             $source = Adapter::findAdapterFor(
                 $this->getTypeClass(),
-                $data['file_path'],
+                $destFile,
                 $this->filesystemFactory->create()
                     ->getDirectoryWrite(DirectoryList::ROOT),
                 $data[Import::FIELD_FIELD_SEPARATOR]
@@ -905,6 +1023,26 @@ class Processor
         return true;
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function prepareDataFromAjax($data)
+    {
+
+        $mapAttributesData = [];
+        foreach ($data['records'] as $map) {
+            $mapAttributesData[] = [
+                'system' => $map['source_data_system'],
+                'import' => $map['source_data_import'],
+                'default' => $map['source_data_replace']
+            ];
+        }
+        $data['records'] = $mapAttributesData;
+
+        return $data;
+    }
+
     public function validateFile()
     {
         $source = $this->getTypeSource();
@@ -913,7 +1051,8 @@ class Processor
     /**
      * @param $data
      *
-     * @return mixed
+     * @return array|string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function processValidate($data)
     {
@@ -921,7 +1060,7 @@ class Processor
             $this->changeLocal($data['locale']);
         }
         $data['output'] = null;
-        $messages = "";
+        $messages = [];
         if ($this->source !== null) {
             $this->getImportModel()->setData($data);
             if (!$this->inConsole) {
@@ -934,71 +1073,7 @@ class Processor
             }
         }
 
-        return $messages;
-    }
-
-    /**
-     * @param $debugData
-     * @param OutputInterface|null $output
-     * @param null $type
-     * @return $this
-     */
-    public function addLogComment($debugData, OutputInterface $output = null, $type = null)
-    {
-        if (!empty($this->logger->getFilename())) {
-            $this->logger->info($debugData);
-        }
-        if ($output) {
-            switch ($type) {
-                case 'error':
-                    $debugData = '<error>' . $debugData . '</error>';
-                    break;
-                case 'info':
-                    $debugData = '<info>' . $debugData . '</info>';
-                    break;
-                default:
-                    $debugData = '<comment>' . $debugData . '</comment>';
-                    break;
-            }
-            $output->writeln($debugData);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $type
-     * @return $this
-     */
-    public function setTypeSource($type)
-    {
-        $this->typeSource = $type;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTypeSource()
-    {
-        return $this->typeSource;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTypeClass()
-    {
-        $data = $this->typeConfig->get();
-        $types = $data['import'];
-        $value = current($types);
-        $model = $value['model'];
-        if (isset($types[$this->getTypeSource()])) {
-            $model = $types[$this->getTypeSource()]['model'];
-        }
-
-        return $model;
+        return empty($messages) ? '' : $messages;
     }
 
     /**
@@ -1009,75 +1084,8 @@ class Processor
         $this->logger = $logger;
     }
 
-    /**
-     * @param $local
-     * @return $this
-     */
-    public function setLocal($local)
-    {
-        $this->localeLocal = $local;
-
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public function getLocal()
-    {
-        return $this->localeLocal;
-    }
-
-    /**
-     * @param $local
-     */
-    public function changeLocal($local)
-    {
-
-        $this->setLocal($this->locale->getLocale());
-        if (!$this->inConsole) {
-            $this->backendConfig->setValue('general/locale/code', $local);
-            $this->locale->setLocale($local);
-            $this->manager->create()->switchBackendInterfaceLocale($this->locale->getLocale());
-        } else {
-            $this->locale->setLocale($local);
-            $this->translator->setLocale($local)->loadData(null, true);
-        }
-
-        $area = $this->areaList->getArea($this->state->getAreaCode());
-        $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
-    }
-
-
-    public function revertLocale()
-    {
-        $this->locale->setLocale($this->getLocal());
-        if (!$this->inConsole) {
-            $this->backendConfig->setValue('general/locale/code', $this->getLocal());
-            $this->locale->setLocale($this->getLocal());
-            $this->manager->create()->switchBackendInterfaceLocale($this->getLocal());
-        } else {
-            $this->locale->setLocale($this->getLocal());
-            $this->translator->setLocale($this->getLocal())->loadData(null, true);
-        }
-        $area = $this->areaList->getArea($this->state->getAreaCode());
-        $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
-    }
-
     public function showErrors()
     {
         $this->getImportModel()->showErrors();
-    }
-
-    public function reindex()
-    {
-        $this->addLogComment(__('Running REINDEX'), $this->output, 'info');
-        $indexerCollection = $this->indCollFactory->create();
-        $indexers = $indexerCollection->getItems();
-        foreach ($indexers as $item) {
-            $this->addLogComment(__('REINDEX %1', $item->getTitle()), $this->output, 'info');
-            $item->reindexAll();
-        }
-        $this->addLogComment(__('REINDEX completed'), $this->output, 'info');
     }
 }

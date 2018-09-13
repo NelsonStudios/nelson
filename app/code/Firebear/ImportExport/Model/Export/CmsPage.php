@@ -134,7 +134,14 @@ class CmsPage extends AbstractEntity
             ++$page;
             $entityCollection = $this->_getEntityCollection(true);
             $entityCollection->setOrder('page_id', 'asc');
-
+            if (isset($this->_parameters['last_entity_id'])
+                && $this->_parameters['last_entity_id'] > 0
+                && $this->_parameters['enable_last_entity_id'] > 0
+            ) {
+                $entityCollection->addFieldToFilter(
+                    PageInterface::PAGE_ID, ['gt' => $this->_parameters['last_entity_id']]
+                );
+            }
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
                 break;
@@ -144,6 +151,9 @@ class CmsPage extends AbstractEntity
                 $writer->setHeaderCols($this->_getHeaderColumns());
             }
             foreach ($exportData as $dataRow) {
+                if ($this->_parameters['enable_last_entity_id'] > 0) {
+                    $this->lastEntityId = $dataRow[PageInterface::PAGE_ID];
+                }
                 $dd = $this->_customFieldsMapping($dataRow);
                 $writer->writeRow($dd);
                 $counts++;
@@ -154,7 +164,7 @@ class CmsPage extends AbstractEntity
             }
         }
 
-        return [$writer->getContents(), $counts];
+        return [$writer->getContents(), $counts, $this->lastEntityId];
     }
 
     /**
@@ -361,6 +371,31 @@ class CmsPage extends AbstractEntity
 
     public function getFieldColumns()
     {
-        return [];
+        $options = [];
+        $model = $this->createFactory->create('\Magento\Cms\Model\Block');
+        $fields = $this->describeTable($model);
+        $mergeFields = [];
+        foreach ($fields as $key => $field) {
+            $type = $this->helper->convertTypesTables($field['DATA_TYPE']);
+            $select = [];
+            if (isset($mergeFields[$key])) {
+                if (!$mergeFields[$key]['delete']) {
+                    $type = $mergeFields[$key]['type'];
+                    $select = $mergeFields[$key]['options'];
+                }
+            }
+            $options['cms_page'][] = ['field' => $key, 'type' => $type, 'select' => $select];
+        }
+
+        return $options;
+    }
+
+    protected function describeTable($model = null)
+    {
+        $resource = $model->getResource();
+        $table = $resource->getMainTable();
+        $fields = $resource->getConnection()->describeTable($table);
+
+        return $fields;
     }
 }

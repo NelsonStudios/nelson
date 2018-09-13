@@ -46,7 +46,12 @@ class Options implements OptionSourceInterface
         $types = $this->config->get();
         $sources[] = ['label' => __('-- Please Select --'), 'value' => ''];
         foreach ($types as $typeName => $type) {
-            $sources[] = ['label' => $type['label'], 'value' => $typeName, 'depends' => $type['depends']];
+            $sources[] = [
+                'label' => $type['label'],
+                'value' => $typeName,
+                'depends' => ($type['depends']) ? explode(',',$type['depends']) : $type['depends'],
+                'api' => isset($type['api']) && $type['api'] === '1'? "1" : "0"
+            ];
         }
 
         $this->options = $sources;

@@ -73,11 +73,8 @@ class Creditmemo extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['creditmemos'])) {
-			return false;
-		}	
-		$rowData = $this-> _explodeField($rowData['creditmemos']);
-		return ($rowData && !$this->isEmptyRow($rowData)) 
+		$rowData = $this->_extractField($rowData, 'creditmemo');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
 			? $rowData 
 			: false;
     }

@@ -35,6 +35,23 @@ class Product extends MagentoProduct
 {
     use \Firebear\ImportExport\Traits\General;
 
+    /**
+     * Default website id
+     */
+    const DEFAULT_WEBSITE_ID = 1;
+    /**
+     * Used when create new attributes in column name
+     */
+    const ATTRIBUTE_SET_GROUP = 'attribute_set_group';
+    /**
+     * Attribute sets column name
+     */
+    const ATTRIBUTE_SET_COLUMN = 'attribute_set';
+    /**
+     * @var \Magento\Framework\App\ProductMetadata
+     */
+    public $productMetadata;
+    public $onlyUpdate = 0;
     protected $addFields = [
         'manage_stock',
         'use_config_manage_stock',
@@ -58,92 +75,68 @@ class Product extends MagentoProduct
         'low_stock_date',
         'stock_status_changed_auto',
         'is_decimal_divided',
-        'has_options'
+        'has_options',
+        'tax_class_name',
+        self::COL_STORE_VIEW_CODE,
+        'attribute_set_code',
+        'configurable_variations',
+        'configurable_variation_labels',
+        'associated_skus',
+        'base_image_label',
+        'additional_images',
+        'additional_image_labels',
+        'small_image_label',
+        'thumbnail_image_label',
+        'swatch_image',
+        'swatch_image_label',
+        'remove_images',
     ];
-    /**
-     * Default website id
-     */
-    const DEFAULT_WEBSITE_ID = 1;
-
-    /**
-     * Used when create new attributes in column name
-     */
-    const ATTRIBUTE_SET_GROUP = 'attribute_set_group';
-
-    /**
-     * Attribute sets column name
-     */
-    const ATTRIBUTE_SET_COLUMN = 'attribute_set';
-
     /**
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
-
     /**
      * @var \Firebear\ImportExport\Helper\Data
      */
     protected $helper;
-
     /**
      * @var \Firebear\ImportExport\Helper\Additional
      */
     protected $additional;
-
     /**
      * @var \Firebear\ImportExport\Model\Source\Type\AbstractType
      */
     protected $sourceType;
-
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory
      */
     protected $attributeFactory;
-
     /**
      * @var \Magento\Eav\Model\EntityFactory
      */
     protected $eavEntityFactory;
-
     /**
      * @var \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory
      */
     protected $groupCollectionFactory;
-
     /**
      * @var array
      */
     protected $_attributeSetGroupCache;
-
     /**
      * @var \Magento\Catalog\Helper\Product
      */
     protected $productHelper;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $_logger;
-
     /**
      * @var ConsoleOutput
      */
     protected $output;
-
     protected $_debugMode;
-
     /**
      * @var \Firebear\ImportExport\Model\Source\Import\Config
      */
     protected $fireImportConfig;
-
     protected $duplicateFields = ['sku', 'scope', 'url_key'];
-
-    /**
-     * @var \Magento\Framework\App\ProductMetadata
-     */
-    public $productMetadata;
-
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
@@ -190,39 +183,31 @@ class Product extends MagentoProduct
      * @var \Magento\Catalog\Model\Product\Media\Config
      */
     protected $mediaConfig;
-
-    private $cachedSwatchOptions = [];
-
-
-    public $onlyUpdate = 0;
-
     /**
      * @var \Magento\Customer\Model\GroupFactory
      */
     protected $groupFactory;
-
     /**
      * @var \Magento\Store\Model\WebsiteFactory
      */
     protected $websiteFactory;
-
     protected $repeatUrls = [];
-
     /**
      * @var \Magento\Tax\Model\ResourceModel\TaxClass\CollectionFactory
      */
     protected $collectionTaxFactory;
-
     protected $storeManager;
-
     protected $notValidedSku = [];
-
-    private $importCollection;
-
     protected $priceRuleConditionFactory;
-
     protected $platform;
-
+    /** @var \Magento\Framework\Module\Manager */
+    protected $manager;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $_logger;
+    private $cachedSwatchOptions = [];
+    private $importCollection;
     private $_isRowCategoryMapped;
 
     /**
@@ -357,8 +342,10 @@ class Product extends MagentoProduct
         \Magento\Swatches\Helper\Media $swatchHelperMedia,
         SwatchCollectionFactory $swatchCollectionFactory,
         \Magento\Catalog\Model\Product\Media\Config $mediaConfig,
+        \Magento\Framework\Module\Manager $moduleManager,
         array $data = []
-    ) {
+    )
+    {
         $this->output = $output;
         $this->request = $request;
         $this->helper = $helper;
@@ -435,31 +422,17 @@ class Product extends MagentoProduct
         $this->categoryProcessor = $fireCategoryProcessor;
         $this->_uploaderFactory = $fireUploader;
         $this->collectionTaxFactory = $collectionTaxFactory;
-        $this->importCollection = $importCollectionFactory->create();
+        $this->importCollection = $importCollectionFactory;
         $this->_specialAttributes[] = '_tier_price_value_type';
         $this->_fieldsMap += [
             '_tier_price_website' => 'tier_price_website',
             '_tier_price_customer_group' => 'tier_price_customer_group',
             '_tier_price_qty' => 'tier_price_qty',
             '_tier_price_price' => 'tier_price_price',
-            '_tier_price_value_type' => 'tier_price_value_type'
+            '_tier_price_value_type' => 'tier_price_value_type',
         ];
         $this->_isRowCategoryMapped = false;
-    }
-
-    /**
-     * Initialize source type model
-     *
-     * @param $type
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function _initSourceType($type)
-    {
-        if (!$this->sourceType) {
-            $this->sourceType = $this->additional->getSourceModelByType($type);
-            $this->sourceType->setData($this->_parameters);
-        }
+        $this->manager = $moduleManager;
     }
 
     /**
@@ -488,15 +461,6 @@ class Product extends MagentoProduct
         return true;
     }
 
-    /*
-    public function getRowScope(array $rowData)
-    {
-        return self::SCOPE_DEFAULT;
-    }
-
-    */
-
-
     /**
      * Replace imported products.
      *
@@ -517,6 +481,14 @@ class Product extends MagentoProduct
 
         return $this;
     }
+
+    /*
+    public function getRowScope(array $rowData)
+    {
+        return self::SCOPE_DEFAULT;
+    }
+
+    */
 
     /**
      * Save products data.
@@ -588,11 +560,41 @@ class Product extends MagentoProduct
 
         return $this;
     }
-
+	
+    /**
+     * Set valid attribute set and product type to rows with all scopes
+     * to ensure that existing products doesn't changed.
+     *
+     * @param array $rowData
+     * @return array
+     */
+    protected function _prepareRowForDb(array $rowData)
+    {
+        $rowData = parent::_prepareRowForDb($rowData);
+		foreach ($this->defaultStockData as $key => $value) {
+			if (isset($rowData[$key])) {				
+				if ($rowData[$key] === true) {
+					$rowData[$key] = 1;
+				} elseif ($rowData[$key] === false) {
+					$rowData[$key] = 0;
+				} elseif ($rowData[$key] === '') {
+					$rowData[$key] = 0;
+				} elseif ($rowData[$key] === null && $key != 'low_stock_date') {
+					$rowData[$key] = 0;
+				}
+			} else {
+				$rowData[$key] = $value;
+			}			
+        }        
+        return $rowData;
+    }
+	
     /**
      * Gather and save information about product entities.
      *
      * @return $this
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\LocalizedException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -622,9 +624,10 @@ class Product extends MagentoProduct
 
             $prevData = [];
             foreach ($nextBunch as $rowNum => $rowData) {
+                $time = explode(" ", microtime());
+                $startTime = $time[0] + $time[1];
                 if (isset($rowData[self::COL_CATEGORY])) {
                     $rowData[self::COL_CATEGORY] = $this->categoriesMapping($rowData[self::COL_CATEGORY]);
-                   // $rowData[self::COL_CATEGORY] = htmlspecialchars($rowData[self::COL_CATEGORY]);
                 }
                 $rowData = $this->joinIdenticalyData($rowData);
                 if (isset($rowData['_attribute_set']) && isset($rowData['attribute_set_code'])) {
@@ -645,7 +648,33 @@ class Product extends MagentoProduct
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
 
-                $productType = isset($rowData[self::COL_TYPE]) ? strtolower($rowData[self::COL_TYPE]) : null;
+                $storeIds = [0];
+                foreach ($this->storeManager->getStores() as $key => $model) {
+                    $storeIds[] = $key;
+                }
+
+                if (isset($rowData['remove_images']) && $rowData['remove_images'] == 1) {
+                    if (isset($existingImages[$rowData[self::COL_SKU]])) {
+                        $this->removeExistingImages($existingImages[$rowData[self::COL_SKU]]);
+                        unset($existingImages[$rowData[self::COL_SKU]]);
+                    }
+                }
+                $rowData = $this->checkUrl($rowData);
+                $rowData = $this->removeQueryStringFromImageURL($rowData);
+                $rowData = $this->checkAdditionalImages($rowData);
+                $rowData = $this->customChangeData($rowData);
+                if (!$this->validateRow($rowData, $rowNum)) {
+                    $this->addLogWriteln(__('product with sku: %1 is not valided', $rowData[self::COL_SKU]),
+                        $this->output, 'info');
+                    $this->notValidedSku[] = strtolower($rowData[self::COL_SKU]);
+                    unset($nextBunch[$rowNum]);
+                    continue;
+                } else {
+                    $rowData = $this->prepareRowForDb($rowData);
+                }
+                $productType = isset($rowData[self::COL_TYPE]) ?
+                    strtolower($rowData[self::COL_TYPE]) :
+                    $this->skuProcessor->getNewSku($rowData[self::COL_SKU])['type_id'];
                 // custom
 
                 if ($productType) {
@@ -658,20 +687,13 @@ class Product extends MagentoProduct
                     }
                 }
 
-                $rowData = $this->checkUrl($rowData);
-                $rowData = $this->checkAdditionalImages($rowData);
-                $rowData = $this->customChangeData($rowData);
-                if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('sku: %1 is not valided', $rowData[self::COL_SKU]), $this->output, 'info');
-                    $this->notValidedSku[] = strtolower($rowData[self::COL_SKU]);
-                    unset($nextBunch[$rowNum]);
-                    continue;
-                } else {
-                    $rowData = $this->prepareRowForDb($rowData);
+                if ($this->manager->isEnabled('Magestore_InventorySuccess')) {
+                    $this->mageStoreWarehouse($rowData);
                 }
+
                 if (!isset($rowData[self::COL_ATTR_SET]) || !isset($this->_attrSetNameToId[$rowData[self::COL_ATTR_SET]])) {
                     $this->addRowError(ValidatorInterface::ERROR_INVALID_ATTR_SET, $rowNum);
-                    $this->addLogWriteln(__('sku: %1 is not valided. Invalid value for Attribute Set column (set doesn\'t exist?)',
+                    $this->addLogWriteln(__('product with sku: %1 is not valided. Invalid value for Attribute Set column (set doesn\'t exist?)',
                         $rowData[self::COL_SKU]), $this->output, 'info');
                     $this->notValidedSku[] = strtolower($rowData[self::COL_SKU]);
                     unset($nextBunch[$rowNum]);
@@ -685,23 +707,18 @@ class Product extends MagentoProduct
                     $nextBunch[$rowNum][self::URL_KEY] = $rowData[self::URL_KEY];
                 }
 
-                if (!isset($rowData[self::URL_KEY])) {
-                    $rowData[self::URL_KEY] = $this->getUrlKey($rowData);
-                }
+                $rowData[self::URL_KEY] = $this->getUrlKey($rowData);
 
                 $this->urlKeys = [];
                 $rowData = $this->applyCategoryLevelSeparator($rowData);
 
-                $rowData = $this->_parseAdditionalAttributes($rowData);
+                $rowData = $this->adjustBundleTypeAttributes($rowData);
 
                 if (empty($rowData[self::COL_SKU])) {
                     $rowData = array_merge($prevData, $this->deleteEmpty($rowData));
                 } else {
                     $prevData = $rowData;
                 }
-                $time = explode(" ", microtime());
-                $startTime = $time[0] + $time[1];
-
                 $sku = $rowData['sku'];
                 if ($this->onlyUpdate) {
                     $collectionUpdate = $this->collectionFactory->create()->addFieldToFilter(
@@ -709,7 +726,7 @@ class Product extends MagentoProduct
                         $rowData[self::COL_SKU]
                     );
                     if (!$collectionUpdate->getSize()) {
-                        $this->addLogWriteln(__('sku: %1 does not exist', $sku), $this->output, 'info');
+                        $this->addLogWriteln(__('product with sku: %1 does not exist', $sku), $this->output, 'info');
                         unset($nextBunch[$rowNum]);
                         continue;
                     }
@@ -775,8 +792,6 @@ class Product extends MagentoProduct
                         $configurableData[$skuConf][] = $arrayConf;
                     }
                 }
-
-
                 $rowScope = $this->getRowScope($rowData);
                 $rowSku = $rowData[self::COL_SKU];
                 $checkSku = $rowSku;
@@ -828,7 +843,6 @@ class Product extends MagentoProduct
                     $entityRowsUp[] = $array;
                 }
 
-
                 // Categories phase
                 if (!array_key_exists($rowSku, $this->categoriesCache)) {
                     $this->categoriesCache[$rowSku] = [];
@@ -842,7 +856,8 @@ class Product extends MagentoProduct
                                 ' Url: ' . $field['category']->getUrlKey() .
                                 ' ' . $field['exception']->getMessage()), $rowNum);
                     }
-                    $this->addLogWriteln(__('sku: %1 is not valided', $rowData[self::COL_SKU]), $this->output, 'info');
+                    $this->addLogWriteln(__('product with sku: %1 is not valided', $rowData[self::COL_SKU]),
+                        $this->output, 'info');
                     $this->notValidedSku[] = strtolower($rowData[self::COL_SKU]);
                     unset($nextBunch[$rowNum]);
                     continue;
@@ -886,14 +901,14 @@ class Product extends MagentoProduct
                             : $this->storeResolver->getWebsiteCodeToId(
                                 $rowData['_tier_price_website']
                             ),
-                        'percentage_value' => (!$fixed) ? $rowData['_tier_price_price'] : 0
+                        'percentage_value' => (!$fixed) ? $rowData['_tier_price_price'] : 0,
                     ];
                     $tierPrices = array_merge($tierPrices, $this->getTierPrices($rowData, $rowSku));
                 } else {
                     $tierPrices += $this->getTierPrices($rowData, $rowSku);
                 }
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('sku: %1 is not valided', $sku), $this->output, 'info');
+                    $this->addLogWriteln(__('product with sku: %1 is not valided', $sku), $this->output, 'info');
                     unset($nextBunch[$rowNum]);
                     continue;
                 }
@@ -911,6 +926,7 @@ class Product extends MagentoProduct
                 }
 
                 list($rowImages, $rowLabels) = $this->getImagesFromRow($rowData);
+
                 if (isset($rowData['_media_is_disabled'])) {
                     $disabledImages = array_flip(
                         explode($this->getMultipleValueSeparator(), $rowData['_media_is_disabled'])
@@ -951,13 +967,15 @@ class Product extends MagentoProduct
                                 $rowData[$column][] = $uploadedFile;
                             }
                             if (version_compare($this->productMetadata->getVersion(), '2.2.4', '>=')) {
-                                $mediaGallery[$storeId][$rowSku][] = [
-                                    'attribute_id' => $this->getMediaGalleryAttributeId(),
-                                    'label' => isset($rowLabels[$column][$position]) ? $rowLabels[$column][$position] : '',
-                                    'position' => $position + 1,
-                                    'disabled' => isset($disabledImages[$columnImage]) ? '1' : '0',
-                                    'value' => $uploadedFile,
-                                ];
+                                foreach ($storeIds as $storeId) {
+                                    $mediaGallery[$storeId][$rowSku][] = [
+                                        'attribute_id' => $this->getMediaGalleryAttributeId(),
+                                        'label' => isset($rowLabels[$column][$position]) ? $rowLabels[$column][$position] : '',
+                                        'position' => $position + 1,
+                                        'disabled' => isset($disabledImages[$columnImage]) ? '1' : '0',
+                                        'value' => $uploadedFile,
+                                    ];
+                                }
                             } else {
                                 $mediaGallery[$rowSku][] = [
                                     'attribute_id' => $this->getMediaGalleryAttributeId(),
@@ -1016,7 +1034,10 @@ class Product extends MagentoProduct
                     }
 
                     if ($this->getBehavior() == Import::BEHAVIOR_APPEND || empty($rowData[self::COL_SKU])) {
-                        $rowData = $productTypeModel->clearEmptyData($rowData);
+                        if (isset($this->_parameters['clear_attribute_value'])
+                            && $this->_parameters['clear_attribute_value'] == 0) {
+                            $rowData = $productTypeModel->clearEmptyData($rowData);
+                        }
                     }
 
                     $rowData = $productTypeModel->prepareAttributesWithDefaultValueForSave(
@@ -1068,11 +1089,12 @@ class Product extends MagentoProduct
                         $attribute->setBackendModel($backModel);
                     }
 
+
                     $time = explode(" ", microtime());
                     $endTime = $time[0] + $time[1];
                     $totalTime = $endTime - $startTime;
                     $totalTime = round($totalTime, 5);
-                    $this->addLogWriteln(__('sku: %1 .... %2s', $sku, $totalTime), $this->output, 'info');
+                    $this->addLogWriteln(__('product with sku: %1 .... %2s', $sku, $totalTime), $this->output, 'info');
                 }
             }
 
@@ -1106,6 +1128,7 @@ class Product extends MagentoProduct
                 ['adapter' => $this, 'bunch' => $nextBunch]
             );
         }
+
         if (!empty($configurableData)) {
             $this->saveConfigurationVariations($configurableData);
         }
@@ -1113,541 +1136,85 @@ class Product extends MagentoProduct
         return $this;
     }
 
-    protected function checkAdditionalImages($rowData)
-    {
-        if (isset($rowData['additional_images'])) {
-            $uploader = $this->_getUploader();
-            $newImage = [];
-            $importImages = explode($this->getMultipleValueSeparator(), $rowData['additional_images']);
-            $newImage = $importImages;
-            /*foreach ($importImages as $importImage) {
-            $newImage[] = $this->uploadMediaFiles($importImage);
-            }*/
-        }
-        if (!empty($newImage)) {
-            $rowData['additional_images'] = implode(",", $newImage);
-        }
-
-        return $rowData;
-    }
-
     /**
-     * @param array $data
-     * @param string $rowSku
+     * Init media gallery resources.
+     *
      * @return void
      */
-    protected function getTierPrices($data, $rowSku)
+    public function initMediaGalleryResources()
     {
-        $tierPrices = [];
-
-        if (!empty($data['tier_prices'])) {
-            $tiers = explode("|", $data['tier_prices']);
-            $groups = $this->groupFactory->create()->getCollection()->toOptionArray();
-            $newGroups = [];
-            foreach ($groups as $group) {
-                $newGroups[$group['label']] = $group['value'];
-            }
-            $websites = $this->websiteFactory->create()->getCollection()->toOptionArray();
-            $newWebsites = [0 => self::VALUE_ALL];
-            foreach ($websites as $website) {
-                $newWebsites[$website['label']] = $website['value'];
-            }
-            foreach ($tiers as $field) {
-                $elements = explode($this->getMultipleValueSeparator(), $field);
-                $isAllGroup = 0;
-                if ($elements[0] == __('ALL GROUPS')) {
-                    $isAllGroup = 1;
-                }
-                if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
-                    $tierPrices[$rowSku][] = [
-                        'all_groups' => $isAllGroup,
-                        'customer_group_id' => (isset($elements[0]) && isset($newGroups[$elements[0]])) ? $newGroups[$elements[0]] : 0,
-                        'qty' => (isset($elements[1])) ? $elements[1] : 0,
-                        'value' => (isset($elements[2])) ? $elements[2] : 0,
-                        'percentage_value' => (isset($elements[3])) ? (!empty($elements[3]) ? $elements[3] : null) : null,
-                        'website_id' => (isset($elements[4]) && isset($newWebsites[$elements[4]])) ? $newWebsites[$elements[4]] : 0,
-                    ];
-                } else {
-                    $tierPrices[$rowSku][] = [
-                        'all_groups' => $isAllGroup,
-                        'customer_group_id' => (isset($elements[0]) && isset($newGroups[$elements[0]])) ? $newGroups[$elements[0]] : 0,
-                        'qty' => (isset($elements[1])) ? $elements[1] : 0,
-                        'value' => (isset($elements[2])) ? $elements[2] : 0,
-                        'website_id' => (isset($elements[3]) && isset($newWebsites[$elements[3]])) ? $newWebsites[$elements[3]] : 0,
-                    ];
-                }
-            }
-        }
-
-        return $tierPrices;
-    }
-
-
-    protected function categoriesMapping($importedCategories)
-    {
-        $explodeImportedCategoriesItems = explode($this->_parameters['categories_separator'], $importedCategories);
-        $importCollectionItems = $this->importCollection->addFieldToFilter(
-            'entity_id',
-            $this->_parameters['job_id']
-        )
-            ->getItems();
-        foreach ($importCollectionItems as $importCollectionItem) {
-            $newCategoriesMapItems = \Zend\Serializer\Serializer::unserialize($importCollectionItem->getMapping());
-            foreach ($newCategoriesMapItems as $newCategoriesMapItem) {
-                foreach ($explodeImportedCategoriesItems as &$explodeImportedCategoriesItem) {
-                    if ($explodeImportedCategoriesItem == $newCategoriesMapItem['source_category_data_import']) {
-                        $explodeImportedCategoriesItem = $newCategoriesMapItem['source_category_data_new'];
-                        $this->setIsRowCategoryMapped(true);
-                    }
-                }
-            }
-        }
-        return implode($this->_parameters['categories_separator'], $explodeImportedCategoriesItems);
-    }
-
-    /**
-     * @param $data
-     * @return $this
-     */
-    protected function saveConfigurationVariations($data)
-    {
-        if (!empty($data)) {
-            foreach ($data as $skuConf => $elements) {
-                $checkSku = $skuConf;
-                if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
-                    $checkSku = strtolower($skuConf);
-                }
-                $created = 0;
-                $websites = [];
-                $additionalRows = [];
-                $changeAttributes = [];
-                $storeIds = [0];
-                $mediaGallery = [];
-                foreach ($this->storeManager->getStores() as $key => $model) {
-                    $storeIds[] = $key;
-                }
-                try {
-                    $collection = $this->collectionFactory->create()
-                        ->addFieldToFilter('sku', $skuConf)
-                        ->addFieldToFilter('type_id', 'configurable')
-                        ->addAttributeToSelect('*');
-                    $this->addLogWriteln(__('Configure variations for SKU:%1', $skuConf), $this->output, 'info');
-                    if ($this->_parameters['configurable_create'] && !$collection->getSize()) {
-                        try {
-                            $created = 1;
-                            $collectionChild = $this->collectionFactory->create();
-                            $collectionChild->addFieldToFilter('sku', $elements[0][self::COL_SKU])
-                                ->addAttributeToSelect('*');
-                            $child = $collectionChild->getFirstItem();
-                            $data = [];
-                            $data[self::COL_SKU] = $skuConf;
-                            $data[self::COL_NAME] = $skuConf;
-                            foreach ($this->_imagesArrayKeys as $fieldImage) {
-                                if ($fieldImage != '_media_image') {
-                                    $data[$fieldImage] = $child->getData($fieldImage);
-                                    $attributeChange = $this->retrieveAttributeByCode($fieldImage);
-                                    $attrId = $attributeChange->getId();
-                                    $attrTable = $attributeChange->getBackend()->getTable();
-                                    $attrValue = $child->getData($fieldImage);
-                                    if (!isset($changeAttributes[$attrTable][$checkSku][$attrId][0]) && !empty($attrValue)) {
-                                        $changeAttributes[$attrTable][$skuConf][$attrId][0] = $attrValue;
-                                        if (version_compare($this->productMetadata->getVersion(), '2.2.4', '>=')){
-                                            $mediaGallery[Store::DEFAULT_STORE_ID][$skuConf][] = [
-                                                'attribute_id' => $this->getMediaGalleryAttributeId(),
-                                                'label' => '',
-                                                'position' => 1,
-                                                'disabled' => '0',
-                                                'value' => $attrValue,
-                                            ];
-                                        } else {
-                                            $mediaGallery[$skuConf][] = [
-                                                'attribute_id' => $this->getMediaGalleryAttributeId(),
-                                                'label' => '',
-                                                'position' => 1,
-                                                'disabled' => '0',
-                                                'value' => $attrValue,
-                                            ];
-
-                                        }
-                                    }
-                                }
-                            }
-                            $data['attribute_set_id'] = $child->getAttributeSetId();
-                            $data['type_id'] = 'configurable';
-                            $data['website_ids'] = $child->getWebsiteIds();
-                            $websites[$skuConf] = $child->getWebsiteIds();
-                            $data['category_ids'] = $child->getCategoryIds();
-                            $data['visibility'] = 4;
-                            $data['has_options'] = $child->getData('has_options');
-                            $changedData = $data;
-                            $product = $this->_proxyProdFactory->create();
-                            $product->setData($data);
-                            $product->setQuantityAndStockStatus(['qty' => 0, 'is_in_stock' => 1]);
-                            $product = $this->productRepository->save($product);
-                            $data['entity_id'] = $product->getId();
-                            $this->skuProcessor->addNewSku($skuConf, $data);
-                            $this->_oldSku[strtolower($skuConf)] = [
-                                'type_id' => "configurable",
-                                'attr_set_id' => $child->getAttributeSetId(),
-                                'entity_id' => $product->getId(),
-                                'supported_type' => true
-                            ];
-                        } catch (LocalizedException $e) {
-                            $this->addLogWriteln($e->getMessage(), $this->output, 'error');
-                        }
-                    } else {
-                        if ($collection->getSize()) {
-                            $product = $collection->getFirstItem();
-                            if ($product->getName() == $skuConf) {
-                                $collectionChild = $this->collectionFactory->create();
-                                $collectionChild->addFieldToFilter('sku', $elements[0][self::COL_SKU])
-                                    ->addAttributeToSelect('*');
-                                $product->setName($skuConf);
-                            }
-                            if ($product->getTypeId() != 'configurable') {
-                                $product->setTypeId('configurable');
-                                $product = $this->productRepository->save($product);
-                            }
-
-                        }
-                    }
-
-                    $vars = [];
-                    $attributes = [];
-                    $attributeChange = $this->retrieveAttributeByCode('visibility');
-                    $attrTable = $attributeChange->getBackend()->getTable();
-
-                    $attrValue = 1;
-
-                    $attrId = $attributeChange->getId();
-                    foreach ($elements as $element) {
-                        $position = 0;
-                        foreach ($element as $ki => $field) {
-                            if ($ki != 'sku' && !empty($field)) {
-                                if (!in_array($ki, $attributes)) {
-                                    $attributes[] = $ki;
-                                }
-                                $vars['fields'][] = [
-                                    'code' => $ki,
-                                    'value' => $field
-                                ];
-                            } else {
-                                $vars[$ki] = $field;
-                                if ($ki == 'sku') {
-                                    foreach ($storeIds as $storeId) {
-                                        if (!isset($changeAttributes[$attrTable][$field][$attrId][$storeId])) {
-                                            $changeAttributes[$attrTable][$field][$attrId][$storeId] = $attrValue;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        $vars['position'] = $position;
-                        $position++;
-                        $additionalRows[] = $vars;
-                    }
-                    $attributeValues = [];
-                    $ids = [];
-                    $configurableAttributesData = [];
-                    $position = 0;
-                    foreach ($attributes as $attribute) {
-                        foreach ($additionalRows as $list) {
-                            $attributeCollection = $this->attributeFactory->create()->getCollection();
-                            $attributeCollection->addFieldToFilter('attribute_code', $attribute);
-                            $value = [];
-                            foreach ($list['fields'] as $item) {
-                                if ($item['code'] == $attribute) {
-                                    $value = $item['value'];
-                                    $collection = $this->collectionFactory->create();
-                                    $collection->addFieldToFilter('sku', $list['sku']);
-                                    if (!in_array($collection->getFirstItem()->getId(), $ids)) {
-                                        $ids[] = $collection->getFirstItem()->getId();
-                                    }
-                                }
-                            }
-                            if ($attributeCollection->getSize()) {
-                                $attributeValues[$attribute][] = [
-                                    'label' => $attribute,
-                                    'attribute_id' => $attributeCollection->getFirstItem()->getId(),
-                                    'value_index' => $value,
-                                ];
-                            }
-                        }
-                        if ($attributeCollection->getSize()) {
-                            $attr = $attributeCollection->getFirstItem();
-                            $configurableAttributesData[] =
-                                [
-                                    'attribute_id' => $attr->getId(),
-                                    'code' => $attr->getAttributeCode(),
-                                    'label' => $attr->getStoreLabel(),
-                                    'position' => $position++,
-                                    'values' => $attributeValues[$attribute],
-                                ];
-                        }
-                    }
-                    if ($created) {
-                        if (!empty($websites)) {
-                            $this->saveProductWebsitesConf($product->getId(), $websites);
-                        }
-
-                        if (!empty($mediaGallery)) {
-                            $this->_saveMediaGallery($mediaGallery);
-                        }
-                        if (!empty($changeAttributes)) {
-                            $this->_saveProductAttributes($changeAttributes);
-                        }
-                    }
-                    $this->saveCollectData($product->getId(), $configurableAttributesData, $ids);
-
-                } catch (\Exception $e) {
-                    $this->addLogWriteln($e->getMessage(), $this->output, 'error');
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    public function saveCollectData($productId, $configurableAttributesData, $ids)
-    {
-
-        $connection = $this->_connection;
-        $resource = $this->_resourceFactory->create();
-        $table = $resource->getTable('catalog_product_super_attribute');
-        $labelTable = $resource->getTable('catalog_product_super_attribute_label');
-        $linkTable = $resource->getTable('catalog_product_super_link');
-        $relationTable = $resource->getTable('catalog_product_relation');
-        // $connection->delete($table, ['product_id=' . $productId]);
-        // $connection->delete($linkTable, ['parent_id=' . $productId]);
-        // $connection->delete($relationTable, ['parent_id=' . $productId]);
-        $select = $connection->select()->from(
-            ['m' => $table],
-            ['product_id', 'attribute_id', 'product_super_attribute_id']
-        )->where(
-            'm.product_id IN ( ? )',
-            [$productId]
-        );
-        $counts = count($connection->fetchAll($select));
-        if (!$counts) {
-            foreach ($configurableAttributesData as $elem) {
-                $data = [
-                    'product_id' => $productId,
-                    'attribute_id' => $elem['attribute_id'],
-                    'position' => $elem['position']
-                ];
-                $connection->insertOnDuplicate($table, $data);
-            }
-
-
-            foreach ($connection->fetchAll($select) as $row) {
-                $attrId = $row['attribute_id'];
-                $superId = $row['product_super_attribute_id'];
-                foreach ($configurableAttributesData as $elem) {
-                    if ($elem['attribute_id'] == $attrId) {
-                        $data = ['product_super_attribute_id' => $superId, 'value' => $elem['label']];
-                        $connection->insertOnDuplicate($labelTable, $data);
-                    }
-                }
-            }
-        }
-
-        foreach ($ids as $id) {
-            $data = ['product_id' => $id, 'parent_id' => $productId];
-            $connection->insertOnDuplicate($linkTable, $data);
-            $relData = ['child_id' => $id, 'parent_id' => $productId];
-            $connection->insertOnDuplicate($relationTable, $relData);
+        if (null == $this->mediaGalleryTableName) {
+            $this->productEntityTableName = $this->getResource()->getTable('catalog_product_entity');
+            $this->mediaGalleryTableName = $this->getResource()->getTable('catalog_product_entity_media_gallery');
+            $this->mediaGalleryValueTableName = $this->getResource()->getTable(
+                'catalog_product_entity_media_gallery_value'
+            );
+            $this->mediaGalleryEntityToValueTableName = $this->getResource()->getTable(
+                'catalog_product_entity_media_gallery_value_to_entity'
+            );
         }
     }
 
-    protected function generateUrl($rowData, $number)
+    protected function removeExistingImages($newMediaValues)
     {
-        $newUrl = '';
-        $this->urlKeys = [];
-        if ($number === 0) {
-            $number = '';
-        }
-        $tempName = $rowData[self::COL_SKU];
-        if (isset($rowData[self::COL_NAME])) {
-            $tempName = $rowData[self::COL_NAME];
-        }
-        $newUrl = $this->productUrl->formatUrlKey(
-            $tempName . '-' . $rowData[self::COL_SKU] . "-" . $number
-        );
-        $urlKey = strtolower($newUrl);
-        $sku = $rowData[self::COL_SKU];
-        $storeCodes = empty($rowData[self::COL_STORE_VIEW_CODE])
-            ? array_flip($this->storeResolver->getStoreCodeToId())
-            : explode($this->getMultipleValueSeparator(), $rowData[self::COL_STORE_VIEW_CODE]);
-        foreach ($storeCodes as $storeCode) {
-            $storeId = $this->storeResolver->getStoreCodeToId($storeCode);
-            $productUrlSuffix = $this->getProductUrlSuffix($storeId);
-            $urlPath = $urlKey;
-            if (empty($this->urlKeys[$storeId][$urlPath])
-                || ($this->urlKeys[$storeId][$urlPath] == $sku)
-            ) {
-                $this->urlKeys[$storeId][$urlPath] = $sku;
-            }
-        }
-
-        $validUrl = $this->checkUrlKeyDuplicates();
-
-        if ($validUrl && $this->_parameters['generate_url']) {
-            return $this->generateUrl($rowData, $number + 1);
-        } else {
-            return $newUrl;
-        }
-    }
-
-    protected function saveProductWebsitesConf($productId, array $websiteData)
-    {
-        static $tableName = null;
-
-        if (!$tableName) {
-            $tableName = $this->_resourceFactory->create()->getProductWebsiteTable();
-        }
-        if ($websiteData) {
-            $websitesData = [];
-            $delProductId = [];
-
-            foreach ($websiteData as $delSku => $websites) {
-                $delProductId[] = $productId;
-                foreach ($websites as $websiteId) {
-                    $websitesData[] = ['product_id' => $productId, 'website_id' => $websiteId];
-                }
-            }
+        try {
+            $this->initMediaGalleryResources();
             $this->_connection->delete(
-                $tableName,
-                $this->_connection->quoteInto('product_id IN (?)', $delProductId)
+                $this->mediaGalleryTableName,
+                $this->_connection->quoteInto('value_id IN (?)', $newMediaValues)
             );
-            if ($websitesData) {
-                $this->_connection->insertOnDuplicate($tableName, $websitesData);
+        } catch (\Exception $e) {
+            $this->addLogWriteln($e->getMessage(), $this->output, 'error');
+        }
+
+        return $this;
+    }
+
+    public function prepareAttributesWithDefaultValueForSave(array $rowData, $withDefaultValue = true)
+    {
+        $resultAttrs = [];
+
+        foreach ($this->_getProductAttributes($rowData) as $attrCode => $attrParams) {
+            if ($attrParams['is_static']) {
+                continue;
+            }
+
+            if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
+                if (in_array($attrParams['type'], ['select', 'boolean'])) {
+                    $resultAttrs[$attrCode] = $attrParams['options'][strtolower($rowData[$attrCode])];
+                } elseif ('multiselect' == $attrParams['type']) {
+                    $resultAttrs[$attrCode] = [];
+                    foreach (parent::parseMultiselectValues($rowData[$attrCode]) as $value) {
+                        $resultAttrs[$attrCode][] = $attrParams['options'][strtolower($value)];
+                    }
+                    $resultAttrs[$attrCode] = implode(',', $resultAttrs[$attrCode]);
+                } else {
+                    $resultAttrs[$attrCode] = $rowData[$attrCode];
+                }
+            } elseif (array_key_exists($attrCode, $rowData)) {
+                $resultAttrs[$attrCode] = $rowData[$attrCode];
+            } elseif ($withDefaultValue && null !== $attrParams['default_value']) {
+                $resultAttrs[$attrCode] = $attrParams['default_value'];
             }
         }
-        return $this;
+
+        return $resultAttrs;
     }
 
     /**
-     * @return $this
+     * Initialize source type model
+     *
+     * @param $type
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function _saveValidatedBunches()
+    protected function _initSourceType($type)
     {
-        $source = $this->_getSource();
-        $currentDataSize = 0;
-        $bunchRows = [];
-        $prevData = [];
-        $startNewBunch = false;
-        $nextRowBackup = [];
-        $maxDataSize = $this->_resourceHelper->getMaxDataSize();
-        $bunchSize = $this->_importExportData->getBunchSize();
-
-        $source->rewind();
-        $this->_dataSourceModel->cleanBunches();
-        $file = null;
-        $jobId = null;
-        if (isset($this->_parameters['file'])) {
-            $file = $this->_parameters['file'];
+        if (!$this->sourceType) {
+            $this->sourceType = $this->additional->getSourceModelByType($type);
+            $this->sourceType->setData($this->_parameters);
         }
-        if (isset($this->_parameters['job_id'])) {
-            $jobId = $this->_parameters['job_id'];
-        }
-
-        while ($source->valid() || $bunchRows) {
-            if ($startNewBunch || !$source->valid()) {
-                $this->_dataSourceModel->saveBunches(
-                    $this->getEntityTypeCode(),
-                    $this->getBehavior(),
-                    $jobId,
-                    $file,
-                    $bunchRows
-                );
-                $bunchRows = $nextRowBackup;
-                $currentDataSize = strlen(serialize($bunchRows));
-                $startNewBunch = false;
-                $nextRowBackup = [];
-            }
-            if ($source->valid()) {
-                try {
-                    $rowData = $source->current();
-                } catch (\InvalidArgumentException $e) {
-                    $this->addRowError($e->getMessage(), $this->_processedRowsCount);
-                    $this->_processedRowsCount++;
-                    $source->next();
-                    continue;
-                }
-                $rowData = $this->_prepareRowForDb($rowData);
-                $rowData = $this->customFieldsMapping($rowData);
-                $rowData = $this->customBunchesData($rowData);
-                if (empty($rowData[self::COL_SKU])) {
-                    $rowData = array_merge($prevData, $this->deleteEmpty($rowData));
-
-                } else {
-                    $prevData = $rowData;
-                }
-                $this->_processedRowsCount++;
-
-                if ($this->onlyUpdate) {
-                    $collectionUpdate = $this->collectionFactory->create()->addFieldToFilter(
-                        self::COL_SKU,
-                        $rowData[self::COL_SKU]
-                    );
-                    if (!$collectionUpdate->getSize()) {
-                        $source->next();
-                        continue;
-                    }
-                }
-
-
-                if ($this->validateRow($rowData, $source->key())) {
-                    // add row to bunch for save
-                    $rowData = $this->_prepareRowForDb($rowData);
-                    $rowSize = strlen($this->jsonHelper->jsonEncode($rowData));
-
-                    $isBunchSizeExceeded = $bunchSize > 0 && count($bunchRows) >= $bunchSize;
-
-                    if ($currentDataSize + $rowSize >= $maxDataSize || $isBunchSizeExceeded) {
-                        $startNewBunch = true;
-                        $nextRowBackup = [$source->key() => $rowData];
-                    } else {
-                        $bunchRows[$source->key()] = $rowData;
-                        $currentDataSize += $rowSize;
-                    }
-                }
-
-                $source->next();
-            }
-        }
-
-        return $this;
     }
-
-    public function isExist($sku)
-    {
-        if ($this->onlyUpdate) {
-            $collectionUpdate = $this->collectionFactory->create()->addFieldToFilter(
-                self::COL_SKU,
-                $sku
-            );
-            if (!$collectionUpdate->getSize()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-    protected function mergeData($rowData, $prevData)
-    {
-
-        $data = $this->deleteEmpty($rowData);
-
-        foreach ($data as $key => $value) {
-            $prevData[$key] .= $this->getMultipleValueSeparator() . $value;
-        }
-
-        return $prevData;
-    }
-    */
 
     /**
      * Import images via initialized source type
@@ -1684,158 +1251,6 @@ class Product extends MagentoProduct
     }
 
     /**
-     * @param $rowData
-     *
-     * @return mixed
-     */
-    public function applyCategoryLevelSeparator($rowData)
-    {
-        if (isset($rowData[self::COL_CATEGORY]) && $rowData[self::COL_CATEGORY]) {
-            $rowData[self::COL_CATEGORY] = str_replace(
-                $this->_parameters['category_levels_separator'],
-                "/",
-                $rowData[self::COL_CATEGORY]
-            );
-        }
-
-        return $rowData;
-    }
-
-    /**
-     * Retrieving images from all columns and rows
-     *
-     * @param $bunch
-     *
-     * @return array
-     */
-    protected function getBunchImages(
-        $bunch
-    ) {
-        $allImagesFromBunch = [];
-        foreach ($bunch as $rowData) {
-            $rowData = $this->customFieldsMapping($rowData);
-            foreach ($this->_imagesArrayKeys as $image) {
-                if (empty($rowData[$image])) {
-                    continue;
-                }
-                $dispersionPath =
-                    \Magento\Framework\File\Uploader::getDispretionPath($rowData[$image]);
-                $importImages = explode($this->getMultipleValueSeparator(), $rowData[$image]);
-                foreach ($importImages as $importImage) {
-                    $imageSting = mb_strtolower(
-                        $dispersionPath . '/' . preg_replace('/[^a-z0-9\._-]+/i', '', $importImage)
-                    );
-                    /**
-                     * TODO: check source type 'file'.
-                     * Compare code with default Magento\CatalogImportExport\Model\Import\Product
-                     */
-                    if (isset($this->_parameters['import_source']) && $this->_parameters['import_source'] != 'file') {
-                        $allImagesFromBunch[$this->sourceType->getCode() . $imageSting] = $imageSting;
-                    } else {
-                        $allImagesFromBunch[$importImage] = $imageSting;
-                    }
-                }
-            }
-        }
-
-        return $allImagesFromBunch;
-    }
-
-    /**
-     * Convert attribute string syntax to array.
-     *
-     * @param $columnData
-     *
-     * @return array
-     * @throws \Exception
-     */
-    protected function prepareAttributeData($columnData)
-    {
-        $result = [];
-        foreach ($columnData as $field) {
-            $field = explode(':', $field);
-            if (isset($field[1])) {
-                if (preg_match('/^(frontend_label_)[0-9]+/', $field[0])) {
-                    $result['frontend_label'][(int)substr($field[0], -1)] = $field[1];
-                } else {
-                    $result[$field[0]] = $field[1];
-                }
-            }
-        }
-
-        if (!empty($result)) {
-            $attributeCode = isset($result['attribute_code']) ? $result['attribute_code'] : null;
-            $frontendLabel = $result['frontend_label'][0];
-            $attributeCode = $attributeCode ?: $this->generateAttributeCode($frontendLabel);
-            $result['attribute_code'] = $attributeCode;
-
-            $entityTypeId = $this->eavEntityFactory->create()->setType(
-                \Magento\Catalog\Model\Product::ENTITY
-            )->getTypeId();
-            $result['entity_type_id'] = $entityTypeId;
-            $result['is_user_defined'] = 1;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Parse swatch attribute value, pulls actual attribute value and swatch options if they are there.
-     *
-     * @param $attributeValue string Swatch attribute value in follow format "{value}|type={1,2}|value={#FFFFFF,path/to/image.file}"
-     *                               where:
-     *                                  type:1 - color
-     *                                  type:2 - image
-     *
-     * @return array
-     */
-    protected function prepareSwatchOptionData(&$attributeValue)
-    {
-        $swatchOptionData = [];
-        $preParsedData = explode('|', $attributeValue);
-        if (count($preParsedData) > 1) {
-            foreach ($preParsedData as $key => $value) {
-                if ($key == 0) {
-                    $attributeValue = $value; //set attributes value
-                    continue;
-                }
-                $value = explode('=', $value);
-                if (isset($value[1])) {
-                    $swatchOptionData[$value[0]] = $value[1];
-                }
-            }
-        }
-
-        return $swatchOptionData;
-    }
-
-    /**
-     * Generate code from label
-     *
-     * @param string $label
-     *
-     * @return string
-     */
-    protected function generateAttributeCode($label)
-    {
-        $code = substr(
-            preg_replace(
-                '/[^a-z_0-9]/',
-                '_',
-                $this->productUrl->formatUrlKey($label)
-            ),
-            0,
-            30
-        );
-        $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
-        if (!$validatorAttrCode->isValid($code)) {
-            $code = 'attr_' . ($code ?: substr(hash("md5", time()), 0, 8));
-        }
-
-        return $code;
-    }
-
-    /**
      * Custom fields mapping for changed purposes of fields and field names.
      *
      * @param array $rowData
@@ -1851,11 +1266,12 @@ class Product extends MagentoProduct
         }
         // restore data for configurable field when it is already used in Map Attributes section
         $configField = $this->_parameters['configurable_field'];
-        if($configField && !isset($rowData[$configField])){
-            if($configKey = array_search($configField, $this->_fieldsMap))
+        if ($configField && !isset($rowData[$configField])) {
+            if ($configKey = array_search($configField, $this->_fieldsMap)) {
                 $rowData[$configField] = $rowData[$configKey];
+            }
         }
-        //   
+        //
         $rowData = $this->_parseAdditionalAttributes($rowData);
         $rowData = $this->setStockUseConfigFieldsValues($rowData);
 
@@ -1914,18 +1330,7 @@ class Product extends MagentoProduct
                 $rowData[$key] = $value === false ? '' : $value;
             }
         }
-        if ($rowData['product_type'] == 'bundle') {
-            $fields = ['price_type', 'weight_type', 'sku_type'];
-            foreach ($fields as $field) {
-                if (isset($rowData[$field]) && is_int($rowData[$field])) {
-                    if ($rowData[$field] === BundlePrice::PRICE_TYPE_DYNAMIC) {
-                        $rowData[$field] = Bundle::VALUE_DYNAMIC;
-                    } else {
-                        $rowData[$field] = Bundle::VALUE_FIXED;
-                    }
-                }
-            }
-        }
+        $rowData = $this->adjustBundleTypeAttributes($rowData);
 
         return $rowData;
     }
@@ -1954,6 +1359,1231 @@ class Product extends MagentoProduct
         }
 
         return $rowData;
+    }
+
+    protected function categoriesMapping($importedCategories)
+    {
+        $explodeImportedCategoriesItems = explode($this->_parameters['categories_separator'], $importedCategories);
+        $connection = $this->_connection;
+        $resource = $this->_resourceFactory->create();
+        $select = $connection->select()->from(
+            [
+                'main' => $resource->getTable('firebear_import_jobs'),
+            ],
+            ['mapping']
+        )->where('entity_id=?', $this->_parameters['job_id']);
+        $maps = $this->_connection->fetchAll(
+            $select
+        );
+        foreach ($maps as $map) {
+            $newCategoriesMapItems = \Zend\Serializer\Serializer::unserialize($map['mapping']);
+            foreach ($newCategoriesMapItems as $newCategoriesMapItem) {
+                foreach ($explodeImportedCategoriesItems as &$explodeImportedCategoriesItem) {
+                    if (trim($explodeImportedCategoriesItem) == $newCategoriesMapItem['source_category_data_import']) {
+                        $explodeImportedCategoriesItem = $newCategoriesMapItem['source_category_data_new'];
+                        $this->setIsRowCategoryMapped(true);
+                    }
+                }
+            }
+        }
+        return implode($this->_parameters['categories_separator'], $explodeImportedCategoriesItems);
+    }
+
+    /**
+     * @param $rowData
+     * @return $this
+     */
+    protected function mageStoreWarehouse($rowData)
+    {
+        if (!isset($this->_oldSku[strtolower($rowData[self::COL_SKU])])) {
+            return $this;
+        }
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        /** @var \Magestore\InventorySuccess\Api\StockActivity\StockChangeInterface $stockChange */
+        $stockChange = $objectManager->get(\Magestore\InventorySuccess\Api\StockActivity\StockChangeInterface::class);
+
+        foreach ($rowData as $attrCode => $attrValue) {
+            if (preg_match('/^(magestore\|).+/', $attrCode)) {
+                $wareHouseData = explode('|', $attrCode);
+                $warehouseCode = '';
+                $warehouseAction = 'update';
+                foreach ($wareHouseData as $wValue) {
+                    $val = explode(':', $wValue);
+                    if ($val[0] === 'code') {
+                        $warehouseCode = $val[1];
+                    }
+                    if ($val[0] === 'action') {
+                        $warehouseAction = $val[1];
+                    }
+                }
+                /** @var \Magestore\InventorySuccess\Api\Warehouse\WarehouseRepositoryInterface $mageWarehouse */
+                $mageWarehouse = $objectManager->get(\Magestore\InventorySuccess\Api\Warehouse\WarehouseRepositoryInterface::class);
+                /** @var \Magestore\InventorySuccess\Api\Warehouse\WarehouseStockRepositoryInterface $mageWarehouseStockRepo */
+                $mageWarehouseStockRepo = $objectManager->get(\Magestore\InventorySuccess\Api\Warehouse\WarehouseStockRepositoryInterface::class);
+                $wData = $mageWarehouse->get($warehouseCode);
+                $warehouseProductData = $mageWarehouseStockRepo->getWarehouseStockBySku($wData->getWarehouseId(), $rowData[self::COL_SKU]);
+                $productId = $this->_oldSku[strtolower($rowData[self::COL_SKU])]['entity_id'];
+                if ($warehouseProductData->isEmpty() && $warehouseAction == 'add' && $productId) {
+                    $wareHouseModel = $objectManager->get(\Magestore\InventorySuccess\Model\Warehouse::class);
+                    $wareHouseModel->createAdjustment($wData->getWarehouseId(), [$productId]);
+                } else {
+                    $warehouseAction = 'update';
+                }
+
+                if ($productId && $wData->getWarehouseId()) {
+                    if ($warehouseAction === 'update') {
+                        $stockChange->update($wData->getWarehouseId(), $productId, $attrValue);
+                    } elseif ($warehouseAction === 'increase') {
+                        $stockChange->increase($wData->getWarehouseId(), $productId, $attrValue);
+                    } elseif ($warehouseAction === 'decrease') {
+                        $stockChange->decrease($wData->getWarehouseId(), $productId, $attrValue);
+                    }
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param $productTypeModel
+     * @param $rowData
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function createAttributeValues($productTypeModel, $rowData)
+    {
+        $options = [];
+        if (isset($rowData[\Magento\CatalogImportExport\Model\Import\Product::COL_ATTR_SET])) {
+            $attributeSet = $rowData[\Magento\CatalogImportExport\Model\Import\Product::COL_ATTR_SET];
+            foreach ($rowData as $attrCode => $attrValue) {
+                /**
+                 * Add attribute to set & set's group
+                 */
+                if (preg_match('/^(attribute\|).+/', $attrCode)) {
+                    $columnData = explode('|', $attrCode);
+                    $columnData = $this->prepareAttributeData($columnData);
+                    if (isset($rowData[$columnData['attribute_code']])) { // might be already inside additional_attributes
+                        unset($rowData[$attrCode]);
+                        continue;
+                    } else {
+                        $rowData[$columnData['attribute_code']] = $rowData[$attrCode];
+                        unset($rowData[$attrCode]);
+                        $attrCode = $columnData['attribute_code'];
+                    }
+                }
+
+                /**
+                 * Prepare new values
+                 */
+                $attrParams = $productTypeModel->retrieveAttribute($attrCode, $attributeSet);
+                if (!empty($attrParams)) {
+                    if (!$attrParams['is_static'] && isset($rowData[$attrCode]) && !empty($rowData[$attrCode])) {
+                        switch ($attrParams['type']) {
+                            case 'select':
+                                $swatchOptionData = [];
+                                $swatchOptions = [];
+                                /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute\Interceptor $attribute */
+                                $attribute = $this->retrieveAttributeByCode($attrCode);
+                                if ($this->swatchesHelperData->isVisualSwatch($attribute)) {
+                                    $swatchOptionData = $this->prepareSwatchOptionData($rowData[$attrCode]);
+                                    $swatchOptions = $this->getSwatchesByOptionsId($attrParams['options'],
+                                        $attrParams['id']);
+                                }
+                                if (!isset($attrParams['options'][strtolower($rowData[$attrCode])])) { //no attribute option
+                                    $options[$attrParams['id']][] = [
+                                        'sort_order' => count($attrParams['options']) + 1,
+                                        'value' => $rowData[$attrCode],
+                                        'code' => $attrCode,
+                                        'swatch_option' => $swatchOptionData,
+                                    ];
+                                } elseif (!empty($swatchOptionData) && !array_key_exists($attrParams['options'][strtolower($rowData[$attrCode])],
+                                        $swatchOptions)) { // no attribute swatch option
+                                    $newSwatchOptions[$attrParams['id']][$attrParams['options'][strtolower($rowData[$attrCode])]] = $swatchOptionData;
+                                } elseif (array_key_exists($attrParams['options'][strtolower($rowData[$attrCode])],
+                                    $swatchOptions)) { // swatch attribute option exist
+                                    $swatchOption = $swatchOptions[$attrParams['options'][strtolower($rowData[$attrCode])]];
+                                    if (!empty($diff = array_diff_assoc($swatchOptionData,
+                                        $swatchOption))) { // but has different value or type
+                                        if (
+                                            (key_exists('type',
+                                                    $diff) && $diff['type'] == Swatch::SWATCH_TYPE_VISUAL_COLOR)
+                                            || (!key_exists('type',
+                                                    $diff) && $swatchOption['type'] == Swatch::SWATCH_TYPE_VISUAL_COLOR)
+                                        ) {
+                                            $this->updateSwatchOption($swatchOption, $diff);
+                                        } elseif ($this->ifVisualSwatchOptionDifferent($swatchOption, $diff)) {
+                                            $diff['value'] = $this->uploadVisualSwatchFile($diff['value']);
+                                            $this->updateSwatchOption($swatchOption, $diff);
+                                        }
+                                    }
+                                }
+                                break;
+                            case 'multiselect':
+
+                                $separator = $this->_parameters['_import_multiple_value_separator'] ?
+                                    $this->_parameters['_import_multiple_value_separator'] :
+                                    MagentoProduct::PSEUDO_MULTI_LINE_SEPARATOR;
+                                $values = explode($separator, $rowData[$attrCode]);
+                                foreach ($values as $value) {
+                                    $value = trim($value);
+                                    if (!isset($attrParams['options'][strtolower($value)])) {
+                                        $options[$attrParams['id']][] = [
+                                            'sort_order' => count($attrParams['options']) + 1,
+                                            'value' => $value,
+                                            'code' => $attrCode,
+                                        ];
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Create new values
+             */
+
+            if (!empty($options)) {
+                $connection = $this->_connection;
+                $resource = $this->_resourceFactory->create();
+                foreach ($options as $attributeId => $optionsArray) {
+                    foreach ($optionsArray as $option) {
+                        /**
+                         * @see \Magento\Eav\Model\ResourceModel\Entity\Attribute::_updateAttributeOption()
+                         */
+                        $table = $resource->getTable('eav_attribute_option');
+                        $data = ['attribute_id' => $attributeId, 'sort_order' => $option['sort_order']];
+                        $connection->insert($table, $data);
+                        $intOptionId = $connection->lastInsertId($table);
+                        /**
+                         * @see \Magento\Eav\Model\ResourceModel\Entity\Attribute::_updateAttributeOptionValues()
+                         */
+                        $table = $resource->getTable('eav_attribute_option_value');
+                        $data = ['option_id' => $intOptionId, 'store_id' => 0, 'value' => $option['value']];
+                        $connection->insert($table, $data);
+                        if (isset($option['swatch_option']) && !empty($option['swatch_option'])) {
+                            $this->insertNewSwatchOption($connection, $resource, $intOptionId, $option['swatch_option'],
+                                $attributeId);
+                        }
+                        foreach ($this->_productTypeModels as $productTypeModel) {
+                            $productTypeModel->addAttributeOption($option['code'], strtolower($option['value']),
+                                $intOptionId);
+                        }
+                    }
+                }
+            }
+            if (!empty($newSwatchOptions)) {
+                $connection = $this->_connection;
+                $resource = $this->_resourceFactory->create();
+                foreach ($newSwatchOptions as $attributeId => $swatchOption) {
+                    foreach ($swatchOption as $optionId => $swatchData) {
+                        $this->insertNewSwatchOption($connection, $resource, $optionId, $swatchData, $attributeId);
+                    }
+                }
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * Convert attribute string syntax to array.
+     *
+     * @param $columnData
+     *
+     * @return array
+     * @throws \Exception
+     */
+    protected function prepareAttributeData($columnData)
+    {
+        $result = [];
+        foreach ($columnData as $field) {
+            $field = explode(':', $field);
+            if (isset($field[1])) {
+                if (preg_match('/^(frontend_label_)[0-9]+/', $field[0])) {
+                    $result['frontend_label'][(int)substr($field[0], -1)] = $field[1];
+                } else {
+                    $result[$field[0]] = $field[1];
+                }
+            }
+        }
+
+        if (!empty($result)) {
+            $attributeCode = isset($result['attribute_code']) ? $result['attribute_code'] : null;
+            $frontendLabel = $result['frontend_label'][0];
+            $attributeCode = $attributeCode ?: $this->generateAttributeCode($frontendLabel);
+            $result['attribute_code'] = $attributeCode;
+
+            $entityTypeId = $this->eavEntityFactory->create()->setType(
+                \Magento\Catalog\Model\Product::ENTITY
+            )->getTypeId();
+            $result['entity_type_id'] = $entityTypeId;
+            $result['is_user_defined'] = 1;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate code from label
+     *
+     * @param string $label
+     *
+     * @return string
+     */
+    protected function generateAttributeCode($label)
+    {
+        $code = substr(
+            preg_replace(
+                '/[^a-z_0-9]/',
+                '_',
+                $this->productUrl->formatUrlKey($label)
+            ),
+            0,
+            30
+        );
+        $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
+        if (!$validatorAttrCode->isValid($code)) {
+            $code = 'attr_' . ($code ?: substr(hash("md5", time()), 0, 8));
+        }
+
+        return $code;
+    }
+
+    /**
+     * Parse swatch attribute value, pulls actual attribute value and swatch options if they are there.
+     *
+     * @param $attributeValue string Swatch attribute value in follow format
+     *     "{value}|type={1,2}|value={#FFFFFF,path/to/image.file}" where: type:1 - color type:2 - image
+     *
+     * @return array
+     */
+    protected function prepareSwatchOptionData(&$attributeValue)
+    {
+        $swatchOptionData = [];
+        $preParsedData = explode('|', $attributeValue);
+        if (count($preParsedData) > 1) {
+            foreach ($preParsedData as $key => $value) {
+                if ($key == 0) {
+                    $attributeValue = $value; //set attributes value
+                    continue;
+                }
+                $value = explode('=', $value);
+                if (isset($value[1])) {
+                    $swatchOptionData[$value[0]] = $value[1];
+                }
+            }
+        }
+
+        return $swatchOptionData;
+    }
+
+    /*
+    protected function mergeData($rowData, $prevData)
+    {
+
+        $data = $this->deleteEmpty($rowData);
+
+        foreach ($data as $key => $value) {
+            $prevData[$key] .= $this->getMultipleValueSeparator() . $value;
+        }
+
+        return $prevData;
+    }
+    */
+
+    /**
+     * Returns Swatch option data for Attribute Option Ids
+     *
+     * @param array $optionIds
+     * @param int $attributeId
+     *
+     * @return array
+     */
+    protected function getSwatchesByOptionsId($optionIds, $attributeId)
+    {
+        if (!isset($this->cachedSwatchOptions[$attributeId]) || empty($this->cachedSwatchOptions[$attributeId])) {
+            $this->cachedSwatchOptions[$attributeId] = [];
+            $swatchCollection = $this->swatchCollectionFactory->create();
+            $swatchCollection->addFilterByOptionsIds($optionIds);
+            foreach ($swatchCollection as $item) {
+                if ($item['type'] != Swatch::SWATCH_TYPE_TEXTUAL) {
+                    $this->cachedSwatchOptions[$attributeId][$item['option_id']] = $item->getData();
+                }
+            }
+        }
+
+        return $this->cachedSwatchOptions[$attributeId];
+    }
+
+    /**
+     * @param int $swatchOption
+     * @param array $diff
+     */
+    protected function updateSwatchOption($swatchOption, $diff)
+    {
+        $connection = $this->_connection;
+        $resource = $this->_resourceFactory->create();
+        $table = $resource->getTable('eav_attribute_option_swatch');
+        $where = '';
+        if (isset($swatchOption['swatch_id'])) {
+            $where = ['swatch_id=?' => (int)$swatchOption['swatch_id']];
+        }
+
+        $connection->update($table, $diff, $where);
+    }
+
+    /**
+     * Checks if imported image for swatch option is different then exist one.
+     *
+     * @param int $swatchOption
+     * @param array $diff Array of type and value that are different
+     *
+     * @return bool
+     */
+    protected function ifVisualSwatchOptionDifferent($swatchOption, $diff)
+    {
+        // TODO: need implement logic for unique names - sometimes image name might have _1_2 endings for the same image.
+        if (isset($diff['value'])) {
+            $fileName = preg_replace('/[^a-z0-9\._-]+/i', '', $diff['value']);
+            $dispretionPath = $this->_getUploader()->getDispretionPath($fileName);
+            return !($swatchOption['value'] == $dispretionPath . '/' . $fileName);
+        }
+        return false;
+    }
+
+    /**
+     * @return \Magento\CatalogImportExport\Model\Import\Uploader
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function _getUploader()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+        if (is_null($this->_fileUploader)) {
+            $this->_fileUploader = $this->_uploaderFactory->create();
+            $this->_fileUploader->init();
+            $dirConfig = DirectoryList::getDefaultConfig();
+            $dirAddon = $dirConfig[DirectoryList::MEDIA][DirectoryList::PATH];
+            if (!empty($this->_parameters[Import::FIELD_NAME_IMG_FILE_DIR])) {
+                $tmpPath = $this->_parameters[Import::FIELD_NAME_IMG_FILE_DIR];
+            } else {
+                $tmpPath = $dirAddon . $DS . $this->_mediaDirectory->getRelativePath('import');
+            }
+            if (!$this->_fileUploader->setTmpDir($tmpPath)) {
+                $this->addLogWriteln(__('File directory \'%1\' is not readable.', $tmpPath), $this->output, 'info');
+                $this->addRowError(
+                    __('File directory \'%1\' is not readable.', $tmpPath),
+                    null,
+                    null,
+                    null,
+                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
+                );
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('File directory \'%1\' is not readable.', $tmpPath)
+                );
+            }
+            $destinationDir = "catalog/product";
+            $destinationPath = $dirAddon . $DS . $this->_mediaDirectory->getRelativePath($destinationDir);
+
+            $this->_mediaDirectory->create($destinationPath);
+            if (!$this->_fileUploader->setDestDir($destinationPath)) {
+                $this->addRowError(
+                    __('File directory \'%1\' is not writable.', $destinationPath),
+                    null,
+                    null,
+                    null,
+                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
+                );
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('File directory \'%1\' is not writable.', $destinationPath)
+                );
+            }
+        }
+
+        return $this->_fileUploader;
+    }
+
+    /**
+     * Uploads Image for Image Swatch option
+     *
+     * @param string $swatchVisualFile
+     *
+     * @return string
+     */
+    protected function uploadVisualSwatchFile($swatchVisualFile)
+    {
+        $config = $this->mediaConfig;
+        $uploader = $this->_getUploader();
+        $newFile = '';
+        $dirConfig = DirectoryList::getDefaultConfig();
+        $mediaRelativePath = $dirConfig[DirectoryList::MEDIA][DirectoryList::PATH];
+        try {
+            $destDir = $uploader->getDestDir();
+            if (!$uploader->setDestDir($mediaRelativePath . DIRECTORY_SEPARATOR . $config->getBaseTmpMediaPath())) {
+                $this->addRowError(
+                    __('File directory \'%1\' is not writable.', $config->getBaseTmpMediaPath()),
+                    null,
+                    null,
+                    null,
+                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
+                );
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('File directory \'%1\' is not writable.', $config->getBaseTmpMediaPath())
+                );
+            } else {
+                $result = $uploader->move($swatchVisualFile);
+                $newFile = $this->swatchHelperMedia->moveImageFromTmp($result['file']);
+                $this->swatchHelperMedia->generateSwatchVariations($newFile);
+                $uploader->setDestDir($destDir);
+            }
+        } catch (\Exception $e) {
+            $this->addLogWriteln($e->getMessage(), $this->output, 'error');
+        }
+
+        return $newFile;
+    }
+
+    /**
+     * @param \Magento\Framework\DB\Adapter\AdapterInterface $connection
+     * @param \Magento\CatalogImportExport\Model\Import\Proxy\Product\ResourceModel $resource
+     * @param int $optionId
+     * @param array $swatchData
+     * @param int $attributeId
+     */
+    protected function insertNewSwatchOption($connection, $resource, $optionId, $swatchData, $attributeId)
+    {
+        if ($swatchData['type'] == Swatch::SWATCH_TYPE_VISUAL_IMAGE) {
+            $swatchData['value'] = $this->uploadVisualSwatchFile($swatchData['value']);
+        }
+        if ($swatchData['value']) {
+            $table = $resource->getTable('eav_attribute_option_swatch');
+            $data = [
+                'option_id' => $optionId,
+                'store_id' => 0,
+                'type' => $swatchData['type'],
+                'value' => $swatchData['value'],
+            ];
+            $connection->insert($table, $data);
+            $this->cachedSwatchOptions[$attributeId][$optionId] = $data;
+        }
+    }
+
+    protected function checkUrl($rowData)
+    {
+        if (isset($rowData[self::URL_KEY]) && $this->_parameters['generate_url']) {
+            $urlKey = strtolower($this->getUrlKey($rowData));
+
+            if (!isset($this->repeatUrls[$urlKey])) {
+                $this->repeatUrls[$urlKey] = 0;
+            } else {
+                $rowData[self::URL_KEY] = $this->generateUrl($rowData, $this->repeatUrls[$urlKey] + 1);
+                $this->repeatUrls[$urlKey] += 1;
+            }
+        }
+        return $rowData;
+    }
+
+    protected function generateUrl($rowData, $number)
+    {
+        $newUrl = '';
+        $this->urlKeys = [];
+        if ($number === 0) {
+            $number = '';
+        }
+        $tempName = $rowData[self::COL_SKU];
+        if (isset($rowData[self::COL_NAME])) {
+            $tempName = $rowData[self::COL_NAME];
+        }
+        $newUrl = $this->productUrl->formatUrlKey(
+            $tempName . '-' . $rowData[self::COL_SKU] . "-" . $number
+        );
+        $urlKey = strtolower($newUrl);
+        $sku = $rowData[self::COL_SKU];
+        $storeCodes = empty($rowData[self::COL_STORE_VIEW_CODE])
+            ? array_flip($this->storeResolver->getStoreCodeToId())
+            : explode($this->getMultipleValueSeparator(), $rowData[self::COL_STORE_VIEW_CODE]);
+        foreach ($storeCodes as $storeCode) {
+            $storeId = $this->storeResolver->getStoreCodeToId($storeCode);
+            $productUrlSuffix = $this->getProductUrlSuffix($storeId);
+            $urlPath = $urlKey;
+            if (empty($this->urlKeys[$storeId][$urlPath])
+                || ($this->urlKeys[$storeId][$urlPath] == $sku)
+            ) {
+                $this->urlKeys[$storeId][$urlPath] = $sku;
+            }
+        }
+
+        $validUrl = $this->checkUrlKeyDuplicates();
+
+        if ($validUrl && $this->_parameters['generate_url']) {
+            return $this->generateUrl($rowData, $number + 1);
+        } else {
+            return $newUrl;
+        }
+    }
+
+    protected function checkUrlKeyDuplicates()
+    {
+        $status = 0;
+        $resource = $this->getResource();
+        foreach ($this->urlKeys as $storeId => $urlKeys) {
+            $scope = [];
+            foreach ($urlKeys as $url => $sku) {
+                $select = $this->_connection->select()->from(
+                    ['url_rewrite' => $resource->getTable('url_rewrite')],
+                    ['request_path', 'store_id']
+                )->joinLeft(
+                    ['cpe' => $resource->getTable('catalog_product_entity')],
+                    "cpe.entity_id = url_rewrite.entity_id"
+                )->where('request_path LIKE \'%/' . $url . '%\'  OR request_path=?', $url)
+                    ->where('cpe.sku not in (?)', [$sku]);
+
+                $urlKeyDuplicates = $this->_connection->fetchAssoc(
+                    $select
+                );
+                if (!empty($urlKeyDuplicates)) {
+                    $scope += $urlKeyDuplicates;
+                }
+
+            }
+
+            foreach ($scope as $entityData) {
+                if (!$this->_parameters['generate_url']
+                    && isset($this->rowNumbers[$entityData['store_id']][$entityData['request_path']])
+                ) {
+                    $rowNum = $this->rowNumbers[$entityData['store_id']][$entityData['request_path']];
+                    $message = sprintf(
+                        $this->retrieveMessageTemplate(ValidatorInterface::ERROR_DUPLICATE_URL_KEY),
+                        $entityData['request_path'],
+                        $sku
+                    );
+                    $this->addRowError(
+                        ValidatorInterface::ERROR_DUPLICATE_URL_KEY,
+                        $rowNum,
+                        $sku,
+                        $message
+                    );
+                }
+                $status = 1;
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * @param $rowData
+     * @return mixed
+     */
+    protected function removeQueryStringFromImageURL($rowData)
+    {
+        foreach ($this->_imagesArrayKeys as $image) {
+            if (isset($rowData[$image])) {
+                if (filter_var($rowData[$image], FILTER_VALIDATE_URL) === FALSE) {
+                    continue;
+                } else {
+                    $imageURL = explode('?', $rowData[$image]);
+                    $rowData[$image] = $imageURL[0];
+                }
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param array $rowData
+     *
+     * @return string
+     */
+    protected function getUrlKey($rowData)
+    {
+        $url = '';
+
+        if (!empty($rowData[self::URL_KEY])) {
+            $url = strtolower($rowData[self::URL_KEY]);
+        } elseif (!empty($rowData[self::COL_NAME])) {
+            $url = $rowData[self::COL_NAME];
+        }
+
+        $url = $this->productUrl->formatUrlKey($url);
+
+        return $url;
+    }
+
+    protected function checkAdditionalImages($rowData)
+    {
+        if (isset($rowData['additional_images'])) {
+            $uploader = $this->_getUploader();
+            $newImage = [];
+            $importImages = explode($this->getMultipleValueSeparator(), $rowData['additional_images']);
+            $newImage = $importImages;
+            /*foreach ($importImages as $importImage) {
+            $newImage[] = $this->uploadMediaFiles($importImage);
+            }*/
+        }
+        if (!empty($newImage)) {
+            $rowData['additional_images'] = implode(",", $newImage);
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param array $rowData
+     *
+     * @return array
+     */
+    public function prepareRowForDb(array $rowData)
+    {
+        $rowData = $this->customFieldsMapping($rowData);
+
+        foreach ($rowData as $key => $val) {
+            if (!empty($val)) {
+                $rowData[$key] = stripslashes($val);
+            }
+        }
+
+        static $lastSku = null;
+
+        if (Import::BEHAVIOR_DELETE == $this->getBehavior()) {
+            return $rowData;
+        }
+
+        $lastSku = $rowData[self::COL_SKU];
+        if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
+            $checkSku = strtolower($lastSku);
+        } else {
+            $checkSku = $lastSku;
+        }
+        if (isset($this->_oldSku[$checkSku]) && $this->_oldSku[$checkSku]) {
+            $newSku = $this->skuProcessor->getNewSku($lastSku);
+            if (isset($rowData[self::COL_ATTR_SET]) && !$rowData[self::COL_ATTR_SET]) {
+                $rowData[self::COL_ATTR_SET] = $newSku['attr_set_code'];
+            }
+            if (isset($rowData[self::COL_TYPE]) && !$rowData[self::COL_TYPE]) {
+                $rowData[self::COL_TYPE] = $newSku['type_id'];
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param $rowData
+     *
+     * @return mixed
+     */
+    public function applyCategoryLevelSeparator($rowData)
+    {
+        if (isset($rowData[self::COL_CATEGORY]) && $rowData[self::COL_CATEGORY]) {
+            $rowData[self::COL_CATEGORY] = str_replace(
+                $this->_parameters['category_levels_separator'],
+                "/",
+                $rowData[self::COL_CATEGORY]
+            );
+
+            $rowCategories = explode('/', $rowData[self::COL_CATEGORY]);
+            $finalRowCat = [];
+            foreach ($rowCategories as $rowCat) {
+                if ($rowCat == '') {
+                    continue;
+                }
+                array_push($finalRowCat, $rowCat);
+            }
+            $rowData[self::COL_CATEGORY] = implode('/', $finalRowCat);
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param $array
+     *
+     * @return array
+     */
+    protected function deleteEmpty($array)
+    {
+        if (isset($array[self::COL_SKU])) {
+            unset($array[self::COL_SKU]);
+        }
+        $newElement = [];
+        foreach ($array as $key => $element) {
+            if (strlen($element)) {
+                $newElement[$key] = $element;
+            }
+        }
+
+        return $newElement;
+    }
+
+    protected function getCategories($rowData)
+    {
+        if (isset($rowData[self::COL_STORE])) {
+            $this->categoryProcessor->setStoreId($this->storeResolver->getStoreCodeToId($rowData[self::COL_STORE]));
+        }
+        $this->categoryProcessor->setGeneratUrl($this->_parameters['generate_url']);
+        $this->categoryProcessor->setResource($this->getResource());
+        $ids = $this->categoryProcessor->getRowCategories($rowData, $this->_parameters['categories_separator']);
+        foreach ($this->categoryProcessor->getFailedCategories() as $error) {
+            $this->errorAggregator->addError(
+                AbstractEntity::ERROR_CODE_CATEGORY_NOT_VALID,
+                ProcessingError::ERROR_LEVEL_NOT_CRITICAL,
+                $rowData['rowNum'],
+                self::COL_CATEGORY,
+                __('Category "%1" has not been created.', $error['category'])
+                . ' ' . $error['exception']->getMessage()
+            );
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param $rowData
+     *
+     * @return mixed
+     */
+    protected function applyPriceRules($rowData)
+    {
+        if (!empty($this->_parameters['price_rules'])) {
+            $priceRules = $this->_parameters['price_rules'];
+
+            foreach ($priceRules as $priceRule) {
+                $applyRule = true;
+
+                if (isset($priceRule['price_rules_conditions_hidden']['rule']['conditions'])) {
+                    $conditions = $priceRule['price_rules_conditions_hidden']['rule']['conditions'];
+                    $aggr = $conditions[1]['aggregator'];
+                    $aggrValue = $conditions[1]['value'];
+
+                    $data = [
+                        'conditions' => $priceRule['price_rules_conditions_hidden']['rule']['conditions'],
+                        'row' => $rowData,
+                        'aggregator' => $aggr,
+                        'value' => $aggrValue,
+                        'categories' => isset($this->categoriesCache[$rowData[self::COL_SKU]]) ?
+                            array_keys($this->categoriesCache[$rowData[self::COL_SKU]]) : [],
+                    ];
+                    $applyRule = $this->priceRuleConditionFactory->create()->validatePriceRuleConditions($data);
+                }
+
+                if ($applyRule) {
+                    if ($priceRule['apply'] == 'fixed') {
+                        $rowData['price'] += $priceRule['value'];
+                    } else {
+                        $rowData['price'] *= 1 + $priceRule['value'] / 100;
+                    }
+                }
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param array $data
+     * @param string $rowSku
+     *
+     * @return array
+     */
+    protected function getTierPrices($data, $rowSku)
+    {
+        $tierPrices = [];
+
+        if (!empty($data['tier_prices'])) {
+            $tiers = explode("|", $data['tier_prices']);
+            $groups = $this->groupFactory->create()->getCollection()->toOptionArray();
+            $newGroups = [];
+            foreach ($groups as $group) {
+                $newGroups[$group['label']] = $group['value'];
+            }
+            $websites = $this->websiteFactory->create()->getCollection()->toOptionArray();
+            $newWebsites = [0 => self::VALUE_ALL];
+            foreach ($websites as $website) {
+                $newWebsites[$website['label']] = $website['value'];
+            }
+            foreach ($tiers as $field) {
+                $elements = explode($this->getMultipleValueSeparator(), $field);
+                $isAllGroup = 0;
+                if ($elements[0] == __('ALL GROUPS')) {
+                    $isAllGroup = 1;
+                }
+                if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
+                    $tierPrices[$rowSku][] = [
+                        'all_groups' => $isAllGroup,
+                        'customer_group_id' => (isset($elements[0]) && isset($newGroups[$elements[0]])) ? $newGroups[$elements[0]] : 0,
+                        'qty' => (isset($elements[1])) ? $elements[1] : 0,
+                        'value' => (isset($elements[2])) ? $elements[2] : 0,
+                        'percentage_value' => (isset($elements[3])) ? (!empty($elements[3]) ? $elements[3] : null) : null,
+                        'website_id' => (isset($elements[4]) && isset($newWebsites[$elements[4]])) ? $newWebsites[$elements[4]] : 0,
+                    ];
+                } else {
+                    $tierPrices[$rowSku][] = [
+                        'all_groups' => $isAllGroup,
+                        'customer_group_id' => (isset($elements[0]) && isset($newGroups[$elements[0]])) ? $newGroups[$elements[0]] : 0,
+                        'qty' => (isset($elements[1])) ? $elements[1] : 0,
+                        'value' => (isset($elements[2])) ? $elements[2] : 0,
+                        'website_id' => (isset($elements[3]) && isset($newWebsites[$elements[3]])) ? $newWebsites[$elements[3]] : 0,
+                    ];
+                }
+            }
+        }
+
+        return $tierPrices;
+    }
+
+    /**
+     * @param $data
+     *
+     * @return $this
+     */
+    protected function saveConfigurationVariations($data)
+    {
+        if (!empty($data)) {
+            foreach ($data as $skuConf => $elements) {
+                $checkSku = $skuConf;
+                if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
+                    $checkSku = strtolower($skuConf);
+                }
+                $created = 0;
+                $websites = [];
+                $additionalRows = [];
+                $changeAttributes = [];
+                $storeIds = [0];
+                $mediaGallery = [];
+                foreach ($this->storeManager->getStores() as $key => $model) {
+                    $storeIds[] = $key;
+                }
+                try {
+                    $collection = $this->collectionFactory->create()
+                        ->addFieldToFilter('sku', $skuConf)
+                        ->addFieldToFilter('type_id', 'configurable')
+                        ->addAttributeToSelect('*');
+                    $this->addLogWriteln(__('Configure variations for SKU:%1', $skuConf), $this->output, 'info');
+                    if ($this->_parameters['configurable_create'] && !$collection->getSize()) {
+                        try {
+                            $created = 1;
+                            $collectionChild = $this->collectionFactory->create();
+                            $collectionChild->addFieldToFilter('sku', $elements[0][self::COL_SKU])
+                                ->addAttributeToSelect('*');
+                            $child = $collectionChild->getFirstItem();
+                            $data = [];
+                            $data[self::COL_SKU] = $skuConf;
+                            $data[self::COL_NAME] = $skuConf;
+                            foreach ($this->_imagesArrayKeys as $fieldImage) {
+                                if ($fieldImage != '_media_image') {
+                                    $data[$fieldImage] = $child->getData($fieldImage);
+                                    $attributeChange = $this->retrieveAttributeByCode($fieldImage);
+                                    $attrId = $attributeChange->getId();
+                                    $attrTable = $attributeChange->getBackend()->getTable();
+                                    $attrValue = $child->getData($fieldImage);
+                                    if (!isset($changeAttributes[$attrTable][$checkSku][$attrId][0]) && !empty($attrValue)) {
+                                        $changeAttributes[$attrTable][$skuConf][$attrId][0] = $attrValue;
+                                        if (version_compare($this->productMetadata->getVersion(), '2.2.4', '>=')) {
+                                            $mediaGallery[Store::DEFAULT_STORE_ID][$skuConf][] = [
+                                                'attribute_id' => $this->getMediaGalleryAttributeId(),
+                                                'label' => '',
+                                                'position' => 1,
+                                                'disabled' => '0',
+                                                'value' => $attrValue,
+                                            ];
+                                        } else {
+                                            $mediaGallery[$skuConf][] = [
+                                                'attribute_id' => $this->getMediaGalleryAttributeId(),
+                                                'label' => '',
+                                                'position' => 1,
+                                                'disabled' => '0',
+                                                'value' => $attrValue,
+                                            ];
+
+                                        }
+                                    }
+                                }
+                            }
+                            $data['attribute_set_id'] = $child->getAttributeSetId();
+                            $data['type_id'] = 'configurable';
+                            $data['website_ids'] = $child->getWebsiteIds();
+                            $websites[$skuConf] = $child->getWebsiteIds();
+                            $data['category_ids'] = $child->getCategoryIds();
+                            $data['visibility'] = 4;
+                            $data['has_options'] = $child->getData('has_options');
+                            $changedData = $data;
+                            $product = $this->_proxyProdFactory->create();
+                            $product->setData($data);
+                            $product->setQuantityAndStockStatus(['qty' => 0, 'is_in_stock' => 1]);
+                            $product = $this->productRepository->save($product);
+                            $data['entity_id'] = $product->getId();
+                            $this->skuProcessor->addNewSku($skuConf, $data);
+                            $this->_oldSku[strtolower($skuConf)] = [
+                                'type_id' => "configurable",
+                                'attr_set_id' => $child->getAttributeSetId(),
+                                'entity_id' => $product->getId(),
+                                'supported_type' => true,
+                            ];
+                        } catch (LocalizedException $e) {
+                            $this->addLogWriteln($e->getMessage(), $this->output, 'error');
+                        }
+                    } else {
+                        if ($collection->getSize()) {
+                            $product = $collection->getFirstItem();
+                            if ($product->getName() == $skuConf) {
+                                $collectionChild = $this->collectionFactory->create();
+                                $collectionChild->addFieldToFilter('sku', $elements[0][self::COL_SKU])
+                                    ->addAttributeToSelect('*');
+                                $product->setName($skuConf);
+                            }
+                            if ($product->getTypeId() != 'configurable') {
+                                $product->setTypeId('configurable');
+                                $product = $this->productRepository->save($product);
+                            }
+
+                        }
+                    }
+
+                    $vars = [];
+                    $attributes = [];
+                    $attributeChange = $this->retrieveAttributeByCode('visibility');
+                    $attrTable = $attributeChange->getBackend()->getTable();
+
+                    $attrValue = 1;
+
+                    $attrId = $attributeChange->getId();
+                    foreach ($elements as $element) {
+                        $position = 0;
+                        foreach ($element as $ki => $field) {
+                            if ($ki != 'sku' && !empty($field)) {
+                                if (!in_array($ki, $attributes)) {
+                                    $attributes[] = $ki;
+                                }
+                                $vars['fields'][] = [
+                                    'code' => $ki,
+                                    'value' => $field,
+                                ];
+                            } else {
+                                $vars[$ki] = $field;
+                                if ($ki == 'sku') {
+                                    foreach ($storeIds as $storeId) {
+                                        if (!isset($changeAttributes[$attrTable][$field][$attrId][$storeId])) {
+                                            $changeAttributes[$attrTable][$field][$attrId][$storeId] = $attrValue;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        $vars['position'] = $position;
+                        $position++;
+                        $additionalRows[] = $vars;
+                    }
+                    $attributeValues = [];
+                    $ids = [];
+                    $configurableAttributesData = [];
+                    $position = 0;
+                    foreach ($attributes as $attribute) {
+                        foreach ($additionalRows as $list) {
+                            $attributeCollection = $this->attributeFactory->create()->getCollection();
+                            $attributeCollection->addFieldToFilter('attribute_code', $attribute);
+                            $value = [];
+                            foreach ($list['fields'] as $item) {
+                                if ($item['code'] == $attribute) {
+                                    $value = $item['value'];
+                                    $collection = $this->collectionFactory->create();
+                                    $collection->addFieldToFilter('sku', $list['sku']);
+                                    if (!in_array($collection->getFirstItem()->getId(), $ids)) {
+                                        $ids[] = $collection->getFirstItem()->getId();
+                                    }
+                                }
+                            }
+                            if ($attributeCollection->getSize()) {
+                                $attributeValues[$attribute][] = [
+                                    'label' => $attribute,
+                                    'attribute_id' => $attributeCollection->getFirstItem()->getId(),
+                                    'value_index' => $value,
+                                ];
+                            }
+                        }
+                        if ($attributeCollection->getSize()) {
+                            $attr = $attributeCollection->getFirstItem();
+                            $configurableAttributesData[] =
+                                [
+                                    'attribute_id' => $attr->getId(),
+                                    'code' => $attr->getAttributeCode(),
+                                    'label' => $attr->getStoreLabel(),
+                                    'position' => $position++,
+                                    'values' => $attributeValues[$attribute],
+                                ];
+                        }
+                    }
+
+                    /**
+                     * Check if attributes was added to target attribute set.
+                     */
+                    if (isset($product) && $product->getAttributeSetId() > 0) {
+                        $invalidAttributes = [];
+                        $attributeSetId = $product->getAttributeSetId();
+                        foreach ($configurableAttributesData as $attribute) {
+                            $attributeId = $attribute['attribute_id'];
+                            $select = $this->_connection->select()
+                                ->from(
+                                    $this->getResource()->getTable('eav_entity_attribute'),
+                                    'attribute_id'
+                                )->where(
+                                    'attribute_set_id = ?',
+                                    $attributeSetId
+                                )->where(
+                                    'attribute_id = ?',
+                                    $attributeId
+                                );
+                            $result = $this->_connection->fetchCol($select);
+                            if (empty($result)) {
+                                $invalidAttributes[] = $attribute['code'];
+                            }
+                        }
+                        if (!empty($invalidAttributes)) {
+                            throw new \Magento\Framework\Exception\LocalizedException(
+                                __("Attributes '%1' is not attached to related attribute set.",
+                                    implode(', ', $invalidAttributes))
+                            );
+                        }
+                    }
+
+                    if ($created) {
+                        if (!empty($websites)) {
+                            $this->saveProductWebsitesConf($product->getId(), $websites);
+                        }
+
+                        if (!empty($mediaGallery)) {
+                            $this->_saveMediaGallery($mediaGallery);
+                        }
+                        if (!empty($changeAttributes)) {
+                            $this->_saveProductAttributes($changeAttributes);
+                        }
+                    }
+                    $this->saveCollectData($product, $configurableAttributesData, $ids);
+
+                } catch (\Exception $e) {
+                    $this->getErrorAggregator()->addError(
+                        $e->getCode(),
+                        ProcessingError::ERROR_LEVEL_NOT_CRITICAL,
+                        null,
+                        null,
+                        $e->getMessage()
+                    );
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function saveProductWebsitesConf($productId, array $websiteData)
+    {
+        static $tableName = null;
+
+        if (!$tableName) {
+            $tableName = $this->_resourceFactory->create()->getProductWebsiteTable();
+        }
+        if ($websiteData) {
+            $websitesData = [];
+            $delProductId = [];
+
+            foreach ($websiteData as $delSku => $websites) {
+                $delProductId[] = $productId;
+                foreach ($websites as $websiteId) {
+                    $websitesData[] = ['product_id' => $productId, 'website_id' => $websiteId];
+                }
+            }
+            $this->_connection->delete(
+                $tableName,
+                $this->_connection->quoteInto('product_id IN (?)', $delProductId)
+            );
+            if ($websitesData) {
+                $this->_connection->insertOnDuplicate($tableName, $websitesData);
+            }
+        }
+        return $this;
+    }
+
+    public function saveCollectData($product, $configurableAttributesData, $ids)
+    {
+	    $productId = $product->getId();
+
+        /*
+         * Fix for EE version
+         */
+        if ($product->getRowId()) {
+            $productId = $product->getRowId();
+        }
+        $connection = $this->_connection;
+        $resource = $this->_resourceFactory->create();
+        $table = $resource->getTable('catalog_product_super_attribute');
+        $labelTable = $resource->getTable('catalog_product_super_attribute_label');
+        $linkTable = $resource->getTable('catalog_product_super_link');
+        $relationTable = $resource->getTable('catalog_product_relation');
+        // $connection->delete($table, ['product_id=' . $productId]);
+        // $connection->delete($linkTable, ['parent_id=' . $productId]);
+        // $connection->delete($relationTable, ['parent_id=' . $productId]);
+        $select = $connection->select()->from(
+            ['m' => $table],
+            ['product_id', 'attribute_id', 'product_super_attribute_id']
+        )->where(
+            'm.product_id IN ( ? )',
+            [$productId]
+        );
+        $counts = count($connection->fetchAll($select));
+        if (!$counts) {
+            foreach ($configurableAttributesData as $elem) {
+                $data = [
+                    'product_id' => $productId,
+                    'attribute_id' => $elem['attribute_id'],
+                    'position' => $elem['position'],
+                ];
+                $connection->insertOnDuplicate($table, $data);
+            }
+
+
+            foreach ($connection->fetchAll($select) as $row) {
+                $attrId = $row['attribute_id'];
+                $superId = $row['product_super_attribute_id'];
+                foreach ($configurableAttributesData as $elem) {
+                    if ($elem['attribute_id'] == $attrId) {
+                        $data = ['product_super_attribute_id' => $superId, 'value' => $elem['label']];
+                        $connection->insertOnDuplicate($labelTable, $data);
+                    }
+                }
+            }
+        }
+        $first = 0;
+        foreach ($ids as $id) {
+            $data = ['product_id' => $id, 'parent_id' => $productId];
+            $connection->insertOnDuplicate($linkTable, $data);
+            if ($this->manager->isEnabled('Firebear_ConfigurableProducts') && !$first) {
+                $connection->insertOnDuplicate($resource->getTableName('icp_catalog_product_default_super_link'),
+                    $data);
+                $first = 1;
+            }
+            $relData = ['child_id' => $id, 'parent_id' => $productId];
+            $connection->insertOnDuplicate($relationTable, $relData);
+        }
+    }
+
+    public function isExist($sku)
+    {
+        if ($this->onlyUpdate) {
+            $collectionUpdate = $this->collectionFactory->create()->addFieldToFilter(
+                self::COL_SKU,
+                $sku
+            );
+            if (!$collectionUpdate->getSize()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -2014,7 +2644,8 @@ class Product extends MagentoProduct
             $emptyHeaderColumns = [];
             $invalidColumns = [];
             $invalidAttributes = [];
-            foreach ($this->getSource()->getColNames() as $columnName) {
+            $isMageStoreWarehouse = false;
+            foreach ($this->helper->partCollection($this->getSource()->getColNames()) as $columnName) {
                 $this->addLogWriteln(__('Checked column %1', $columnNumber), $this->output);
                 $columnNumber++;
                 if (!$this->isAttributeParticular($columnName)) {
@@ -2026,8 +2657,8 @@ class Product extends MagentoProduct
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                     );
                     $isNewAttribute = false;
-
                     if ($createValuesAllowed && preg_match('/^(attribute\|).+/', $columnName)) {
+                        $attrCodes = [];
                         $isNewAttribute = true;
                         $columnData = explode('|', $columnName);
                         $columnData = $this->prepareAttributeData($columnData);
@@ -2055,7 +2686,6 @@ class Product extends MagentoProduct
                             } catch (\Exception $e) {
                                 $invalidColumns[] = $columnName;
                             }
-
                             $attributeSetCodes = explode(',', $columnData[self::ATTRIBUTE_SET_COLUMN]);
                             foreach ($attributeSetCodes as $attributeSetCode) {
                                 if (isset($this->_attrSetNameToId[$attributeSetCode])) {
@@ -2077,6 +2707,7 @@ class Product extends MagentoProduct
                                             $attribute->setAttributeGroupId($groupId);
                                             try {
                                                 $attribute->save();
+                                                $attrCodes[] = $attribute->getAttributeCode();
                                             } catch (\Exception $e) {
                                                 $this->addLogWriteln($e->getMessage(), $this->output, 'error');
                                             }
@@ -2084,21 +2715,22 @@ class Product extends MagentoProduct
                                         }
                                     }
                                 }
+
                             }
                         }
-                        $this->_initTypeModels();
+                        $this->_specialAttributes = array_merge($this->_specialAttributes, $attrCodes);
+                    } elseif (preg_match('/^(magestore\|).+/', $columnName)) {
+                        $isMageStoreWarehouse = true;
                     }
-
                     if (trim($columnName) == '') {
                         $emptyHeaderColumns[] = $columnNumber;
-                    } elseif (!preg_match('/^[a-zA-Z.][a-zA-Z0-9_\.]*$/', $columnName) && !$isNewAttribute) {
+                    } elseif (!preg_match('/^[a-zA-Z.][a-zA-Z0-9_\.]*$/', $columnName) && !$isNewAttribute && !$isMageStoreWarehouse) {
                         $invalidColumns[] = $columnName;
                     } elseif ($this->needColumnCheck && !in_array($columnName, $this->getValidColumnNames())) {
                         $invalidAttributes[] = $columnName;
                     }
                 }
             }
-
             $this->addErrors(self::ERROR_CODE_INVALID_ATTRIBUTE, $invalidAttributes);
             $this->addErrors(self::ERROR_CODE_COLUMN_EMPTY_HEADER, $emptyHeaderColumns);
             $this->addErrors(self::ERROR_CODE_COLUMN_NAME_INVALID, $invalidColumns);
@@ -2128,6 +2760,7 @@ class Product extends MagentoProduct
                             );
                         }
                     }
+
                     $this->addLogWriteln(__('Finish saving bunches'), $this->output);
                     $this->_dataValidated = true;
                 }
@@ -2135,6 +2768,24 @@ class Product extends MagentoProduct
         }
 
         return $this->getErrorAggregator();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initTypeModels()
+    {
+        $this->_importConfig = $this->fireImportConfig;
+        $productTypes = $this->_importConfig->getEntityTypes($this->getEntityTypeCode());
+        foreach ($productTypes as $productTypeName => $productTypeConfig) {
+            $class = $productTypeConfig['model'];
+            $class::$commonAttributesCache = [];
+            $class::$attributeCodeToId = [];
+        }
+
+        parent::_initTypeModels();
+
+        return $this;
     }
 
     /**
@@ -2186,6 +2837,99 @@ class Product extends MagentoProduct
         }
     }
 
+    /**
+     * @return $this
+     */
+    protected function _saveValidatedBunches()
+    {
+        $source = $this->_getSource();
+        $currentDataSize = 0;
+        $bunchRows = [];
+        $prevData = [];
+        $startNewBunch = false;
+        $nextRowBackup = [];
+        $maxDataSize = $this->_resourceHelper->getMaxDataSize();
+        $bunchSize = $this->_importExportData->getBunchSize();
+
+        $source->rewind();
+        $this->_dataSourceModel->cleanBunches();
+        $file = null;
+        $jobId = null;
+        if (isset($this->_parameters['file'])) {
+            $file = $this->_parameters['file'];
+        }
+        if (isset($this->_parameters['job_id'])) {
+            $jobId = $this->_parameters['job_id'];
+        }
+
+        while ($source->valid() || $bunchRows) {
+            if ($startNewBunch || !$source->valid()) {
+                $this->_dataSourceModel->saveBunches(
+                    $this->getEntityTypeCode(),
+                    $this->getBehavior(),
+                    $jobId,
+                    $file,
+                    $bunchRows
+                );
+                $bunchRows = $nextRowBackup;
+                $currentDataSize = strlen(serialize($bunchRows));
+                $startNewBunch = false;
+                $nextRowBackup = [];
+            }
+            if ($source->valid()) {
+                try {
+                    $rowData = $source->current();
+                } catch (\InvalidArgumentException $e) {
+                    $this->addRowError($e->getMessage(), $this->_processedRowsCount);
+                    $this->_processedRowsCount++;
+                    $source->next();
+                    continue;
+                }
+
+                $rowData = $this->customFieldsMapping($rowData);
+                $rowData = $this->checkUrl($rowData);
+                $this->validateRow($rowData, $source->key());
+                $rowData = $this->_prepareRowForDb($rowData);
+                $rowData = $this->customBunchesData($rowData);
+                if (empty($rowData[self::COL_SKU])) {
+                    $rowData = array_merge($prevData, $this->deleteEmpty($rowData));
+                } else {
+                    $prevData = $rowData;
+                }
+                $this->_processedRowsCount++;
+                if ($this->onlyUpdate) {
+                    $collectionUpdate = $this->collectionFactory->create()->addFieldToFilter(
+                        self::COL_SKU,
+                        $rowData[self::COL_SKU]
+                    );
+                    if (!$collectionUpdate->getSize()) {
+                        $source->next();
+                        continue;
+                    }
+                }
+
+                //   if ($this->validateRow($rowData, $source->key())) {
+                // add row to bunch for save
+                $rowData = $this->_prepareRowForDb($rowData);
+                $rowSize = strlen($this->jsonHelper->jsonEncode($rowData));
+
+                $isBunchSizeExceeded = $bunchSize > 0 && count($bunchRows) >= $bunchSize;
+
+                if ($currentDataSize + $rowSize >= $maxDataSize || $isBunchSizeExceeded) {
+                    $startNewBunch = true;
+                    $nextRowBackup = [$source->key() => $rowData];
+                } else {
+                    $bunchRows[$source->key()] = $rowData;
+                    $currentDataSize += $rowSize;
+                }
+                //   }
+
+                $source->next();
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return string[]
@@ -2193,273 +2937,6 @@ class Product extends MagentoProduct
     public function getSpecialAttributes()
     {
         return $this->_specialAttributes;
-    }
-
-    /**
-     * @param $productTypeModel
-     * @param $rowData
-     *
-     * @return mixed
-     */
-    public function createAttributeValues($productTypeModel, $rowData)
-    {
-        $options = [];
-        if (isset($rowData[\Magento\CatalogImportExport\Model\Import\Product::COL_ATTR_SET])) {
-            $attributeSet = $rowData[\Magento\CatalogImportExport\Model\Import\Product::COL_ATTR_SET];
-            foreach ($rowData as $attrCode => $attrValue) {
-                /**
-                 * Add attribute to set & set's group
-                 */
-                if (preg_match('/^(attribute\|).+/', $attrCode)) {
-                    $columnData = explode('|', $attrCode);
-                    $columnData = $this->prepareAttributeData($columnData);
-                    if (isset($rowData[$columnData['attribute_code']])) { // might be already inside additional_attributes
-                        unset($rowData[$attrCode]);
-                        continue;
-                    } else {
-                        $rowData[$columnData['attribute_code']] = $rowData[$attrCode];
-                        unset($rowData[$attrCode]);
-                        $attrCode = $columnData['attribute_code'];
-                    }
-                }
-
-                /**
-                 * Prepare new values
-                 */
-                $attrParams = $productTypeModel->retrieveAttribute($attrCode, $attributeSet);
-                if (!empty($attrParams)) {
-                    if (!$attrParams['is_static'] && isset($rowData[$attrCode]) && !empty($rowData[$attrCode])) {
-                        switch ($attrParams['type']) {
-                            case 'select':
-                                $swatchOptionData = [];
-                                $swatchOptions = [];
-                                /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute\Interceptor $attribute */
-                                $attribute = $this->retrieveAttributeByCode($attrCode);
-                                if ($this->swatchesHelperData->isVisualSwatch($attribute)) {
-                                    $swatchOptionData = $this->prepareSwatchOptionData($rowData[$attrCode]);
-                                    $swatchOptions = $this->getSwatchesByOptionsId($attrParams['options'],
-                                        $attrParams['id']);
-                                }
-                                if (!isset($attrParams['options'][strtolower($rowData[$attrCode])])) { //no attribute option
-                                    $options[$attrParams['id']][] = [
-                                        'sort_order' => count($attrParams['options']) + 1,
-                                        'value' => $rowData[$attrCode],
-                                        'code' => $attrCode,
-                                        'swatch_option' => $swatchOptionData
-                                    ];
-                                } elseif (!empty($swatchOptionData) && !array_key_exists($attrParams['options'][strtolower($rowData[$attrCode])],
-                                        $swatchOptions)) { // no attribute swatch option
-                                    $newSwatchOptions[$attrParams['id']][$attrParams['options'][strtolower($rowData[$attrCode])]] = $swatchOptionData;
-                                } elseif (array_key_exists($attrParams['options'][strtolower($rowData[$attrCode])],
-                                    $swatchOptions)) { // swatch attribute option exist
-                                    $swatchOption = $swatchOptions[$attrParams['options'][strtolower($rowData[$attrCode])]];
-                                    if (!empty($diff = array_diff_assoc($swatchOptionData,
-                                        $swatchOption))) { // but has different value or type
-                                        if (
-                                            (key_exists('type',
-                                                    $diff) && $diff['type'] == Swatch::SWATCH_TYPE_VISUAL_COLOR)
-                                            || (!key_exists('type',
-                                                    $diff) && $swatchOption['type'] == Swatch::SWATCH_TYPE_VISUAL_COLOR)
-                                        ) {
-                                            $this->updateSwatchOption($swatchOption, $diff);
-                                        } elseif ($this->ifVisualSwatchOptionDifferent($swatchOption, $diff)) {
-                                            $diff['value'] = $this->uploadVisualSwatchFile($diff['value']);
-                                            $this->updateSwatchOption($swatchOption, $diff);
-                                        }
-                                    }
-                                }
-                                break;
-                            case 'multiselect':
-
-                                $separator = $this->_parameters['_import_multiple_value_separator'] ?
-                                    $this->_parameters['_import_multiple_value_separator'] :
-                                    MagentoProduct::PSEUDO_MULTI_LINE_SEPARATOR;
-                                $values = explode($separator, $rowData[$attrCode]);
-                                foreach ($values as $value) {
-                                    $value = trim($value);
-                                    if (!isset($attrParams['options'][strtolower($value)])) {
-                                        $options[$attrParams['id']][] = [
-                                            'sort_order' => count($attrParams['options']) + 1,
-                                            'value' => $value,
-                                            'code' => $attrCode
-                                        ];
-                                    }
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-
-            /**
-             * Create new values
-             */
-
-            if (!empty($options)) {
-                $connection = $this->_connection;
-                $resource = $this->_resourceFactory->create();
-                foreach ($options as $attributeId => $optionsArray) {
-                    foreach ($optionsArray as $option) {
-                        /**
-                         * @see \Magento\Eav\Model\ResourceModel\Entity\Attribute::_updateAttributeOption()
-                         */
-                        $table = $resource->getTable('eav_attribute_option');
-                        $data = ['attribute_id' => $attributeId, 'sort_order' => $option['sort_order']];
-                        $connection->insert($table, $data);
-                        $intOptionId = $connection->lastInsertId($table);
-                        /**
-                         * @see \Magento\Eav\Model\ResourceModel\Entity\Attribute::_updateAttributeOptionValues()
-                         */
-                        $table = $resource->getTable('eav_attribute_option_value');
-                        $data = ['option_id' => $intOptionId, 'store_id' => 0, 'value' => $option['value']];
-                        $connection->insert($table, $data);
-                        if (isset($option['swatch_option']) && !empty($option['swatch_option'])) {
-                            $this->insertNewSwatchOption($connection, $resource, $intOptionId, $option['swatch_option'],
-                                $attributeId);
-                        }
-                        foreach ($this->_productTypeModels as $productTypeModel) {
-                            $productTypeModel->addAttributeOption($option['code'], strtolower($option['value']),
-                                $intOptionId);
-                        }
-                    }
-                }
-            }
-            if (!empty($newSwatchOptions)) {
-                $connection = $this->_connection;
-                $resource = $this->_resourceFactory->create();
-                foreach ($newSwatchOptions as $attributeId => $swatchOption) {
-                    foreach ($swatchOption as $optionId => $swatchData) {
-                        $this->insertNewSwatchOption($connection, $resource, $optionId, $swatchData, $attributeId);
-                    }
-                }
-            }
-        }
-
-        return $rowData;
-    }
-
-    /**
-     * @param \Magento\Framework\DB\Adapter\AdapterInterface $connection
-     * @param \Magento\CatalogImportExport\Model\Import\Proxy\Product\ResourceModel $resource
-     * @param int $optionId
-     * @param array $swatchData
-     * @param int $attributeId
-     */
-    protected function insertNewSwatchOption($connection, $resource, $optionId, $swatchData, $attributeId)
-    {
-        if ($swatchData['type'] == Swatch::SWATCH_TYPE_VISUAL_IMAGE) {
-            $swatchData['value'] = $this->uploadVisualSwatchFile($swatchData['value']);
-        }
-        if ($swatchData['value']) {
-            $table = $resource->getTable('eav_attribute_option_swatch');
-            $data = [
-                'option_id' => $optionId,
-                'store_id' => 0,
-                'type' => $swatchData['type'],
-                'value' => $swatchData['value'],
-            ];
-            $connection->insert($table, $data);
-            $this->cachedSwatchOptions[$attributeId][$optionId] = $data;
-        }
-    }
-
-    /**
-     * @param int $swatchOption
-     * @param array $diff
-     */
-    protected function updateSwatchOption($swatchOption, $diff)
-    {
-        $connection = $this->_connection;
-        $resource = $this->_resourceFactory->create();
-        $table = $resource->getTable('eav_attribute_option_swatch');
-        $where = ['swatch_id=?' => (int)$swatchOption['swatch_id']];
-
-        $connection->update($table, $diff, $where);
-    }
-
-    /**
-     * Uploads Image for Image Swatch option
-     *
-     * @param string $swatchVisualFile
-     *
-     * @return string
-     */
-    protected function uploadVisualSwatchFile($swatchVisualFile)
-    {
-        $config = $this->mediaConfig;
-        $uploader = $this->_getUploader();
-        $newFile = '';
-        $dirConfig = DirectoryList::getDefaultConfig();
-        $mediaRelativePath = $dirConfig[DirectoryList::MEDIA][DirectoryList::PATH];
-        try {
-            $destDir = $uploader->getDestDir();
-            if (!$uploader->setDestDir($mediaRelativePath . DIRECTORY_SEPARATOR . $config->getBaseTmpMediaPath())) {
-                $this->addRowError(
-                    __('File directory \'%1\' is not writable.', $config->getBaseTmpMediaPath()),
-                    null,
-                    null,
-                    null,
-                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
-                );
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __('File directory \'%1\' is not writable.', $config->getBaseTmpMediaPath())
-                );
-            } else {
-                $result = $uploader->move($swatchVisualFile);
-                $newFile = $this->swatchHelperMedia->moveImageFromTmp($result['file']);
-                $this->swatchHelperMedia->generateSwatchVariations($newFile);
-                $uploader->setDestDir($destDir);
-            }
-        } catch (\Exception $e) {
-            $this->addRowError($e->getMessage(), $this->output, 'error');
-        }
-
-        return $newFile;
-    }
-
-    /**
-     * Checks if imported image for swatch option is different then exist one.
-     *
-     * @param int $swatchOption
-     * @param array $diff Array of type and value that are different
-     *
-     * @return bool
-     */
-    protected function ifVisualSwatchOptionDifferent($swatchOption, $diff)
-    {
-        // TODO: need implement logic for unique names - sometimes image name might have _1_2 endings for the same image.
-        if (isset($diff['value'])) {
-            $fileName = preg_replace('/[^a-z0-9\._-]+/i', '', $diff['value']);
-            $dispretionPath = $this->_getUploader()->getDispretionPath($fileName);
-            return !($swatchOption['value'] == $dispretionPath . '/' . $fileName);
-        }
-        return false;
-    }
-
-    /**
-     * Returns Swatch option data for Attribute Option Ids
-     *
-     * @param array $optionIds
-     * @param int $attributeId
-     *
-     * @return array
-     */
-    protected function getSwatchesByOptionsId($optionIds, $attributeId)
-    {
-        if (!isset($this->cachedSwatchOptions[$attributeId]) || empty($this->cachedSwatchOptions[$attributeId])) {
-            $this->cachedSwatchOptions[$attributeId] = [];
-            $swatchCollection = $this->swatchCollectionFactory->create();
-            $swatchCollection->addFilterByOptionsIds($optionIds);
-            foreach ($swatchCollection as $item) {
-                if ($item['type'] != Swatch::SWATCH_TYPE_TEXTUAL) {
-                    $this->cachedSwatchOptions[$attributeId][$item['option_id']] = $item->getData();
-                }
-            }
-        }
-
-        return $this->cachedSwatchOptions[$attributeId];
     }
 
     /**
@@ -2471,45 +2948,8 @@ class Product extends MagentoProduct
     }
 
     /**
-     * @return $this
-     */
-    protected function _initTypeModels()
-    {
-
-        $this->_importConfig = $this->fireImportConfig;
-        $productTypes = $this->_importConfig->getEntityTypes($this->getEntityTypeCode());
-        foreach ($productTypes as $productTypeName => $productTypeConfig) {
-            $class = $productTypeConfig['model'];
-            $class::$commonAttributesCache = [];
-            $class::$attributeCodeToId = [];
-        }
-
-        parent::_initTypeModels();
-
-        return $this;
-    }
-
-    /**
-     * @param $array
-     * @return array
-     */
-    protected function deleteEmpty($array)
-    {
-        if (isset($array[self::COL_SKU])) {
-            unset($array[self::COL_SKU]);
-        }
-        $newElement = [];
-        foreach ($array as $key => $element) {
-            if (strlen($element)) {
-                $newElement[$key] = $element;
-            }
-        }
-
-        return $newElement;
-    }
-
-    /**
      * @param string $productSku
+     *
      * @return array
      */
     public function getProductWebsites($productSku)
@@ -2519,121 +2959,12 @@ class Product extends MagentoProduct
 
     /**
      * @param string $productSku
+     *
      * @return array
      */
     public function getProductCategories($productSku)
     {
         return array_keys($this->categoriesCache[$productSku]);
-    }
-
-    /**
-     * @return \Magento\CatalogImportExport\Model\Import\Uploader
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function _getUploader()
-    {
-        $DS = DIRECTORY_SEPARATOR;
-        if (is_null($this->_fileUploader)) {
-            $this->_fileUploader = $this->_uploaderFactory->create();
-            $this->_fileUploader->init();
-            $dirConfig = DirectoryList::getDefaultConfig();
-            $dirAddon = $dirConfig[DirectoryList::MEDIA][DirectoryList::PATH];
-            if (!empty($this->_parameters[Import::FIELD_NAME_IMG_FILE_DIR])) {
-                $tmpPath = $this->_parameters[Import::FIELD_NAME_IMG_FILE_DIR];
-            } else {
-                $tmpPath = $dirAddon . $DS . $this->_mediaDirectory->getRelativePath('import');
-            }
-            if (!$this->_fileUploader->setTmpDir($tmpPath)) {
-                $this->addLogWriteln(__('File directory \'%1\' is not readable.', $tmpPath), $this->output, 'info');
-                $this->addRowError(
-                    __('File directory \'%1\' is not readable.', $tmpPath),
-                    null,
-                    null,
-                    null,
-                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
-                );
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __('File directory \'%1\' is not readable.', $tmpPath)
-                );
-            }
-            $destinationDir = "catalog/product";
-            $destinationPath = $dirAddon . $DS . $this->_mediaDirectory->getRelativePath($destinationDir);
-
-            $this->_mediaDirectory->create($destinationPath);
-            if (!$this->_fileUploader->setDestDir($destinationPath)) {
-                $this->addRowError(
-                    __('File directory \'%1\' is not writable.', $destinationPath),
-                    null,
-                    null,
-                    null,
-                    ProcessingError::ERROR_LEVEL_NOT_CRITICAL
-                );
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __('File directory \'%1\' is not writable.', $destinationPath)
-                );
-            }
-        }
-
-        return $this->_fileUploader;
-    }
-
-    protected function getCategories($rowData)
-    {
-        if (isset($rowData[self::COL_STORE])) {
-            $this->categoryProcessor->setStoreId($this->storeResolver->getStoreCodeToId($rowData[self::COL_STORE]));
-        }
-        $this->categoryProcessor->setGeneratUrl($this->_parameters['generate_url']);
-        $this->categoryProcessor->setResource($this->getResource());
-        $ids = $this->categoryProcessor->getRowCategories($rowData, $this->_parameters['categories_separator']);
-        foreach ($this->categoryProcessor->getFailedCategories() as $error) {
-            $this->errorAggregator->addError(
-                AbstractEntity::ERROR_CODE_CATEGORY_NOT_VALID,
-                ProcessingError::ERROR_LEVEL_NOT_CRITICAL,
-                $rowData['rowNum'],
-                self::COL_CATEGORY,
-                __('Category "%1" has not been created.', $error['category'])
-                . ' ' . $error['exception']->getMessage()
-            );
-        }
-
-        return $ids;
-    }
-
-    protected function checkUrlKeyDuplicates()
-    {
-        $status = 0;
-        $resource = $this->getResource();
-        foreach ($this->urlKeys as $storeId => $urlKeys) {
-            $scope = [];
-            foreach ($urlKeys as $url => $sku) {
-                $select = $this->_connection->select()->from(
-                    ['url_rewrite' => $resource->getTable('url_rewrite')],
-                    ['request_path', 'store_id']
-                )->joinLeft(
-                    ['cpe' => $resource->getTable('catalog_product_entity')],
-                    "cpe.entity_id = url_rewrite.entity_id"
-                )->where('request_path LIKE \'%/' . $url . '%\'  OR request_path=?', $url)
-                    ->where('cpe.sku not in (?)', [$sku]);
-
-                $urlKeyDuplicates = $this->_connection->fetchAssoc(
-                    $select
-                );
-                if (!empty($urlKeyDuplicates)) {
-                    $scope += $urlKeyDuplicates;
-                }
-
-            }
-
-            foreach ($scope as $entityData) {
-                if (!$this->_parameters['generate_url']) {
-                    $rowNum = $this->rowNumbers[$entityData['store_id']][$entityData['request_path']];
-                    $this->addRowError(ValidatorInterface::ERROR_DUPLICATE_URL_KEY, $rowNum);
-                }
-                $status = 1;
-            }
-        }
-
-        return $status;
     }
 
     /**
@@ -2647,45 +2978,6 @@ class Product extends MagentoProduct
     public function setErrorMessages()
     {
         $this->_initErrorTemplates();
-    }
-
-    /**
-     * @param array $rowData
-     * @return array
-     */
-    public function prepareRowForDb(array $rowData)
-    {
-        $rowData = $this->customFieldsMapping($rowData);
-
-        foreach ($rowData as $key => $val) {
-            if (!empty($val)) {
-                $rowData[$key] = stripslashes($val);
-            }
-        }
-
-        static $lastSku = null;
-
-        if (Import::BEHAVIOR_DELETE == $this->getBehavior()) {
-            return $rowData;
-        }
-
-        $lastSku = $rowData[self::COL_SKU];
-        if (strpos($this->productMetadata->getVersion(), '2.2') !== false) {
-            $checkSku = strtolower($lastSku);
-        } else {
-            $checkSku = $lastSku;
-        }
-        if (isset($this->_oldSku[$checkSku]) && $this->_oldSku[$checkSku]) {
-            $newSku = $this->skuProcessor->getNewSku($lastSku);
-            if (isset($rowData[self::COL_ATTR_SET]) && !$rowData[self::COL_ATTR_SET]) {
-                $rowData[self::COL_ATTR_SET] = $newSku['attr_set_code'];
-            }
-            if (isset($rowData[self::COL_TYPE]) && !$rowData[self::COL_TYPE]) {
-                $rowData[self::COL_TYPE] = $newSku['type_id'];
-            }
-        }
-
-        return $rowData;
     }
 
     /**
@@ -2706,68 +2998,11 @@ class Product extends MagentoProduct
     }
 
     /**
-     * @param $rowData
-     *
-     * @return mixed
-     */
-    protected function applyPriceRules($rowData)
-    {
-        if (!empty($this->_parameters['price_rules'])) {
-            $priceRules = $this->_parameters['price_rules'];
-
-            foreach ($priceRules as $priceRule) {
-                $applyRule = true;
-
-                if (isset($priceRule['price_rules_conditions_hidden']['rule']['conditions'])) {
-                    $conditions = $priceRule['price_rules_conditions_hidden']['rule']['conditions'];
-                    $aggr = $conditions[1]['aggregator'];
-                    $aggrValue = $conditions[1]['value'];
-
-                    $data = [
-                        'conditions' => $priceRule['price_rules_conditions_hidden']['rule']['conditions'],
-                        'row' => $rowData,
-                        'aggregator' => $aggr,
-                        'value' => $aggrValue,
-                        'categories' => isset($this->categoriesCache[$rowData[self::COL_SKU]]) ?
-                            array_keys($this->categoriesCache[$rowData[self::COL_SKU]]) : []
-                    ];
-                    $applyRule = $this->priceRuleConditionFactory->create()->validatePriceRuleConditions($data);
-                }
-
-                if ($applyRule) {
-                    if ($priceRule['apply'] == 'fixed') {
-                        $rowData['price'] += $priceRule['value'];
-                    } else {
-                        $rowData['price'] *= 1 + $priceRule['value'] / 100;
-                    }
-                }
-            }
-        }
-
-        return $rowData;
-    }
-
-    protected function checkUrl($rowData)
-    {
-        if (isset($rowData[self::URL_KEY])) {
-            $urlKey = strtolower($this->getUrlKey($rowData));
-
-            if (!isset($this->repeatUrls[$urlKey])) {
-                $this->repeatUrls[$urlKey] = 0;
-            } else {
-                $rowData[self::URL_KEY] = $this->generateUrl($rowData, $this->repeatUrls[$urlKey] + 1);
-                $this->repeatUrls[$urlKey] += 1;
-            }
-        }
-
-        return $rowData;
-    }
-
-    /**
      * Parse values of multiselect attributes depends on "Fields Enclosure" parameter
      *
      * @param string $values
      * @param string $delimiter
+     *
      * @return array
      * @since 100.1.2
      */
@@ -2813,4 +3048,87 @@ class Product extends MagentoProduct
     {
         $this->_isRowCategoryMapped = $isRowCategoryMapped;
     }
+
+    /**
+     * Retrieving images from all columns and rows
+     *
+     * @param $bunch
+     *
+     * @return array
+     */
+    protected function getBunchImages(
+        $bunch
+    )
+    {
+        $allImagesFromBunch = [];
+        foreach ($bunch as $rowData) {
+            $rowData = $this->customFieldsMapping($rowData);
+            foreach ($this->_imagesArrayKeys as $image) {
+                if (empty($rowData[$image])) {
+                    continue;
+                }
+                $dispersionPath =
+                    \Magento\Framework\File\Uploader::getDispretionPath($rowData[$image]);
+                $importImages = explode($this->getMultipleValueSeparator(), $rowData[$image]);
+                foreach ($importImages as $importImage) {
+                    $imageSting = mb_strtolower(
+                        $dispersionPath . '/' . preg_replace('/[^a-z0-9\._-]+/i', '', $importImage)
+                    );
+                    /**
+                     * TODO: check source type 'file'.
+                     * Compare code with default Magento\CatalogImportExport\Model\Import\Product
+                     */
+                    if (isset($this->_parameters['import_source']) && $this->_parameters['import_source'] != 'file') {
+                        $allImagesFromBunch[$this->sourceType->getCode() . $imageSting] = $imageSting;
+                    } else {
+                        $allImagesFromBunch[$importImage] = $imageSting;
+                    }
+                }
+            }
+        }
+
+        return $allImagesFromBunch;
+    }
+
+    /**
+     * @param $rowData
+     *
+     * @return mixed
+     */
+    private function adjustBundleTypeAttributes($rowData)
+    {
+        if ($rowData['product_type'] == 'bundle') {
+            $fields = ['price_type', 'weight_type', 'sku_type'];
+            foreach ($fields as $field) {
+                if (isset($rowData[$field]) && is_int($rowData[$field])) {
+                    if ($rowData[$field] === BundlePrice::PRICE_TYPE_DYNAMIC) {
+                        $rowData[$field] = Bundle::VALUE_DYNAMIC;
+                    } else {
+                        $rowData[$field] = Bundle::VALUE_FIXED;
+                    }
+                }
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * Obtain scope of the row from row data.
+     *
+     * @param array $rowData
+     *
+     * @return int
+     */
+    public function getRowScope(array $rowData)
+    {
+        if (
+            empty($rowData[self::COL_STORE])
+            || strtolower(trim($rowData[self::COL_STORE])) == 'default'
+        ) {
+            return self::SCOPE_DEFAULT;
+        }
+        return self::SCOPE_STORE;
+    }
+
 }

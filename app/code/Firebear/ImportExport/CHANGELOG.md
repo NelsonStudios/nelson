@@ -137,3 +137,34 @@ Add import JSON
 ==============
 * Fix bugs:
    - Cannot load additional images
+
+2.2.2
+==============
+* Add buttons "Duplicate"
+
+2.2.3
+==============
+* Fix bugs:
+   - Export CMS Blocks and Pages
+* Add REST API
+* Order export new file format
+* Add support ods, xlsx and xls
+
+3.0.0
+==============
+* Added support of Excel XLSX file format
+* Added support of OpenOffice ODS file format
+* Added support of REST API  – XML files with XSLT templates and custom Json files
+* Added support of SOAP API – XML files with XSLT templates and custom Json files
+* Added improved Json file compatibility
+* Added new entity Product Attributes – now all attributes, attribute sets and groups can be imported to Magento 2
+* Added consecutive export procedure – the export jobs can now remember already exported entities and export only NEW entities added since the last run
+* Export date and time can now be added automatically to the file name
+* All files from the specified folder can now be imported in a single job
+* Swatch attribute values, both color and image, can now be imported along with products
+* Default product variations of Improved Configurable Product extension can now be imported
+* Added compatibility with the following third-party extensions:
+    - MageWorx Advanced Product Options
+    - MageStore Inventory Management
+    - Wyomind Advanced Inventory
+    - MageDelight Price per Customer

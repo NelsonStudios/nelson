@@ -115,10 +115,10 @@ class Loadcategories extends JobController
                         $importData['mappingData'] = $this->jsonDecoder->decode('[' . $exData[0] . ']');
                     }
                 } else {
-                    $exData = explode('+', $data);
-                    $index = str_replace($sourceType . '[', '', $exData[0]);
+                    $index = strstr($data, '+', true);
+                    $index = str_replace($sourceType . '[', '', $index);
                     $index = str_replace(']', '', $index);
-                    $importData[$index] = $exData[1];
+                    $importData[$index] = substr($data, strpos($data, '+') + 1);
                 }
             }
             $importData['platforms'] = $type;
@@ -134,6 +134,7 @@ class Loadcategories extends JobController
                 if ($importModel->getEntity() == 'catalog_product') {
                     $categories = $importModel->getCategories($importData);
                     $categories = $this->ieAssistant->parsingCategories($categories, $importData['categories_separator']);
+                    $categories = array_unique($categories);
                 }
             } catch (\Exception $e) {
                 return $resultJson->setData(['error' => $e->getMessage()]);

@@ -60,7 +60,9 @@ class Converter implements ConverterInterface
                     $result[$typeName]['links'][] = [
                         'label' => $childNode->attributes->getNamedItem('label')->nodeValue,
                         'suffix' => $childNode->attributes->getNamedItem('suffix')
-                            ? $childNode->attributes->getNamedItem('suffix')->nodeValue : ''
+                            ? $childNode->attributes->getNamedItem('suffix')->nodeValue : '',
+                        'entity' => $childNode->attributes->getNamedItem('entity')
+                            ? $childNode->attributes->getNamedItem('entity')->nodeValue : '',
                     ];
                 }
             }

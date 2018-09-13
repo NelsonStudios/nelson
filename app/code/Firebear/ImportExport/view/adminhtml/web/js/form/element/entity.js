@@ -19,6 +19,10 @@ define(
             {
                 defaults: {
                     code: '',
+                    imports: {
+                        changeOptions: '${$.parentName}.use_api:value'
+                    },
+                    apiOptions: null
                 },
                 initialize: function () {
                     this._super();
@@ -90,8 +94,32 @@ define(
                             else
                                 $(this).css('display', 'block');
                         }
+                        if (dataIndex == 'clear_attribute_value') {
+                            if (entityValue == 'catalog_product')
+                                $(this).css('display', 'block');
+                            else
+                                $(this).css('display', 'none');
+                        }
+                        if (dataIndex == 'remove_product_association') {
+                            if (entityValue == 'catalog_product')
+                                $(this).css('display', 'block');
+                            else
+                                $(this).css('display', 'none');
+                        }
                     });
                 },
+                changeOptions : function (value) {
+                    if (this.apiOptions == null) {
+                        this.apiOptions = [];
+                        this.apiOptions.push(this.getOption('catalog_product'));
+                    }
+                    if (value === "1") {
+                        this.setOptions(this.apiOptions);
+                        this.value('catalog_product');
+                    } else {
+                        this.setOptions(this.initialOptions);
+                    }
+                }
             }
         );
     }

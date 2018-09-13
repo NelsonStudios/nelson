@@ -15,13 +15,13 @@ use Magento\Framework\Model\AbstractModel;
  */
 class Job extends AbstractModel implements ImportInterface
 {
-    const CACHE_TAG         = 'import_job';
+    const CACHE_TAG = 'import_job';
 
     /**#@-*/
     /**
      * @var string
      */
-    protected $_cacheTag    = 'importexport_job';
+    protected $_cacheTag = 'importexport_job';
 
     /**
      * Prefix of model events names
@@ -37,7 +37,8 @@ class Job extends AbstractModel implements ImportInterface
      */
     protected $behaviorFields = [
         'validation_strategy',
-    //    'type_file',
+        'use_api',
+//        'type_file',
         'allowed_error_count',
         '_import_field_separator',
         '_import_multiple_value_separator',
@@ -62,12 +63,12 @@ class Job extends AbstractModel implements ImportInterface
     /**
      * Job constructor.
      *
-     * @param \Magento\Framework\Model\Context                             $context
-     * @param \Magento\Framework\Registry                                  $registry
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null           $resourceCollection
-     * @param ResourceModel\Job\Mapping\CollectionFactory                  $collectionMapsFactory
-     * @param array                                                        $data
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param ResourceModel\Job\Mapping\CollectionFactory $collectionMapsFactory
+     * @param array $data
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -78,7 +79,7 @@ class Job extends AbstractModel implements ImportInterface
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-        if (isset($data['behaviorFields'])){
+        if (isset($data['behaviorFields'])) {
             $this->setBehaviorFields($data['behaviorFields']);
         }
         $this->collectionMapsFactory = $collectionMapsFactory;
@@ -207,48 +208,48 @@ class Job extends AbstractModel implements ImportInterface
     public function getExtendedFrequencyModes()
     {
         return [
-            self::FREQUENCY_NONE  => [
+            self::FREQUENCY_NONE => [
                 'title' => __('None'),
                 'label' => __('None (manual run only)'),
                 'value' => self::FREQUENCY_NONE,
-                'expr'  => '',
+                'expr' => '',
             ],
-            self::FREQUENCY_MINUTE  => [
+            self::FREQUENCY_MINUTE => [
                 'title' => __('Minute'),
                 'label' => __('Every minute'),
                 'value' => self::FREQUENCY_MINUTE,
-                'expr'  => '*/1 * * * *',
+                'expr' => '*/1 * * * *',
             ],
-            self::FREQUENCY_HOUR    => [
+            self::FREQUENCY_HOUR => [
                 'title' => __('Hour'),
                 'label' => __('Every hour'),
                 'value' => self::FREQUENCY_HOUR,
-                'expr'  => '* */1 * * *',
+                'expr' => '* */1 * * *',
             ],
-            self::FREQUENCY_DAY     => [
+            self::FREQUENCY_DAY => [
                 'title' => __('Day'),
                 'label' => __('Every day at 3:00am'),
                 'value' => self::FREQUENCY_DAY,
-                'expr'  => '0 3 * * *',
+                'expr' => '0 3 * * *',
             ],
-            self::FREQUENCY_WEEK    => [
+            self::FREQUENCY_WEEK => [
                 'title' => __('Week'),
                 'label' => __('Every Monday at 3:00am'),
                 'value' => self::FREQUENCY_WEEK,
-                'expr'  => '0 3 * * 1',
+                'expr' => '0 3 * * 1',
             ],
-            self::FREQUENCY_MONTH   => [
+            self::FREQUENCY_MONTH => [
                 'title' => __('Month'),
                 'label' => __('Every 1st day of month at 3:00am'),
                 'value' => self::FREQUENCY_MONTH,
-                'expr'  => '0 3 1 * *',
+                'expr' => '0 3 1 * *',
             ],
-            self::FREQUENCY_CUSTOM  => [
+            self::FREQUENCY_CUSTOM => [
                 'title' => __('Custom'),
                 'label' => __('Custom'),
                 'value' => self::FREQUENCY_CUSTOM,
-                'expr'  => '* * * * *',
-                'custom'=> true
+                'expr' => '* * * * *',
+                'custom' => true
             ]
         ];
     }

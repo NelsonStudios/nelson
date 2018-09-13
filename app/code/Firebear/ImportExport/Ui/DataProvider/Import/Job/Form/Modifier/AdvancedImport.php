@@ -17,12 +17,20 @@ use \Psr\Log\LoggerInterface;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\ObjectManagerInterface;
+
 
 /**
  * Data provider for advanced inventory form
  */
 class AdvancedImport implements ModifierInterface
 {
+    /**
+     * Object manager
+     *
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
     /**
      * @var ArrayManager
      */
@@ -63,6 +71,7 @@ class AdvancedImport implements ModifierInterface
      */
     private $cacheManager;
 
+
     private $categoriesTree;
 
 
@@ -93,7 +102,8 @@ class AdvancedImport implements ModifierInterface
         LocatorInterface $locator,
         CategoryCollectionFactory $categoryCollectionFactory,
         LoggerInterface $logger,
-        RequestInterface $request
+        RequestInterface $request,
+        ObjectManagerInterface $objectManager
     ) {
         $this->arrayManager = $arrayManager;
         $this->config = $config;
@@ -104,6 +114,7 @@ class AdvancedImport implements ModifierInterface
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->logger = $logger;
         $this->request = $request;
+        $this->objectManager = $objectManager;
     }
 
     /**
@@ -188,6 +199,15 @@ class AdvancedImport implements ModifierInterface
                 if ($values['componentType'] == 'fileUploader') {
                     $localConfig['maxFileSize'] = $maxImageSize;
                 }
+                if (isset($values['formElement']) && ($values['formElement'])) {
+                    $localConfig['formElement'] = $values['formElement'];
+                }
+//                if (isset($values['options']) && ($values['options'])) {
+//                    $localConfig['sourceOptions'] = json_encode([
+//                        ['value' => 'post', 'label' => 'POST'],
+//                        ['value' => 'get', 'label' => 'GET'],
+//                    ]);
+//                }
                 $sortOrder += 10;
                 $config = array_merge($generalConfig, $localConfig);
 
@@ -198,6 +218,12 @@ class AdvancedImport implements ModifierInterface
                         ],
                     ]
                 ];
+                if (isset($values['options']) && ($values['options'])) {
+                    $childrenArray[$typeName . "_" . $name]['arguments']['data']['options'] = $this->objectManager->create( $values['options']);
+                }
+                if (isset($values['source_options']) && ($values['source_options'])) {
+                    $childrenArray[$typeName . "_" . $name]['arguments']['data']['source_options'] = $this->objectManager->create( $values['source_options']);
+                }
             }
         }
 

@@ -77,6 +77,12 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
     const XML_SWITCH = 'xml_switch';
 
+    const JOB_ID = 'job_id';
+
+    const LAST_ENTITY_ID = 'last_entity_id';
+
+    const LAST_ENTITY_SWITCH = 'enable_last_entity_id';
+
     /**
      * @var ExportFactory
      */
@@ -195,10 +201,10 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
     /**
      * @param $jobId
-     *
-     * @return ExportJobRepositoryInterface
+     * @return \Firebear\ImportExport\Api\Data\ExportInterface|mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function getJobModel($jobId)
+    public function getJobModel($jobId)
     {
         return $this->exportJobRepository->getById($jobId);
     }
@@ -249,6 +255,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
         return $source;
     }
+
 
     /**
      * @param $data
@@ -368,11 +375,12 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         $data = [];
         $allFields = 0;
         list($listCodes, $exportFilter, $exportFilterTable, $replaceCode, $replaceValues, $allFields, $deps) =
-            $this->getMapData($mapsData);
+        $this->getMapData($mapsData);
         if (isset($sourceData[self::SOURCE . '_entity'])) {
             $exportSource = $sourceData[self::SOURCE . '_entity'];
             $source = $this->getSourceData($sourceData, $exportSource);
             $data = [
+                self::JOB_ID => $this->getJob()->getId(),
                 self::ENTITY => $this->getJob()->getEntity(),
                 self::FILE_FORMAT => isset($behaviorData['file_format']) ? $behaviorData['file_format'] : 'csv',
                 self::LIST_DATA => $listCodes,
@@ -395,11 +403,19 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
             $data[self::XML_SWITCH] = $mapsData[self::XML_SWITCH];
         }
 
+        if (isset($sourceData[self::LAST_ENTITY_SWITCH])) {
+            $data[self::LAST_ENTITY_SWITCH] = $sourceData[self::LAST_ENTITY_SWITCH];
+        }
+        if (isset($sourceData[self::LAST_ENTITY_ID])) {
+            $data[self::LAST_ENTITY_ID] = $sourceData[self::LAST_ENTITY_ID];
+        }
+
         return $data;
     }
 
     /**
      * @param $data
+     * @return array
      */
     public function run($data)
     {
@@ -411,7 +427,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         $source = $this->getSource($entity);
         $source->setData($data[self::EXPORT_SOURCE]);
         list($result, $file, $errors) = $source->run($model);
-        
+
         if ($result) {
             $this->setExportFile($file);
         } else {
@@ -450,20 +466,20 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
     {
 
        // if ($this->debugMode) {
-            $this->logger->debug($debugData);
+        $this->logger->debug($debugData);
       //  }
- 
+
         if ($output) {
             switch ($type) {
                 case 'error':
-                    $debugData = '<error>' . $debugData . '</error>';
-                    break;
+                $debugData = '<error>' . $debugData . '</error>';
+                break;
                 case 'info':
-                    $debugData = '<info>' . $debugData . '</info>';
-                    break;
+                $debugData = '<info>' . $debugData . '</info>';
+                break;
                 default:
-                    $debugData = '<comment>' . $debugData . '</comment>';
-                    break;
+                $debugData = '<comment>' . $debugData . '</comment>';
+                break;
             }
 
             $output->writeln($debugData);

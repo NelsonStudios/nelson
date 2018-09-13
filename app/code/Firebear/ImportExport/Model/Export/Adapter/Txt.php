@@ -6,9 +6,45 @@
 
 namespace Firebear\ImportExport\Model\Export\Adapter;
 
-class Txt extends \Magento\ImportExport\Model\Export\Adapter\Csv
-{
+use Magento\Framework\Filesystem;
+use Magento\ImportExport\Model\Export\Adapter\Csv as AbstractAdapter;
 
+/**
+ * Txt Export Adapter
+ */
+class Txt extends AbstractAdapter
+{
+    /**
+     * Adapter Data
+     *
+     * @var []
+     */     
+    protected $_data;
+    
+    /**
+     * Initialize Adapter
+     * 
+     * @param Filesystem $filesystem
+     * @param null $destination
+     * @param [] $data      
+     */
+    public function __construct(
+		Filesystem $filesystem, 
+		$destination = null,
+		array $data = []
+	) {
+        $this->_data = $data;
+        if (isset($data['behavior_data'])) {
+            $data = $data['behavior_data'];
+            $this->_delimiter = $data['separator'] ?? $this->_delimiter;
+        } 
+        
+        parent::__construct(
+			$filesystem, 
+			$destination
+		);
+    }
+    
     /**
      * Return file extension for downloading.
      *
@@ -63,22 +99,6 @@ class Txt extends \Magento\ImportExport\Model\Export\Adapter\Csv
         );
 
         return $this;
-    }
-
-    /**
-     * @param $del
-     */
-    public function setDelimeter($del)
-    {
-        $this->_delimiter = $del;
-    }
-
-    /**
-     * @param $enc
-     */
-    public function setEnclosure($enc)
-    {
-        $this->_enclosure = $enc;
     }
 
     protected function implodeData($data)

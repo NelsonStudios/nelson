@@ -80,10 +80,10 @@ class Track extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['shipments_shipments_track'])) {
-			return false;
-		}		
-		return $this-> _explodeField($rowData['shipments_shipments_track']);
+		$rowData = $this->_extractField($rowData, 'shipment_track');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;		
     }
 	
     /**

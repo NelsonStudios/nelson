@@ -73,13 +73,10 @@ class Invoice extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['invoices'])) {
-			return false;
-		}
-		$rowData = $this-> _explodeField($rowData['invoices']);
-		return ($rowData && !$this->isEmptyRow($rowData)) 
+		$rowData = $this->_extractField($rowData, 'invoice');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
 			? $rowData 
-			: false;		
+			: false;	
     }
     
     /**

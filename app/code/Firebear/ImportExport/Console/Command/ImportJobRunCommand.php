@@ -56,6 +56,9 @@ class ImportJobRunCommand extends ImportJobAbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $time = explode(" ", microtime());
+        $startTime = $time[0] + $time[1];
+
         $isAreaCode = 0;
         try {
             if ($this->state->getAreaCode()) {
@@ -84,7 +87,6 @@ class ImportJobRunCommand extends ImportJobAbstractCommand
                 $this->processor->inConsole = 1;
                 $this->processor->setLogger($this->helper->getLogger());
                 $this->processor->processScope($id, $file);
-
                 $this->helper->saveFinishHistory($history);
                 $counter = $this->helper->countData($file, $job->getId());
                 $error = 0;
@@ -104,5 +106,11 @@ class ImportJobRunCommand extends ImportJobAbstractCommand
         } else {
             $this->addLogComment('No jobs found', $output, 'error');
         }
+
+        $time = explode(" ", microtime());
+        $endTime = $time[0] + $time[1];
+        $totalTime = $endTime - $startTime;
+        $totalTime = round($totalTime, 5);
+        $this->addLogComment("------------" .$totalTime, $output, 'info');
     }
 }

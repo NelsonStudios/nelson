@@ -63,29 +63,10 @@ class Payment extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['orders_payment'])) {
-			return false;
-		}		
-		$additional = $this->_getAdditionalInformation($rowData);
-		$rowData = $this-> _explodeField($rowData['orders_payment']);
-		if (!$this->isEmptyRow($rowData)) {
-			$rowData['additional_information'] = $additional;
-			return $rowData;
-		}
-		return false;
-    }
-
-    /**
-     * Retrieve The Additional Information
-     *
-     * @param array $rowData
-     * @return array|bool
-     */
-    protected function _getAdditionalInformation(array $rowData)
-    {
-		return isset($rowData['orders_payment_additional_information'])
-			? $rowData['orders_payment_additional_information']
-			: null;
+		$rowData = $this->_extractField($rowData, 'payment');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;
     }
     
     /**

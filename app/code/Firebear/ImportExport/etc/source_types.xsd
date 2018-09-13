@@ -24,6 +24,7 @@
         <xs:attribute name="sortOrder" type="xs:integer" use="optional"/>
         <xs:attribute name="exists" type="xs:string" use="optional"/>
         <xs:attribute name="depends" type="xs:string" use="optional"/>
+        <xs:attribute name="api" type="xs:string" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="fieldDeclaration">
@@ -39,6 +40,9 @@
         <xs:attribute name="required" type="xs:boolean" use="optional"/>
         <xs:attribute name="validation" type="xs:string" use="optional"/>
         <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:attribute name="options" type="xs:string" use="optional"/>
+        <xs:attribute name="source_options" type="xs:string" use="optional"/>
+        <xs:attribute name="formElement" type="xs:string" use="optional"/>
     </xs:complexType>
 
     <xs:simpleType name="modelName">

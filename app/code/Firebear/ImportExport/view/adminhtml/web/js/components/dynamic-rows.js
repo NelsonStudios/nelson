@@ -43,6 +43,14 @@ define(
                     this.custom = 0;
                     this.processingAddChild(ctx, index, prop);
                 },
+                addChild: function (data, index, prop) {
+
+                    if (typeof data.custom !== 'undefined') {
+                        this.custom = data.custom;
+                    }
+
+                    return this._super(data, index, prop);
+                },
             }
         );
     }

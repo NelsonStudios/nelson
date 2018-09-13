@@ -142,7 +142,7 @@ trait Map
     public function checkMimeType($file)
     {
         $message = true;
-        $error = __('The format of this file is not suitable');
+        $error = __('Incorrect file format');
 
         if (function_exists('mime_content_type') && !empty($this->mimeTypes)) {
             try {

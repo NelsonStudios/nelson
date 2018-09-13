@@ -6,18 +6,18 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Api\JobRepositoryInterface;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
+use Firebear\ImportExport\Helper\Assistant;
+use Firebear\ImportExport\Model\Import\Platforms;
+use Firebear\ImportExport\Model\Job\Processor;
+use Firebear\ImportExport\Model\JobFactory;
+use Firebear\ImportExport\Model\Source\Config\CartPrice;
+use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Options;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Firebear\ImportExport\Model\Job\Processor;
 use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\Import\Platforms;
-use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Options;
-use Firebear\ImportExport\Helper\Assistant;
-use Firebear\ImportExport\Model\Source\Config\CartPrice;
 
 class Loadmap extends JobController
 {
@@ -114,10 +114,10 @@ class Loadmap extends JobController
             $sourceType = $this->getRequest()->getParam('source_type');
             $importData = [];
             foreach ($formData as $data) {
-                $exData = explode('+', $data);
-                $index = str_replace($sourceType . '[', '', $exData[0]);
+                $index = strstr($data, '+', true);
+                $index = str_replace($sourceType . '[', '', $index);
                 $index = str_replace(']', '', $index);
-                $importData[$index] = $exData[1];
+                $importData[$index] = substr($data, strpos($data, '+') + 1);
             }
             $importData['platforms'] = $type;
             $importData['locale'] = $locale;
@@ -133,16 +133,20 @@ class Loadmap extends JobController
             $sourceType = $this->getRequest()->getParam('source_type');
             $importData = [];
             foreach ($formData as $data) {
-                $exData = explode('+', $data);
-                $index = str_replace($sourceType . '[', '', $exData[0]);
+                $index = strstr($data, '+', true);
+                $index = str_replace($sourceType . '[', '', $index);
                 $index = str_replace(']', '', $index);
-                $importData[$index] = $exData[1];
+                $importData[$index] = substr($data, strpos($data, '+') + 1);
             }
-
+            if ($this->getRequest()->getParam('job_id')) {
+                $importData['job_id'] = (int)$this->getRequest()->getParam('job_id');
+            }
             if (isset($importData['type_file'])) {
                 $this->processor->setTypeSource($importData['type_file']);
             }
-            $importData[$sourceType . '_file_path'] = $importData['file_path'];
+            if (!in_array($importData['import_source'], ['rest', 'soap'])) {
+                $importData[$sourceType . '_file_path'] = $importData['file_path'];
+            }
 
             try {
                 $result = $this->processor->getCsvColumns($importData);

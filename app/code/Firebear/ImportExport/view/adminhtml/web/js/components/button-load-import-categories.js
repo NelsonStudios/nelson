@@ -83,6 +83,19 @@ define(
                                 }
                             );
                             registry.get(
+                                self.ns + '.' + self.ns + '.xml_conf',
+                                function (object) {
+                                    _.each(
+                                        object.elems(),
+                                        function (element) {
+                                            if (element.visible() && element.componentType != 'container') {
+                                                formElements.push(element.dataScope.replace('data.', '') + '+' + element.value())
+                                            }
+                                        }
+                                    );
+                                }
+                            );
+                            registry.get(
                                 self.ns + '.' + self.ns + '.settings',
                                 function (object) {
                                     _.each(

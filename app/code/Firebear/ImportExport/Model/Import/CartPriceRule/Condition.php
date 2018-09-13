@@ -86,6 +86,7 @@ class Condition
             $this->attributes = $this->reverseArray($address->getAttributeOption());
             $this->attributes += $this->reverseArray($product->getAttributeOption());
         }
+
         $this->address = $address;
         $this->product = $product;
     }

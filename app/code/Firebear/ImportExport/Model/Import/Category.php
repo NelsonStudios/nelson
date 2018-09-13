@@ -73,6 +73,15 @@ class Category extends AbstractEntity
     const COL_INCLUDE_IN_MENU = 'include_in_menu';
 
     /**
+     * Error codes
+     */
+    const ERROR_CODE_NAME_REQUIRED = 'columnNameIsRequired';
+
+    protected $errorTemplates = [
+        self::ERROR_CODE_NAME_REQUIRED => "Column 'name' is not set"
+    ];
+
+    /**
      * Core event manager proxy
      *
      * @var ManagerInterface
@@ -300,8 +309,13 @@ class Category extends AbstractEntity
      */
     protected function _importData()
     {
-
-     //   $this->registry->register("isSecureArea", true);
+        /**
+         * Add templates here because we rewrite aggregator in General Trait
+         */
+        foreach ($this->errorTemplates as $errorCode => $message) {
+            $this->errorAggregator
+                ->addErrorMessageTemplate($errorCode, $message);
+        }
 
         $this->_validatedRows = null;
         if (Import::BEHAVIOR_DELETE == $this->getBehavior()) {
@@ -421,15 +435,27 @@ class Category extends AbstractEntity
             $this->categoriesCache = [];
             $bunch = $this->prepareImagesFromSource($bunch);
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_processedRowsCount++;
                 $rowData = $this->joinIdenticalyData($rowData);
                 $rowData = $this->customChangeData($rowData);
+
+                if (!isset($rowData[self::COL_NAME])) {
+
+                    $this->getErrorAggregator()->addError(
+                        self::ERROR_CODE_NAME_REQUIRED,
+                        ProcessingError::ERROR_LEVEL_CRITICAL,
+                        $this->_processedRowsCount
+                    );
+                    continue;
+                }
+
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('name: %1 is not valided', $rowData['name']), $this->output, 'info');
+                    $this->addLogWriteln(__('Category with name: %1 is not valided', $rowData[self::COL_NAME]), $this->output, 'info');
                     continue;
                 }
                 $time = explode(" ", microtime());
                 $startTime = $time[0] + $time[1];
-                $name = $rowData['name'];
+                $name = $rowData[self::COL_NAME];
                 if (!$this->validateRow($rowData, $rowNum)) {
                     continue;
                 }
@@ -494,7 +520,7 @@ class Category extends AbstractEntity
                                 null,
                                 $e->getMessage()
                             );
-                            $this->_processedRowsCount++;
+                            //$this->_processedRowsCount++;
                         }
                     } else {
                         if (!isset($this->categories[$rowPath])) {
@@ -513,7 +539,7 @@ class Category extends AbstractEntity
                 $endTime = $time[0] + $time[1];
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
-                $this->addLogWriteln(__('name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(__('category with name: %1 .... %2s', $name, $totalTime), $this->output, 'info');
             }
             $this->addLogWriteln(__('Imported: %1 rows', $in), $this->output, 'info');
             $this->addLogWriteln(__('Updated: %1 rows', $up), $this->output, 'info');
@@ -542,6 +568,9 @@ class Category extends AbstractEntity
         $pathParts = explode(self::DELIMITER_CATEGORY, $rowPath);
         $path = '';
         foreach ($pathParts as $pathPart) {
+            if ($pathPart == '') {
+                continue;
+            }
             $path .= $pathPart;
             if (!isset($this->categories[$path])) {
                 try {
@@ -579,7 +608,7 @@ class Category extends AbstractEntity
                         $e->getMessage()
                     );
                     $result = false;
-                    $this->_processedRowsCount++;
+                    //$this->_processedRowsCount++;
                 }
             }
             if (isset($this->categories[$path])) {
@@ -634,7 +663,7 @@ class Category extends AbstractEntity
                 $e->getMessage()
             );
             $result = false;
-            $this->_processedRowsCount++;
+         //   $this->_processedRowsCount++;
         }
 
         return $result;

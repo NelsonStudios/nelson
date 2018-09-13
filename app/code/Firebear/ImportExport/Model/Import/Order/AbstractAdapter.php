@@ -105,13 +105,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     protected $_logger;
 
     /**
-     * Field Processor
-     *
-     * @var \Firebear\ImportExport\Model\Import\Order\FieldProcessor
-     */
-    protected $_fieldProcessor;
-
-    /**
      * Main Table Name
      *
      * @var string
@@ -176,7 +169,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
         Context $context
     ) {
         $this->_logger = $context->getLogger();
-        $this->_fieldProcessor = $context->getFieldProcessor();
         $this->_resource = $context->getResource();
 
         parent::__construct(
@@ -494,15 +486,34 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     {
         return $this->_fieldProcessor->explode($field, $this->_getSeparator());
     }
-
+	
     /**
-     * Retrieve Import Multiple Value Separator
+     * Retrieve Extracted Field
      *
-     * @return string
+     * @param array $rowData
+     * @param string $prefix
+     * @return array|bool
      */
-    protected function _getSeparator()
+    protected function _extractField($rowData, $prefix)
     {
-        return $this->_parameters['_import_multiple_value_separator'];
+		if (isset($rowData[$prefix]) && 
+			is_array($rowData[$prefix])
+		) {
+			/* from nested format (xml, json etc) */
+			return $rowData[$prefix];
+		}
+		/* from plain format (csv, ods, xlsx etc) */
+		$data = [];
+		foreach ($rowData as $field => $value) {
+			if (false === strpos($field, ':')) {
+				continue;
+			}
+			list($fieldPrefix, $field) = explode(':', $field);
+			if ($fieldPrefix == $prefix) {
+				$data[$field] = $value;
+			}
+		}
+		return $data;
     }
 
     /**

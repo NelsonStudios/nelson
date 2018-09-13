@@ -64,15 +64,15 @@ define([
             object.percent(0);
             object.percentWidth('0%');
             var url = this.url +     '?form_key='+ window.FORM_KEY;
+            url +=  '&id=' + job + '&file=' + file;
             this.currentAjax = this.urlAjax + '?file=' + file;
             var urlAjax = this.currentAjax;
 
             $('.run').attr("disabled", true);
             var self = this;
             this.loading(true);
-            storage.post(
-                url,
-                JSON.stringify({id: job, file: file})
+            storage.get(
+                url
             ).done(
                 function (response) {
                     if (response.result != false) {

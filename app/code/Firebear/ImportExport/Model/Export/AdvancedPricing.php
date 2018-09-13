@@ -114,6 +114,6 @@ class AdvancedPricing extends \Magento\AdvancedPricingImportExport\Model\Export\
                 break;
             }
         }
-        return [$writer->getContents(),$countes];
+        return [$writer->getContents(), $countes];
     }
 }

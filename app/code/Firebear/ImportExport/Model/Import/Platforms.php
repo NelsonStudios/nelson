@@ -61,7 +61,8 @@ class Platforms extends \Magento\Framework\DataObject
                             self::URL_DOWNLOAD,
                             ['type' => $platform . $link['suffix']]
                         ),
-                        'type' => $platform
+                        'type' => $platform,
+                        'entity' => isset($link['entity']) ? $link['entity'] : ''
                     ];
                 }
             }

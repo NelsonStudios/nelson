@@ -182,6 +182,7 @@ class Options implements OptionSourceInterface
         foreach ($this->helper->partCollection($specialAttributes) as $attribute) {
             $subOptions[] = ['label' => $attribute, 'value' => $attribute];
         }
+
         unset($specialAttributes);
         $AddFields = $this->productImportModel->getAddFields();
         foreach ($this->helper->partCollection($AddFields) as $attribute) {

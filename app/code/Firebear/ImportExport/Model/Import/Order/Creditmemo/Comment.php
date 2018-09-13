@@ -64,10 +64,10 @@ class Comment extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['creditmemos_creditmemos_comment'])) {
-			return false;
-		}		
-		return $this-> _explodeField($rowData['creditmemos_creditmemos_comment']);
+		$rowData = $this->_extractField($rowData, 'creditmemo_comment');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
+			? $rowData 
+			: false;
     }
 	
     /**

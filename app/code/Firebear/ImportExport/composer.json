@@ -4,10 +4,11 @@
 	"require" : {
 		"php" : "~5.5.0|~5.6.0|~7.0.0|~7.1",
 		"kunalvarma05/dropbox-php-sdk" : "0.2.*",
-		"salsify/json-streaming-parser":  "~6.0"
+		"salsify/json-streaming-parser":  "~6.0",
+		"tcdent/php-restclient": "^0.1.7"
 	},
 	"type" : "magento2-module",
-	"version" : "2.2.1",
+	"version" : "3.0.0",
 	"license" : "OSL-3.0",
 	"autoload" : {
 		"files" : [

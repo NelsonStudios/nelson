@@ -31,7 +31,7 @@ class Assistant extends AbstractHelper
             $explodeArray = explode($categorySeparator, $categories);
             foreach ($explodeArray as $categoryPath) {
                 if (!$this->matchSearch($categoryArrayAfterParse, $categoryPath)) {
-                    $categoryArrayAfterParse[] = $categoryPath;
+                    $categoryArrayAfterParse[] = trim($categoryPath);
                 }
             }
             $iterator++;

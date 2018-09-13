@@ -58,7 +58,7 @@ define(
                     pickerDefaultTimeFormat: 'h:mm a',
                     elementName: '',
                     number: '',
-                    typesEntity: ['cms_page', 'catalog_category', 'catalog_product', 'advanced_pricing', 'customer', 'customer_address', 'catalog_price_rule'],
+                    typesEntity: ['catalog_category', 'catalog_product', 'advanced_pricing', 'customer', 'customer_address', 'catalog_price_rule'],
                     validationParams: {
                         dateFormat: '${ $.outputDateFormat }'
                     },

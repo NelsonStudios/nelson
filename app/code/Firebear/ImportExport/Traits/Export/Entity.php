@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Traits\Export;
 trait Entity
 {
     /**
+     * @var int
+     */
+    protected $lastEntityId;
+
+    /**
      * @param $data
      *
      * @return array

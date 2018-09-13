@@ -58,10 +58,10 @@ define(
         return Acstract.extend(
             {
                 defaults: {
-                  imports: {
-                      'setOptionsAdv': '${$.parentName}.type_file:value'
-                  },
-                  sourceOptions:null
+                    imports: {
+                        setOptionsAdv: '${$.parentName}.type_file:value'
+                    },
+                    sourceOptions: null
                 },
                 initConfig: function (config) {
                     var options = config.options,
@@ -97,15 +97,17 @@ define(
                     }
                     return this;
                 },
-                setOptionsAdv: function(value) {
+                setOptionsAdv: function (value) {
+                    var isApi = reg.get('import_job_form.import_job_form.settings.use_api').value();
                     if (this.sourceOptions == null) {
                         this.sourceOptions = this.options();
                     }
                     var options = this.sourceOptions;
                     var prevValue = this.value();
                     var newOptions = [];
-                    _.each(options, function(element, index) {
-                        if (element.depends == "" || element.depends == value) {
+                    _.each(options, function (element, index) {
+                        if (isApi !== element.api) return;
+                        if (element.depends == "" || $.inArray(value, element.depends) !== -1) {
                             newOptions.push(element);
                         }
                     })

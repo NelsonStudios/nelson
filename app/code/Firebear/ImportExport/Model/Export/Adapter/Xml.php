@@ -6,28 +6,73 @@
 
 namespace Firebear\ImportExport\Model\Export\Adapter;
 
-class Xml extends \Magento\ImportExport\Model\Export\Adapter\AbstractAdapter
-{
+use Magento\Framework\Filesystem;
+use Magento\ImportExport\Model\Export\Adapter\AbstractAdapter;
+use Firebear\ImportExport\Model\Output\Xslt;
 
+/**
+ * Xml Export Adapter
+ */
+class Xml extends AbstractAdapter
+{
     /**
+     * XML Writer
+     *
      * @var \XMLWriter
      */
     protected $writer;
+    
+    /**
+     * Xslt Converter
+     *
+     * @var \Firebear\ImportExport\Model\Output\Xslt
+     */    
+    protected $xslt;
+    
+    /**
+     * Xsl Document
+     *
+     * @var string
+     */	
+	protected $xsl;
 
     /**
-     * Xml constructor.
-     * @param \Magento\Framework\Filesystem $filesystem
+     * Adapter Data
+     *
+     * @var []
+     */     
+    protected $_data;
+    
+    /**
+     * Initialize Adapter
+     * 
+     * @param Filesystem $filesystem
      * @param \XMLWriter $writer
+     * @param Xslt $xslt     
      * @param null $destination
+     * @param [] $data      
      */
     public function __construct(
-        \Magento\Framework\Filesystem $filesystem,
+        Filesystem $filesystem,
         \XMLWriter $writer,
-        $destination = null
+        Xslt $xslt,
+        $destination = null,
+        array $data = []
     ) {
         $this->writer = $writer;
+        $this->xslt = $xslt;
+        $this->_data = $data;
+        
+        if (!empty($data['xml_switch']) && isset($data['xslt'])) {
+			$this->xsl = $data['xslt'];
+        }        
+        
         register_shutdown_function([$this, 'destruct']);
-        parent::__construct($filesystem, $destination);
+        
+        parent::__construct(
+			$filesystem, 
+			$destination
+		);
     }
 
     /**
@@ -63,11 +108,19 @@ class Xml extends \Magento\ImportExport\Model\Export\Adapter\AbstractAdapter
     {
         return 'text/xml';
     }
-
+    
+    /**
+     * Get contents of export file
+     *
+     * @return string
+     */
     public function getContents()
     {
         $this->writer->endDocument();
-        return $this->writer->outputMemory();
+		$result = $this->writer->outputMemory();
+		return $this->xsl 
+			? $this->xslt->convert($result, $this->xsl)
+			: $result;
     }
 
     /**

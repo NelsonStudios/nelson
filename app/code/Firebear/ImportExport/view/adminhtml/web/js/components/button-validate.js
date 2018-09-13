@@ -165,7 +165,6 @@ define(
                                                 self.error($t(result.error));
                                             } else {
                                                   self.note($t('Import data validation is complete.'))
-
                                             }
                                             form.resolve(true);
                                         },

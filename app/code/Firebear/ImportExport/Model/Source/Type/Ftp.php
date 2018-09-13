@@ -179,7 +179,14 @@ class Ftp extends AbstractType
             $path = AbstractType::EXPORT_DIR . "/" . $name;
             if ($this->writeFile($path)) {
                 if ($client = $this->_getSourceClient()) {
-                    $sourceFilePath = $this->getData('file_path');
+                    $fileFormat = $model->getFileFormat();
+                    $currentDate = "";
+                    if ($this->getData('date_format')) {
+                        $format = $this->getData('date_format') ?? 'Y-m-d-hi';
+                        $currentDate = "-" . $this->timezone->date()->format($format);
+                    }
+                    $info = pathinfo($this->getData('file_path'));
+                    $sourceFilePath =  $info['dirname'] . '/' . $info['filename'] . $currentDate . '.' . $info['extension'];
                     $filePath = $this->directory->getAbsolutePath($path);
                     $result = $client->write($sourceFilePath, $filePath);
                     if (!$result) {

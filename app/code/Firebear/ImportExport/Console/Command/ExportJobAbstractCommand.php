@@ -55,6 +55,11 @@ class ExportJobAbstractCommand extends Command
 
     protected $debugMode;
 
+    /** @var \Magento\Framework\Json\DecoderInterface  */
+    protected $jsonDecoder;
+    /** @var \Magento\Framework\Json\EncoderInterface  */
+    protected $jsonEncoder;
+
     /**
      * ExportJobAbstractCommand constructor.
      * @param Job $job
@@ -62,8 +67,10 @@ class ExportJobAbstractCommand extends Command
      * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $repository
      * @param \Firebear\ImportExport\Model\ExportJobFactory $factory
      * @param \Magento\Framework\App\State $state
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Firebear\ImportExport\Logger\Logger $logger
      * @param \Firebear\ImportExport\Helper\Data $helper
+     * @param \Magento\Framework\Json\DecoderInterface $jsonDecoder
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
      */
     public function __construct(
         Job $job,
@@ -72,7 +79,9 @@ class ExportJobAbstractCommand extends Command
         \Firebear\ImportExport\Model\ExportJobFactory $factory,
         \Magento\Framework\App\State $state,
         \Firebear\ImportExport\Logger\Logger $logger,
-        \Firebear\ImportExport\Helper\Data $helper
+        \Firebear\ImportExport\Helper\Data $helper,
+        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder
     ) {
         parent::__construct();
         $this->job = $job;
@@ -82,6 +91,8 @@ class ExportJobAbstractCommand extends Command
         $this->state = $state;
         $this->logger = $logger;
         $this->helper = $helper;
+        $this->jsonDecoder = $jsonDecoder;
+        $this->jsonEncoder = $jsonEncoder;
     }
 
     /**

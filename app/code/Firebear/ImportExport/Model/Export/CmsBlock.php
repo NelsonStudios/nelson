@@ -40,6 +40,11 @@ class CmsBlock extends AbstractEntity
     /** @var LoggerInterface */
     protected $_logger;
 
+    /**
+     * @var \Firebear\ImportExport\Model\Source\Factory
+     */
+    protected $createFactory;
+
     protected $headerColumns = [];
 
     protected $blockFields = [
@@ -65,6 +70,12 @@ class CmsBlock extends AbstractEntity
      * @var Store
      */
     protected $store;
+
+    /**
+     * @var \Firebear\ImportExport\Helper\Data
+     */
+    protected $helper;
+
 
     /**
      * CmsBlock constructor.
@@ -119,7 +130,14 @@ class CmsBlock extends AbstractEntity
             ++$page;
             $entityCollection = $this->_getEntityCollection(true);
             $entityCollection->setOrder('block_id', 'asc');
-
+            if (isset($this->_parameters['last_entity_id'])
+                && $this->_parameters['last_entity_id'] > 0
+                && $this->_parameters['enable_last_entity_id'] > 0
+            ) {
+                $entityCollection->addFieldToFilter(
+                    BlockInterface::BLOCK_ID, ['gt' => $this->_parameters['last_entity_id']]
+                );
+            }
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
                 break;
@@ -129,6 +147,9 @@ class CmsBlock extends AbstractEntity
                 $writer->setHeaderCols($this->_getHeaderColumns());
             }
             foreach ($exportData as $dataRow) {
+                if ($this->_parameters['enable_last_entity_id'] > 0) {
+                    $this->lastEntityId = $dataRow[BlockInterface::BLOCK_ID];
+                }
                 $dd = $this->_customFieldsMapping($dataRow);
                 $writer->writeRow($dd);
                 $counts++;
@@ -139,7 +160,7 @@ class CmsBlock extends AbstractEntity
             }
         }
 
-        return [$writer->getContents(), $counts];
+        return [$writer->getContents(), $counts, $this->lastEntityId];
     }
 
     /**
@@ -343,6 +364,31 @@ class CmsBlock extends AbstractEntity
 
     public function getFieldColumns()
     {
-        return [];
+        $options = [];
+        $model = $this->createFactory->create('\Magento\Cms\Model\Block');
+        $fields = $this->describeTable($model);
+        $mergeFields = [];
+        foreach ($fields as $key => $field) {
+            $type = $this->helper->convertTypesTables($field['DATA_TYPE']);
+            $select = [];
+            if (isset($mergeFields[$key])) {
+                if (!$mergeFields[$key]['delete']) {
+                    $type = $mergeFields[$key]['type'];
+                    $select = $mergeFields[$key]['options'];
+                }
+            }
+            $options['cms_block'][] = ['field' => $key, 'type' => $type, 'select' => $select];
+        }
+
+        return $options;
+    }
+
+    protected function describeTable($model = null)
+    {
+        $resource = $model->getResource();
+        $table = $resource->getMainTable();
+        $fields = $resource->getConnection()->describeTable($table);
+
+        return $fields;
     }
 }

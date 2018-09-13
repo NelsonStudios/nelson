@@ -129,31 +129,34 @@ class Magento extends AbstractPlatform
         if ($rowData['product_type'] == 'configurable') {
             $newArray = [];
             $configuration = '';
-            $superSku = explode($this->separator, $rowData['_super_products_sku']);
-            $superAttr = explode($this->separator, $rowData['_super_attribute_code']);
-            $superOption = explode($this->separator, $rowData['_super_attribute_option']);
-            if (sizeof($superSku) > 0) {
-                foreach ($superSku as $key => $skuSuper) {
-                    $newArray[$skuSuper][] = $superAttr[$key] . "=" . $superOption[$key];
-                }
+            if (!isset($rowData['configurable_variations'])) {
+                $superSku = explode($this->separator, $rowData['_super_products_sku']);
+                $superAttr = explode($this->separator, $rowData['_super_attribute_code']);
+                $superOption = explode($this->separator, $rowData['_super_attribute_option']);
+                if (sizeof($superSku) > 0) {
+                    foreach ($superSku as $key => $skuSuper) {
+                        $newArray[$skuSuper][] = $superAttr[$key] . "=" . $superOption[$key];
+                    }
 
-                foreach ($newArray as $key => $array) {
-                    $configuration .= 'sku=' . $key;
-                    foreach ($array as $arrayItem) {
-                        $configuration .= $this->separator . $arrayItem;
-                    }
-                    if (next($newArray)) {
-                        $configuration .= "|";
+                    foreach ($newArray as $key => $array) {
+                        $configuration .= 'sku=' . $key;
+                        foreach ($array as $arrayItem) {
+                            $configuration .= $this->separator . $arrayItem;
+                        }
+                        if (next($newArray)) {
+                            $configuration .= "|";
+                        }
                     }
                 }
-            }
-            if (!empty($configuration)) {
-                $rowData['configurable_variations'] = $configuration;
-                unset($rowData['_super_products_sku']);
-                unset($rowData['_super_attribute_code']);
-                unset($rowData['_super_attribute_option']);
+                if (!empty($configuration)) {
+                    $rowData['configurable_variations'] = $configuration;
+                    unset($rowData['_super_products_sku']);
+                    unset($rowData['_super_attribute_code']);
+                    unset($rowData['_super_attribute_option']);
+                }
             }
         }
+
         $rowData = $this->changeTierPrices($rowData);
         if (isset($rowData['_attribute_set'])) {
             $rowData['_attribute_set'] = $this->getAttributeSetName($rowData['_attribute_set']);

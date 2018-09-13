@@ -79,11 +79,8 @@ class Tax extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		if (empty($rowData['taxs'])) {
-			return false;
-		}
-		$rowData = $this-> _explodeField($rowData['taxs']);
-		return ($rowData && !$this->isEmptyRow($rowData)) 
+		$rowData = $this->_extractField($rowData, 'tax');
+		return (count($rowData) && !$this->isEmptyRow($rowData)) 
 			? $rowData 
 			: false;
     }

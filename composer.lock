@@ -1,64 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "35699fa63c676a898f72379908e77a64",
+    "content-hash": "c98afd6c72131821f01ed79bf3099030",
     "packages": [
-        {
-            "name": "amasty/aminvisiblecaptcha",
-            "version": "2.1.0",
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.amasty.com/community/packages/aminvisiblecaptcha-2.1.0.zip",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "amasty/base": "*",
-                "php": "~5.6.5|7.0.2|7.0.4|~7.0.6|~7.1.0"
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "Amasty\\InvisibleCaptcha\\": ""
-                }
-            },
-            "license": [
-                "Commercial"
-            ],
-            "description": "Amasty Google Invisible Captcha"
-        },
-        {
-            "name": "amasty/base",
-            "version": "1.4.4",
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.amasty.com/community/packages/base-1.4.4.zip",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "php": "~5.6.5|7.0.2|7.0.4|~7.0.6|~7.1.0"
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "Amasty\\Base\\": ""
-                }
-            },
-            "license": [
-                "Commercial"
-            ],
-            "description": "Amasty Base"
-        },
         {
             "name": "andreyco/instagram",
             "version": "v3.0",
@@ -5833,6 +5780,12 @@
         {
             "name": "magento/product-community-edition",
             "version": "2.2.3",
+            "dist": {
+                "type": "zip",
+                "url": "https://repo.magento.com/archives/magento/product-community-edition/magento-product-community-edition-2.2.3.0.zip",
+                "reference": null,
+                "shasum": "6f48d20bdce5c5f7dc1e45de6b369aa4ea6abb64"
+            },
             "require": {
                 "braintree/braintree_php": "3.27.0",
                 "colinmollenhour/cache-backend-file": "1.4",
