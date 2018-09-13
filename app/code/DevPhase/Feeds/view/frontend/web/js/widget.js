@@ -127,6 +127,9 @@ FeconSocialWidget.prototype.html_frame = function ( frame ) {
 				'</div>' +
 				'<div class="fsw-item-details" style="display: none;">';
 		if ( this.$wrap.hasClass('fsw-youtube')) {
+			//Youtube hashtag and mentions
+			item.description = item.description.replace(/@(\S*)/g,'<a href="https://www.youtube.com/user/$1">@$1</a>');
+			item.description = item.description.replace(/#(\S*)/g,'<a href="https://www.youtube.com/results?search_query=%23$1">#$1</a>');
 			html += '' +
 					'<div class="fsw-video-wrap" data-video-id="' + item.id + '"></div>' +
 					'<div class="fsw-video-right">' +
@@ -135,6 +138,9 @@ FeconSocialWidget.prototype.html_frame = function ( frame ) {
 					'</div>';
 		}
 		if ( this.$wrap.hasClass('fsw-instagram')) {
+			//Instagram hashtag and mentions
+			item.description = item.description.replace(/@(\S*)/g,'<a href="https://www.instagram.com/$1/">@$1</a>');
+			item.description = item.description.replace(/#(\S*)/g,'<a href="https://www.instagram.com/explore/tags/$1">#$1</a>');
 			html += '' +
 					'<div class="fsw-photo">' +
 						'<div class="js-lazy" data-bg="'+item.image+'"></div>' +
