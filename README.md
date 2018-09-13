@@ -333,7 +333,7 @@ if ($err) {
   }
 }
 ```
-### Example with Postam (with valid Authorization access token)
+### Example with cURL (with valid Authorization access token)
 ``` php
 <?php
 
