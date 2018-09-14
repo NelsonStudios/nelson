@@ -1,4 +1,4 @@
-body.category-attachments:not(.catalog-product-view) {
+body.catalog-category-view {
     overflow-x: hidden;
     .page-wrapper {
         main#maincontent {
@@ -6,24 +6,25 @@ body.category-attachments:not(.catalog-product-view) {
                 display: block;
                 text-align: center;
                 h1.page-title {
+                  overflow: hidden;
+                  color: black;
+                  display: block;
+                  text-align: center;
+                  font-size: 3.4rem;
+                  font-weight: 600;
                     span {
                         position: relative;
-                        text-transform: uppercase;
-                        color: black;
-                        font-size: 44px;
-                        font-weight: 600;
                         &:before,
                         &:after {
                           content: "";
                           position: absolute;
-                          height: 14px;
-                          border-bottom: 3px solid @fecon-theme-color;
+                          height: 3px;
+                          background-color: @fecon-theme-color;
                           top: 8px;
-                          width: 178%;
+                          width: 200%;
                           left: 111%;
                         }
                         &:before {
-                          width: 175%;
                           left: -188%;
                         }
                     }
@@ -51,7 +52,7 @@ body {
                                             span {
                                                font-size: 20px;
                                                color: @fecon-theme-color;
-                                               padding: 20px;  
+                                               padding: 20px;
                                             }
                                             span.label {
                                                 display: none;
@@ -72,7 +73,7 @@ body {
                                             span {
                                                 font-size: 20px;
                                                 color: @color-white;
-                                                padding: 20px;      
+                                                padding: 20px;
                                             }
                                             .label {
                                                 display: none;
