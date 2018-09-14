@@ -25,8 +25,8 @@ class Images extends \Magento\Cms\Helper\Wysiwyg\Images
     {
         $fileurl = $this->getCurrentUrl() . $filename;
         $mediaUrl = $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
-        $mediaPath = str_replace($mediaUrl, '', $fileurl);
-        $directive = sprintf('{{media url="%s"}}', $mediaPath);
+        // $mediaPath = str_replace($mediaUrl, '', $fileurl);
+        $directive = sprintf('%s', $fileurl);
         if ($renderAsTag) {
             $path_info = pathinfo($fileurl);
             if($path_info['extension'] == 'pdf'){
