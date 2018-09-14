@@ -1,32 +1,42 @@
 body.catalog-category-view {
-    overflow-x: hidden;
     .page-wrapper {
-        main#maincontent {
-            .page-title-wrapper {
-                display: block;
-                text-align: center;
-                h1.page-title {
-                  overflow: hidden;
-                  color: black;
-                  display: block;
-                  text-align: center;
-                  font-size: 3.4rem;
-                  font-weight: 600;
-                    span {
-                        position: relative;
-                        &:before,
-                        &:after {
-                          content: "";
-                          position: absolute;
-                          height: 3px;
-                          background-color: @fecon-theme-color;
-                          top: 8px;
-                          width: 200%;
-                          left: 111%;
-                        }
-                        &:before {
-                          left: -188%;
-                        }
+      > .breadcrumbs {
+        text-align: center;
+      }
+    }
+    overflow-x: hidden;
+    main#maincontent {
+        .page-title-wrapper {
+            display: block;
+            text-align: center;
+            h1.page-title {
+              overflow: hidden;
+              color: black;
+              display: block;
+              text-align: center;
+              font-size: 3.4rem;
+              font-weight: 500;
+              text-transform: uppercase;
+                span {
+                    position: relative;
+                    display: inline-block;
+                    &:before,
+                    &:after {
+                      content: "";
+                      position: absolute;
+                      height: 4px;
+                      background-color: @fecon-theme-color;
+                      top: 50%;
+                      width: 50vw;
+                      transform: translateY(-50%);
+                    }
+                    &:before {
+                      right: 100%;
+                      margin-right: 10px;
+                    }
+                    &:after {
+                      left: 100%;
+                      margin-left: 10px;
                     }
                 }
             }
