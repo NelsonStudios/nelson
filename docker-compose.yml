@@ -33,7 +33,7 @@ services:
     depends_on:
       - redis
     user: root
-#    command: /usr/local/bin/cronstart
+    command: /usr/local/bin/cronstart
     links:
       - phpfpm
     tty: true
