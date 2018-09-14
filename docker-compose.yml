@@ -22,8 +22,7 @@ services:
     links:
       - phpmyadmin
       - mailcatcher
-    volumes: *appvolumes
-    command: php bin/magento setup:upgrade
+    volumes: *appvolumes    
     networks:
       default:
         aliases:
