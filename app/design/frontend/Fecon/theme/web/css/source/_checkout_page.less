@@ -1,8 +1,10 @@
-/* 
+/*
     Created on : May 15, 2018, 5:00:35 PM
     Author     :  <fecon.com>
 */
-
+.cart-container {
+  margin-top: 4rem;
+}
 .iwd_opc_wrapper {
     padding: 40px;
     box-shadow: 6px 10px 49px @color-gray-darken1;
@@ -52,10 +54,30 @@
         }
     }
 
+    #iwd_opc_shipping_method_group {
+      background: #fff;
+    }
+
     .iwd_opc_section_delimiter {
         & + .iwd_opc_section_delimiter {
             display: none;
         }
+    }
+    .selectize-control.single {
+      .selectize-dropdown.single {
+        z-index: 9999;
+      }
+      .selectize-input {
+          &:after {
+            color: #fff;
+            font-size: 16px;
+            right: 0;
+            top: 0;
+            background: @minicart-green;
+            padding: 11px 14px;
+            font-weight: bold;
+          }
+      }
     }
 }
 
@@ -67,6 +89,38 @@
         }
     }
 }
+
+//readonly fix
+.iwd_main_wrapper {
+  .iwd_opc_field.iwd_opc_input:disabled,
+  .field.iwd_opc_input:disabled,
+  .iwd_opc_field .input-text:disabled,
+  .field .input-text:disabled,
+  .iwd_opc_field textarea:disabled,
+  .field textarea:disabled,
+  .iwd_opc_field .iwd_opc_hosted_field:disabled,
+  .field .iwd_opc_hosted_field:disabled,
+  .iwd_opc_field.iwd_opc_textarea:disabled,
+  .field.iwd_opc_textarea:disabled,
+  .iwd_opc_field.iwd_opc_input[readonly],
+  .field.iwd_opc_input[readonly],
+  .iwd_opc_field .input-text[readonly],
+  .field .input-text[readonly],
+  .iwd_opc_field textarea[readonly],
+  .field textarea[readonly],
+  .iwd_opc_field .iwd_opc_hosted_field[readonly],
+  .field .iwd_opc_hosted_field[readonly],
+  .iwd_opc_field.iwd_opc_textarea[readonly],
+  .field.iwd_opc_textarea[readonly]
+  {
+    opacity: 0.9;
+    background-color: #eaeaea;
+    &:after {
+      color: @minicart-green;
+    }
+  }
+}
+
 
 //
 //    Desktop
