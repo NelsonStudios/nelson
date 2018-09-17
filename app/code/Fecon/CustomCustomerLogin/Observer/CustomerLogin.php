@@ -53,14 +53,9 @@ class CustomerLogin implements ObserverInterface
         // $customer = $observer->getEvent()->getCustomer();
         // echo $customer->getName(); //Get customer name
         // exit;
-        $customer = $observer->getEvent()->getCustomer();
+        // $customer = $observer->getEvent()->getCustomer();
         
-        $data = $this->helper->checkDocumotoUser($customer);
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-        exit;
-        die('OBSERVER');
+        // $data = $this->helper->checkDocumotoUser($customer);
         // if($this->checkDocumotoUser($customer)) {// Check if it's a Documoto user
             //// Collect customer data
             
