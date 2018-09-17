@@ -1,9 +1,11 @@
 .page-wrapper {
-    .breadcrumbs {
-        padding: 40px 0 10px !important;
-        background-color: transparent !important;
+    > .breadcrumbs {
+        padding: 4rem 0 0 !important;
+        margin: 0;
+        background-color: transparent !important;        
         ul.items {
             background-color: transparent;
+            margin: 0 !important;
             li:first-child:before {
                 content: none;
             }
@@ -12,17 +14,22 @@
             }
             li.item {
                 font-size: 14px;
-                color: @color-gray-darken10 !important;
+                color: @color-gray-lighten3 !important;
                 display: inline;
                 text-transform: uppercase;
                 a {
-                    color: @color-gray-darken5;
+                    color: @color-gray-lighten3 !important;
                     overflow: visible;
                     float: none;
                     width: auto;
                     text-indent: 0;
+                    font-weight: normal;
                 }
-                color: @color-gray-darken5;
+                strong {
+                  font-weight: normal;
+                  color: @color-gray-lighten3 !important;
+                }
+
             }
             li.item.home {
                 a {
