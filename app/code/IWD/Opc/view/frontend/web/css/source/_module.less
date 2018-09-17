@@ -11,22 +11,11 @@
 @border_color: #E5E5E5;
 @sub_color: #999999;
 
-//@active_color: blue;
-//@active_color_hover: darkblue;
-//@disabled_opacity: 0.4;
-//@error_color: yellow;
-//@focus_color: red;
-//
-//@title_color: black;
-//@general_color: pink;
-//@border_color: grey;
-//@sub_color: lightblue;
-
 @loader_color_spinner: @sub_color;
 @loader_color_spinner_background: fade(@border_color, 40%);
 
 @font_family_awesome: 'FontAwesome';
-@default_border_radius: 4px;
+@default_border_radius: 0;//all design without radius
 
 @default_padding_top: 8px;
 @default_padding_right: 16px;
@@ -135,7 +124,7 @@
         font-size: 12px;
         line-height: 17px;
         width: 100%;
-        border-radius: 4px;
+        border-radius: 0;
         &:focus {
           box-shadow: 0 0 3px 1px @focus_color;
         }
@@ -211,6 +200,7 @@
         max-height: 368px;
       }
       border: 1px solid @border_color;
+      background-color: #fff;
       outline: none;
       border-radius: @default_border_radius;
       width: 100%;
@@ -331,6 +321,10 @@
       &:disabled, &[readonly] {
         opacity: @disabled_opacity;
         pointer-events: none;
+        background-color: fade(@border_color, 90%);
+        &:after {
+          color: @active_color;
+        }
       }
       &.mage-error {
         border-color: @error_color;
