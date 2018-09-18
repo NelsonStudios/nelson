@@ -5,6 +5,7 @@ function($) {
   "use strict";
 
   $(document).ready(function($) {
+    $("body").addClass("page-ready");
     function applyFixesOnWindowsBrowsers() {
       /* Hack to detect Edge or Firefox under windows 10 to fix style issue */
       if ((navigator.userAgent.indexOf("Edge") !== -1 || navigator.userAgent.indexOf("Firefox") !== -1) && navigator.userAgent.indexOf("Windows") !== -1) {
