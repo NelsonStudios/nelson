@@ -42,6 +42,14 @@ body.catalog-category-view {
             }
         }
     }
+
+    &.page-ready {
+      .product-item-photo {
+         > a:not(.weltpixel-quickview):before {
+            display: none!important;
+         }
+      }
+    }
 }
 body {
     .page-wrapper {
@@ -104,6 +112,7 @@ body {
                                     margin-bottom: -1px;
                                     .product-item-info {
                                         border: 1px solid @color-gray-lighten1;
+                                        min-height: 60vh;padding-top: 10px;
                                         .product-item-photo {
                                             height: 432px;
                                             width: 75%;
