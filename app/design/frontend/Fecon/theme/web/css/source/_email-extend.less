@@ -10,6 +10,22 @@
 
 @import url("@{baseUrl}css/email-fonts.css");
 
+//general styles
+p {
+  line-height: 24px;
+  line-height: 2.4rem;
+  font-size: 12px;
+  font-size: 1.2rem;
+  a {
+   background-color: none!important;
+   background-color: transparent!important;
+   color: @fecon-theme-color!important;
+  }
+}
+h1,h2,h3,h4 {
+  font-weight: bold;
+}
+
 .header {
     background-color: @email__background-color;
     padding: @email-body__padding;
@@ -71,7 +87,7 @@
     border-radius: 4px;
     padding: 25px;
     vertical-align: top;
-    
+
     td {
         width: 33%;
         padding-bottom: 25px;

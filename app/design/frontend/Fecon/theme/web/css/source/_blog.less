@@ -10,6 +10,20 @@ body.blog-category-view {
                     color: @fecon-theme-color;
                 }
             }
+            .c-replyform {
+              button {
+                  background-color: @fecon-theme-color;
+                  color: #fff;
+                  border: 1px solid @fecon-theme-color;
+                  border-radius: 0 !important;
+                  line-height: 20px;
+                  margin: 5px;
+                  &:hover {
+                    background-color: #fff;
+                    color: @fecon-theme-color;
+                  }
+              }
+            }
             .columns {
                 .column.main {
                     .category-content {
@@ -130,7 +144,7 @@ body.blog-category-view {
                                                 }
                                                 .p-name {
                                                     font-size: 16px;
-                                                } 
+                                                }
                                                 .p-text {
                                                     font-size: 14px;
                                                 }
@@ -145,12 +159,13 @@ body.blog-category-view {
                         }
                     }
                 }
+
                 .sidebar-additional {
                     display: inline-block;
                     .widget.block {
                         .block-title {
                             strong {
-                                font-size: 18px; 
+                                font-size: 18px;
                                 color: @color-gray-lighten3;
                             }
                         }
@@ -174,6 +189,7 @@ body.blog-category-view {
                         }
                     }
                 }
+
             }
         }
     }
