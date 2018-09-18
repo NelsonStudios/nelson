@@ -8,7 +8,7 @@
         "AFL-3.0"
     ],
     "require": {
-        "magento/product-community-edition": "2.2.4",
+        "magento/product-community-edition": "2.2.5",
         "composer/composer": "@alpha",
         "andreyco/instagram": "3.0.0",
         "magepal/magento2-gmailsmtpapp": "^2.5",
