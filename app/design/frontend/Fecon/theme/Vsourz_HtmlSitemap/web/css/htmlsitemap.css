@@ -13,12 +13,12 @@
 	overflow: hidden;
 	position: relative;
 }
-.htmlsitemap-container .top-sitemap-container a,
-.htmlsitemap-container .top-sitemap-container a:visited,
-.htmlsitemap-container .top-sitemap-container a:focus {
+.htmlsitemap-container a,
+.htmlsitemap-container a:visited,
+.htmlsitemap-container a:focus {
   color: #333;
 }
-.htmlsitemap-container .top-sitemap-container a:hover {
+.htmlsitemap-container a:hover {
   color: #2daa77;
 }
 .htmlsitemap-container .products-container{
