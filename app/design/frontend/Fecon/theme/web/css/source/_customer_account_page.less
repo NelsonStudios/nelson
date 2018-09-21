@@ -19,9 +19,13 @@
 .wishlist-index-index,
 .multishipping-checkout-login,
 .multishipping-checkout-addresses,
-.multishipping-checkout-address-newshipping {
+.multishipping-checkout-address-newshipping,
+.multishipping-checkout-shipping,
+.multishipping-checkout-billing {
     .page-wrapper {
+        background: url('../images/background_fecon.png') repeat;
         #maincontent {
+            background: url('../images/background_fecon.png') repeat;
             .page-title-wrapper {
                 .page-title {
                     color: @fecon-theme-color;
@@ -59,6 +63,44 @@
                         .actions-toolbar {
                             button {
                                 height: 40px;
+                            }
+                        }
+                    }
+                    .form.multicheckout.shipping,
+                    .form.multicheckout.billing {
+                        .actions-toolbar {
+                            button {
+                                height: 40px;
+                            }
+                            .secondary {
+                                .action.back {
+                                    color: @fecon-theme-color;
+                                }
+                            }
+                        }
+                        .block-content {
+                            .box-billing-address,
+                            .box-billing-method,
+                            .box-shipping-address,
+                            .box-shipping-method,
+                            .box-items {
+                                .box-title, .box-actions {
+                                    background-color: @color-gray-darken1;
+                                    color: @color-white;
+                                    a.action {
+                                        font-size: 12px;
+                                        color: @fecon-theme-color;
+                                    }
+                                }
+                                .box-content {
+                                    color: @color-white;
+                                    background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
+                                    linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
+                                    repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+                                }
+                                a {
+                                    color: @fecon-theme-color;
+                                }
                             }
                         }
                     }
