@@ -13,12 +13,20 @@ body {
                         linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
                         repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
                         form.form-cart {
+                          @media (min-width: 490px) and (max-width: 980px) {
+                            //fix for small tablet and iPad 2/3
+                            overflow-x: scroll;
+                          }
                             .cart.table-wrapper {
                                 #shopping-cart-table {
                                     thead {
                                         tr {
                                             th {
                                                 color: @color-white;
+                                                &:last-child {
+                                                  text-align: right;
+                                                  padding-right: 1px;
+                                                }
                                             }
                                         }
                                     }
@@ -27,15 +35,18 @@ body {
                                             td.col.item {
                                                 a.product-item-photo {
                                                     span.product-image-container {
-                                                        background: transparent;
-                                                        border: none;
+                                                      background: #fff;
+                                                      border: 2px solid desaturate(@fecon-theme-color,20%);
                                                     }
                                                 }
                                                 .product-item-details {
                                                     .product-item-name {
                                                         a {
-                                                           color: @fecon-theme-color;
-                                                        } 
+                                                           color: @color-white;
+                                                           &:hover {
+                                                              color: @fecon-theme-color;
+                                                           }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -66,10 +77,12 @@ body {
                                                 }
                                             }
                                             td.col.subtotal {
+                                                text-align: right;
+                                                padding-right: 1px;
                                                 .price-excluding-tax {
                                                     .cart-price {
                                                         .price {
-                                                            color: @fecon-theme-color;
+                                                            color: @color-white;
                                                         }
                                                     }
                                                 }
@@ -79,27 +92,92 @@ body {
                                             .actions-toolbar {
                                                 a {
                                                     color: @fecon-theme-color;
-                                                }
-                                                a.action {
+                                                    background-color: white;
+                                                    padding: 0;
+                                                    width: 25px;
+                                                    height: 26px;
+                                                    line-height: 24px;
+                                                    text-align: center;
+                                                    border-radius: 50%;
+                                                    border: 1px solid #00aa73;
                                                     &:before {
                                                         color: @fecon-theme-color;
                                                     }
+                                                    &:hover {
+                                                      background-color: @fecon-theme-color;
+                                                      &:before {
+                                                          color: white;
+                                                      }
+                                                    }
+                                                    &.action-delete {
+                                                      color: @color-red;
+                                                      border-color: @color-red;
+                                                      &:before {
+                                                        color: @color-red;
+                                                      }
+                                                      &:hover {
+                                                        background-color: @color-red;
+                                                        &:before {
+                                                          color: @color-white;
+                                                        }
+                                                      }
+                                                    }
                                                 }
+
                                             }
                                         }
                                     }
                                 }
                             }
+
+                            button {
+                              &.action {
+                                &.update {
+                                  padding-right: 2em;
+                                  position: relative;
+                                  &:after {
+                                    color: #fff;
+                                    content: "\f826";
+                                    font-family: 'porto-icons';
+                                    font-size: 10px;
+                                    position: absolute;
+                                    right: 3px;
+                                    top: 50%;
+                                    -webkit-transition: all .5s ease-in-out;
+                                       -moz-transition: all .5s ease-in-out;
+                                            transition: all .5s ease-in-out;
+                                    -webkit-transform: translate(0,-50%);
+                                       -moz-transform: translate(0,-50%);
+                                            transform: translate(0,-50%);
+                                    -webkit-font-smoothing: antialiased;
+                                    font-size: 1.2em;
+                                  }
+                                  &:hover {
+                                    background-color: @color-white;
+                                    border-color: @fecon-theme-color;
+                                    color: @fecon-theme-color;
+                                    &:after {
+                                      right: 7px;
+                                      color: @fecon-theme-color;
+                                    }
+                                  }
+                                }
+                              }
+                            }
                         }
                         .cart-discount {
                             .title {
                                 strong {
-                                    color: @fecon-theme-color;
+                                    color: @color-white;
                                 }
                             }
                             .content {
                                 form {
                                     .fieldset {
+                                      &.coupon {
+                                        input {
+                                          min-width: 100px;
+                                        }
                                         .actions-toolbar {
                                             .primary {
                                                 button {
@@ -107,6 +185,7 @@ body {
                                                 }
                                             }
                                         }
+                                      }
                                     }
                                 }
                             }
@@ -116,8 +195,72 @@ body {
                             background-color: @color-white;
                             .checkout-methods-items {
                                 li {
-                                    .action.multicheckout {
+                                    .action {
+                                      &.checkout {
+                                        position: relative;
+                                        &:after {
+                                          visibility: hidden;
+                                          color: @fecon-theme-color;
+                                          content: "\f801";
+                                          font-family: 'porto-icons';
+                                          position: absolute;
+                                          right: 1.5em;
+                                          top: 50%;
+                                          -webkit-transition: all .5s ease-in-out;
+                                             -moz-transition: all .5s ease-in-out;
+                                                  transition: all .5s ease-in-out;
+                                          -webkit-transform: translateY(-50%);
+                                             -moz-transform: translateY(-50%);
+                                                  transform: translateY(-50%);
+                                          -webkit-font-smoothing: antialiased;
+                                          font-size: 2em;
+                                        }
+
+                                        &:hover {
+                                          &:after {
+                                            visibility: visible;
+                                            right: .5em;
+                                          }
+                                        }
+                                      }
+                                      &.multicheckout {
+                                        position: relative;
                                         color: @fecon-theme-color;
+                                        border: 1px solid @fecon-theme-color;
+                                        background-color: #fff;
+                                        padding: 1em;
+                                        width: 100%;
+                                        text-transform: uppercase;
+                                        text-decoration: none;
+                                        display: block;
+
+                                        &:after {
+                                          color: #fff;
+                                          content: "\f801";
+                                          font-family: 'porto-icons';
+                                          position: absolute;
+                                          right: 1.5em;
+                                          top: 50%;
+                                          -webkit-transition: all .5s ease-in-out;
+                                             -moz-transition: all .5s ease-in-out;
+                                                  transition: all .5s ease-in-out;
+                                          -webkit-transform: translateY(-50%);
+                                             -moz-transform: translateY(-50%);
+                                                  transform: translateY(-50%);
+                                          -webkit-font-smoothing: antialiased;
+                                          font-size: 2em;
+                                        }
+
+                                        &:hover {
+                                          text-decoration: none;
+                                          color: #fff;
+                                          background-color: @fecon-theme-color;
+
+                                          &:after {
+                                            right: .5em;
+                                          }
+                                        }
+                                      }
                                     }
                                 }
                             }
