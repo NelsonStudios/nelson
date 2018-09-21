@@ -47,7 +47,7 @@ class ApiHelper extends SoapClient
             $partInfo = $this->dataHandler->parsePartData($data);
             $response = $this->execRequest("GetPartInfo", $partInfo);
         } else {
-            $response = ['error'];
+            $response = ['errors' => $errors];
         }
         
 
