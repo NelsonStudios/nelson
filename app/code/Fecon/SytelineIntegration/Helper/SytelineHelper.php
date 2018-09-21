@@ -148,12 +148,10 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function logDataErrors($errors, $orderId = null, $productId = null)
     {
-        if (isset($errors['errors'])) {
-            foreach ($errors['errors'] as $error) {
-                $entity = $orderId ? 'Order' . ' Id: ' . $orderId : 'Product' . ' Id: ' . $productId;
+        foreach ($errors['errors'] as $error) {
+            $entity = $orderId ? 'Order' . ' Id: ' . $orderId : 'Product' . ' Id: ' . $productId;
 
-                $this->logger->err($entity . ' - Error: ' . $error);
-            }
+            $this->logger->err($entity . ' - Error: ' . $error);
         }
     }
 
