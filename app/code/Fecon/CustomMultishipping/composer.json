@@ -1,0 +1,22 @@
+{
+    "name": "fecon/module-custommultishipping",
+    "description": "Extend the functionality of the mutishipping built-in behavior",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "email": "fecon.com",
+            "name": ""
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Fecon\\CustomMultishipping\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

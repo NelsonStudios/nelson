@@ -48,7 +48,8 @@
                             </div>
                         </td>
                         <td class="col choose-carrier" data-th="<?= $block->escapeHtml(__('Choose Carrier')) ?>">
-                            TEST for NOW.
+                            <input type="checkbox" name="choose_carrier[<?= $_index ?>]" class="choose-carrier-input" value="1">
+                            <label class="choose-carrier-label"><?php echo __('Split to choose a different carrier.') ?></label>
                         </td>
                         <td class="col address" data-th="<?= $block->escapeHtml(__('Send To')) ?>">
                             <?php if ($_item->getProduct()->getIsVirtual()): ?>

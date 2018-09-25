@@ -12,6 +12,7 @@ return [
         'Fecon_AskAnExpert' => 1,
         'Fecon_BackendConfig' => 1,
         'Fecon_CustomCustomerLogin' => 1,
+        'Fecon_CustomMultishipping' => 1,
         'Fecon_EditorPdf' => 1,
         'Fecon_ExternalCart' => 1,
         'Fecon_Filterproducts' => 1,

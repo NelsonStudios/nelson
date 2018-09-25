@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <referenceBlock name="checkout_addresses">
+        <action method="setTemplate">
+            <argument name="template" xsi:type="string">Fecon_CustomMultishipping::checkout/addresses.phtml</argument>
+        </action>
+    </referenceBlock>
+    <referenceBlock name="checkout_shipping">
+        <action method="setTemplate">
+            <argument name="template" xsi:type="string">Fecon_CustomMultishipping::checkout/shipping.phtml</argument>
+        </action>
+    </referenceBlock>
+</page>
