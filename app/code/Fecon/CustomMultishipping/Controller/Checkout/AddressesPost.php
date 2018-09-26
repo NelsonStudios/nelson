@@ -35,7 +35,12 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
             /* Changes will be added here.. */
                 
             if ($shipToInfo = $this->getRequest()->getPost('ship')) {
-                $this->_getCheckout()->setShippingItemsInformation($shipToInfo);
+                if($chooseCarrierInfo = $this->getRequest()->getPost('choose_carrier')) {
+                    $this->_getCheckout()->setShippingItemsInformation($shipToInfo, $chooseCarrierInfo);
+                } else {
+                    $this->_getCheckout()->setShippingItemsInformation($shipToInfo);
+                    
+                }
             }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->messageManager->addError($e->getMessage());

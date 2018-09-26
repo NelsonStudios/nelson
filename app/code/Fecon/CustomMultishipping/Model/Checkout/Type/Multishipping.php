@@ -271,7 +271,7 @@ class Multishipping extends \Magento\Framework\DataObject
      * Initialize multishipping checkout.
      * Split virtual/not virtual items between default billing/shipping addresses
      *
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function _init()
@@ -352,7 +352,7 @@ class Multishipping extends \Magento\Framework\DataObject
      *
      * @param int $addressId
      * @param int $itemId
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      */
     public function removeAddressItem($addressId, $itemId)
     {
@@ -403,12 +403,13 @@ class Multishipping extends \Magento\Framework\DataObject
      * )
      *
      * @param array $info
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @param array $carrierInfo
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @throws \Magento\Framework\Exception\LocalizedException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function setShippingItemsInformation($info)
+    public function setShippingItemsInformation($info, $carrierInfo = null)
     {
         if (is_array($info)) {
             $allQty = 0;
@@ -437,7 +438,6 @@ class Multishipping extends \Magento\Framework\DataObject
                     $this->_addShippingItem($quoteItemId, $data);
                 }
             }
-
             $this->prepareShippingAssignment($quote);
 
             /**
@@ -492,7 +492,7 @@ class Multishipping extends \Magento\Framework\DataObject
      * @param int $quoteItemId
      * @param array $data array('qty'=>$qty, 'address'=>$customerAddressId)
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -548,7 +548,7 @@ class Multishipping extends \Magento\Framework\DataObject
      *
      * @param int $addressId customer address id
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      */
     public function updateQuoteCustomerShippingAddress($addressId)
     {
@@ -575,7 +575,7 @@ class Multishipping extends \Magento\Framework\DataObject
      *
      * @param int $addressId customer address id
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      */
     public function setQuoteCustomerBillingAddress($addressId)
     {
@@ -601,7 +601,7 @@ class Multishipping extends \Magento\Framework\DataObject
      * Assign shipping methods to addresses
      *
      * @param  array $methods
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setShippingMethods($methods)
@@ -628,7 +628,7 @@ class Multishipping extends \Magento\Framework\DataObject
      * Set payment method info to quote payment
      *
      * @param array $payment
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setPaymentMethod($payment)
@@ -715,7 +715,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * Validate quote data
      *
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _validate()
@@ -768,7 +768,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * Create orders per each quote address
      *
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      * @throws \Exception
      */
     public function createOrders()
@@ -863,7 +863,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * Collect quote totals and save quote object
      *
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      */
     public function save()
     {
@@ -875,7 +875,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * Specify BEGIN state in checkout session whot allow reinit multishipping checkout
      *
-     * @return \Magento\Multishipping\Model\Checkout\Type\Multishipping
+     * @return \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping
      */
     public function reset()
     {

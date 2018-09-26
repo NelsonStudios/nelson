@@ -3,7 +3,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace Magento\Multishipping\Model\Checkout\Type\Multishipping;
+namespace Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping;
 
 use Magento\Framework\ObjectManager\TMap;
 use Magento\Framework\ObjectManager\TMapFactory;
