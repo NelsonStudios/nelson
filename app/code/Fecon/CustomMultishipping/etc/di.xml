@@ -2,30 +2,17 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     
     <preference for="Magento\Multishipping\Controller\Checkout\Addresses" type="Fecon\CustomMultishipping\Controller\Checkout\Addresses"/>
-
     <preference for="Magento\Multishipping\Controller\Checkout\AddressesPost" type="Fecon\CustomMultishipping\Controller\Checkout\AddressesPost"/>
-    
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping"/>
-    
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\State" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State"/>
-    
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory"/>
-    
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderPool" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderPool"/>
-    
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderInterface" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderInterface"/>
-    
     <preference for="Magento\Multishipping\Block\Checkout\Addresses" type="Fecon\CustomMultishipping\Block\Checkout\Addresses"/>
-    
     <preference for="Magento\Multishipping\Block\Checkout\Shipping" type="Fecon\CustomMultishipping\Block\Checkout\Shipping"/>
-
     <preference for="Magento\Multishipping\Block\Checkout\Billing" type="Fecon\CustomMultishipping\Block\Checkout\Billing"/>
-    
     <preference for="Magento\Multishipping\Block\Checkout\Overview" type="Fecon\CustomMultishipping\Block\Checkout\Overview"/>
-
     <preference for="Magento\Multishipping\Block\Checkout\Billing\Items" type="Fecon\CustomMultishipping\Block\Checkout\Billing\Items"/>
-
     <preference for="Magento\Multishipping\Block\Checkout\Payment\Info" type="Fecon\CustomMultishipping\Block\Checkout\Payment\Info"/>
-
     <preference for="Magento\Payment\Model\Method\SpecificationInterface" type="Magento\Payment\Model\Method\Specification\Composite"/>
 </config>
