@@ -173,6 +173,13 @@ class Multishipping extends \Magento\Framework\DataObject
     private $dataObjectHelper;
 
     /**
+     * Virtual Addresses created
+     *
+     * @var array
+     */
+    protected $_virtualAddressesIds;
+
+    /**
      * Constructor
      *
      * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -433,11 +440,29 @@ class Multishipping extends \Magento\Framework\DataObject
                 $quote->removeAddress($address->getId());
             }
 
-            foreach ($info as $itemData) {
+            foreach ($info as $k => $itemData) {
                 foreach ($itemData as $quoteItemId => $data) {
+                    /* Custom code */
+                    if(!empty($carrierInfo[$k]) && $carrierInfo[$k] == 1) { // Check for address that need to be splitted
+                        $customer = $this->getCustomer(); // Get customer
+                        $addresses = $customer->getAddresses(); // Get default customer address
+                        foreach ($addresses as $address) {
+                            if($address->getId() === $data['address']) { // If address it's equal to address set in "Send To"
+                                $newAddress = $this->cloneCustomerAddress($customer->getId(), $address); // Clone address
+                                $this->_virtualAddressesIds[] = $newAddress->getId(); // Set to "virtual" addresses created in order to delete them after.
+                                $data['address'] = $newAddress->getId(); // Set new address in order to split carriers
+                                $data['virtual'] = true; // Mark as virtual in order to validate after.
+                                break; // Break iterative process here in order to continue with parent foreach. (level 2)
+                            }
+                        }
+                    }
+                    /* End of custom code */
                     $this->_addShippingItem($quoteItemId, $data);
                 }
             }
+            /* Custom code */
+            $this->getCheckoutSession()->setVirtualAddressesIds($this->_virtualAddressesIds);
+            /* End Custom code */
             $this->prepareShippingAssignment($quote);
 
             /**
@@ -501,10 +526,11 @@ class Multishipping extends \Magento\Framework\DataObject
         $qty = isset($data['qty']) ? (int)$data['qty'] : 1;
         //$qty       = $qty > 0 ? $qty : 1;
         $addressId = isset($data['address']) ? $data['address'] : false;
+        $isVirtualAddress = isset($data['virtual']) ? $data['virtual'] : false;
         $quoteItem = $this->getQuote()->getItemById($quoteItemId);
 
         if ($addressId && $quoteItem) {
-            if (!$this->isAddressIdApplicable($addressId)) {
+            if (!$this->isAddressIdApplicable($addressId) && !$isVirtualAddress) {
                 throw new LocalizedException(__('Please check shipping address information.'));
             }
 
@@ -1259,5 +1285,36 @@ class Multishipping extends \Magento\Framework\DataObject
         }
 
         return $placedAddressItems;
+    }
+
+    /**
+     * Function added by (Fecon) in order to generate customer "virtual" address
+     * 
+     * @param  [type] $observer [description]
+     * @return [type]           [description]
+     */
+    private function cloneCustomerAddress($customerId, $address)
+    {
+        $addressFactory = ObjectManager::getInstance()->get('\Magento\Customer\Model\AddressFactory');
+        $newAddress = $addressFactory->create();
+
+        $newAddress->setCustomerId($customerId)
+                ->setFirstname($address->getFirstname())
+                ->setLastname($address->getLastname())
+                ->setCountryId($address->getCountryId())
+                ->setPostcode($address->getPostcode())
+                ->setRegionId($address->getRegionId())
+                ->setCity($address->getCity())
+                ->setTelephone($address->getTelephone())
+                ->setStreet($address->getStreet()[0])
+                ->setSaveInAddressBook('1');
+        try {
+            $newAddress->save();
+        } catch (\Exception $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
+        }
+        return $newAddress;
     }
 }

@@ -142,6 +142,29 @@ class State extends \Magento\Framework\DataObject
         return $this;
     }
 
+    
+    /**
+     * Set selected indexes to split carriers to preserve checkboxes.
+     *
+     * @param array carriers
+     * @return $this
+     */
+    public function setSelectedCarriersToSplitStep($carriers)
+    {
+        $this->getCheckoutSession()->setCarrierData($carriers);
+    }
+
+    /**
+     * Get splitted carriers indexes.
+     *
+     * @param array carriers
+     * @return $this
+     */
+    public function getSelectedCarriersToSplitStep()
+    {
+        return $this->getCheckoutSession()->getCarrierData();
+    }
+
     /**
      * Retrieve step complete status
      *

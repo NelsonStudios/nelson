@@ -1,6 +1,8 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     
+    <preference for="Magento\Multishipping\Controller\Checkout\Addresses" type="Fecon\CustomMultishipping\Controller\Checkout\Addresses"/>
+
     <preference for="Magento\Multishipping\Controller\Checkout\AddressesPost" type="Fecon\CustomMultishipping\Controller\Checkout\AddressesPost"/>
     
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping"/>
