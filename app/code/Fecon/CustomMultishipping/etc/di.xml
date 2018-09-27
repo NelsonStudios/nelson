@@ -25,5 +25,7 @@
 
     <preference for="Magento\Multishipping\Block\Checkout\Billing\Items" type="Fecon\CustomMultishipping\Block\Checkout\Billing\Items"/>
 
+    <preference for="Magento\Multishipping\Block\Checkout\Payment\Info" type="Fecon\CustomMultishipping\Block\Checkout\Payment\Info"/>
+
     <preference for="Magento\Payment\Model\Method\SpecificationInterface" type="Magento\Payment\Model\Method\Specification\Composite"/>
 </config>
