@@ -4,6 +4,7 @@
     <preference for="Magento\Multishipping\Controller\Checkout\Addresses" type="Fecon\CustomMultishipping\Controller\Checkout\Addresses"/>
     <preference for="Magento\Multishipping\Controller\Checkout\AddressesPost" type="Fecon\CustomMultishipping\Controller\Checkout\AddressesPost"/>
     <preference for="Magento\Multishipping\Controller\Checkout\OverviewPost" type="Fecon\CustomMultishipping\Controller\Checkout\OverviewPost"/>
+    <preference for="Magento\Multishipping\Controller\Checkout\Success" type="Fecon\CustomMultishipping\Controller\Checkout\Success"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\State" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory"/>
