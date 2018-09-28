@@ -10,4 +10,9 @@
             <argument name="template" xsi:type="string">Fecon_CustomMultishipping::checkout/shipping.phtml</argument>
         </action>
     </referenceBlock>
+    <referenceBlock name="checkout_billing">
+        <action method="setTemplate">
+            <argument name="template" xsi:type="string">Fecon_CustomMultishipping::checkout/billing.phtml</argument>
+        </action>
+    </referenceBlock>
 </page>
