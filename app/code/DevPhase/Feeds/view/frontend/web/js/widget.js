@@ -315,7 +315,8 @@ FeconSocialWidget.prototype.feed_load = function () {
 			_this.frame_set ( 0, true );
 		},
 		error: function ( xhr, status, error ) {
-			alert ( 'Ajax error: '+status+' / '+error );
+			console.log('Feed ajax error: '+status);
+			console.log(error);
 		}
 	});
 };
