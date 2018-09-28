@@ -49,10 +49,10 @@ interface CustomerInterface
      * Get the customer data customer
      *
      * @api
-     * @param  string $documotoCustomerId The documotoCustomerId to save.
+     * @param  string $documotoCustomerUsername The documotoCustomerUsername (email) to search.
      * @return string $customerData
      */
-    public function getCustomerByDocumotoId($documotoCustomerId);
+    public function getCustomerByDocumotoUsername($documotoCustomerUsername);
     /**
      * Set the customer address
      *

@@ -238,15 +238,15 @@ class Customer implements CustomerInterface {
      * Get the customer data customer
      *
      * @api
-     * @param  string $documotoCustomerId The customerId to save.
+     * @param  string $documotoCustomerUsername The customerUsername (email) to search.
      * @return string $customerData
      */
-    public function getCustomerByDocumotoId($documotoCustomerId) {
-        //$documotoCustomerId = $this->request->getParam('customerId');// Enable for testing only.
+    public function getCustomerByDocumotoUsername($documotoCustomerUsername) {
+        //$documotoCustomerId = $this->request->getParam('Username');// Enable for testing only.
         try {
             $collection = $this->customerCollection
               ->addAttributeToSelect(array('id', 'firstname', 'customer_id',  'email'))
-              ->addAttributeToFilter('customer_id', array('eq' => $documotoCustomerId))
+              ->addAttributeToFilter('username', array('eq' => $documotoCustomerUsername))
               ->load();
         } catch(\Excepetion $e) {
             return $e->getMessage();
@@ -256,7 +256,7 @@ class Customer implements CustomerInterface {
             return $collection->getData();
         } else {
             throw new \Exception(
-                __('Error, there\'re multiple users with same id.')
+                __('Error, there\'s no users matching query.')
             );
         }
     }
@@ -267,7 +267,7 @@ class Customer implements CustomerInterface {
      * @api
      * @param  string $customerData The customerData to search.
      * @param  string $customerAddressData The customerAddressData to save.
-     * @return boolean true on success or throws error on failure.
+     * @return boolean true on success or false is address data isn't coming.
      */
     public function setCustomerAddress($customerData, $customerAddressData, $addressType) {
         $address = null;
@@ -328,18 +328,12 @@ class Customer implements CustomerInterface {
                 $address->setIsDefaultShipping('1')
                 ->setSaveInAddressBook('1');
             }
-        } else {
-            $errorMsg = 'Error, there\'s an error validating customer '. (($addressType === 'BillTo')? 'billing' : 'shipping') .' address. Data sent was: ' . json_encode($customerAddressData[$addressType]['SiteAddress']) . ' data could not be empty.';
-            $this->cartHelper->sendAdminErrorNotification($errorMsg);
-            throw new \Exception(
-                __($errorMsg)
-            );
-        }
-        
-        try {
-            return $address->save();
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
+            try {
+                return $address->save();
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        } 
+        return false;
     }
 }

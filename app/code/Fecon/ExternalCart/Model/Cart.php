@@ -401,7 +401,8 @@ class Cart implements CartInterface {
                 'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
             ];
             /* Get customer data */
-            $customerDataRaw = $this->customerModel->getCustomerByDocumotoId($customerAddressData['BillTo']['SiteAddress']['CustomerId']);
+            $customerDataRaw = $this->customerModel->getCustomerByDocumotoUsername($customerAddressData['BillTo']['SiteAddress']['Username']);
+            /* This is only to avoid to access subzero in further var usage. */
             $customerData = $customerDataRaw[0];
             unset($customerDataRaw);
             /* Get customer token otherwise we can't add products into cart as a valid logged-in user 
@@ -417,10 +418,10 @@ class Cart implements CartInterface {
                 /* If we not set endpoints for logged-in customer, this will fail on first execution time */
                 $this->setEndpoints($this->customerToken);
             }
-            /* Set/update billing address */
-            $billingAddress = $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'BillTo');
-            /* Set/update shipping address */
-            $shippingAddress = $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'ShipTo');
+            /* Set/update billing address - optional since ~447576 */
+            $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'BillTo');
+            /* Set/update shipping address - optional since ~447576 */
+            $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'ShipTo');
             
             /* Make customer autologin 
              * Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail 
@@ -496,7 +497,8 @@ class Cart implements CartInterface {
                             'Success' => 'true',
                             'Message' => 'Cart submitted successfully.',
                             'ReferenceNumber' => $productDataMap['quoteId'],    
-                            'ExternalOrderID' => 'false'
+                            'ExternalOrderID' => 'false',
+                            'RedirectionURL' => $this->getCartUrl()
                         ]
                     ]
                 ];
