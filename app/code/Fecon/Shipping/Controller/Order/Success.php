@@ -35,7 +35,7 @@ class Success extends \Magento\Framework\App\Action\Action
     {
         $rP = $this->resultPageFactory->create();
         //page title for browser
-        $rP->getConfig()->getTitle()->set('Fecon - You have received your request successfully');
+        $rP->getConfig()->getTitle()->set('Quote requested successfully');
         return $rP;
     }
 }

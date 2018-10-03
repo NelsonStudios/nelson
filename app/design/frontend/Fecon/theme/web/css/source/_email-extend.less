@@ -17,14 +17,13 @@ p {
   font-size: 12px;
   font-size: 1.2rem;
 }
-a {
+a, a:hover, a:link, a:visited, a:focus {
  background-color: none!important;
  background-color: transparent!important;
  color: @fecon-theme-color!important;
- &:hover {
-   color: @fecon-theme-color!important;
-   text-decoration: underline!important;
- }
+}
+a:hover {
+  text-decoration: underline!important;
 }
 h1,h2,h3,h4 {
   font-weight: bold;
