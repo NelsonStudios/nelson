@@ -22,14 +22,6 @@ class Success extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Return base URL or link based on given path
-     */
-    public function getUrl($path = '')
-    {
-      return (empty($path))?$this->_storeManager->getStore()->getBaseUrl():$this->_storeManager->getStore()->getUrl($path);
-    }
-
-    /**
      * Return link to My Account
      */
     public function getCustomerAccountUrl()
