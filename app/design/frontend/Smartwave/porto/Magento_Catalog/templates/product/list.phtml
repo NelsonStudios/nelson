@@ -109,7 +109,7 @@ $flex_grid = "";
                                 $now = date("Y-m-d");
                                 $newsFrom= substr($_product->getData('news_from_date'),0,10);
                                 $newsTo=  substr($_product->getData('news_to_date'),0,10);
-                                
+
                                 if ($newsTo != '' || $newsFrom != ''){
                                     if (($newsTo != '' && $newsFrom != '' && $now>=$newsFrom && $now<=$newsTo) || ($newsTo == '' && $now >=$newsFrom) || ($newsFrom == '' && $now<=$newsTo)) {
                                         $product_label .= '<div class="product-label new-label">'.$_product_label_config['new_label_text'].'</div>';
@@ -230,7 +230,7 @@ $flex_grid = "";
                         <?php echo $block->getProductPrice($_product) ?>
                         <?php endif; ?>
                         <?php echo $block->getProductDetailsHtml($_product); ?>
-                        
+
                         <?php if($_category_config['actions'] && !$move_actions): ?>
                         <div class="product-item-inner">
                             <div class="product actions product-item-actions">
@@ -330,7 +330,7 @@ $flex_grid = "";
     <?php if ($block->getMode() == 'grid'): ?>
         <script type="text/javascript">
             require([
-                'jquery'        
+                'jquery'
             ], function ($) {
                 $('.main .products.grid .product-items li.product-item:nth-child(2n)').addClass('nth-child-2n');
                 $('.main .products.grid .product-items li.product-item:nth-child(2n+1)').addClass('nth-child-2np1');
