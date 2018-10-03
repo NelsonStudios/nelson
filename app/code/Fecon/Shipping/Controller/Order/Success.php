@@ -5,7 +5,7 @@ namespace Fecon\Shipping\Controller\Order;
 /**
  * Description of Success
  *
- * 
+ *
  */
 class Success extends \Magento\Framework\App\Action\Action
 {
@@ -33,6 +33,9 @@ class Success extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        return $this->resultPageFactory->create();
+        $rP = $this->resultPageFactory->create();
+        //page title for browser
+        $rP->getConfig()->getTitle()->set('Fecon - You have received your request successfully');
+        return $rP;
     }
 }
