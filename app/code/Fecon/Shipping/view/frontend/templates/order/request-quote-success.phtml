@@ -13,7 +13,7 @@
                   <?php echo __('Continue Shopping'); ?>
               </a>
           </div>
-          <?php if ($block->isCustomerLoggedIn()) { ?>
+          <?php if ($block->isCustomerLoggedIn()): ?>
               <div class="iwd_opc_universal_wrapper">
                   <a href="<?php echo $block->getCustomerAccountUrl(); ?>"
                      class="iwd_opc_button"
@@ -21,7 +21,7 @@
                       <?php echo __('My Account'); ?>
                   </a>
               </div>
-          <?php } ?>
+          <?php endif; ?>
         </div>
       </div>
     </div>
