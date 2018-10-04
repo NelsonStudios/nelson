@@ -8,12 +8,16 @@ body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif;
 @-->
 {{template config_path="design/email/header_template"}}
 
-
+<style>
+li a:hover {
+  color: green;
+}
+</style>
 <div>
     <p>There's a new shipping quote request for review.</p>
     <p>To set the price please follow these instructions:</p>
     <ol>
-        <li>Go to the backend <a href="{{var url}}" target="_blank"><span>Login Page</span></a></li>
+        <li>Go to the backend <a style="color: green" href="{{var url}}" target="_blank"><span>Login Page</span></a></li>
         <li>Click on the left menu the Fecon section</li>
         <li>Click on the <b>Preorder</b> option</li>
         <li>In the grid, search for the Preorder with ID <b>{{var preorderId}}</b></li>

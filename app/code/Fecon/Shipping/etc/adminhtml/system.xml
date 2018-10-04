@@ -30,6 +30,9 @@
                     <source_model>Fecon\Shipping\Model\Source\Method</source_model>
                     <can_be_empty>1</can_be_empty>
                 </field>
+                <field id="specificerrmsg" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="textarea">
+                    <label>Displayed Error Message</label>
+                </field>
                 <field id="sallowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
                     <label>Ship to Applicable Countries</label>
                     <frontend_class>shipping-applicable-country</frontend_class>
@@ -39,9 +42,6 @@
                     <label>Ship to Specific Countries</label>
                     <can_be_empty>1</can_be_empty>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                </field>
-                <field id="specificerrmsg" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="textarea">
-                    <label>Displayed Error Message</label>
                 </field>
             </group>
         </section>
