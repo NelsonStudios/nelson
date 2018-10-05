@@ -40,7 +40,6 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
                     $this->_getCheckout()->setShippingItemsInformation($shipToInfo, $chooseCarrierInfo);
                 } else {
                     $this->_getCheckout()->setShippingItemsInformation($shipToInfo);
-
                 }
             }
             /* End custom code */

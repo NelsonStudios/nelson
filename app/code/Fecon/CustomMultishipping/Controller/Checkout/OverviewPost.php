@@ -96,6 +96,10 @@ class OverviewPost extends \Magento\Multishipping\Controller\Checkout
                 $this->_redirect('*/*/billing');
                 return;
             }
+$e = new \Exception();
+echo '<pre>';
+print_r($e->getTraceAsString());
+exit;
 
             $payment = $this->getRequest()->getPost('payment');
             $paymentInstance = $this->_getCheckout()->getQuote()->getPayment();
@@ -126,7 +130,7 @@ class OverviewPost extends \Magento\Multishipping\Controller\Checkout
                 // Get customer data object
                 $customer = $customerSession->getCustomerDataObject();
                 // Get customer addresses
-                $addresses = $customer->getAddresses(); 
+                $addresses = $customer->getAddresses();
                 // Prepare to delete only virtual ones.
                 foreach ($addresses as $address) {
                     if (!empty($addressesIds) && in_array($address->getId(), $addressesIds)) {

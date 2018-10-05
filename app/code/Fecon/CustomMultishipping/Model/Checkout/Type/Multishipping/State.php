@@ -142,7 +142,7 @@ class State extends \Magento\Framework\DataObject
         return $this;
     }
 
-    
+
     /**
      * Set selected indexes to split carriers to preserve checkboxes.
      *
@@ -155,7 +155,7 @@ class State extends \Magento\Framework\DataObject
     }
 
     /**
-     * Get splitted carriers indexes.
+     * Get split carriers indexes.
      *
      * @param array carriers
      * @return $this
