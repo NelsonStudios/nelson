@@ -23,11 +23,11 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
                 $this->_getCheckout()->setCollectRatesFlag(true);
                 $this->_getState()->setActiveStep(State::STEP_SHIPPING);
                 $this->_getState()->setCompleteStep(State::STEP_SELECT_ADDRESSES);
-                /* Custom code */ 
+                /* Custom code */
                 if(!empty($chooseCarrierInfo)) {
                     $this->_getState()->setSelectedCarriersToSplitStep($chooseCarrierInfo);
                 }
-                /* End custom code */ 
+                /* End custom code */
                 $this->_redirect('*/*/shipping');
             } elseif ($this->getRequest()->getParam('new_address')) {
                 $this->_redirect('*/checkout_address/newShipping');
@@ -40,10 +40,10 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
                     $this->_getCheckout()->setShippingItemsInformation($shipToInfo, $chooseCarrierInfo);
                 } else {
                     $this->_getCheckout()->setShippingItemsInformation($shipToInfo);
-                    
+
                 }
             }
-            /* End custom code */ 
+            /* End custom code */
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->messageManager->addError($e->getMessage());
             $this->_redirect('*/*/addresses');
@@ -52,7 +52,7 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
             print_r($e->getMessage());
             echo '</pre>';
             exit;
-            $this->messageManager->addException($e, __('Data saving problem'));
+            $this->messageManager->addException($e, __('Address saving problem'));
             $this->_redirect('*/*/addresses');
         }
     }

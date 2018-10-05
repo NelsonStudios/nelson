@@ -14,6 +14,7 @@
  * @var $block \Magento\Multishipping\Block\Checkout\Shipping
  */
 ?>
+<div class="iwd_main_wrapper">
 <form action="<?= /* @escapeNotVerified */ $block->getPostActionUrl() ?>" method="post" id="shipping_method_form" class="form multicheckout shipping">
     <?php foreach ($block->getAddresses() as $_index => $_address): ?>
     <div class="block block-shipping">
@@ -121,3 +122,4 @@
         </div>
     </div>
 </form>
+</div>
