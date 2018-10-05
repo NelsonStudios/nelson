@@ -448,10 +448,13 @@ class Multishipping extends \Magento\Framework\DataObject
                         $addresses = $customer->getAddresses(); // Get default customer address
                         foreach ($addresses as $address) {
                             if($address->getId() === $data['address']) { // If address it's equal to address set in "Send To"
-                                $newAddress = $this->cloneCustomerAddress($customer->getId(), $address); // Clone address
-                                $this->_virtualAddressesIds[] = $newAddress->getId(); // Set to "virtual" addresses created in order to delete them after.
-                                $data['address'] = $newAddress->getId(); // Set new address in order to split carriers
-                                $data['virtual'] = true; // Mark as virtual in order to validate after.
+
+                                // @TODO: review this cloneCustomerAddress() because maybe not necessary
+                                //$newAddress = $this->cloneCustomerAddress($customer->getId(), $address); // Clone address
+
+                                $this->_virtualAddressesIds[] = $address->getId(); // Set to "virtual" addresses created in order to delete them after.
+                                $itemData[$quoteItemId]['address'] = $address->getId(); // Set new address in order to split carriers
+                                $itemData[$quoteItemId]['virtual'] = true; // Mark as virtual in order to validate after.
                                 break; // Break iterative process here in order to continue with parent foreach. (level 2)
                             }
                         }
@@ -1289,7 +1292,7 @@ class Multishipping extends \Magento\Framework\DataObject
 
     /**
      * Function added by (Fecon) in order to generate customer "virtual" address
-     * 
+     *
      * @param  [type] $observer [description]
      * @return [type]           [description]
      */
