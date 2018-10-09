@@ -38,6 +38,7 @@
             /* Custom code - Intended to get selected carriers when user come back to this page. */
             $selectedCarriers = $block->getSelectedCarriers();
             /* End Custom code */
+            $skipFirst = true;
             foreach ($block->getItems() as $_index => $_item): ?>
                 <?php if ($_item->getQuoteItem()) : ?>
                     <tr>
@@ -54,6 +55,7 @@
                         </td>
                         <td class="col choose-carrier" data-th="<?= $block->escapeHtml(__('Choose Carrier')) ?>">
                           <div class="field choice">
+                            <?php if (!$skipFirst): ?>
                               <input type="checkbox" class="checkbox" name="choose_carrier[<?= $_index ?>]"
                                 id="choose_carrier-<?= $_index ?>" class="choose-carrier-input" value="1"
                                 data-bind="checked: <?php echo (!empty($selectedCarriers[$_index])? 'true' : 'false') ?>,
@@ -62,6 +64,10 @@
                                 data-bind="attr: {for: 'choose_carrier-<?= $_index ?>'}">
                                   <span data-bind="i18n: '<?php echo __('Split for a different carrier.') ?>'"><?php echo __('Split for a different carrier.') ?></span>
                               </label>
+                            <?php
+                            else:
+                              $skipFirst = false;
+                            endif; ?>
                           </div>
                         </td>
                         <td class="col address" data-th="<?= $block->escapeHtml(__('Send To')) ?>">

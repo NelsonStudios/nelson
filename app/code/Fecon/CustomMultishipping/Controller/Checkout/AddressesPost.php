@@ -3,9 +3,35 @@
 namespace Fecon\CustomMultishipping\Controller\Checkout;
 
 use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
+use Magento\Customer\Api\AccountManagementInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 
 class AddressesPost extends \Magento\Multishipping\Controller\Checkout
 {
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param AccountManagementInterface $accountManagement
+     */
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Customer\Model\Session $customerSession,
+        CustomerRepositoryInterface $customerRepository,
+        AccountManagementInterface $accountManagement,
+        \Psr\Log\LoggerInterface $logger
+    ) {
+        $this->_logger = $logger;
+        parent::__construct(
+            $context,
+            $customerSession,
+            $customerRepository,
+            $accountManagement
+        );
+    }
     /**
      * Multishipping checkout process posted addresses
      *
@@ -34,6 +60,7 @@ class AddressesPost extends \Magento\Multishipping\Controller\Checkout
             } else {
                 $this->_redirect('*/*/addresses');
             }
+
             /* Custom code */
             if ($shipToInfo = $this->getRequest()->getPost('ship')) {
                 if(!empty($chooseCarrierInfo)) {

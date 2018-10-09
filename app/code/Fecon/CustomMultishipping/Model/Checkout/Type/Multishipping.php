@@ -165,7 +165,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private $_logger;
 
     /**
      * @var \Magento\Framework\Api\DataObjectHelper
@@ -266,7 +266,7 @@ class Multishipping extends \Magento\Framework\DataObject
             ->get(AllowedCountries::class);
         $this->placeOrderFactory = $placeOrderFactory ?: ObjectManager::getInstance()
             ->get(Multishipping\PlaceOrderFactory::class);
-        $this->logger = $logger ?: ObjectManager::getInstance()
+        $this->_logger = $logger ?: ObjectManager::getInstance()
             ->get(LoggerInterface::class);
         $this->dataObjectHelper = $dataObjectHelper ?: ObjectManager::getInstance()
             ->get(\Magento\Framework\Api\DataObjectHelper::class);
@@ -444,26 +444,19 @@ class Multishipping extends \Magento\Framework\DataObject
                 foreach ($itemData as $quoteItemId => $data) {
                     /* Custom code */
                     if(!empty($carrierInfo[$k]) && $carrierInfo[$k] == 1) { // Check for address that need to be splitted
-                        $customer = $this->getCustomer(); // Get customer
-                        $addresses = $customer->getAddresses(); // Get default customer address
-                        foreach ($addresses as $address) {
-                            if($address->getId() === $data['address']) { // If address it's equal to address set in "Send To"
-
-                                // @TODO: review this cloneCustomerAddress() because maybe not necessary
-                                //$newAddress = $this->cloneCustomerAddress($customer->getId(), $address); // Clone address
-
-                                $this->_virtualAddressesIds[] = $address->getId(); // Set to "virtual" addresses created in order to delete them after.
-                                $itemData[$quoteItemId]['address'] = $address->getId(); // Set new address in order to split carriers
-                                $itemData[$quoteItemId]['virtual'] = true; // Mark as virtual in order to validate after.
-                                break; // Break iterative process here in order to continue with parent foreach. (level 2)
-                            }
-                        }
+                      $this->_virtualAddressesIds[] = $data['address']; // Set to "virtual" addresses created in order to delete them after.
+                      $data['virtual'] = true; // Mark as virtual in order to validate after.
+$this->_logger->debug( 'Virtual Address');
+                    }else {
+                      $data['virtual'] = false;
                     }
+$this->_logger->debug( 'Adding virtual Address ID:'. $data['address'] . ' - Item ID:'.$quoteItemId);
                     /* End of custom code */
                     $this->_addShippingItem($quoteItemId, $data);
                 }
             }
             /* Custom code */
+            //@TODO remove this to the session
             $this->getCheckoutSession()->setVirtualAddressesIds($this->_virtualAddressesIds);
             /* End Custom code */
             $this->prepareShippingAssignment($quote);
@@ -533,7 +526,7 @@ class Multishipping extends \Magento\Framework\DataObject
         $quoteItem = $this->getQuote()->getItemById($quoteItemId);
 
         if ($addressId && $quoteItem) {
-            if (!$this->isAddressIdApplicable($addressId) && !$isVirtualAddress) {
+            if (!$this->isAddressIdApplicable($addressId)) {
                 throw new LocalizedException(__('Please check shipping address information.'));
             }
 
@@ -551,14 +544,28 @@ class Multishipping extends \Magento\Framework\DataObject
             }
             if (isset($address)) {
                 if (!($quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId()))) {
+                  //can't find or retrieve address on existing Quote item
                     $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
                     $this->getQuote()->addShippingAddress($quoteAddress);
                 }
 
-                $quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId());
+                if ($isVirtualAddress) {
+                  //Here we force to add as a new address line
+                  //remove from previous address line
+                  $this->removeAddressItem($address->getId(),$quoteItemId);
+
+                  //if the address is flagged as virtual, this means we are expecting to split order for same addresses
+                  $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
+                  $this->getQuote()->addShippingAddress($quoteAddress);
+
+                }else {
+                  //this is to keep fallback to use Magento Multishipping workflow
+                  $quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId());
+                }
+
                 $quoteAddress->setCustomerAddressId($addressId);
                 $quoteAddressItem = $quoteAddress->getItemByQuoteItemId($quoteItemId);
-                if ($quoteAddressItem) {
+                if ($quoteAddressItem && !$isVirtualAddress) {
                     $quoteAddressItem->setQty((int)($quoteAddressItem->getQty() + $qty));
                 } else {
                     $quoteAddress->addItem($quoteItem, $qty);
@@ -567,6 +574,11 @@ class Multishipping extends \Magento\Framework\DataObject
                  * Require shipping rate recollect
                  */
                 $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag());
+                if ($isVirtualAddress) {
+                  //if the address is flagged as virtual, this means we are expecting to split order for same addresses
+                  $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
+                  $this->getQuote()->addShippingAddress($quoteAddress);
+                }
             }
         }
         return $this;
@@ -590,10 +602,15 @@ class Multishipping extends \Magento\Framework\DataObject
             //
         }
         if (isset($address)) {
-            $quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($addressId);
-            $quoteAddress->setCollectShippingRates(true)->importCustomerAddressData($address);
-            $this->totalsCollector->collectAddressTotals($this->getQuote(), $quoteAddress);
-            $this->quoteRepository->save($this->getQuote());
+            $addresses = [];
+            //due to our changes, same address ID can appears multiple times in the Quote
+            foreach ($this->getQuote()->getAddressesCollection() as $a) {
+                if ($a->getAddressType() == Address::TYPE_SHIPPING && !$a->isDeleted() && $a->getId()==$addressId) {
+                    $a->setCollectShippingRates(true)->importCustomerAddressData($address);
+                    $this->totalsCollector->collectAddressTotals($this->getQuote(), $a);
+                    $this->quoteRepository->save($this->getQuote());
+                }
+            }
         }
 
         return $this;
@@ -760,6 +777,7 @@ class Multishipping extends \Magento\Framework\DataObject
         }
 
         $addresses = $quote->getAllShippingAddresses();
+$this->_logger->debug("All Shipping addresses ".count($addresses));
         foreach ($addresses as $address) {
             $addressValidation = $address->validate();
             if ($addressValidation !== true) {

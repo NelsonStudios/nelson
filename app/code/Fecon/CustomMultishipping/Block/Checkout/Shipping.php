@@ -46,12 +46,14 @@ class Shipping extends \Magento\Sales\Block\Items\AbstractItems
         \Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping $multishipping,
         \Magento\Tax\Helper\Data $taxHelper,
         PriceCurrencyInterface $priceCurrency,
+        \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
         $this->priceCurrency = $priceCurrency;
         $this->_taxHelper = $taxHelper;
         $this->_filterGridFactory = $filterGridFactory;
         $this->_multishipping = $multishipping;
+        $this->_logger = $logger;
         parent::__construct($context, $data);
         $this->_isScopePrivate = true;
     }
@@ -103,7 +105,7 @@ class Shipping extends \Magento\Sales\Block\Items\AbstractItems
      * @return \Magento\Framework\DataObject[]
      */
     public function getAddressItems($address)
-    {
+    {        
         $items = [];
         foreach ($address->getAllItems() as $item) {
             if ($item->getParentItemId()) {
@@ -111,6 +113,7 @@ class Shipping extends \Magento\Sales\Block\Items\AbstractItems
             }
             $item->setQuoteItem($this->getCheckout()->getQuote()->getItemById($item->getQuoteItemId()));
             $items[] = $item;
+
         }
         $itemsFilter = $this->_filterGridFactory->create();
         $itemsFilter->addFilter(new \Magento\Framework\Filter\Sprintf('%d'), 'qty');
