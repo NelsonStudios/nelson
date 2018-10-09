@@ -114,7 +114,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function autoLoginUser(\Magento\Quote\Model\Quote $quote, $customerEmail)
     {
         $login = true;
-        if (!$this->session->isLoggedIn()) {
+        if (!$this->isUserLoggedIn()) {
             $login = $this->loginCurrentUser($quote, $customerEmail);
         }
 
@@ -338,5 +338,15 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $customer = $this->customerFactory->create()->load($customerId);
         $this->emailHelper->sendCustomerNotificationEmail($customer);
+    }
+
+    /**
+     * Checking customer login status
+     *
+     * @return bool
+     */
+    public function isUserLoggedIn()
+    {
+        return $this->session->isLoggedIn();
     }
 }
