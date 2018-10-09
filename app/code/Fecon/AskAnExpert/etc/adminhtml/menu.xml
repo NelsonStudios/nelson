@@ -7,7 +7,7 @@
             module="Fecon_AskAnExpert" 
             sortOrder="50" 
             parent="Fecon::fecon_top_level" 
-            resource="Fecon_AskAnExpert::askanexpert"
+            resource="Fecon_AskAnExpert::askanexpert_config"
         />
         
         <add 
@@ -17,7 +17,7 @@
             sortOrder="60" 
             parent="Fecon_AskAnExpert::AskAnExpert" 
             action="askanexpert/index/index" 
-            resource="Fecon_AskAnExpert::askanexpert"
+            resource="Fecon_AskAnExpert::askanexpert_config"
         />
     </menu>
 </config>
