@@ -47,6 +47,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $productRepository;
 
     /**
+     * @var EmailHelper
+     */
+    protected $emailHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -55,6 +60,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper
      * @param \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param EmailHelper $emailHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -62,13 +68,15 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Fecon\SytelineIntegration\Logger\Logger $logger,
         \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper,
         \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        EmailHelper $emailHelper
     ) {
         $this->apiHelper = $apiHelper;
         $this->logger = $logger;
         $this->dataTransformHelper = $dataTransformHelper;
         $this->submissionHelper = $submissionHelper;
         $this->productRepository = $productRepository;
+        $this->emailHelper = $emailHelper;
 
         parent::__construct($context);
     }
@@ -153,6 +161,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
             $this->logger->err($entity . ' - Error: ' . $error);
         }
+        $this->emailHelper->sendErrorEmailToAdmin($errors, $orderId, $productId);
     }
 
     /**
