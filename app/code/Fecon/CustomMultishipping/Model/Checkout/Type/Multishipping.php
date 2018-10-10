@@ -574,11 +574,7 @@ $this->_logger->debug( 'Adding virtual Address ID:'. $data['address'] . ' - Item
                  * Require shipping rate recollect
                  */
                 $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag());
-                if ($isVirtualAddress) {
-                  //if the address is flagged as virtual, this means we are expecting to split order for same addresses
-                  $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
-                  $this->getQuote()->addShippingAddress($quoteAddress);
-                }
+                
             }
         }
         return $this;

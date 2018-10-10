@@ -96,10 +96,6 @@ class OverviewPost extends \Magento\Multishipping\Controller\Checkout
                 $this->_redirect('*/*/billing');
                 return;
             }
-$e = new \Exception();
-echo '<pre>';
-print_r($e->getTraceAsString());
-exit;
 
             $payment = $this->getRequest()->getPost('payment');
             $paymentInstance = $this->_getCheckout()->getQuote()->getPayment();
@@ -119,25 +115,6 @@ exit;
                 $this->_getState()->setActiveStep(State::STEP_SUCCESS);
                 $this->_getCheckout()->getCheckoutSession()->clearQuote();
                 $this->_getCheckout()->getCheckoutSession()->setDisplaySuccess(true);
-                /* Custom code */
-                /* Delete virtual addresses after place order success */
-                // Get ObjectManager instance of a customer session and checkout address
-                $checkoutSession = ObjectManager::getInstance()->get(\Magento\Checkout\Model\Session::class);
-                $customerSession = ObjectManager::getInstance()->get(\Magento\Customer\Model\Session::class);
-                $addressRepository = ObjectManager::getInstance()->get(\Magento\Customer\Api\AddressRepositoryInterface::class);
-                // Get sessioned virtual addresses
-                $addressesIds = $checkoutSession->getVirtualAddressesIds();
-                // Get customer data object
-                $customer = $customerSession->getCustomerDataObject();
-                // Get customer addresses
-                $addresses = $customer->getAddresses();
-                // Prepare to delete only virtual ones.
-                foreach ($addresses as $address) {
-                    if (!empty($addressesIds) && in_array($address->getId(), $addressesIds)) {
-                        $addressRepository->deleteById($address->getId());
-                    }
-                }
-                /* End Custom code */
                 $this->_redirect('*/*/success');
             }
         } catch (PaymentException $e) {

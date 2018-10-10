@@ -11,7 +11,7 @@ class Submit implements \Magento\Framework\Event\ObserverInterface
     /**
      * Preorder Helper
      *
-     * @var \Fecon\Shipping\Helper\PreorderHelper 
+     * @var \Fecon\Shipping\Helper\PreorderHelper
      */
     protected $preorderHelper;
 
@@ -36,10 +36,12 @@ class Submit implements \Magento\Framework\Event\ObserverInterface
         \Magento\Framework\Event\Observer $observer
     ) {
         $order = $observer->getOrder();
-        $shippingMethod = $order->getShippingMethod();
-        if (strpos($shippingMethod, 'manualshipping') !== false) {
-            $quote = $observer->getQuote();
-            $this->preorderHelper->completePreorder($quote);
+        if(method_exists($order,'getShippingMethod')) {
+            $shippingMethod = $order->getShippingMethod();
+            if (strpos($shippingMethod, 'manualshipping') !== false) {
+                $quote = $observer->getQuote();
+                $this->preorderHelper->completePreorder($quote);
+            }
         }
     }
 }
