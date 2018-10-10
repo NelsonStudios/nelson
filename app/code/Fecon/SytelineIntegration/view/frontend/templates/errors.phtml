@@ -1,0 +1,8 @@
+<ul>
+    <?php
+        $errors = $block->getErrors();
+        foreach ($errors['errors'] as $error) {
+            echo '<li>' . $error . '</li>';
+        }
+    ?>
+</ul>

@@ -1,0 +1,31 @@
+<!--@subject {{trans "Syteline Error detected"}} @-->
+<!--@vars
+{"store url=\"\"":"Store Url",
+"skin url=\"images/logo_email.gif\" _area='frontend'":"Email Logo Image"}
+@-->
+<!--@styles
+body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+@-->
+{{template config_path="design/email/header_template"}}
+<style>
+a:hover {
+  color: green !important;
+}
+a:visited {
+  color: green !important;
+}
+</style>
+
+<p>There has been an error related to Syteline integration, see more details below</p>
+{{depend product_id}}
+<p><strong>Product Id:</strong> {{var product_id}}</p>
+<p><strong>Product Name:</strong> {{var product_name}}</p>
+<p><strong>Product Url:</strong> <a style="color: green !important" href="{{var product_url}}" target="_blank">Go to product page</a></p>
+{{/depend}}
+{{depend order_id}}
+<p><strong>Order Id:</strong> {{var order_id}}</p>
+{{/depend}}
+<p><strong>Error Message:</strong></p>{{layout handle="email_template" errors=$errors}}
+<p><strong>Date occurred:</strong> {{var date}}</p>
+
+{{template config_path="design/email/footer_template"}}
