@@ -16,9 +16,15 @@
                     <label>WSDL Url Production</label>
                     <comment/>
                 </field>
-                <field id="wsdl_url_test" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="40" translate="label" type="text" canRestore="1">
+                <field id="wsdl_url_test" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="50" translate="label" type="text" canRestore="1">
                     <label>WSDL Url Test</label>
                     <comment/>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Admin Email</label>
+                    <validate>validate-email</validate>
+                    <backend_model>Magento\Config\Model\Config\Backend\Email\Address</backend_model>
+                    <comment>Administrator email that will receive emails in case any error occur.</comment>
                 </field>
                 <field id="soap_version" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select" canRestore="1">
                     <label>SOAP Version</label>
