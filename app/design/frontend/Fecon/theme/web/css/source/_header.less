@@ -161,6 +161,7 @@
         repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
         height: @height110;
         background-color: @color-gray-darken5;
+        position: relative;
         .logo {
             position: absolute;
             top: 0;
@@ -168,16 +169,39 @@
             margin-top: 24px;
             margin-left: 84px;
         }
-        .shopping-cart {
-            background-color: @minicart-green;
-            width: 120px;
-            position: absolute;
-            top: -47px;
-            right: -48px;
-            height: @height110;
-            padding-top: 19px;
-            padding-left: 17px;
+        .minicart-wrapper {
+          background-color: @minicart-green;
+          width: 110px;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: @height110;
+          &.active {
+            background-color: @color-white;
+          }
+          .action.showcart {
+            padding: 19px 0 0 17px;
+            height: 110px;
+            .shopping-cart {
+              .cart-img {
+                padding-left: 80px;
+                background-size: contain;
+              }
+            }
+            .counter.qty {
+              position: absolute;
+              left: 50%;top: 40%;
+              width: 30px;
+              height: 20px;
+              line-height: 20px;
+              font-size: 11px;
+            }
+          }
         }
+
+
         .block.block-search {
             .block.block-content {
                 .minisearch {

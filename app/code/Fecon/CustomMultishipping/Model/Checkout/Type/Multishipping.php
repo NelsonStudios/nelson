@@ -270,6 +270,8 @@ class Multishipping extends \Magento\Framework\DataObject
             ->get(LoggerInterface::class);
         $this->dataObjectHelper = $dataObjectHelper ?: ObjectManager::getInstance()
             ->get(\Magento\Framework\Api\DataObjectHelper::class);
+
+        $this->_virtualAddressesIds = array();
         parent::__construct($data);
         $this->_init();
     }
@@ -439,18 +441,16 @@ class Multishipping extends \Magento\Framework\DataObject
             foreach ($addresses as $address) {
                 $quote->removeAddress($address->getId());
             }
-
             foreach ($info as $k => $itemData) {
                 foreach ($itemData as $quoteItemId => $data) {
                     /* Custom code */
                     if(!empty($carrierInfo[$k]) && $carrierInfo[$k] == 1) { // Check for address that need to be splitted
                       $this->_virtualAddressesIds[] = $data['address']; // Set to "virtual" addresses created in order to delete them after.
                       $data['virtual'] = true; // Mark as virtual in order to validate after.
-$this->_logger->debug( 'Virtual Address');
                     }else {
                       $data['virtual'] = false;
                     }
-$this->_logger->debug( 'Adding virtual Address ID:'. $data['address'] . ' - Item ID:'.$quoteItemId);
+
                     /* End of custom code */
                     $this->_addShippingItem($quoteItemId, $data);
                 }
@@ -543,13 +543,15 @@ $this->_logger->debug( 'Adding virtual Address ID:'. $data['address'] . ' - Item
             } catch (\Exception $e) {
             }
             if (isset($address)) {
-                if (!($quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId()))) {
+                if (!($quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId())) && !$isVirtualAddress) {
                   //can't find or retrieve address on existing Quote item
                     $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
                     $this->getQuote()->addShippingAddress($quoteAddress);
                 }
+                //first occurnce flagged to split was working buggy, we add this extra check to duplicate the address as customer may expect
+                $firstAddressOccurrence = array_count_values($this->_virtualAddressesIds);
 
-                if ($isVirtualAddress) {
+                if ($isVirtualAddress || (!empty($firstAddressOccurrence[$address->getId()]) && $firstAddressOccurrence[$address->getId()]===1) ) {
                   //Here we force to add as a new address line
                   //remove from previous address line
                   $this->removeAddressItem($address->getId(),$quoteItemId);
@@ -574,7 +576,7 @@ $this->_logger->debug( 'Adding virtual Address ID:'. $data['address'] . ' - Item
                  * Require shipping rate recollect
                  */
                 $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag());
-                
+
             }
         }
         return $this;

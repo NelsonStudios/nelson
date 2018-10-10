@@ -118,7 +118,8 @@ class Addresses extends \Magento\Sales\Block\Items\AbstractItems
             ->setName('ship[' . $index . '][' . $item->getQuoteItemId() . '][address]')
             ->setId('ship_' . $index . '_' . $item->getQuoteItemId() . '_address')
             ->setValue($item->getCustomerAddressId())
-            ->setOptions($this->getAddressOptions());
+            ->setOptions($this->getAddressOptions())
+            ->setExtraParams('class="multiship_address" data-index="'. $index .'" onchange="multiShippingAddressCheck('. $index .','. $item->getQuoteItemId() .',' . $item->getCustomerAddressId() . ');"');
 
         return $select->getHtml();
     }
@@ -219,9 +220,9 @@ class Addresses extends \Magento\Sales\Block\Items\AbstractItems
     }
     /**
      * Custom Fecon method
-     * 
+     *
      * Get selected carriers by customer.
-     * 
+     *
      * @return array return an array with the previously selected indexes
      *  to split carriers using the same address
      */
