@@ -3,9 +3,7 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Fecon_BackendConfig::Menu">
-                    <resource id="Fecon_SytelineIntegration::config_fecon_sytelineintegration" title="Syteline Menu"/>
-                </resource>
+                <resource id="Fecon_BackendConfig::Menu" sortOrder="10" title="Fecon Menu"/>
             </resource>
         </resources>
     </acl>

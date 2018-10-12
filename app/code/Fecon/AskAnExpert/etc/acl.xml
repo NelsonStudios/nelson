@@ -9,12 +9,8 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Magento_Backend::stores">
-                    <resource id="Magento_Backend::stores_settings">
-                        <resource id="Magento_Config::config">                            
-                                <resource id="Fecon_AskAnExpert::askanexpert_config" title="askanexpert" />                            
-                        </resource>
-                    </resource>
+                <resource id="Fecon_BackendConfig::Menu">                        
+                    <resource id="Fecon_AskAnExpert::askanexpert_config" title="Ask An Expert" />                            
                 </resource>             
             </resource>
         </resources>

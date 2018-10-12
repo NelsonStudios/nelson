@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Fecon_FlatRateMinimumAmount::shipping_configurations" title="Shipping" module="Fecon_FlatRateMinimumAmount" sortOrder="10" resource="Magento_Backend::content" parent="Fecon::fecon_top_level"/>
-        <add id="Fecon_FlatRateMinimumAmount::flat_rate_configurations" title="Flat Rate Minimum Amount" module="Fecon_FlatRateMinimumAmount" sortOrder="10" action="adminhtml/system_config/edit/section/fecon_flat_rate" resource="Magento_Backend::content" parent="Fecon_FlatRateMinimumAmount::shipping_configurations"/>
+        <add id="Fecon_FlatRateMinimumAmount::shipping_configurations" title="Shipping" module="Fecon_FlatRateMinimumAmount" sortOrder="10" resource="Fecon_FlatRateMinimumAmount::config_fecon_flatrateminimumamount" parent="Fecon::fecon_top_level"/>
+        <add id="Fecon_FlatRateMinimumAmount::flat_rate_configurations" title="Flat Rate Minimum Amount" module="Fecon_FlatRateMinimumAmount" sortOrder="10" action="adminhtml/system_config/edit/section/fecon_flat_rate" resource="Fecon_FlatRateMinimumAmount::config_fecon_flatrateminimumamount" parent="Fecon_FlatRateMinimumAmount::shipping_configurations"/>
     </menu>
 </config>

@@ -79,12 +79,15 @@ class Create extends \Magento\Framework\App\Action\Action
         if ($this->_checkoutSession->isSessionExists() && $this->_checkoutSession->isSessionExists()) {
             $quote = $this->_checkoutSession->getQuote();
             $email = $this->getRequest()->getParam('email');
+            $shouldLogout = !$this->customerHelper->isUserLoggedIn();
             $login = $this->customerHelper->autoLoginUser($quote, $email);
             $preorder = $this->preorderHelper->createPreorder($quote);
 
             if ($preorder && $login) {
-                $this->customerHelper->logoutUser();
                 $success = true;
+            }
+            if ($shouldLogout) {
+                $this->customerHelper->logoutUser();
             }
             $response = [
                 'success' => $success
