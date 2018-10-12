@@ -9,6 +9,9 @@
                             margin-left: 19%;
                         }
                     }
+                    a.right-side-open {
+                      display: none !important;//this link is not working from Proto Theme                      
+                    }
                 }
             }
         }
@@ -75,7 +78,7 @@
                                         padding-top: 0;
                                         border: none;
                                         padding-left: 0px;
-                                        margin-left: 0;  
+                                        margin-left: 0;
                                     }
                                 }
                             }
@@ -129,7 +132,7 @@
                     .column.main {
                         .product.info.detailed {
                             margin-left: -11px;
-                            
+
                         }
                     }
                 }
@@ -153,7 +156,7 @@
                                     }
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -180,6 +183,22 @@
                                     .action.view {
                                         padding-left: 10px;
                                     }
+                                }
+                            }
+                            .product-add-form {
+                              form {
+                                  .product-options-wrapper {
+                                    .fieldset {
+                                      .field {
+                                        .control {
+                                          select {
+                                            width: auto;
+                                            max-width: 98%;
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
                                 }
                             }
                             .product-info-price {
@@ -310,7 +329,7 @@
                                     padding-left: 10px;
                                     .review-add {
                                         .block-content {
-                                            width: 95%;    
+                                            width: 95%;
                                         }
                                     }
                                 }
@@ -348,8 +367,8 @@
 /* ----------- iPhone 4 and 4S ----------- */
 
 /* Portrait and Landscape */
-@media (max-width: 318px), only screen 
-  and (min-device-width: 320px) 
+@media (max-width: 318px), only screen
+  and (min-device-width: 320px)
   and (max-device-width: 480px)
   and (-webkit-min-device-pixel-ratio: 2) {
     body.catalog-product-view {

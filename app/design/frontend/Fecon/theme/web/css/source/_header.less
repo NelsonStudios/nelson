@@ -171,6 +171,7 @@
         }
         .minicart-wrapper {
           background-color: @minicart-green;
+          transition: all .2s ease-in-out;
           width: 110px;
           margin: 0;
           padding: 0;
@@ -229,8 +230,7 @@
     /* This is only to exclude from mobile sizes */
     @media (min-width: 768px) {
         .sections.nav-sections {
-            margin-left: 360px;
-            margin-top: 36px;
+            margin-top: 0;
             white-space: nowrap;
             margin-bottom: 0;
             .section-items.nav-sections-items {
@@ -241,34 +241,15 @@
                         text-align: center;
                         margin-right: 105px;
 
-                        li:hover {
-                            a {
-                                background-color: @color-gray-darken4;
-                            }
-                        }
-                        li.ui-menu-item.level0:first-child {
-                            display: none;
-                        }
-                        li.parent {
-                            a {
-                                &:after {
-                                    content: '';
-                                    background: url('../images/down-chevron-white.png') no-repeat 49% 45%;
-                                    width: 24px;
-                                    height: 50px;
-                                    margin-top: -4px;
-                                    margin-left: 11px;
-                                }
-                            }
-                        }
                         li {
                             margin-right: 5rem;
                             a, span {
-
                               line-height: 4rem;
                               font-size: 2rem;
                               font-weight: 400;
                               color: @color-white;
+                              line-height: 110px;
+                              height: 110px;
                             }
                             a:hover {
                                 background-color: @color-gray-darken4;
@@ -285,6 +266,28 @@
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+                            &:hover {
+                                a {
+                                    background-color: @color-gray-darken4;
+                                }
+                            }
+                            &.ui-menu-item.level0:first-child {
+                                display: none;
+                            }
+                            &.parent {
+                                a {
+                                  line-height: 24px;
+                                  height: auto;
+                                    &:after {
+                                        content: '';
+                                        background: url('../images/down-chevron-white.png') no-repeat 49% 45%;
+                                        width: 24px;
+                                        height: 50px;
+                                        margin-top: -4px;
+                                        margin-left: 11px;
                                     }
                                 }
                             }

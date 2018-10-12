@@ -46,26 +46,6 @@ class Addresses extends \Magento\Multishipping\Controller\Checkout
      */
     public function execute()
     {
-        /* Custom code */
-        // Get ObjectManager instance of a customer session and checkout address
-        $checkoutSession = ObjectManager::getInstance()->get(\Magento\Checkout\Model\Session::class);
-        $customerSession = ObjectManager::getInstance()->get(\Magento\Customer\Model\Session::class);
-        $addressRepository = ObjectManager::getInstance()->get(\Magento\Customer\Api\AddressRepositoryInterface::class);
-        // Get sessioned virtual addresses
-        $addressesIds = $checkoutSession->getVirtualAddressesIds();
-        // Get customer data object
-        $customer = $customerSession->getCustomerDataObject();
-        // Get customer addresses
-        $addresses = $customer->getAddresses();
-        // Prepare to delete only virtual ones.
-        foreach ($addresses as $address) {
-            if (!empty($addressesIds) && in_array($address->getId(), $addressesIds)) {
-              $this->_logger->debug( 'Delete Address ID: '.$address->getId() );
-                //$addressRepository->deleteById($address->getId());
-            }
-        }
-        /* End Custom code */
-
         // If customer do not have addresses
         if (!$this->_getCheckout()->getCustomerDefaultShippingAddress()) {
             $this->_redirect('*/checkout_address/newShipping');

@@ -5,7 +5,7 @@
  */
 namespace Fecon\CustomMultishipping\Controller\Checkout;
 
-use Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State;
+use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\PaymentException;
