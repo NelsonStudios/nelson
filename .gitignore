@@ -79,3 +79,6 @@ atlassian*
 
 ### IGNORE CACHE FILES FOR INSTAGRAM AND YOUTUBE WIDGETS ###
 /pub/*.json
+
+### IGNORE SIMPLESAMLPHP VENDORS ###
+/simplesamlphp/vendor
