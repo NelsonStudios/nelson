@@ -7,6 +7,7 @@
                 <wsdl_url_production/>
                 <wsdl_url_test>http://sl.fecon.com/FeconWebServicePilot/FeconWebService.asmx?WSDL</wsdl_url_test>
                 <soap_version>SOAP_1_1</soap_version>
+                <guest_customer_syteline_id>C003149</guest_customer_syteline_id>
             </setting>
         </syteline_integration>
     </default>

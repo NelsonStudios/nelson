@@ -14,6 +14,7 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const TEST_MODE_CONFIG_PATH = "syteline_integration/setting/test_mode";
     const SOAP_VERSION = "syteline_integration/setting/soap_version";
     const ADMIN_EMAIL = "syteline_integration/setting/email";
+    const DEFAULT_CUSTOEMR_ID = "syteline_integration/setting/guest_customer_syteline_id";
 
     /**
      * Store Manager
@@ -95,5 +96,17 @@ class ConfigHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $adminEmail = $this->getConfigValue($this::ADMIN_EMAIL);
 
         return $adminEmail;
+    }
+
+    /**
+     * Get default Sytiline Customer Id
+     *
+     * @return string
+     */
+    public function getDefaultSytelineCustomerId()
+    {
+        $defaultId = $this->getConfigValue($this::DEFAULT_CUSTOEMR_ID);
+
+        return $defaultId;
     }
 }

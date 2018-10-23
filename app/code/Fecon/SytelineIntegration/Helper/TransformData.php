@@ -9,8 +9,6 @@ namespace Fecon\SytelineIntegration\Helper;
  */
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const SYTELINE_CUSTOMER_ID = 'C000037';
-
     /**
      *
      * @var \Magento\Directory\Model\RegionFactory 
@@ -30,6 +28,16 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected $productRepository;
 
     /**
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper 
+     */
+    protected $configHelper;
+
+    /**
+     * @var \Magento\Customer\Model\Session 
+     */
+    protected $customerSession;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -41,13 +49,17 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Directory\Model\CountryFactory $countryFactory
+        \Magento\Directory\Model\CountryFactory $countryFactory,
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
+        \Magento\Customer\Model\Session $customerSession
     ) {
         parent::__construct($context);
 
         $this->regionFactory = $regionFactory;
         $this->countryFactory = $countryFactory;
         $this->productRepository = $productRepository;
+        $this->configHelper = $configHelper;
+        $this->customerSession = $customerSession;
     }
     /**
      * Transform Magento order to array
@@ -98,10 +110,12 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function productToArray(\Magento\Catalog\Model\Product $product, $qty)
     {
+        $customer = $this->getCustomer();
+
         return [
             "PartNumber" => $product->getPartNumber(),
             "Quantity" => $qty,
-            "CustomerId" => $this::SYTELINE_CUSTOMER_ID
+            "CustomerId" => $this->getSytelineCustomerId($customer)
         ];
     }
 
@@ -183,7 +197,19 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
             $partNumber = '';
         }
-        
+
         return $partNumber;
+    }
+
+    protected function getCustomer($order = null)
+    {
+        if (!$order) {
+            $customer = $this->customerSession->getCustomer();
+        }
+    }
+
+    protected function getSytelineCustomerId($customer)
+    {
+        $configuredSytelineId = $this->configHelper->getDefaultSytelineCustomerId();
     }
 }

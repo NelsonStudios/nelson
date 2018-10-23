@@ -26,6 +26,10 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Email\Address</backend_model>
                     <comment>Administrator email that will receive emails in case any error occur.</comment>
                 </field>
+                <field id="guest_customer_syteline_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text" canRestore="1">
+                    <label>Syteline Guest Customer ID</label>
+                    <comment>Default Customer ID pushed to Syteline to retrieve stock inventory, prices and update orders.</comment>
+                </field>
                 <field id="soap_version" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select" canRestore="1">
                     <label>SOAP Version</label>
                     <comment/>
