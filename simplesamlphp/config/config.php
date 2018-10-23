@@ -27,13 +27,13 @@ $config = array(
      * external url, no matter where you come from (direct access or via the
      * reverse proxy).
      */
-    'baseurlpath' => 'simplesaml/',
+    'baseurlpath' => '/simplesaml/',
 
     /*
      * The 'application' configuration array groups a set configuration options
      * relative to an application protected by SimpleSAMLphp.
      */
-    //'application' => array(
+    'application' => array(
         /*
          * The 'baseURL' configuration option allows you to specify a protocol,
          * host and optionally a port that serves as the canonical base for all
@@ -48,8 +48,8 @@ $config = array(
          * need to compute the right URLs yourself and pass them dynamically
          * to SimpleSAMLphp's API.
          */
-        //'baseURL' => 'https://example.com',
-    //),
+        'baseURL' => 'http://development.fecon:8020',
+    ),
 
     /*
      * The following settings are *filesystem paths* which define where

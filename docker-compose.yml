@@ -16,6 +16,7 @@ services:
       - ./:/var/www/html
       - ~/.composer:/var/www/html/var/composer_home
       - sockdata:/sock
+      - ./nginx-conf:/etc/nginx/conf.d
 
   phpfpm:
     image: markoshust/magento-php:7.1-fpm
