@@ -38,12 +38,20 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customerSession;
 
     /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Directory\Model\RegionFactory $regionFactory
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -51,7 +59,8 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
     ) {
         parent::__construct($context);
 
@@ -60,6 +69,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $this->productRepository = $productRepository;
         $this->configHelper = $configHelper;
         $this->customerSession = $customerSession;
+        $this->customerRepository = $customerRepository;
     }
     /**
      * Transform Magento order to array
@@ -71,12 +81,13 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     public function orderToArray($order)
     {
         $shippingAddress = $order->getShippingAddress();
+        $customer = $this->getCustomer($order);
         if(!$shippingAddress) {
             throw new Exception('The order has null Shipping Address');
         }
         return [
             "address" => [
-                "CustomerId" => $this::SYTELINE_CUSTOMER_ID,
+                "CustomerId" => $this->getSytelineCustomerId($customer),
                 "Line1" => $this->getShippingAddress($shippingAddress),
                 "Line2" => "",
                 "Line3" => "",
@@ -201,15 +212,47 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         return $partNumber;
     }
 
+    /**
+     * Get customer to be used in the Syteline request
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return \Magento\Customer\Api\Data\CustomerInterface|null
+     */
     protected function getCustomer($order = null)
     {
-        if (!$order) {
-            $customer = $this->customerSession->getCustomer();
+        $customer = null;
+        $customerId = null;
+        if (!$order && $this->customerSession->isLoggedIn()) {
+            $customerId = $this->customerSession->getCustomer()->getId();
+        } elseif ($order) {
+            $customerId = $order->getCustomerId();
         }
+
+        if ($customerId) {
+            try {
+                $customer = $this->customerRepository->getById($customerId);
+            } catch (\Exception $ex) {
+            }
+        }
+
+        return $customer;
     }
 
+    /**
+     * Get Syteline ID to be used in the Syteline request
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface|null $customer
+     * @return string
+     */
     protected function getSytelineCustomerId($customer)
     {
         $configuredSytelineId = $this->configHelper->getDefaultSytelineCustomerId();
+        $sytelineCustomerId = $configuredSytelineId;
+        if ($customer) {
+            $customerId = $customer->getCustomAttribute('syteline_customer_id')->getValue();
+            $sytelineCustomerId = $customerId ? $customerId : $configuredSytelineId;
+        }
+
+        return $sytelineCustomerId;
     }
 }
