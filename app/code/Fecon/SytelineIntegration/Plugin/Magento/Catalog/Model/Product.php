@@ -45,4 +45,20 @@ class Product
 
         return $returnValue;
     }
+
+    /**
+     * 
+     * @param \Magento\Catalog\Model\Product $subject
+     * @param float $result
+     * @return float
+     */
+    public function afterGetPrice(\Magento\Catalog\Model\Product $subject, $result)
+    {
+        $returnValue = $result;
+//        if ($this->sytelineHelper->existsInSyteline($subject)) {
+//            $returnValue = $this->sytelineHelper->getProductPrice($subject);
+//        }
+
+        return $returnValue;
+    }
 }
