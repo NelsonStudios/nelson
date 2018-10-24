@@ -52,6 +52,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $emailHelper;
 
     /**
+     * @var CacheHelper
+     */
+    protected $cacheHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -61,6 +66,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param EmailHelper $emailHelper
+     * @param CacheHelper $cacheHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -69,7 +75,8 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper,
         \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        EmailHelper $emailHelper
+        EmailHelper $emailHelper,
+        CacheHelper $cacheHelper
     ) {
         $this->apiHelper = $apiHelper;
         $this->logger = $logger;
@@ -77,6 +84,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->submissionHelper = $submissionHelper;
         $this->productRepository = $productRepository;
         $this->emailHelper = $emailHelper;
+        $this->cacheHelper = $cacheHelper;
 
         parent::__construct($context);
     }
@@ -246,5 +254,55 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $exists;
+    }
+
+    /**
+     * Check in Syteline the $product price
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @param boolean $specialPrice
+     * @param string $qty
+     * @return float|boolean    Returns false if response has no price
+     */
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $specialPrice = false, $qty = '1')
+    {
+        $productData = $this->dataTransformHelper->productToArray($product, $qty);
+        $productId = $product->getId();
+        $cachePrice = $this->cacheHelper->getPrice($productId, $productData['CustomerId']);
+        if ($cachePrice !== false) {
+            $price = $cachePrice;
+        } else {
+            $apiResponse = $this->apiHelper->getPartInfo($productData);
+            $price = $this->extractPriceFromResponse($apiResponse, $product->getId(), $specialPrice);
+            $this->cacheHelper->savePrice($price, $productId, $productData['CustomerId']);
+        }
+
+        return $price;
+    }
+
+    /**
+     * Get availability attribute from API Response
+     *
+     * @param array|\stdClass $response
+     * @param string $productId
+     * @param boolean $specialPrice
+     * @return float|boolean    Returns false if response has no price
+     */
+    protected function extractPriceFromResponse($response, $productId, $specialPrice = false)
+    {
+        $price = false;
+        if (is_array($response)) {
+            $errors = $response;
+        } else {
+            if (!$this->responseHasErrors($response, $errors)) {
+                $priceStr = $specialPrice ? $response->ErpGetPartInfoResponse->DiscountedPrice : $response->ErpGetPartInfoResponse->RetailPrice;
+                $price = (float) $priceStr;
+            }
+        }
+        if (isset($errors) && !empty($errors)) {
+            $this->logDataErrors($errors, null, $productId);
+        }
+
+        return $price;
     }
 }
