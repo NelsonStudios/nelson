@@ -224,7 +224,7 @@ class Cart implements CartInterface {
      * @throws \SoapFault response
      */
     public function getCartInfo($cartId) {
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : '' ));
+        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : [] ));
         try {
             $cartInfo = $client->{$this->quoteCartRepositoryV1Get}(array('cartId' => $cartId));
             return $this->cartHelper->jsonResponse($cartInfo->result); //Return cartInfo result object with cart information.
@@ -362,7 +362,6 @@ class Cart implements CartInterface {
      * submitCart function | check: https://tracker.serfe.com/view.php?id=52950#c442215
      *  Steps to get this working
      *   - Check if customer exists, if not return error response.
-     *     - Check if customer has billing and/or shipping address, if it has: update, if not: create a new one.
      *   - Get customer token in order to perform further requests.
      *   - Set Magento API REST endpoints for logged-in customers.
      *   - Perform customer autologin in order to add the products to the customer cart.
@@ -385,10 +384,6 @@ class Cart implements CartInterface {
             $productsAdded = [];
             /* Transform post data from body into an array to easily handle the data. */
             $cartData = $this->cartHelper->jsonDecode($postData['body']);
-            $customerAddressData = [
-                'BillTo' => (!empty($cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'])? $cartData['GetCart']['ErpSendShoppingCartRequest']['BillTo'] : ''),
-                'ShipTo' => (!empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo'])? $cartData['GetCart']['ErpSendShoppingCartRequest']['ShipTo'] : '')
-            ];
             /* Validation for shopping cart, check if there're products to add into the Magento cart, if not throw an exception */
             if(empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine'])) {
                 $errMsg = 'Error, empty ShoppingCartLine no products to add.';
@@ -400,8 +395,10 @@ class Cart implements CartInterface {
             $shippingCartData = [
                 'ShoppingCartLine' => $cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine']
             ];
+            $documotoUsername = $cartData['GetCart']['ErpSendShoppingCartRequest']['Username'];
             /* Get customer data */
-            $customerDataRaw = $this->customerModel->getCustomerByDocumotoUsername($customerAddressData['BillTo']['SiteAddress']['Username']);
+            $customerDataRaw = $this->customerModel->getCustomerByDocumotoUsername($documotoUsername);
+
             /* This is only to avoid to access subzero in further var usage. */
             $customerData = $customerDataRaw[0];
             unset($customerDataRaw);
@@ -418,10 +415,6 @@ class Cart implements CartInterface {
                 /* If we not set endpoints for logged-in customer, this will fail on first execution time */
                 $this->setEndpoints($this->customerToken);
             }
-            /* Set/update billing address - optional since ~447576 */
-            $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'BillTo');
-            /* Set/update shipping address - optional since ~447576 */
-            $this->customerModel->setCustomerAddress($customerData, $customerAddressData, 'ShipTo');
             
             /* Make customer autologin 
              * Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail 
@@ -442,6 +435,8 @@ class Cart implements CartInterface {
             ]);
             $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
             try {
+                /* Create empty cart */
+                $client->quoteCartManagementV1CreateEmptyCartForCustomer(((!empty($requestData))? $requestData : '' ));
                 /* Get quote */
                 $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); /* If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {
