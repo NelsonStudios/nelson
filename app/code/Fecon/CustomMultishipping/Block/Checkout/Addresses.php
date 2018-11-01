@@ -62,7 +62,7 @@ class Addresses extends \Magento\Sales\Block\Items\AbstractItems
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         array $data = []
     ) {
-        $this->_state = ObjectManager::getInstance()->get(\Magento\Multishipping\Model\Checkout\Type\Multishipping\State::class);
+        $this->_state = ObjectManager::getInstance()->get(\Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State::class);
         $this->_filterGridFactory = $filterGridFactory;
         $this->_multishipping = $multishipping;
         $this->customerRepository = $customerRepository;
