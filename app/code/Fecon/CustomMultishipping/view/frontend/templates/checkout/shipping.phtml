@@ -15,6 +15,11 @@
  */
 ?>
 <div class="iwd_main_wrapper">
+  <div class="panel">
+    <p>
+    Please, check information below and choose one shipping methods per location.
+    </p>
+  </div>
 <form action="<?= /* @escapeNotVerified */ $block->getPostActionUrl() ?>" method="post" id="shipping_method_form" class="form multicheckout shipping">
     <?php foreach ($block->getAddresses() as $_index => $_address): ?>
     <div class="block block-shipping">
