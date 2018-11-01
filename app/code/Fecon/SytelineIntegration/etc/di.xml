@@ -39,4 +39,7 @@
     <type name="Magento\Sales\Model\Service\OrderService">
         <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Sales_Model_Service_OrderService" type="Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Service\OrderService"/>
     </type>
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="Syteline_Product_Prices" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model\ProductPrice"/>
+    </type>
 </config>

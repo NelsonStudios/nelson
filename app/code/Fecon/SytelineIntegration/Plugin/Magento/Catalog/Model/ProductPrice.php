@@ -1,14 +1,14 @@
 <?php
 
+
 namespace Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model;
 
 /**
- * Plugin to detect if a product is Available based on Syteline Web Service
- *
- * 
+ * Plugin to retrieve product prices from Syteline
  */
-class Product
+class ProductPrice
 {
+
     /**
      * Syteline  Helper
      *
@@ -28,21 +28,18 @@ class Product
     }
 
     /**
-     * isAvailable Plugin
-     *
+     * 
      * @param \Magento\Catalog\Model\Product $subject
-     * @param boolean $result
-     * @return boolean
+     * @param float $result
+     * @return float
      */
-    public function afterIsAvailable(
-        \Magento\Catalog\Model\Product $subject,
-        $result
-    ) {
+    public function afterGetPrice(\Magento\Catalog\Model\Product $subject, $result)
+    {
         $returnValue = $result;
         if ($this->sytelineHelper->existsInSyteline($subject)) {
-            $returnValue = $this->sytelineHelper->isProductAvailable($subject);
+            $returnValue = $this->sytelineHelper->getProductPrice($subject);
         }
 
-        return $returnValue;
+        return $returnValue * 3;
     }
 }
