@@ -220,7 +220,7 @@
     -webkit-tap-highlight-color: transparent;
 }
 .owl-theme .owl-controls .owl-nav [class*=owl-] {
-    color: #08c;
+    color: #00AA73;
     font-size: 17px;
     text-shadow: 0 0 3px rgba(255,255,255,0.5);
     margin: 5px;
@@ -262,7 +262,7 @@
 }
 .owl-theme .owl-dots .owl-dot.active span,
 .owl-theme .owl-dots .owl-dot:hover span {
-    background: #08c;
+    background: #00AA73;
 }
 .owl-dots {
     margin-top: 30px;
