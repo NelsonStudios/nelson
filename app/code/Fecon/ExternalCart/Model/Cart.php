@@ -405,7 +405,7 @@ class Cart implements CartInterface {
             /* Get customer token otherwise we can't add products into cart as a valid logged-in user 
              * Verified: entity_id is the customer id.
              */
-            if(empty($this->customerToken) && !empty($customerData['entity_id'])) {
+            if(!empty($customerData['entity_id'])) {
                 /* Instance tokenModelFactory */
                 $customerToken = $this->tokenModelFactory->create();
                 /* Create customer token based on customer id */
