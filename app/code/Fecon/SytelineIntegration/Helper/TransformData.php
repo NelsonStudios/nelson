@@ -5,35 +5,35 @@ namespace Fecon\SytelineIntegration\Helper;
 /**
  * Transform Magento entities to arrays, in order to use with the Syteline Web Services
  *
- *
+ * 
  */
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      *
-     * @var \Magento\Directory\Model\RegionFactory
+     * @var \Magento\Directory\Model\RegionFactory 
      */
     protected $regionFactory;
 
     /**
      *
-     * @var \Magento\Directory\Model\CountryFactory
+     * @var \Magento\Directory\Model\CountryFactory 
      */
     protected $countryFactory;
 
     /**
      *
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface 
      */
     protected $productRepository;
 
     /**
-     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper 
      */
     protected $configHelper;
 
     /**
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Customer\Model\Session 
      */
     protected $customerSession;
 
@@ -111,7 +111,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
             ]
         ];
     }
-
+    
     /**
      * Generate array data to send via GetPartInfo Web Service
      *
@@ -132,7 +132,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get region code based on region id
-     *
+     * 
      * @param string $regionId
      * @return string
      */
@@ -180,7 +180,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $cartLines;
     }
-
+    
     /**
      * Get Shipping Address
      *
@@ -190,10 +190,10 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getShippingAddress($shippingAddress)
     {
         $address = isset($shippingAddress->getStreet()[0]) ? $shippingAddress->getStreet()[0] : '';
-
+        
         return (string) $address;
     }
-
+    
     /**
      * Get Part Number from $productId
      *
@@ -246,9 +246,10 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getSytelineCustomerId($customer)
     {
-        $configuredSytelineId = $this->configHelper->getDefaultSytelineCustomerId();
-        $sytelineCustomerId = $configuredSytelineId;
-        if ($customer && $customer->getCustomAttribute('syteline_customer_id') ) {
+        $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
+		//if customer is logged in and attribute 'syteline_customer_id' is not empty, 
+		//then, we should use the customer ID from syteline not default from config
+		if ($customer && $customer->getCustomAttribute('syteline_customer_id') ) {
             $customerId = $customer->getCustomAttribute('syteline_customer_id')->getValue();
             $sytelineCustomerId = $customerId ? $customerId : $configuredSytelineId;
         }
