@@ -9,8 +9,6 @@ namespace Fecon\SytelineIntegration\Helper;
  */
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const SYTELINE_CUSTOMER_ID = 'C000037';
-
     /**
      *
      * @var \Magento\Directory\Model\RegionFactory 
@@ -30,24 +28,48 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected $productRepository;
 
     /**
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper 
+     */
+    protected $configHelper;
+
+    /**
+     * @var \Magento\Customer\Model\Session 
+     */
+    protected $customerSession;
+
+    /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Directory\Model\RegionFactory $regionFactory
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Directory\Model\CountryFactory $countryFactory
+        \Magento\Directory\Model\CountryFactory $countryFactory,
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
     ) {
         parent::__construct($context);
 
         $this->regionFactory = $regionFactory;
         $this->countryFactory = $countryFactory;
         $this->productRepository = $productRepository;
+        $this->configHelper = $configHelper;
+        $this->customerSession = $customerSession;
+        $this->customerRepository = $customerRepository;
     }
     /**
      * Transform Magento order to array
@@ -59,12 +81,13 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     public function orderToArray($order)
     {
         $shippingAddress = $order->getShippingAddress();
+        $customer = $this->getCustomer($order);
         if(!$shippingAddress) {
             throw new Exception('The order has null Shipping Address');
         }
         return [
             "address" => [
-                "CustomerId" => $this::SYTELINE_CUSTOMER_ID,
+                "CustomerId" => $this->getSytelineCustomerId($customer),
                 "Line1" => $this->getShippingAddress($shippingAddress),
                 "Line2" => "",
                 "Line3" => "",
@@ -98,10 +121,12 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function productToArray(\Magento\Catalog\Model\Product $product, $qty)
     {
+        $customer = $this->getCustomer();
+
         return [
             "PartNumber" => $product->getPartNumber(),
             "Quantity" => $qty,
-            "CustomerId" => $this::SYTELINE_CUSTOMER_ID
+            "CustomerId" => $this->getSytelineCustomerId($customer)
         ];
     }
 
@@ -183,7 +208,52 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
             $partNumber = '';
         }
-        
+
         return $partNumber;
+    }
+
+    /**
+     * Get customer to be used in the Syteline request
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return \Magento\Customer\Api\Data\CustomerInterface|null
+     */
+    protected function getCustomer($order = null)
+    {
+        $customer = null;
+        $customerId = null;
+        if (!$order && $this->customerSession->isLoggedIn()) {
+            $customerId = $this->customerSession->getCustomer()->getId();
+        } elseif ($order) {
+            $customerId = $order->getCustomerId();
+        }
+
+        if ($customerId) {
+            try {
+                $customer = $this->customerRepository->getById($customerId);
+            } catch (\Exception $ex) {
+            }
+        }
+
+        return $customer;
+    }
+
+    /**
+     * Get Syteline ID to be used in the Syteline request
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface|null $customer
+     * @return string
+     */
+    protected function getSytelineCustomerId($customer)
+    {
+        $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
+		//if customer is logged in and attribute 'syteline_customer_id' is not empty, 
+		//then, we should use the customer ID from syteline not default from config
+		if ($customer && $customer->getCustomAttribute('syteline_customer_id') ) {
+            $customerId = $customer->getCustomAttribute('syteline_customer_id')->getValue();
+            $sytelineCustomerId = $customerId ? $customerId : $configuredSytelineId;
+        }
+
+        return $sytelineCustomerId;
     }
 }

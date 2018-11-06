@@ -332,7 +332,7 @@ form.form-shipping-address div#shipping-new-address-form .field ._with-tooltip .
 .iwd-opc-block-summary ol.iwd-minicart-items-header li.iwd-product-items-title div{display: inline-block;}
 .iwd-onepage-checkout .opc-sidebar {margin: 0 !important; position: absolute; top: -15px; left: 0; width: 360px; max-width: 100%;}
 .iwd-opc-block-summary span.iwd-summary-title{border-bottom: 1px solid #dadada;}
-.iwd-one-page-checkout-sidebar .iwd-opc-block-summary{background-color: white; padding: 22px 24px; margin-bottom: 0; border-top: 6px solid #08c; position: relative;}
+.iwd-one-page-checkout-sidebar .iwd-opc-block-summary{background-color: white; padding: 22px 24px; margin-bottom: 0; border-top: 6px solid #00AA73; position: relative;}
 .iwd-one-page-checkout-sidebar .iwd-opc-block-summary:before {
     content: "";
     position: absolute;
@@ -340,7 +340,7 @@ form.form-shipping-address div#shipping-new-address-form .field ._with-tooltip .
     right: auto;
     left: 26px;
     border: 8px solid;
-    border-color: transparent transparent #08c transparent;
+    border-color: transparent transparent #00AA73 transparent;
 }
 .iwd-product-item-details-wrapper.product-item-details{padding-right: 0;}
 .iwd-product-item-details-wrapper .product-item-inner div{ display: inline-block !important; padding: 0 15px 0 0 !important;}
@@ -381,7 +381,7 @@ table#iwd-opc-summary-table-totals tbody > tr.totals:last-child{border-bottom: n
 #iwd-opc-summary-table-totals tbody > tr.iwd-totals-tax th.mark{text-align: left; padding: 11px 0 10px 0;}
 .opc-block-summary .iwd-opc-product-details .product-item-inner{margin: 0; display: block;}
 .iwd-opc-block-summary .iwd-opc-product-details .iwd-subtotal{display: block}
-.iwd-summary-cart { position: absolute; top: -60px; left: 0; background-color: #08c; border-radius: 5px;}
+.iwd-summary-cart { position: absolute; top: -60px; left: 0; background-color: #00AA73; border-radius: 5px;}
 
 .iwd-opc-all-subitem-options dt{ margin-bottom: 0; /*margin-top: 6px;*/     line-height: 23px !important;}
 .iwd-opc-all-subitem-options dd{ margin-bottom: 0;/*margin-top: 6px;*/     line-height: 22px !important;}

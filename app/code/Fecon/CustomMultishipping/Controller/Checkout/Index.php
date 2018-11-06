@@ -6,9 +6,9 @@
  */
 namespace Fecon\CustomMultishipping\Controller\Checkout;
 
-use \Magento\Multishipping\Controller\Checkout;
+use \Fecon\CustomMultishipping\Controller\Checkout;
 
-class Index extends \Magento\Multishipping\Controller\Checkout
+class Index extends \Fecon\CustomMultishipping\Controller\Checkout
 {
     /**
      * Index action of Multishipping checkout

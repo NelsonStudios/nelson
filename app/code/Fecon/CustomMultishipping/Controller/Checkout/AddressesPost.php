@@ -2,11 +2,11 @@
 
 namespace Fecon\CustomMultishipping\Controller\Checkout;
 
-use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
+use Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 
-class AddressesPost extends \Magento\Multishipping\Controller\Checkout
+class AddressesPost extends \Fecon\CustomMultishipping\Controller\Checkout
 {
 
     /**

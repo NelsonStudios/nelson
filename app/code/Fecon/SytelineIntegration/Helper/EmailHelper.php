@@ -91,9 +91,10 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
         $templateVars = $this->getTemplateVars($errors, $orderId, $productId);
         $from = $this->getFromSupportIdentity();
-        $this->inlineTranslation->suspend();
-        $to = array($this->configHelper->getAdminEmail());
-        if ($to) {
+        $toEmail = $this->configHelper->getAdminEmail();
+        if ($toEmail) {
+            $to = array($toEmail);
+            $this->inlineTranslation->suspend();
             $transport = $this->transportBuilder->setTemplateIdentifier($this::ERROR_EMAIL_IDENTIFIER)
                 ->setTemplateOptions($templateOptions)
                 ->setTemplateVars($templateVars)

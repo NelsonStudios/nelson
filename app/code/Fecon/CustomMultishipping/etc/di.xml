@@ -1,16 +1,19 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-
+    <preference for="Magento\Multishipping\Block\Checkout\Results" type="Fecon\CustomMultishipping\Block\Checkout\Results"/>
     <preference for="Magento\Multishipping\Controller\Checkout\Addresses" type="Fecon\CustomMultishipping\Controller\Checkout\Addresses"/>
     <preference for="Magento\Multishipping\Controller\Checkout\AddressesPost" type="Fecon\CustomMultishipping\Controller\Checkout\AddressesPost"/>
     <preference for="Magento\Multishipping\Controller\Checkout\OverviewPost" type="Fecon\CustomMultishipping\Controller\Checkout\OverviewPost"/>
     <preference for="Magento\Multishipping\Controller\Checkout\Success" type="Fecon\CustomMultishipping\Controller\Checkout\Success"/>
     <preference for="Magento\Multishipping\Controller\Checkout\Results" type="Fecon\CustomMultishipping\Controller\Checkout\Results"/>
+    <preference for="Magento\Multishipping\Model\Cart\Controller" type="Fecon\CustomMultishipping\Model\Cart\Controller"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping"/>
-    <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\State" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State"/>
+    <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderDefault" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderDefault"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderPool" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderPool"/>
     <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderInterface" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\PlaceOrderInterface"/>
+    <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\Plugin" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\Plugin"/>
+    <preference for="Magento\Multishipping\Model\Checkout\Type\Multishipping\State" type="Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State"/>
     <preference for="Magento\Multishipping\Block\Checkout\Addresses" type="Fecon\CustomMultishipping\Block\Checkout\Addresses"/>
     <preference for="Magento\Multishipping\Block\Checkout\Shipping" type="Fecon\CustomMultishipping\Block\Checkout\Shipping"/>
     <preference for="Magento\Multishipping\Block\Checkout\Billing" type="Fecon\CustomMultishipping\Block\Checkout\Billing"/>
