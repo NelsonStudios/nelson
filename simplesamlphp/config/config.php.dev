@@ -27,7 +27,7 @@ $config = array(
      * external url, no matter where you come from (direct access or via the
      * reverse proxy).
      */
-    'baseurlpath' => '/simplesaml/',
+    'baseurlpath' => 'http://development.fecon:8020/simplesaml/',
 
     /*
      * The 'application' configuration array groups a set configuration options
