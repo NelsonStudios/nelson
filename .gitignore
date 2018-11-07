@@ -81,4 +81,5 @@ atlassian*
 /pub/*.json
 
 ### IGNORE SIMPLESAMLPHP VENDORS ###
-/simplesamlphp/vendor
+/simplesamlphp/vendor/*
+/simplesamlphp/config/config.php
