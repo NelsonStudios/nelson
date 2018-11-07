@@ -20,6 +20,7 @@ return [
         'Magento_Indexer' => 1,
         'Fecon_Shipping' => 1,
         'Fecon_SmtpTlsUpdate' => 1,
+        'Fecon_Sso' => 1,
         'Fecon_SytelineIntegration' => 1,
         'Magento_ImportExport' => 1,
         'IWD_All' => 1,
