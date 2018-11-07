@@ -83,3 +83,4 @@ atlassian*
 ### IGNORE SIMPLESAMLPHP VENDORS ###
 /simplesamlphp/vendor/*
 /simplesamlphp/config/config.php
+/simplesamlphp/cert/*
