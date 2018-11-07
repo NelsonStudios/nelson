@@ -85,6 +85,16 @@ services:
     image: redis:alpine
     depends_on:
       - db
+
+  simplesamlphpsp:
+    image: cirrusid/ssp-base
+    ports:
+      - 8060:443
+    volumes:
+      - ./spconfig:/var/simplesamlphp/config
+      - ./spmetadata:/var/simplesamlphp/metadata
+    depends_on:
+      - app
 volumes:
   dbdata:
   sockdata:
