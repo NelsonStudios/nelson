@@ -68,7 +68,7 @@ $config = array(
     ),
     */
 
-    /*
+    
     'example-userpass' => array(
         'exampleauth:UserPass',
 
@@ -86,7 +86,7 @@ $config = array(
             'eduPersonAffiliation' => array('member', 'employee'),
         ),
     ),
-    */
+    
 
     /*
     'crypto-hash' => array(
