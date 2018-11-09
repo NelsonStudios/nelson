@@ -1,6 +1,6 @@
 <?php
 
-namespace Fecon\Sso\Model;
+namespace Fecon\Sso\Model\Sso;
 
 use SAML2\Constants;
 use SimpleSAML\Utils\Auth as Auth;
@@ -11,8 +11,21 @@ use SimpleSAML\Utils\Config\Metadata as Metadata;
 /**
  * Class to handle SSO metadata
  */
-class SsoMetadata extends SimpleSaml
+class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml
 {
+
+    protected $ssoConfiguration;
+
+    public function __construct(
+        \Magento\Framework\Filesystem\DirectoryList $dir,
+        \Fecon\Sso\Helper\Config $configHelper,
+        \Magento\Framework\UrlInterface $urlInterface,
+        \Fecon\Sso\Api\Sso\SsoConfigurationInterfaceFactory $ssoConfigurationFactory
+    ) {
+        $this->ssoConfiguration = $ssoConfigurationFactory->create();
+
+        parent::__construct($dir, $configHelper, $urlInterface);
+    }
 
     public function getMetadata()
     {
@@ -20,7 +33,7 @@ class SsoMetadata extends SimpleSaml
             $this->loadSimpleSamlApplication();
         }
         // load SimpleSAMLphp, configuration and metadata
-        $config = \SimpleSAML_Configuration::getInstance();
+        $config = $this->ssoConfiguration->getInstance();
         $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
 
         if (!$config->getBoolean('enable.saml20-idp', false)) {
@@ -33,10 +46,8 @@ class SsoMetadata extends SimpleSaml
         }
 
         try {
-            $idpentityid = isset($_GET['idpentityid']) ?
-                $_GET['idpentityid'] :
-                $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted');
-            $idpmeta = $metadata->getMetaDataConfig($idpentityid, 'saml20-idp-hosted');
+            $identityProviderId = $this->getIdentityProviderId();
+            $idpmeta = $this->getMetaDataConfig();
 
             $availableCerts = array();
 
@@ -78,13 +89,13 @@ class SsoMetadata extends SimpleSaml
 
             $metaArray = array(
                 'metadata-set' => 'saml20-idp-remote',
-                'entityid'     => $idpentityid,
+                'entityid'     => $identityProviderId,
             );
 
             $ssob = $metadata->getGenerated('SingleSignOnServiceBinding', 'saml20-idp-hosted');
             $slob = $metadata->getGenerated('SingleLogoutServiceBinding', 'saml20-idp-hosted');
-            $ssol = $metadata->getGenerated('SingleSignOnService', 'saml20-idp-hosted');
-            $slol = $metadata->getGenerated('SingleLogoutService', 'saml20-idp-hosted');
+            $ssol = $this->getSingleSignOnService();
+            $slol = $this->getSingleLogoutService();
 
             if (is_array($ssob)) {
                 foreach ($ssob as $binding) {
@@ -212,13 +223,13 @@ class SsoMetadata extends SimpleSaml
                 $metaArray['contacts'][] = Metadata::getContact($techcontact);
             }
 
-            $metaBuilder = new \SimpleSAML_Metadata_SAMLBuilder($idpentityid);
+            $metaBuilder = new \SimpleSAML_Metadata_SAMLBuilder($identityProviderId);
             $metaBuilder->addMetadataIdP20($metaArray);
             $metaBuilder->addOrganizationInfo($metaArray);
 
             $metaxml = $metaBuilder->getEntityDescriptorText();
 
-            $metaflat = '$metadata['.var_export($idpentityid, true).'] = '.var_export($metaArray, true).';';
+            $metaflat = '$metadata['.var_export($identityProviderId, true).'] = '.var_export($metaArray, true).';';
 
             // sign the metadata if enabled
             $metaxml = \SimpleSAML_Metadata_Signer::sign($metaxml, $idpmeta->toArray(), 'SAML 2 IdP');
@@ -238,12 +249,43 @@ class SsoMetadata extends SimpleSaml
                 $t->data['defaultidp'] = $defaultidp;
                 $t->show();
             } else {
-                header('Content-Type: application/xml');
-
-                echo $metaxml;
+                return $metaxml;
             }
         } catch (Exception $exception) {
             throw new \SimpleSAML_Error_Error('METADATA', $exception);
         }
+    }
+
+    public function getMetaDataConfig()
+    {
+        if (!$this->applicationInitialized) {
+            $this->loadSimpleSamlApplication();
+        }
+        $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
+        $identityProviderId = $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted');
+        $idpmeta = $metadata->getMetaDataConfig($identityProviderId, 'saml20-idp-hosted');
+        $idmetaArray = $idpmeta->toArray();
+        $idmetaArray['entityid'] = $this->getIdentityProviderId();
+        $idmetaArray['metadata-index'] = $this->getIdentityProviderId();
+        $idmetaArray['privatekey'] = $this->configHelper->getSslPrivateKey();
+        $idmetaArray['certificate'] = $this->configHelper->getSslCertificate();
+        $idpmeta = $idpmeta->loadFromArray($idmetaArray);
+
+        return $idpmeta;
+    }
+
+    public function getSingleSignOnService()
+    {
+        return $this->url->getUrl('sso/idp/signon');
+    }
+
+    public function getSingleLogoutService()
+    {
+        return $this->url->getUrl('sso/idp/logout');
+    }
+
+    public function getIdentityProviderId()
+    {
+        return $this->url->getUrl('sso/metadata');
     }
 }
