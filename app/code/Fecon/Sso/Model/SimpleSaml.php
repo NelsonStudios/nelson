@@ -12,14 +12,22 @@ class SimpleSaml implements \Fecon\Sso\Api\SimpleSamlInterface
 
     protected $applicationInitialized;
 
+    protected $configHelper;
+
+    protected $url;
+
     public function __construct(
-        \Magento\Framework\Filesystem\DirectoryList $dir
+        \Magento\Framework\Filesystem\DirectoryList $dir,
+        \Fecon\Sso\Helper\Config $configHelper,
+        \Magento\Framework\UrlInterface $urlInterface
     ) {
         $this->dir = $dir;
+        $this->configHelper = $configHelper;
         $this->applicationInitialized = false;
+        $this->url = $urlInterface;
     }
 
-    public function loadSimpleSamlApplication()
+    protected function loadSimpleSamlApplication()
     {
         $magentoRoot = $this->dir->getRoot();
         $simpleSamlPhpRoot = $magentoRoot . '/' . self::SIMPLE_SAML_PHP_ROOT_FOLDER . '/' . self::SIMPLE_SAML_PHP_LIB_FOLDER;
