@@ -2,10 +2,11 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <sso>
-            <setting>
+            <settings>
                 <enabled>1</enabled>
-                <idp_id>fecon-magento2-idp</idp_id>
-            </setting>
+                <ssl_private_key>/var/www/html/nginx-certs/key.pem</ssl_private_key>
+                <ssl_certificate>/var/www/html/nginx-certs/cert.pem</ssl_certificate>
+            </settings>
         </sso>
     </default>
 </config>

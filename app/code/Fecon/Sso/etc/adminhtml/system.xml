@@ -5,15 +5,19 @@
             <label>SSO</label>
             <tab>fecon</tab>
             <resource>Fecon_Sso::config_fecon_sso</resource>
-            <group id="setting" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
+            <group id="settings" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
                 <label>Settings</label>
                 <field id="enabled" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="select">
                     <label>Enabled</label>
-                    <comment/>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="idp_id" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
-                    <label>Identity Provider ID</label>
+                <field id="ssl_private_key" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>SSL Private Key</label>
+                    <comment>Full path to the SSL private key location on the server</comment>
+                </field>
+                <field id="ssl_certificate" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>SSL Certificate</label>
+                    <comment>Full path to the SSL certificate location on the server</comment>
                 </field>
             </group>
         </section>
