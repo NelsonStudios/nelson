@@ -1,11 +1,16 @@
 <?php
 
-namespace Fecon\Sso\Model;
+namespace Fecon\Sso\Model\Sso;
 
 /**
  * Class to handle SimpleSamlPhp configurations
  */
-class Configuration extends SimpleSaml
+class SsoConfiguration extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\Sso\SsoConfigurationInterface
 {
-    //put your code here
+    public function getInstance()
+    {
+        $config = \SimpleSAML_Configuration::getInstance();
+
+        return $config;
+    }
 }
