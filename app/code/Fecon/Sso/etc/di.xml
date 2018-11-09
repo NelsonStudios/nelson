@@ -2,4 +2,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Fecon\Sso\Api\SimpleSamlInterface" type="Fecon\Sso\Model\SimpleSaml"/>
     <preference for="Fecon\Sso\Api\SsoInterface" type="Fecon\Sso\Model\Sso"/>
+    <preference for="Fecon\Sso\Api\Sso\SsoConfigurationInterface" type="Fecon\Sso\Model\Sso\SsoConfiguration"/>
 </config>
