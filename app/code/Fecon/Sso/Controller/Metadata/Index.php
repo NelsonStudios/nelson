@@ -20,6 +20,7 @@ class Index extends \Fecon\Sso\Controller\AbstractController
         $this->resultFactory = $context->getResultFactory();
         parent::__construct($context, $resultPageFactory, $ssoFactory);
     }
+
     public function execute()
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
