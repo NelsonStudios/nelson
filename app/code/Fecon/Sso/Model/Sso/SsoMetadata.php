@@ -11,7 +11,7 @@ use SimpleSAML\Utils\Config\Metadata as Metadata;
 /**
  * Class to handle SSO metadata
  */
-class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml
+class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\Sso\SsoMetadataInterface
 {
 
     protected $ssoConfiguration;

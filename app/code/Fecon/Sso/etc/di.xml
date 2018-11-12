@@ -3,4 +3,6 @@
     <preference for="Fecon\Sso\Api\SimpleSamlInterface" type="Fecon\Sso\Model\SimpleSaml"/>
     <preference for="Fecon\Sso\Api\SsoInterface" type="Fecon\Sso\Model\Sso"/>
     <preference for="Fecon\Sso\Api\Sso\SsoConfigurationInterface" type="Fecon\Sso\Model\Sso\SsoConfiguration"/>
+    <preference for="Fecon\Sso\Api\IdentityProviderInterface" type="Fecon\Sso\Model\IdentityProvider"/>
+    <preference for="Fecon\Sso\Api\Sso\SsoMetadataInterface" type="Fecon\Sso\Model\Sso\SsoMetadata"/>
 </config>
