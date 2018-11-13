@@ -24,8 +24,7 @@ class Index extends \Fecon\Sso\Controller\AbstractController
     public function execute()
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
-        $sso = $this->ssoFactory->create();
-        $xml = $sso->getMetadataXml();
+        $xml = $this->sso->getMetadataXml();
 
         return $result->setHeader('Content-Type','text/xml')->setContents($xml);
     }

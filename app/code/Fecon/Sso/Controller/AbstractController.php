@@ -10,7 +10,7 @@ abstract class AbstractController extends \Magento\Framework\App\Action\Action
 
     protected $resultPageFactory;
 
-    protected $ssoFactory;
+    protected $sso;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ abstract class AbstractController extends \Magento\Framework\App\Action\Action
         \Fecon\Sso\Api\SsoInterfaceFactory $ssoFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
-        $this->ssoFactory = $ssoFactory;
+        $this->sso = $ssoFactory->create();
         parent::__construct($context);
     }
 }

@@ -10,7 +10,6 @@ class SignOn extends \Fecon\Sso\Controller\AbstractController
 
     public function execute()
     {
-        $sso = $this->ssoFactory->create();
-        $sso->handleAuthRequest();
+        return $this->sso->handleAuthRequest();
     }
 }
