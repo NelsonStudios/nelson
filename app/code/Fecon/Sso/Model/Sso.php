@@ -2,6 +2,11 @@
 
 namespace Fecon\Sso\Model;
 
+use Fecon\Sso\Api\IdentityProviderInterface;
+use Fecon\Sso\Api\IdentityProviderInterfaceFactory;
+use Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory;
+use Magento\Framework\App\RequestInterface;
+
 /**
  * Sso class
  */
@@ -12,12 +17,16 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
     protected $request;
 
+    protected $identityProvider;
+
     public function __construct(
-        \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory,
-        \Magento\Framework\App\RequestInterface $request
+        SsoMetadataInterfaceFactory $metadataFactory,
+        RequestInterface $request,
+        IdentityProviderInterfaceFactory $identityProviderFactory
     ) {
         $this->metadata = $metadataFactory->create();
         $this->request = $request;
+        $this->identityProvider = $identityProviderFactory->create();
     }
 
     public function getMetadataXml()
@@ -28,13 +37,14 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
     public function handleAuthRequest()
     {
         $this->metadata->getMetaDataConfig();
-        $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
+//        $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
 //        $metadata = $this->metadata->getMetaDataConfig();
-        $idpEntityId = $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted');
+//        $idpEntityId = $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted');
 //        $idpEntityId = $this->metadata->getIdentityProviderId();
-        $idp = \SimpleSAML_IdP::getById('saml2:' . $idpEntityId);
+//        $idp = \SimpleSAML_IdP::getById('saml2:' . $idpEntityId);
         try {
-            \sspmod_saml_IdP_SAML2::receiveAuthnRequest($idp);
+//            \sspmod_saml_IdP_SAML2::receiveAuthnRequest($idp);
+            return $this->receiveAuthnRequest($this->identityProvider);
         } catch (\Exception $e) {
             if ($e->getMessage() === "Unable to find the current binding.") {
                 throw new \SimpleSAML_Error_Error('SSOPARAMS', $e, 400);
@@ -48,13 +58,14 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
     /**
      * Receive an authentication request.
      *
-     * @param SimpleSAML_IdP $idp The IdP we are receiving it for.
+     * @param IdentityProviderInterface $idp The IdP we are receiving it for.
      * @throws SimpleSAML_Error_BadRequest In case an error occurs when trying to receive the request.
      */
-    public static function receiveAuthnRequest(SimpleSAML_IdP $idp)
+    public function receiveAuthnRequest(IdentityProviderInterface $idp)
     {
 
-        $metadata = SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
+        $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
+//        $metadata = $this->metadata->getMetaDataConfig();
         $idpMetadata = $idp->getConfig();
 
         $supportedBindings = array(\SAML2\Constants::BINDING_HTTP_POST);
@@ -118,28 +129,28 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
             $idpInit = true;
 
-            SimpleSAML\Logger::info(
-                'SAML2.0 - IdP.SSOService: IdP initiated authentication: '.var_export($spEntityId, true)
-            );
+//            SimpleSAML\Logger::info(
+//                'SAML2.0 - IdP.SSOService: IdP initiated authentication: '.var_export($spEntityId, true)
+//            );
         } else {
-            $binding = \SAML2\Binding::getCurrentBinding();
+            $binding = $this->getCurrentBinding();
             $request = $binding->receive();
 
             if (!($request instanceof \SAML2\AuthnRequest)) {
-                throw new SimpleSAML_Error_BadRequest(
+                throw new \SimpleSAML_Error_BadRequest(
                     'Message received on authentication request endpoint wasn\'t an authentication request.'
                 );
             }
 
             $spEntityId = $request->getIssuer();
             if ($spEntityId === null) {
-                throw new SimpleSAML_Error_BadRequest(
+                throw new \SimpleSAML_Error_BadRequest(
                     'Received message on authentication request endpoint without issuer.'
                 );
             }
             $spMetadata = $metadata->getMetaDataConfig($spEntityId, 'saml20-sp-remote');
 
-            sspmod_saml_Message::validateMessage($spMetadata, $idpMetadata, $request);
+            \sspmod_saml_Message::validateMessage($spMetadata, $idpMetadata, $request);
 
             $relayState = $request->getRelayState();
 
@@ -172,19 +183,19 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
             $idpInit = false;
 
-            SimpleSAML\Logger::info(
-                'SAML2.0 - IdP.SSOService: incoming authentication request: '.var_export($spEntityId, true)
-            );
+//            SimpleSAML\Logger::info(
+//                'SAML2.0 - IdP.SSOService: incoming authentication request: '.var_export($spEntityId, true)
+//            );
         }
 
-        SimpleSAML_Stats::log('saml:idp:AuthnRequest', array(
-            'spEntityID'  => $spEntityId,
-            'idpEntityID' => $idpMetadata->getString('entityid'),
-            'forceAuthn'  => $forceAuthn,
-            'isPassive'   => $isPassive,
-            'protocol'    => 'saml2',
-            'idpInit'     => $idpInit,
-        ));
+//        SimpleSAML_Stats::log('saml:idp:AuthnRequest', array(
+//            'spEntityID'  => $spEntityId,
+//            'idpEntityID' => $idpMetadata->getString('entityid'),
+//            'forceAuthn'  => $forceAuthn,
+//            'isPassive'   => $isPassive,
+//            'protocol'    => 'saml2',
+//            'idpInit'     => $idpInit,
+//        ));
 
         $acsEndpoint = self::getAssertionConsumerService(
             $supportedBindings,
@@ -218,8 +229,8 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
         $state = array(
             'Responder'                                   => array('sspmod_saml_IdP_SAML2', 'sendResponse'),
-            SimpleSAML_Auth_State::EXCEPTION_HANDLER_FUNC => array('sspmod_saml_IdP_SAML2', 'handleAuthError'),
-            SimpleSAML_Auth_State::RESTART                => $sessionLostURL,
+            \SimpleSAML_Auth_State::EXCEPTION_HANDLER_FUNC => array('sspmod_saml_IdP_SAML2', 'handleAuthError'),
+            \SimpleSAML_Auth_State::RESTART                => $sessionLostURL,
 
             'SPMetadata'                  => $spMetadata->toArray(),
             'saml:RelayState'             => $relayState,
@@ -243,6 +254,102 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
             self::processSOAPAuthnRequest($state);
         }
 
-        $idp->handleAuthenticationRequest($state);
+        return $idp->handleAuthenticationRequest($state);
+    }
+
+    /**
+     * Find SP AssertionConsumerService based on parameter in AuthnRequest.
+     *
+     * @param array                    $supportedBindings The bindings we allow for the response.
+     * @param SimpleSAML_Configuration $spMetadata The metadata for the SP.
+     * @param string|NULL              $AssertionConsumerServiceURL AssertionConsumerServiceURL from request.
+     * @param string|NULL              $ProtocolBinding ProtocolBinding from request.
+     * @param int|NULL                 $AssertionConsumerServiceIndex AssertionConsumerServiceIndex from request.
+     *
+     * @return array  Array with the Location and Binding we should use for the response.
+     */
+    private static function getAssertionConsumerService(
+        array $supportedBindings,
+        \SimpleSAML_Configuration $spMetadata,
+        $AssertionConsumerServiceURL,
+        $ProtocolBinding,
+        $AssertionConsumerServiceIndex
+    ) {
+        assert(is_string($AssertionConsumerServiceURL) || $AssertionConsumerServiceURL === null);
+        assert(is_string($ProtocolBinding) || $ProtocolBinding === null);
+        assert(is_int($AssertionConsumerServiceIndex) || $AssertionConsumerServiceIndex === null);
+
+        /* We want to pick the best matching endpoint in the case where for example
+         * only the ProtocolBinding is given. We therefore pick endpoints with the
+         * following priority:
+         *  1. isDefault="true"
+         *  2. isDefault unset
+         *  3. isDefault="false"
+         */
+        $firstNotFalse = null;
+        $firstFalse = null;
+        foreach ($spMetadata->getEndpoints('AssertionConsumerService') as $ep) {
+            if ($AssertionConsumerServiceURL !== null && $ep['Location'] !== $AssertionConsumerServiceURL) {
+                continue;
+            }
+            if ($ProtocolBinding !== null && $ep['Binding'] !== $ProtocolBinding) {
+                continue;
+            }
+            if ($AssertionConsumerServiceIndex !== null && $ep['index'] !== $AssertionConsumerServiceIndex) {
+                continue;
+            }
+
+            if (!in_array($ep['Binding'], $supportedBindings, true)) {
+                /* The endpoint has an unsupported binding. */
+                continue;
+            }
+
+            // we have an endpoint that matches all our requirements. Check if it is the best one
+
+            if (array_key_exists('isDefault', $ep)) {
+                if ($ep['isDefault'] === true) {
+                    // this is the first matching endpoint with isDefault set to true
+                    return $ep;
+                }
+                // isDefault is set to FALSE, but the endpoint is still usable
+                if ($firstFalse === null) {
+                    // this is the first endpoint that we can use
+                    $firstFalse = $ep;
+                }
+            } else {
+                if ($firstNotFalse === null) {
+                    // this is the first endpoint without isDefault set
+                    $firstNotFalse = $ep;
+                }
+            }
+        }
+
+        if ($firstNotFalse !== null) {
+            return $firstNotFalse;
+        } elseif ($firstFalse !== null) {
+            return $firstFalse;
+        }
+
+//        SimpleSAML\Logger::warning('Authentication request specifies invalid AssertionConsumerService:');
+//        if ($AssertionConsumerServiceURL !== null) {
+//            SimpleSAML\Logger::warning('AssertionConsumerServiceURL: '.var_export($AssertionConsumerServiceURL, true));
+//        }
+//        if ($ProtocolBinding !== null) {
+//            SimpleSAML\Logger::warning('ProtocolBinding: '.var_export($ProtocolBinding, true));
+//        }
+//        if ($AssertionConsumerServiceIndex !== null) {
+//            SimpleSAML\Logger::warning(
+//                'AssertionConsumerServiceIndex: '.var_export($AssertionConsumerServiceIndex, true)
+//            );
+//        }
+
+        // we have no good endpoints. Our last resort is to just use the default endpoint
+        return $spMetadata->getDefaultEndpoint('AssertionConsumerService', $supportedBindings);
+    }
+
+    protected function getCurrentBinding()
+    {
+//        return new \SAML2\HTTPPost();
+        return \SAML2\Binding::getCurrentBinding();
     }
 }
