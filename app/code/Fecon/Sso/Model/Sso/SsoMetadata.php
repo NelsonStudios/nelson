@@ -274,9 +274,9 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
         return $idpmeta;
     }
 
-    public function getSingleSignOnService()
+    public function getSingleSignOnService($routeParams = null)
     {
-        return $this->url->getUrl('sso/idp/signon');
+        return $this->url->getUrl('sso/idp/signon', $routeParams);
     }
 
     public function getSingleLogoutService()
@@ -287,5 +287,10 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
     public function getIdentityProviderId()
     {
         return $this->url->getUrl('sso/metadata');
+    }
+
+    public function getSamlResponseUrl($routeParams = null)
+    {
+        return $this->url->getUrl('sso/idp/samlresponse', $routeParams);
     }
 }
