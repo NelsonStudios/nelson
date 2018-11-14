@@ -8,8 +8,14 @@ namespace Fecon\Sso\Controller;
 abstract class AbstractController extends \Magento\Framework\App\Action\Action
 {
 
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
     protected $resultPageFactory;
 
+    /**
+     * @var \Fecon\Sso\Api\SsoInterfaceFactory
+     */
     protected $sso;
 
     /**
@@ -17,6 +23,7 @@ abstract class AbstractController extends \Magento\Framework\App\Action\Action
      *
      * @param \Magento\Framework\App\Action\Context  $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Fecon\Sso\Api\SsoInterfaceFactory $ssoFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
