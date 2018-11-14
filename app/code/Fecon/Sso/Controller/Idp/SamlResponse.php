@@ -11,7 +11,6 @@ class SamlResponse extends \Fecon\Sso\Controller\AbstractController
 
     public function execute()
     {
-        var_dump('SAML Response');
-        die;
+        return $this->resultPageFactory->create();
     }
 }
