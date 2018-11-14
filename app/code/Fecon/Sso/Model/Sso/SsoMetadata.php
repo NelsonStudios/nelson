@@ -3,7 +3,6 @@
 namespace Fecon\Sso\Model\Sso;
 
 use SAML2\Constants;
-use SimpleSAML\Utils\Auth as Auth;
 use SimpleSAML\Utils\Crypto as Crypto;
 use SimpleSAML\Utils\HTTP as HTTP;
 use SimpleSAML\Utils\Config\Metadata as Metadata;
@@ -14,35 +13,17 @@ use SimpleSAML\Utils\Config\Metadata as Metadata;
 class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\Sso\SsoMetadataInterface
 {
 
-    protected $ssoConfiguration;
-
-    public function __construct(
-        \Magento\Framework\Filesystem\DirectoryList $dir,
-        \Fecon\Sso\Helper\Config $configHelper,
-        \Magento\Framework\UrlInterface $urlInterface,
-        \Fecon\Sso\Api\Sso\SsoConfigurationInterfaceFactory $ssoConfigurationFactory
-    ) {
-        $this->ssoConfiguration = $ssoConfigurationFactory->create();
-
-        parent::__construct($dir, $configHelper, $urlInterface);
-    }
-
     public function getMetadata()
     {
         if (!$this->applicationInitialized) {
             $this->loadSimpleSamlApplication();
         }
         // load SimpleSAMLphp, configuration and metadata
-        $config = $this->ssoConfiguration->getInstance();
+        $config = \SimpleSAML_Configuration::getInstance();
         $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
 
         if (!$config->getBoolean('enable.saml20-idp', false)) {
             throw new \SimpleSAML_Error_Error('NOACCESS');
-        }
-
-        // check if valid local session exists
-        if ($config->getBoolean('admin.protectmetadata', false)) {
-            Auth::requireAdmin();
         }
 
         try {
@@ -292,5 +273,59 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
     public function getSamlResponseUrl($routeParams = null)
     {
         return $this->url->getUrl('sso/idp/samlresponse', $routeParams);
+    }
+
+    public function getSPMetaData()
+    {
+        if (!$this->applicationInitialized) {
+            $this->loadSimpleSamlApplication();
+        }
+        $config = $this->getSPMetaDataArray();
+        $metadata = \SimpleSAML_Configuration::loadFromArray($config);
+
+        return $metadata;
+    }
+
+    public function getSPMetaDataArray()
+    {
+        $metadata = [];
+        $metadata['https://172.18.0.9/simplesaml/module.php/saml/sp/metadata.php/default-sp'] = array (
+            'SingleLogoutService' => 
+            array (
+              0 => 
+              array (
+                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp',
+              ),
+            ),
+            'AssertionConsumerService' => 
+            array (
+              0 => 
+              array (
+                'index' => 0,
+                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
+              ),
+              1 => 
+              array (
+                'index' => 1,
+                'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:browser-post',
+                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp',
+              ),
+              2 => 
+              array (
+                'index' => 2,
+                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
+                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
+              ),
+              3 => 
+              array (
+                'index' => 3,
+                'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:artifact-01',
+                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact',
+              ),
+            ),
+        );
+        return $metadata;
     }
 }
