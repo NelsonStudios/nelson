@@ -349,7 +349,13 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
     protected function getCurrentBinding()
     {
-//        return new \SAML2\HTTPPost();
         return \SAML2\Binding::getCurrentBinding();
+    }
+
+    public function sendSamlResponse()
+    {
+        $authState = $this->request->getParam('AuthState');
+        $state = $this->identityProvider->getStateFromSession($authState);
+        return $this->identityProvider->postAuth($state);
     }
 }
