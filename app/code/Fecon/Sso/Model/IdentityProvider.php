@@ -42,7 +42,7 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     /**
     * @var SerializerInterface
     */
-    private $serializer;
+    protected $serializer;
 
     public function __construct(
         \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory,
@@ -213,5 +213,216 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $this->session->setData($stateId, $serializedState);
 
         return $stateId;
+    }
+
+    /**
+     * Retrieves and deletes state from session
+     *
+     * @param string $stateId
+     * @return array|null   Returns null if state does not exist on session
+     */
+    public function getStateFromSession($stateId)
+    {
+        $sessionData = $this->session->getData();
+        $state = null;
+        if (isset($sessionData[$stateId])){
+            $serializedState = $sessionData[$stateId];
+            $this->removeStateFromSession($stateId);
+            $state = $this->serializer->unserialize($serializedState);
+        }
+
+        return $state;
+    }
+
+    protected function removeStateFromSession($stateId)
+    {
+        $sessionData = $this->session->getData();
+        unset($sessionData[$stateId]);
+        $this->session->clearStorage();
+        foreach ($sessionData as $key => $value) {
+            $this->session->setData($key, $value);
+        }
+    }
+
+    private function reauthenticate(array &$state)
+    {
+        return $this->authenticate($state);
+    }
+
+    /**
+     * The user is authenticated.
+     *
+     * @param array $state The authentication request state array.
+     *
+     * @throws SimpleSAML_Error_Exception If we are not authenticated.
+     */
+    public function postAuth(array $state)
+    {
+
+//        if (!$this->isAuthenticated()) {
+//            throw new \SimpleSAML_Error_Exception('Not authenticated.');
+//        }
+
+        $state['Attributes'] = $this->getAttributes();
+
+        if (isset($state['SPMetadata'])) {
+            $spMetadata = $state['SPMetadata'];
+        } else {
+            $spMetadata = $this->metadata->getSPMetaDataArray();
+        }
+//
+//        if (isset($state['core:SP'])) {
+//            $session = \SimpleSAML_Session::getSessionFromRequest();
+//            $previousSSOTime = $session->getData('core:idp-ssotime', $state['core:IdP'].';'.$state['core:SP']);
+//            if ($previousSSOTime !== null) {
+//                $state['PreviousSSOTimestamp'] = $previousSSOTime;
+//            }
+//        }
+//
+        $idpMetadata = $this->metadata->getMetaDataConfig()->toArray();
+//
+//        $pc = new \SimpleSAML_Auth_ProcessingChain($idpMetadata, $spMetadata, 'idp');
+//
+//        $state['ReturnCall'] = array('SimpleSAML_IdP', 'postAuthProc');
+        $state['Destination'] = $spMetadata;
+        $state['Source'] = $idpMetadata;
+
+//        $pc->processState($state);
+
+//        self::postAuthProc($state);
+        return $this->sendResponse($state);
+    }
+
+    protected function getAttributes()
+    {
+        return [
+            'UserName' => ['testusername'],
+            'Organization' => ['FECON'],
+            'UserGroup' => ['Publisher']
+        ];
+    }
+
+    /**
+     * Send a response to the SP.
+     *
+     * @param array $state The authentication state.
+     */
+    public function sendResponse(array $state)
+    {
+        assert(isset($state['Attributes']));
+        assert(isset($state['SPMetadata']));
+        assert(isset($state['saml:ConsumerURL']));
+        assert(array_key_exists('saml:RequestId', $state)); // Can be NULL
+        assert(array_key_exists('saml:RelayState', $state)); // Can be NULL.
+
+        $spMetadata = $state["SPMetadata"];
+        $spEntityId = $spMetadata['entityid'];
+        $spMetadata = \SimpleSAML_Configuration::loadFromArray(
+            $spMetadata,
+            '$metadata['.var_export($spEntityId, true).']'
+        );
+
+//        SimpleSAML\Logger::info('Sending SAML 2.0 Response to '.var_export($spEntityId, true));
+
+        $requestId = $state['saml:RequestId'];
+        $relayState = $state['saml:RelayState'];
+        $consumerURL = $state['saml:ConsumerURL'];
+        $protocolBinding = $state['saml:Binding'];
+
+//        $idp = \SimpleSAML_IdP::getByState($state);
+
+        $idpMetadata = $this->metadata->getMetaDataConfig();
+
+        $assertion = \sspmod_saml_IdP_SAML2::buildAssertion($idpMetadata, $spMetadata, $state);
+
+        if (isset($state['saml:AuthenticatingAuthority'])) {
+            $assertion->setAuthenticatingAuthority($state['saml:AuthenticatingAuthority']);
+        }
+
+        // create the session association (for logout)
+        $association = array(
+            'id'                => 'saml:'.$spEntityId,
+            'Handler'           => 'sspmod_saml_IdP_SAML2',
+            'Expires'           => $assertion->getSessionNotOnOrAfter(),
+            'saml:entityID'     => $spEntityId,
+            'saml:NameID'       => $state['saml:idp:NameID'],
+            'saml:SessionIndex' => $assertion->getSessionIndex(),
+        );
+
+        // maybe encrypt the assertion
+        $assertion = \sspmod_saml_IdP_SAML2::encryptAssertion($idpMetadata, $spMetadata, $assertion);
+
+        // create the response
+        $ar = \sspmod_saml_IdP_SAML2::buildResponse($idpMetadata, $spMetadata, $consumerURL);
+        $ar->setInResponseTo($requestId);
+        $ar->setRelayState($relayState);
+        $ar->setAssertions(array($assertion));
+
+        // register the session association with the IdP
+//        $idp->addAssociation($association);
+
+        $statsData = array(
+            'spEntityID'  => $spEntityId,
+            'idpEntityID' => $idpMetadata->getString('entityid'),
+            'protocol'    => 'saml2',
+        );
+        if (isset($state['saml:AuthnRequestReceivedAt'])) {
+            $statsData['logintime'] = microtime(true) - $state['saml:AuthnRequestReceivedAt'];
+        }
+//        SimpleSAML_Stats::log('saml:idp:Response', $statsData);
+
+        // send the response
+        $binding = \SAML2\Binding::getBinding($protocolBinding);
+//        $binding->send($ar);
+        return $this->send($ar);
+    }
+
+    protected function authenticateInSP($postData)
+    {
+        
+    }
+
+    /**
+     * Send a SAML 2 message using the HTTP-POST binding.
+     *
+     * Note: This function never returns.
+     *
+     * @param \SAML2\Message $message The message we should send.
+     */
+    public function send(\SAML2\Message $message)
+    {
+//        if ($this->destination === null) {
+            $destination = $message->getDestination();
+//        } else {
+//            $destination = $this->destination;
+//        }
+        $relayState = $message->getRelayState();
+
+        $msgStr = $message->toSignedXML();
+        $msgStr = $msgStr->ownerDocument->saveXML($msgStr);
+
+        \SAML2\Utils::getContainer()->debugMessage($msgStr, 'out');
+
+        $msgStr = base64_encode($msgStr);
+
+        if ($message instanceof \SAML2\Request) {
+            $msgType = 'SAMLRequest';
+        } else {
+            $msgType = 'SAMLResponse';
+        }
+
+        $post = array();
+        $post[$msgType] = $msgStr;
+        //@TODO     Get RelayState dynamically
+        $post['RelayState'] = 'https://172.18.0.9/simplesaml/module.php/core/authenticate.php?as=default-sp';
+        $response = [
+            'postData' => $post,
+            'destination' => $destination
+        ];
+    
+        return $response;
+        if ($relayState !== null) {
+            $post['RelayState'] = $relayState;
+        }
     }
 }
