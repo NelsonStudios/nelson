@@ -8,14 +8,33 @@ namespace Fecon\Sso\Model;
 class SimpleSaml implements \Fecon\Sso\Api\SimpleSamlInterface
 {
 
+    /**
+     * @var \Magento\Framework\Filesystem\DirectoryList 
+     */
     protected $dir;
 
+    /**
+     * @var boolean 
+     */
     protected $applicationInitialized;
 
+    /**
+     * @var \Fecon\Sso\Helper\Config 
+     */
     protected $configHelper;
 
+    /**
+     * @var \Magento\Framework\UrlInterface 
+     */
     protected $url;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Filesystem\DirectoryList $dir
+     * @param \Fecon\Sso\Helper\Config $configHelper
+     * @param \Magento\Framework\UrlInterface $urlInterface
+     */
     public function __construct(
         \Magento\Framework\Filesystem\DirectoryList $dir,
         \Fecon\Sso\Helper\Config $configHelper,
@@ -27,6 +46,11 @@ class SimpleSaml implements \Fecon\Sso\Api\SimpleSamlInterface
         $this->url = $urlInterface;
     }
 
+    /**
+     * Loads SimpleSamlPhp application
+     *
+     * @returns void
+     */
     protected function loadSimpleSamlApplication()
     {
         $magentoRoot = $this->dir->getRoot();
