@@ -13,6 +13,12 @@ use SimpleSAML\Utils\Config\Metadata as Metadata;
 class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\Sso\SsoMetadataInterface
 {
 
+    /**
+     * Return a string representing the signed XML with the IdP metadata
+     *
+     * @return string The $metadataString with the signature embedded.
+     * @throws \Exception If the certificate or private key cannot be loaded, or the metadata doesn't parse properly.
+     */
     public function getMetadata()
     {
         if (!$this->applicationInitialized) {
@@ -21,10 +27,6 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
         // load SimpleSAMLphp, configuration and metadata
         $config = \SimpleSAML_Configuration::getInstance();
         $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
-
-        if (!$config->getBoolean('enable.saml20-idp', false)) {
-            throw new \SimpleSAML_Error_Error('NOACCESS');
-        }
 
         try {
             $identityProviderId = $this->getIdentityProviderId();
@@ -189,21 +191,6 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
                 $metaArray['redirect.sign'] = $idpmeta->getBoolean('redirect.validate');
             }
 
-            if ($idpmeta->hasValue('contacts')) {
-                $contacts = $idpmeta->getArray('contacts');
-                foreach ($contacts as $contact) {
-                    $metaArray['contacts'][] = Metadata::getContact($contact);
-                }
-            }
-
-            $technicalContactEmail = $config->getString('technicalcontact_email', false);
-            if ($technicalContactEmail && $technicalContactEmail !== 'na@example.org') {
-                $techcontact['emailAddress'] = $technicalContactEmail;
-                $techcontact['name'] = $config->getString('technicalcontact_name', null);
-                $techcontact['contactType'] = 'technical';
-                $metaArray['contacts'][] = Metadata::getContact($techcontact);
-            }
-
             $metaBuilder = new \SimpleSAML_Metadata_SAMLBuilder($identityProviderId);
             $metaBuilder->addMetadataIdP20($metaArray);
             $metaBuilder->addOrganizationInfo($metaArray);
@@ -215,28 +202,20 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             // sign the metadata if enabled
             $metaxml = \SimpleSAML_Metadata_Signer::sign($metaxml, $idpmeta->toArray(), 'SAML 2 IdP');
 
-            if (array_key_exists('output', $_GET) && $_GET['output'] == 'xhtml') {
-                $defaultidp = $config->getString('default-saml20-idp', null);
-
-                $t = new \SimpleSAML_XHTML_Template($config, 'metadata.php', 'admin');
-
-                $t->data['clipboard.js'] = true;
-                $t->data['available_certs'] = $availableCerts;
-                $t->data['header'] = 'saml20-idp'; // TODO: Replace with headerString in 2.0
-                $t->data['headerString'] = \SimpleSAML\Locale\Translate::noop('metadata_saml20-idp');
-                $t->data['metaurl'] = HTTP::getSelfURLNoQuery();
-                $t->data['metadata'] = htmlspecialchars($metaxml);
-                $t->data['metadataflat'] = htmlspecialchars($metaflat);
-                $t->data['defaultidp'] = $defaultidp;
-                $t->show();
-            } else {
-                return $metaxml;
-            }
-        } catch (Exception $exception) {
+            return $metaxml;
+        } catch (\Exception $exception) {
             throw new \SimpleSAML_Error_Error('METADATA', $exception);
         }
     }
 
+    /**
+     * Retrieve the metadata as a configuration object.
+     *
+     * This function will throw an exception if it is unable to locate the metadata.
+     *
+     * @return \SimpleSAML_Configuration The configuration object representing the metadata.
+     * @throws \SimpleSAML_Error_MetadataNotFound If no metadata for the entity specified can be found.
+     */
     public function getMetaDataConfig()
     {
         if (!$this->applicationInitialized) {
@@ -255,26 +234,53 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
         return $idpmeta;
     }
 
+    /**
+     * getSingleSignOnService
+     *
+     * @param null|array $routeParams
+     * @return string
+     */
     public function getSingleSignOnService($routeParams = null)
     {
         return $this->url->getUrl('sso/idp/signon', $routeParams);
     }
 
+    /**
+     * getSingleLogoutService
+     *
+     * @return string
+     */
     public function getSingleLogoutService()
     {
         return $this->url->getUrl('sso/idp/logout');
     }
 
+    /**
+     * getIdentityProviderId
+     *
+     * @return string
+     */
     public function getIdentityProviderId()
     {
         return $this->url->getUrl('sso/metadata');
     }
 
+    /**
+     * getSamlResponseUrl
+     *
+     * @param null|array $routeParams
+     * @return string
+     */
     public function getSamlResponseUrl($routeParams = null)
     {
         return $this->url->getUrl('sso/idp/samlresponse', $routeParams);
     }
 
+    /**
+     * Returns SP metadata configuration
+     *
+     * @return \SimpleSAML_Configuration The configuration object.
+     */
     public function getSPMetaData()
     {
         if (!$this->applicationInitialized) {
@@ -286,46 +292,108 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
         return $metadata;
     }
 
+    /**
+     * Get formated SP configurations
+     *
+     * @return array
+     */
     public function getSPMetaDataArray()
     {
         $metadata = [];
-        $metadata['https://172.18.0.9/simplesaml/module.php/saml/sp/metadata.php/default-sp'] = array (
-            'SingleLogoutService' => 
-            array (
-              0 => 
-              array (
-                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp',
-              ),
-            ),
-            'AssertionConsumerService' => 
-            array (
-              0 => 
-              array (
-                'index' => 0,
-                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
-              ),
-              1 => 
-              array (
-                'index' => 1,
-                'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:browser-post',
-                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp',
-              ),
-              2 => 
-              array (
-                'index' => 2,
-                'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
-                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
-              ),
-              3 => 
-              array (
-                'index' => 3,
-                'Binding' => 'urn:oasis:names:tc:SAML:1.0:profiles:artifact-01',
-                'Location' => 'https://172.18.0.9/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact',
-              ),
-            ),
-        );
+        $spId = $this->configHelper->getSpEntityId();
+        $endpoints = $this->configHelper->getSpEndpoints();
+        $publicCertificate = $this->configHelper->getSpPublicCertificate();
+        $nameFormatId = $this->configHelper->getSpNameFormatId();
+        $validateAuthnReq = $this->configHelper->getSpValidateAuthnReq();
+        $samlSignAssrt = $this->configHelper->getSpSamlSignAssertion();
+
+        $metadata[$spId] = [
+            'entityid' => $spId,
+            'metadata-set' => self::REMOTE_SP_METADATA_SET,
+            self::ENDPOINT_LOGOUT_TYPE => $this->getEndpoints(self::ENDPOINT_LOGOUT_TYPE, $endpoints),
+            self::ENDPOINT_ASSERTION_TYPE => $this->getEndpoints(self::ENDPOINT_ASSERTION_TYPE, $endpoints),
+        ];
+        if ($publicCertificate) {
+            $metadata[$spId]['keys'] = $this->getKeys($publicCertificate);
+        }
+        if ($nameFormatId) {
+            $metadata[$spId]['NameIDFormat'] = $nameFormatId;
+        }
+        if ($validateAuthnReq) {
+            $metadata[$spId]['validate.authnrequest'] = $validateAuthnReq;
+        }
+        if ($samlSignAssrt) {
+            $metadata[$spId]['saml20.sign.assertion'] = $samlSignAssrt;
+        }
+
         return $metadata;
+    }
+
+    /**
+     * Get formated endpoints for the $endpointType
+     *
+     * @param string $endpointType
+     * @param array $endpoints
+     * @return array
+     */
+    protected function getEndpoints($endpointType, $endpoints)
+    {
+        $availableLocations = [];
+        foreach ($endpoints as $endpoint) {
+            if ($endpointType == $endpoint['endpoint']) {
+                $availableLocations[] = $this->getEndpoint($endpoint);
+            }
+        }
+
+        return $availableLocations;
+    }
+
+    /**
+     * Get formated endpoint
+     *
+     * @param array $endpoint
+     * @return array
+     */
+    protected function getEndpoint($endpoint)
+    {
+        $formatedEndpoint = [];
+        if (isset($endpoint['binding']) && !empty($endpoint['binding'])) {
+            $formatedEndpoint['Binding'] = $endpoint['binding'];
+        }
+        if (isset($endpoint['location']) && !empty($endpoint['location'])) {
+            $formatedEndpoint['Location'] = $endpoint['location'];
+        }
+        if (isset($endpoint['index']) && is_numeric($endpoint['index'])) {
+            $formatedEndpoint['index'] = (int) $endpoint['index'];
+        }
+        if (isset($endpoint['is_default']) && !empty($endpoint['is_default'])) {
+            $formatedEndpoint['isDefault'] = (bool) $endpoint['is_default'];
+        }
+
+        return $formatedEndpoint;
+    }
+
+    /**
+     * Format keys field based on the configured SP certificate
+     *
+     * @param string $publicCert
+     * @return array
+     */
+    protected function getKeys($publicCert)
+    {
+        return [
+            [
+                'encryption' => false,
+                'signing' => true,
+                'type' => self::CERTIFICATE_TYPE,
+                self::CERTIFICATE_TYPE => $publicCert
+            ],
+            [
+                'encryption' => true,
+                'signing' => false,
+                'type' => self::CERTIFICATE_TYPE,
+                self::CERTIFICATE_TYPE => $publicCert
+            ]
+        ];
     }
 }
