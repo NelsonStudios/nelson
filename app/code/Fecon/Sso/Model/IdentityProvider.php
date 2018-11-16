@@ -20,8 +20,14 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      */
     protected $id;
 
+    /**
+     * @var \Fecon\Sso\Api\Sso\SsoMetadataInterface 
+     */
     protected $metadata;
 
+    /**
+     * @var \Magento\Customer\Model\Session 
+     */
     protected $session;
 
     /**
@@ -44,6 +50,15 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     */
     protected $serializer;
 
+    /**
+     * Constructor
+     *
+     * @param \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory
+     * @param \Magento\Customer\Model\Session $session
+     * @param Context $context
+     * @param UrlInterface $urlInterface
+     * @param SerializerInterface $serializer
+     */
     public function __construct(
         \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory,
         \Magento\Customer\Model\Session $session,
@@ -91,20 +106,12 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $state['IdPMetadata'] = $this->getConfig()->toArray();
         $state['ReturnCallback'] = array('SimpleSAML_IdP', 'postAuth');
 
-//        try {
-            if ($needAuth) {
-                return $this->authenticate($state);
-                assert(false);
-            } else {
-                $this->reauthenticate($state);
-            }
-            $this->postAuth($state);
-//        } catch (\SimpleSAML_Error_Exception $e) {
-//            \SimpleSAML_Auth_State::throwException($state, $e);
-//        } catch (\Exception $e) {
-//            $e = new \SimpleSAML_Error_UnserializableException($e);
-//            \SimpleSAML_Auth_State::throwException($state, $e);
-//        }
+        if ($needAuth) {
+            return $this->authenticate($state);
+            assert(false);
+        } else {
+            return $this->reauthenticate($state);
+        }
     }
 
     /**
@@ -123,77 +130,15 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      * This function authenticates the user.
      *
      * @param array &$state The authentication request state.
-     *
-     * @throws \SimpleSAML\Module\saml\Error\NoPassive If we were asked to do passive authentication.
      */
     private function authenticate(array &$state)
     {
-//        if (isset($state['isPassive']) && (bool) $state['isPassive']) {
-//            throw new \SimpleSAML\Module\saml\Error\NoPassive('Passive authentication not supported.');
-//        }
-//
-//        $this->authSource->login($state);
         assert(is_array($state));
 
-        /*
-         * Save the identifier of this authentication source, so that we can
-         * retrieve it later. This allows us to call the login()-function on
-         * the current object.
-         */
-//        $state[self::AUTHID] = $this->authId;
-
-        // What username we should force, if any
-//        if ($this->forcedUsername !== NULL) {
-            /*
-             * This is accessed by the login form, to determine if the user
-             * is allowed to change the username.
-             */
-//            $state['forcedUsername'] = $this->forcedUsername;
-//        }
-
-        // ECP requests supply authentication credentials with the AUthnRequest
-        // so we validate them now rather than redirecting
-//        if (isset($state['core:auth:username']) && isset($state['core:auth:password'])) {
-//            $username = $state['core:auth:username'];
-//            $password = $state['core:auth:password'];
-//
-//            if (isset($state['forcedUsername'])) {
-//                $username = $state['forcedUsername'];
-//            }
-//
-//            $attributes = $this->login($username, $password);
-//            assert(is_array($attributes));
-//            $state['Attributes'] = $attributes;
-//
-//            return;
-//        }
-
         /* Save the $state-array, so that we can restore it after a redirect. */
-//        $id = \SimpleSAML_Auth_State::saveState($state, self::STAGEID);
         $id = $this->saveStateIdToSession($state);
 
-        $url = $this->metadata->getSamlResponseUrl(['AuthState' => $id]);
-
-        // Create login URL
-        $loginUrl = $this->urlInterface->getUrl(
-            'customer/account/login', 
-            [
-                'referer' => base64_encode($url)
-            ]
-        );
-        /*
-         * Redirect to the login form. We include the identifier of the saved
-         * state array as a parameter to the login form.
-         */
-//        $url = \SimpleSAML\Module::getModuleURL('core/loginuserpass.php');
-//        $params = array('AuthState' => $id);
-//        \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, $params);
-
-        // Redirect to login URL
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
-        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setUrl($loginUrl);
-        return $resultRedirect;
+        return $this->getRedirectUrl($id);
     }
 
     /**
@@ -234,6 +179,12 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         return $state;
     }
 
+    /**
+     * Remove state from session
+     *
+     * @param string $stateId
+     * @return void
+     */
     protected function removeStateFromSession($stateId)
     {
         $sessionData = $this->session->getData();
@@ -258,11 +209,6 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      */
     public function postAuth(array $state)
     {
-
-//        if (!$this->isAuthenticated()) {
-//            throw new \SimpleSAML_Error_Exception('Not authenticated.');
-//        }
-
         $state['Attributes'] = $this->getAttributes();
 
         if (isset($state['SPMetadata'])) {
@@ -270,33 +216,24 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         } else {
             $spMetadata = $this->metadata->getSPMetaDataArray();
         }
-//
-//        if (isset($state['core:SP'])) {
-//            $session = \SimpleSAML_Session::getSessionFromRequest();
-//            $previousSSOTime = $session->getData('core:idp-ssotime', $state['core:IdP'].';'.$state['core:SP']);
-//            if ($previousSSOTime !== null) {
-//                $state['PreviousSSOTimestamp'] = $previousSSOTime;
-//            }
-//        }
-//
+
         $idpMetadata = $this->metadata->getMetaDataConfig()->toArray();
-//
-//        $pc = new \SimpleSAML_Auth_ProcessingChain($idpMetadata, $spMetadata, 'idp');
-//
-//        $state['ReturnCall'] = array('SimpleSAML_IdP', 'postAuthProc');
         $state['Destination'] = $spMetadata;
         $state['Source'] = $idpMetadata;
 
-//        $pc->processState($state);
-
-//        self::postAuthProc($state);
         return $this->sendResponse($state);
     }
 
+    /**
+     * Get user attributes
+     *
+     * @return array
+     */
     protected function getAttributes()
     {
+        $userName = $this->getUserName();
         return [
-            'UserName' => ['testusername'],
+            'UserName' => [$userName],
             'Organization' => ['FECON'],
             'UserGroup' => ['Publisher']
         ];
@@ -322,14 +259,10 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
             '$metadata['.var_export($spEntityId, true).']'
         );
 
-//        SimpleSAML\Logger::info('Sending SAML 2.0 Response to '.var_export($spEntityId, true));
-
         $requestId = $state['saml:RequestId'];
         $relayState = $state['saml:RelayState'];
         $consumerURL = $state['saml:ConsumerURL'];
         $protocolBinding = $state['saml:Binding'];
-
-//        $idp = \SimpleSAML_IdP::getByState($state);
 
         $idpMetadata = $this->metadata->getMetaDataConfig();
 
@@ -358,9 +291,6 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $ar->setRelayState($relayState);
         $ar->setAssertions(array($assertion));
 
-        // register the session association with the IdP
-//        $idp->addAssociation($association);
-
         $statsData = array(
             'spEntityID'  => $spEntityId,
             'idpEntityID' => $idpMetadata->getString('entityid'),
@@ -369,17 +299,8 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         if (isset($state['saml:AuthnRequestReceivedAt'])) {
             $statsData['logintime'] = microtime(true) - $state['saml:AuthnRequestReceivedAt'];
         }
-//        SimpleSAML_Stats::log('saml:idp:Response', $statsData);
 
-        // send the response
-        $binding = \SAML2\Binding::getBinding($protocolBinding);
-//        $binding->send($ar);
         return $this->send($ar);
-    }
-
-    protected function authenticateInSP($postData)
-    {
-        
     }
 
     /**
@@ -388,14 +309,12 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      * Note: This function never returns.
      *
      * @param \SAML2\Message $message The message we should send.
+     * @return array
      */
     public function send(\SAML2\Message $message)
     {
-//        if ($this->destination === null) {
-            $destination = $message->getDestination();
-//        } else {
-//            $destination = $this->destination;
-//        }
+        $destination = $message->getDestination();
+
         $relayState = $message->getRelayState();
 
         $msgStr = $message->toSignedXML();
@@ -413,16 +332,58 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
 
         $post = array();
         $post[$msgType] = $msgStr;
-        //@TODO     Get RelayState dynamically
-        $post['RelayState'] = 'https://172.18.0.9/simplesaml/module.php/core/authenticate.php?as=default-sp';
+        if ($relayState !== null) {
+            $post['RelayState'] = $relayState;
+        }
         $response = [
             'postData' => $post,
             'destination' => $destination
         ];
-    
+
         return $response;
-        if ($relayState !== null) {
-            $post['RelayState'] = $relayState;
+    }
+
+    /**
+     * Get current logged-in customer's UserName
+     *
+     * @return string
+     */
+    protected function getUserName()
+    {
+        $customer = $this->session->getCustomer();
+        $userName = $customer->getData('username');
+
+        return $userName;
+    }
+
+    /**
+     * Get the redirect url to continue with SSO
+     *
+     * @param string $stateId
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
+    protected function getRedirectUrl($stateId)
+    {
+        $url = $this->metadata->getSamlResponseUrl(['AuthState' => $stateId]);
+        if ($this->isAuthenticated()) {
+            // Redirect to login URL
+            /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setUrl($url);
+        } else {
+            // Create login URL
+            $loginUrl = $this->urlInterface->getUrl(
+                'customer/account/login', 
+                [
+                    'referer' => base64_encode($url)
+                ]
+            );
+            // Redirect to login URL
+            /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setUrl($loginUrl);
         }
+
+        return $resultRedirect;
     }
 }
