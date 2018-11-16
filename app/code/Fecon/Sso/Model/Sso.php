@@ -13,12 +13,28 @@ use Magento\Framework\App\RequestInterface;
 class Sso implements \Fecon\Sso\Api\SsoInterface
 {
 
+    /**
+     * @var \Fecon\Sso\Api\Sso\SsoMetadataInterface 
+     */
     protected $metadata;
 
+    /**
+     * @var RequestInterface 
+     */
     protected $request;
 
+    /**
+     * @var IdentityProviderInterface 
+     */
     protected $identityProvider;
 
+    /**
+     * Constructor
+     *
+     * @param SsoMetadataInterfaceFactory $metadataFactory
+     * @param RequestInterface $request
+     * @param IdentityProviderInterfaceFactory $identityProviderFactory
+     */
     public function __construct(
         SsoMetadataInterfaceFactory $metadataFactory,
         RequestInterface $request,
@@ -29,21 +45,27 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
         $this->identityProvider = $identityProviderFactory->create();
     }
 
+    /**
+     * Get IdP Metadata on XML format
+     *
+     * @return string
+     */
     public function getMetadataXml()
     {
         return $this->metadata->getMetadata();
     }
 
+    /**
+     * Handle Authn request and return the url redirect
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
+     * @throws \SimpleSAML_Error_Error
+     * @throws \Exception
+     */
     public function handleAuthRequest()
     {
         $this->metadata->getMetaDataConfig();
-//        $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
-//        $metadata = $this->metadata->getMetaDataConfig();
-//        $idpEntityId = $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted');
-//        $idpEntityId = $this->metadata->getIdentityProviderId();
-//        $idp = \SimpleSAML_IdP::getById('saml2:' . $idpEntityId);
         try {
-//            \sspmod_saml_IdP_SAML2::receiveAuthnRequest($idp);
             return $this->receiveAuthnRequest($this->identityProvider);
         } catch (\Exception $e) {
             if ($e->getMessage() === "Unable to find the current binding.") {
@@ -59,13 +81,13 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
      * Receive an authentication request.
      *
      * @param IdentityProviderInterface $idp The IdP we are receiving it for.
+     * @return \Magento\Framework\Controller\ResultInterface
      * @throws SimpleSAML_Error_BadRequest In case an error occurs when trying to receive the request.
      */
     public function receiveAuthnRequest(IdentityProviderInterface $idp)
     {
 
         $metadata = \SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
-//        $metadata = $this->metadata->getMetaDataConfig();
         $idpMetadata = $idp->getConfig();
 
         $supportedBindings = array(\SAML2\Constants::BINDING_HTTP_POST);
@@ -128,10 +150,6 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
             $binding = null;
 
             $idpInit = true;
-
-//            SimpleSAML\Logger::info(
-//                'SAML2.0 - IdP.SSOService: IdP initiated authentication: '.var_export($spEntityId, true)
-//            );
         } else {
             $binding = $this->getCurrentBinding();
             $request = $binding->receive();
@@ -148,7 +166,7 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
                     'Received message on authentication request endpoint without issuer.'
                 );
             }
-            $spMetadata = $metadata->getMetaDataConfig($spEntityId, 'saml20-sp-remote');
+            $spMetadata = $this->metadata->getSPMetaData();
 
             \sspmod_saml_Message::validateMessage($spMetadata, $idpMetadata, $request);
 
@@ -182,20 +200,7 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
             }
 
             $idpInit = false;
-
-//            SimpleSAML\Logger::info(
-//                'SAML2.0 - IdP.SSOService: incoming authentication request: '.var_export($spEntityId, true)
-//            );
         }
-
-//        SimpleSAML_Stats::log('saml:idp:AuthnRequest', array(
-//            'spEntityID'  => $spEntityId,
-//            'idpEntityID' => $idpMetadata->getString('entityid'),
-//            'forceAuthn'  => $forceAuthn,
-//            'isPassive'   => $isPassive,
-//            'protocol'    => 'saml2',
-//            'idpInit'     => $idpInit,
-//        ));
 
         $acsEndpoint = self::getAssertionConsumerService(
             $supportedBindings,
@@ -330,28 +335,31 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
             return $firstFalse;
         }
 
-//        SimpleSAML\Logger::warning('Authentication request specifies invalid AssertionConsumerService:');
-//        if ($AssertionConsumerServiceURL !== null) {
-//            SimpleSAML\Logger::warning('AssertionConsumerServiceURL: '.var_export($AssertionConsumerServiceURL, true));
-//        }
-//        if ($ProtocolBinding !== null) {
-//            SimpleSAML\Logger::warning('ProtocolBinding: '.var_export($ProtocolBinding, true));
-//        }
-//        if ($AssertionConsumerServiceIndex !== null) {
-//            SimpleSAML\Logger::warning(
-//                'AssertionConsumerServiceIndex: '.var_export($AssertionConsumerServiceIndex, true)
-//            );
-//        }
-
         // we have no good endpoints. Our last resort is to just use the default endpoint
         return $spMetadata->getDefaultEndpoint('AssertionConsumerService', $supportedBindings);
     }
 
+    /**
+     * Guess the current binding.
+     *
+     * This function guesses the current binding and creates an instance
+     * of \SAML2\Binding matching that binding.
+     *
+     * An exception will be thrown if it is unable to guess the binding.
+     *
+     * @return \SAML2\Binding The binding.
+     * @throws \Exception
+     */
     protected function getCurrentBinding()
     {
         return \SAML2\Binding::getCurrentBinding();
     }
 
+    /**
+     * Retrieves SamlResponse to be sent to the SP
+     *
+     * @return array
+     */
     public function sendSamlResponse()
     {
         $authState = $this->request->getParam('AuthState');
