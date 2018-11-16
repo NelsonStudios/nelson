@@ -46,8 +46,8 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     protected $resultFactory;
 
     /**
-    * @var SerializerInterface
-    */
+     * @var SerializerInterface
+     */
     protected $serializer;
 
     /**
@@ -179,7 +179,7 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     {
         $sessionData = $this->session->getData();
         $state = null;
-        if (isset($sessionData[$stateId])){
+        if (isset($sessionData[$stateId])) {
             $serializedState = $sessionData[$stateId];
             $this->removeStateFromSession($stateId);
             $state = $this->serializer->unserialize($serializedState);
@@ -265,8 +265,7 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $spMetadata = $state["SPMetadata"];
         $spEntityId = $spMetadata['entityid'];
         $spMetadata = \SimpleSAML_Configuration::loadFromArray(
-            $spMetadata,
-            '$metadata['.var_export($spEntityId, true).']'
+                $spMetadata, '$metadata[' . var_export($spEntityId, true) . ']'
         );
 
         $requestId = $state['saml:RequestId'];
@@ -284,11 +283,11 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
 
         // create the session association (for logout)
         $association = array(
-            'id'                => 'saml:'.$spEntityId,
-            'Handler'           => 'sspmod_saml_IdP_SAML2',
-            'Expires'           => $assertion->getSessionNotOnOrAfter(),
-            'saml:entityID'     => $spEntityId,
-            'saml:NameID'       => $state['saml:idp:NameID'],
+            'id' => 'saml:' . $spEntityId,
+            'Handler' => 'sspmod_saml_IdP_SAML2',
+            'Expires' => $assertion->getSessionNotOnOrAfter(),
+            'saml:entityID' => $spEntityId,
+            'saml:NameID' => $state['saml:idp:NameID'],
             'saml:SessionIndex' => $assertion->getSessionIndex(),
         );
 
@@ -302,9 +301,9 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $ar->setAssertions(array($assertion));
 
         $statsData = array(
-            'spEntityID'  => $spEntityId,
+            'spEntityID' => $spEntityId,
             'idpEntityID' => $idpMetadata->getString('entityid'),
-            'protocol'    => 'saml2',
+            'protocol' => 'saml2',
         );
         if (isset($state['saml:AuthnRequestReceivedAt'])) {
             $statsData['logintime'] = microtime(true) - $state['saml:AuthnRequestReceivedAt'];
@@ -383,9 +382,8 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         } else {
             // Create login URL
             $loginUrl = $this->urlInterface->getUrl(
-                'customer/account/login', 
-                [
-                    'referer' => base64_encode($url)
+                'customer/account/login', [
+                'referer' => base64_encode($url)
                 ]
             );
             // Redirect to login URL
