@@ -144,13 +144,20 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     /**
      * Retrieve the configuration for this IdP.
      *
-     * @return SimpleSAML_Configuration The configuration object.
+     * @return \SimpleSAML_Configuration The configuration object.
      */
     public function getConfig()
     {
         return $this->metadata->getMetaDataConfig();
     }
 
+    /**
+     * Save $state into session
+     *
+     * @param array $state
+     * @param boolean $rawId
+     * @return string
+     */
     protected function saveStateIdToSession(&$state, $rawId = false)
     {
         $stateId = \SimpleSAML_Auth_State::getStateId($state, $rawId);
@@ -234,8 +241,8 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $userName = $this->getUserName();
         return [
             'UserName' => [$userName],
-            'Organization' => ['FECON'],
-            'UserGroup' => ['Publisher']
+            'Organization' => [self::DEFAULT_ORGANIZATION],
+            'UserGroup' => [self::DEFAULT_USER_GROUP]
         ];
     }
 
