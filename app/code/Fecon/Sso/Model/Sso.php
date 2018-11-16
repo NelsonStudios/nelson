@@ -156,14 +156,14 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
 
             if (!($request instanceof \SAML2\AuthnRequest)) {
                 throw new \SimpleSAML_Error_BadRequest(
-                    'Message received on authentication request endpoint wasn\'t an authentication request.'
+                'Message received on authentication request endpoint wasn\'t an authentication request.'
                 );
             }
 
             $spEntityId = $request->getIssuer();
             if ($spEntityId === null) {
                 throw new \SimpleSAML_Error_BadRequest(
-                    'Received message on authentication request endpoint without issuer.'
+                'Received message on authentication request endpoint without issuer.'
                 );
             }
             $spMetadata = $this->metadata->getSPMetaData();
@@ -203,11 +203,7 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
         }
 
         $acsEndpoint = self::getAssertionConsumerService(
-            $supportedBindings,
-            $spMetadata,
-            $consumerURL,
-            $protocolBinding,
-            $consumerIndex
+                $supportedBindings, $spMetadata, $consumerURL, $protocolBinding, $consumerIndex
         );
 
         $IDPList = array_unique(array_merge($IDPList, $spMetadata->getArrayizeString('IDPList', array())));
@@ -228,30 +224,28 @@ class Sso implements \Fecon\Sso\Api\SsoInterface
         }
 
         $sessionLostURL = \SimpleSAML\Utils\HTTP::addURLParameters(
-            \SimpleSAML\Utils\HTTP::getSelfURLNoQuery(),
-            $sessionLostParams
+                \SimpleSAML\Utils\HTTP::getSelfURLNoQuery(), $sessionLostParams
         );
 
         $state = array(
-            'Responder'                                   => array('sspmod_saml_IdP_SAML2', 'sendResponse'),
+            'Responder' => array('sspmod_saml_IdP_SAML2', 'sendResponse'),
             \SimpleSAML_Auth_State::EXCEPTION_HANDLER_FUNC => array('sspmod_saml_IdP_SAML2', 'handleAuthError'),
-            \SimpleSAML_Auth_State::RESTART                => $sessionLostURL,
-
-            'SPMetadata'                  => $spMetadata->toArray(),
-            'saml:RelayState'             => $relayState,
-            'saml:RequestId'              => $requestId,
-            'saml:IDPList'                => $IDPList,
-            'saml:ProxyCount'             => $ProxyCount,
-            'saml:RequesterID'            => $RequesterID,
-            'ForceAuthn'                  => $forceAuthn,
-            'isPassive'                   => $isPassive,
-            'saml:ConsumerURL'            => $acsEndpoint['Location'],
-            'saml:Binding'                => $acsEndpoint['Binding'],
-            'saml:NameIDFormat'           => $nameIDFormat,
-            'saml:AllowCreate'            => $allowCreate,
-            'saml:Extensions'             => $extensions,
+            \SimpleSAML_Auth_State::RESTART => $sessionLostURL,
+            'SPMetadata' => $spMetadata->toArray(),
+            'saml:RelayState' => $relayState,
+            'saml:RequestId' => $requestId,
+            'saml:IDPList' => $IDPList,
+            'saml:ProxyCount' => $ProxyCount,
+            'saml:RequesterID' => $RequesterID,
+            'ForceAuthn' => $forceAuthn,
+            'isPassive' => $isPassive,
+            'saml:ConsumerURL' => $acsEndpoint['Location'],
+            'saml:Binding' => $acsEndpoint['Binding'],
+            'saml:NameIDFormat' => $nameIDFormat,
+            'saml:AllowCreate' => $allowCreate,
+            'saml:Extensions' => $extensions,
             'saml:AuthnRequestReceivedAt' => microtime(true),
-            'saml:RequestedAuthnContext'  => $authnContext,
+            'saml:RequestedAuthnContext' => $authnContext,
         );
 
         // ECP AuthnRequests need to supply credentials

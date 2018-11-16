@@ -39,9 +39,9 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             if ($certInfo !== null) {
                 $availableCerts['new_idp.crt'] = $certInfo;
                 $keys[] = array(
-                    'type'            => 'X509Certificate',
-                    'signing'         => true,
-                    'encryption'      => true,
+                    'type' => 'X509Certificate',
+                    'signing' => true,
+                    'encryption' => true,
                     'X509Certificate' => $certInfo['certData'],
                 );
                 $hasNewCert = true;
@@ -52,9 +52,9 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             $certInfo = Crypto::loadPublicKey($idpmeta, true);
             $availableCerts['idp.crt'] = $certInfo;
             $keys[] = array(
-                'type'            => 'X509Certificate',
-                'signing'         => true,
-                'encryption'      => ($hasNewCert ? false : true),
+                'type' => 'X509Certificate',
+                'signing' => true,
+                'encryption' => ($hasNewCert ? false : true),
                 'X509Certificate' => $certInfo['certData'],
             );
 
@@ -63,16 +63,16 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
                 assert(isset($httpsCert['certData']));
                 $availableCerts['https.crt'] = $httpsCert;
                 $keys[] = array(
-                    'type'            => 'X509Certificate',
-                    'signing'         => true,
-                    'encryption'      => false,
+                    'type' => 'X509Certificate',
+                    'signing' => true,
+                    'encryption' => false,
                     'X509Certificate' => $httpsCert['certData'],
                 );
             }
 
             $metaArray = array(
                 'metadata-set' => 'saml20-idp-remote',
-                'entityid'     => $identityProviderId,
+                'entityid' => $identityProviderId,
             );
 
             $ssob = $metadata->getGenerated('SingleSignOnServiceBinding', 'saml20-idp-hosted');
@@ -83,13 +83,13 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             if (is_array($ssob)) {
                 foreach ($ssob as $binding) {
                     $metaArray['SingleSignOnService'][] = array(
-                        'Binding'  => $binding,
+                        'Binding' => $binding,
                         'Location' => $ssol,
                     );
                 }
             } else {
                 $metaArray['SingleSignOnService'][] = array(
-                    'Binding'  => $ssob,
+                    'Binding' => $ssob,
                     'Location' => $ssol,
                 );
             }
@@ -97,13 +97,13 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             if (is_array($slob)) {
                 foreach ($slob as $binding) {
                     $metaArray['SingleLogoutService'][] = array(
-                        'Binding'  => $binding,
+                        'Binding' => $binding,
                         'Location' => $slol,
                     );
                 }
             } else {
                 $metaArray['SingleLogoutService'][] = array(
-                    'Binding'  => $slob,
+                    'Binding' => $slob,
                     'Location' => $slol,
                 );
             }
@@ -117,9 +117,9 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             if ($idpmeta->getBoolean('saml20.sendartifact', false)) {
                 // Artifact sending enabled
                 $metaArray['ArtifactResolutionService'][] = array(
-                    'index'    => 0,
-                    'Location' => HTTP::getBaseURL().'saml2/idp/ArtifactResolutionService.php',
-                    'Binding'  => Constants::BINDING_SOAP,
+                    'index' => 0,
+                    'Location' => HTTP::getBaseURL() . 'saml2/idp/ArtifactResolutionService.php',
+                    'Binding' => Constants::BINDING_SOAP,
                 );
             }
 
@@ -127,29 +127,27 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
                 // Prepend HoK SSO Service endpoint.
                 array_unshift($metaArray['SingleSignOnService'], array(
                     'hoksso:ProtocolBinding' => Constants::BINDING_HTTP_REDIRECT,
-                    'Binding'                => Constants::BINDING_HOK_SSO,
-                    'Location'               => HTTP::getBaseURL().'saml2/idp/SSOService.php'
+                    'Binding' => Constants::BINDING_HOK_SSO,
+                    'Location' => HTTP::getBaseURL() . 'saml2/idp/SSOService.php'
                 ));
             }
 
             if ($idpmeta->getBoolean('saml20.ecp', false)) {
                 $metaArray['SingleSignOnService'][] = array(
                     'index' => 0,
-                    'Binding'  => Constants::BINDING_SOAP,
-                    'Location' => HTTP::getBaseURL().'saml2/idp/SSOService.php',
+                    'Binding' => Constants::BINDING_SOAP,
+                    'Location' => HTTP::getBaseURL() . 'saml2/idp/SSOService.php',
                 );
             }
 
             $metaArray['NameIDFormat'] = $idpmeta->getString(
-                'NameIDFormat',
-                'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+                'NameIDFormat', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
             );
 
             if ($idpmeta->hasValue('OrganizationName')) {
                 $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
                 $metaArray['OrganizationDisplayName'] = $idpmeta->getLocalizedString(
-                    'OrganizationDisplayName',
-                    $metaArray['OrganizationName']
+                    'OrganizationDisplayName', $metaArray['OrganizationName']
                 );
 
                 if (!$idpmeta->hasValue('OrganizationURL')) {
@@ -197,7 +195,7 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
 
             $metaxml = $metaBuilder->getEntityDescriptorText();
 
-            $metaflat = '$metadata['.var_export($identityProviderId, true).'] = '.var_export($metaArray, true).';';
+            $metaflat = '$metadata[' . var_export($identityProviderId, true) . '] = ' . var_export($metaArray, true) . ';';
 
             // sign the metadata if enabled
             $metaxml = \SimpleSAML_Metadata_Signer::sign($metaxml, $idpmeta->toArray(), 'SAML 2 IdP');
