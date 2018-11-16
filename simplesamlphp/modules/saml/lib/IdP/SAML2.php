@@ -745,7 +745,6 @@ class sspmod_saml_IdP_SAML2
         SimpleSAML_Configuration $spMetadata,
         array $attributes
     ) {
-
         $base64Attributes = $spMetadata->getBoolean('base64attributes', null);
         if ($base64Attributes === null) {
             $base64Attributes = $idpMetadata->getBoolean('base64attributes', false);
@@ -862,7 +861,7 @@ class sspmod_saml_IdP_SAML2
      *
      * @throws SimpleSAML_Error_Exception In case an error occurs when creating a holder-of-key assertion.
      */
-    private static function buildAssertion(
+    public static function buildAssertion(
         SimpleSAML_Configuration $idpMetadata,
         SimpleSAML_Configuration $spMetadata,
         array &$state
@@ -1053,7 +1052,7 @@ class sspmod_saml_IdP_SAML2
      *
      * @throws SimpleSAML_Error_Exception In case the encryption key type is not supported.
      */
-    private static function encryptAssertion(
+    public static function encryptAssertion(
         SimpleSAML_Configuration $idpMetadata,
         SimpleSAML_Configuration $spMetadata,
         \SAML2\Assertion $assertion
@@ -1154,7 +1153,7 @@ class sspmod_saml_IdP_SAML2
      *
      * @return \SAML2\Response The SAML2 response corresponding to the given data.
      */
-    private static function buildResponse(
+    public static function buildResponse(
         SimpleSAML_Configuration $idpMetadata,
         SimpleSAML_Configuration $spMetadata,
         $consumerURL
