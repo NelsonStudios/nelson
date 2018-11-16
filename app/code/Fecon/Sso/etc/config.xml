@@ -7,6 +7,35 @@
                 <ssl_private_key>/var/www/html/nginx-certs/key.pem</ssl_private_key>
                 <ssl_certificate>/var/www/html/nginx-certs/cert.pem</ssl_certificate>
             </settings>
+            <sp_settings>
+                <sp_entity_id>https://documoto.digabit.com:443/Portal/saml/metadata/alias/defaultAlias</sp_entity_id>
+                <endpoints><![CDATA[{"_1542291873774_774":{"endpoint":"AssertionConsumerService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SSO\/alias\/defaultAlias","index":"0","is_default":"0"},"_1542292132710_710":{"endpoint":"AssertionConsumerService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SSO\/alias\/defaultAlias","index":"1","is_default":"1"},"_1542292144222_222":{"endpoint":"AssertionConsumerService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:PAOS","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SSO\/alias\/defaultAlias","index":"2","is_default":"0"},"_1542292144877_877":{"endpoint":"AssertionConsumerService","binding":"urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/HoKSSO\/alias\/defaultAlias","index":"3","is_default":"0"},"_1542292170758_758":{"endpoint":"AssertionConsumerService","binding":"urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/HoKSSO\/alias\/defaultAlias","index":"4","is_default":"0"},"_1542292177582_582":{"endpoint":"SingleLogoutService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SingleLogout\/alias\/defaultAlias","index":"","is_default":"0"},"_1542292193902_902":{"endpoint":"SingleLogoutService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SingleLogout\/alias\/defaultAlias","index":"","is_default":"0"},"_1542292204606_606":{"endpoint":"SingleLogoutService","binding":"urn:oasis:names:tc:SAML:2.0:bindings:SOAP","location":"https:\/\/documoto.digabit.com:443\/Portal\/saml\/SingleLogout\/alias\/defaultAlias","index":"","is_default":"0"}}]]></endpoints>
+                <sp_name_format_id>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</sp_name_format_id>
+                <sp_public_certificate><![CDATA[MIIErDCCA5SgAwIBAgIQASoIBoDwJ1U9QcKEQSmS6DANBgkqhkiG9w0BAQsFADBeMQswCQYDVQQG
+EwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cuZGlnaWNlcnQuY29tMR0w
+GwYDVQQDExRSYXBpZFNTTCBSU0EgQ0EgMjAxODAeFw0xODAxMjMwMDAwMDBaFw0yMDAxMjMxMjAw
+MDBaMBgxFjAUBgNVBAMMDSouZGlnYWJpdC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQDCMECf5L9HF9jsIAUU99Jf5sE3zuvzlilXUyh7TTH67p84tnqrGBWgxuJXM5iulBo52yj4
+7TkrQw2ZNHxi7Y76C/QZv3YT99YNJmgrkw0ZKezXP+iLQNXGjnXagChGrvPyBmE6mNakiv3WW6Pc
+Po7dkXrQl5BJEg9Qs3mfUvF1/qDR0cMy+nGZqNKOEm3UYKLK87MekwNZqsAWffDmG44W0GbK+wqv
+ZSKtm/hdxWnNCkoC1p/Dhr8jXx7K2kmc8uuNtqeugBL5IGH+ljkc3WwsM4X1BtcNGUUsZfTIuTe3
+XLLZBZWeXiYp7biVWQWKsZkkSsfhm6WBCh0NW65NuN0BAgMBAAGjggGqMIIBpjAfBgNVHSMEGDAW
+gBRTyhdZ/GvAAyEvGq7kqqgcglbadTAdBgNVHQ4EFgQUpJrJRHAFPjBO0ZGjak3scrz3nwUwJQYD
+VR0RBB4wHIINKi5kaWdhYml0LmNvbYILZGlnYWJpdC5jb20wDgYDVR0PAQH/BAQDAgWgMB0GA1Ud
+JQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjA+BgNVHR8ENzA1MDOgMaAvhi1odHRwOi8vY2RwLnJh
+cGlkc3NsLmNvbS9SYXBpZFNTTFJTQUNBMjAxOC5jcmwwTAYDVR0gBEUwQzA3BglghkgBhv1sAQIw
+KjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzAIBgZngQwBAgEwdQYI
+KwYBBQUHAQEEaTBnMCYGCCsGAQUFBzABhhpodHRwOi8vc3RhdHVzLnJhcGlkc3NsLmNvbTA9Bggr
+BgEFBQcwAoYxaHR0cDovL2NhY2VydHMucmFwaWRzc2wuY29tL1JhcGlkU1NMUlNBQ0EyMDE4LmNy
+dDAJBgNVHRMEAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQAgxxhbpStP8YzFhdP/KWqkClP1DDgL4WqZ
+byRcNfqsQOgXwLLFktNLEqnzGBcMUxVB6gLpwPgJz8JRZ9m0eLf9I/LyhX9SA27nX4YB0ZjMqxfX
+o/7gQRjfFoakTzbppFRITEZiCYWgCTqLz3ZYB+wIrE6ecbYHKAGBe6O6UolPwVrwXXa9XlyG0S77
+LzGhItrj3r450cxaTbX76a1KAE7nBEIWwYfDQE6wF97UnmUIXSxvP8RAv1N/EoTZywpXcM/t+A8q
+fgGMA/OYii6gZa+N1IxckcM7qeehQx8D7CpGR8w5lgFy4E4lqBN9Qjql4Jgg+bgesxqqG7JHhYCp
+qUfo]]></sp_public_certificate>
+                <validate_authnrequest>1</validate_authnrequest>
+                <saml20_sign_assertion>1</saml20_sign_assertion>
+            </sp_settings>
         </sso>
     </default>
 </config>
