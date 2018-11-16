@@ -15,6 +15,7 @@ interface IdentityProviderInterface
      * Process authentication requests.
      *
      * @param array &$state The authentication request state.
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function handleAuthenticationRequest(array &$state);
 
@@ -44,7 +45,7 @@ interface IdentityProviderInterface
      * The user is authenticated.
      *
      * @param array $state The authentication request state array.
-     *
+     * @return array
      * @throws SimpleSAML_Error_Exception If we are not authenticated.
      */
     public function postAuth(array $state);
@@ -53,6 +54,7 @@ interface IdentityProviderInterface
      * Send a response to the SP.
      *
      * @param array $state The authentication state.
+     * @return array
      */
     public function sendResponse(array $state);
 
