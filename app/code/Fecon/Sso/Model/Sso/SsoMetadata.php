@@ -299,7 +299,6 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
      */
     public function getSPMetaDataArray()
     {
-        $metadata = [];
         $spId = $this->configHelper->getSpEntityId();
         $endpoints = $this->configHelper->getSpEndpoints();
         $publicCertificate = $this->configHelper->getSpPublicCertificate();
@@ -307,7 +306,7 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
         $validateAuthnReq = $this->configHelper->getSpValidateAuthnReq();
         $samlSignAssrt = $this->configHelper->getSpSamlSignAssertion();
 
-        $metadata[$spId] = [
+        $metadata = [
             'entityid' => $spId,
             'metadata-set' => self::REMOTE_SP_METADATA_SET,
             self::ENDPOINT_LOGOUT_TYPE => $this->getEndpoints(self::ENDPOINT_LOGOUT_TYPE, $endpoints),
