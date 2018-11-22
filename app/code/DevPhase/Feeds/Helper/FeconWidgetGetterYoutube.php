@@ -33,6 +33,9 @@ class FeconWidgetGetterYoutube extends FeconWidgetGetter
         if ($resp) {
             if (isset($resp['items'])) {
                 foreach ($resp['items'] as $item) {
+                    if (!isset($item['id']['videoId'])) {
+                        continue;
+                    }
                     $r = array();
                     $r['id'] = $item['id']['videoId'];
                     $r['link'] = 'https://www.youtube.com/watch?v=' . $r['id'];
