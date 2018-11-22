@@ -5,7 +5,7 @@
  */
 namespace Fecon\CustomMultishipping\Controller\Checkout;
 
-use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
+use Fecon\CustomMultishipping\Model\Checkout\Type\Multishipping\State;
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\PaymentException;
@@ -17,7 +17,7 @@ use Magento\Framework\App\ObjectManager;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class OverviewPost extends \Magento\Multishipping\Controller\Checkout
+class OverviewPost extends \Fecon\CustomMultishipping\Controller\Checkout
 {
     /**
      * @var \Magento\Framework\Data\Form\FormKey\Validator

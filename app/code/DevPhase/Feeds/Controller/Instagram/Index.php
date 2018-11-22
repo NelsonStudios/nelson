@@ -31,6 +31,11 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $instagramHelper;
 
     /**
+     * @var \Psr\Log\LoggerInterface 
+     */
+    protected $logger;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context  $context
@@ -42,11 +47,13 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \DevPhase\Feeds\Helper\FeconWidgetGetterInstagram $instagramHelper
+        \DevPhase\Feeds\Helper\FeconWidgetGetterInstagram $instagramHelper,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->jsonHelper = $jsonHelper;
         $this->instagramHelper = $instagramHelper;
+        $this->logger = $logger;
         parent::__construct($context);
     }
 

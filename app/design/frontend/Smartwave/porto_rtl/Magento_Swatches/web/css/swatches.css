@@ -87,7 +87,7 @@
     margin-left: 5px;
 }
 .swatch-option.selected {
-    border-color: #08c;
+    border-color: #00AA73;
     color: #333;
 }
 
@@ -111,17 +111,17 @@
 .swatch-attribute.size .swatch-option.selected, .swatch-attribute.manufacturer .swatch-option.selected {
     color: black;
     background: #fff;
-    border-color: #08c;
+    border-color: #00AA73;
 }
 
 .swatch-option:not(.disabled):hover {
-    border-color: #08c;
+    border-color: #00AA73;
     color: #333;
 }
 
 .swatch-option.image:not(.disabled):hover,
 .swatch-option.color:not(.disabled):hover {
-    border-color: #08c;
+    border-color: #00AA73;
 }
 
 .swatch-option.disabled {

@@ -1,0 +1,16 @@
+{
+    "name": "fecon/module-sso",
+    "description": "Handle the SSO integration with Documoto",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Fecon\\Sso\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

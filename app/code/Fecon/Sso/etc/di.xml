@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Fecon\Sso\Api\SimpleSamlInterface" type="Fecon\Sso\Model\SimpleSaml"/>
+    <preference for="Fecon\Sso\Api\SsoInterface" type="Fecon\Sso\Model\Sso"/>
+    <preference for="Fecon\Sso\Api\IdentityProviderInterface" type="Fecon\Sso\Model\IdentityProvider"/>
+    <preference for="Fecon\Sso\Api\Sso\SsoMetadataInterface" type="Fecon\Sso\Model\Sso\SsoMetadata"/>
+</config>

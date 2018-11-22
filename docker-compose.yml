@@ -5,6 +5,7 @@ services:
     image: markoshust/magento-nginx:1.13
     ports:
       - 8020:8000
+      - 8070:8443
     depends_on:
       - cron
     links:
@@ -16,12 +17,16 @@ services:
       - ./:/var/www/html
       - ~/.composer:/var/www/html/var/composer_home
       - sockdata:/sock
+      - ./nginx-conf:/etc/nginx/conf.d
+      - ./nginx-certs:/etc/nginx/certs
 
   phpfpm:
     image: markoshust/magento-php:7.1-fpm
     links:
       - phpmyadmin
       - mailcatcher
+    depends_on:
+      - phpmyadmin
     volumes: *appvolumes    
     networks:
       default:
@@ -31,7 +36,7 @@ services:
   cron:
     image: markoshust/magento-php:7.1-fpm
     depends_on:
-      - redis
+      - phpfpm
     user: root
     command: /usr/local/bin/cronstart
     links:
@@ -43,20 +48,19 @@ services:
 
   db:
     image: mysql:5.7
-    depends_on:
-      - mailcatcher
     ports:
       - 800:3306
     env_file: env/db.env
     volumes:
       - dbdata:/var/lib/mysql
+
   varnish:
     image: million12/varnish
     links:
       - app
       - phpfpm
     depends_on:
-      - app
+      - simplesamlphpsp
     ports:
       - 8030:80
     volumes:
@@ -67,23 +71,41 @@ services:
       default:
         aliases:
           - varnish
+
   mailcatcher:
     image: tophfr/mailcatcher
+    depends_on:
+      - redis
     ports:
         - 8040:80
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     depends_on:
-      - db
       - mailcatcher
     links:
         - db
     ports:
         - 8050:80
+    environment:
+     - PMA_HOST=db
+     - PMA_USER=root
+     - PMA_PASSWORD=s3rf3ntr4nd0
+
   redis:
     image: redis:alpine
     depends_on:
       - db
+
+  simplesamlphpsp:
+    image: cirrusid/ssp-base
+    ports:
+      - 8060:443
+    volumes:
+      - ./spconfig:/var/simplesamlphp/config
+      - ./spmetadata:/var/simplesamlphp/metadata
+    depends_on:
+      - app
 volumes:
   dbdata:
   sockdata:

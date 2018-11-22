@@ -68,7 +68,7 @@ class Multishipping extends \Magento\Framework\DataObject
     /**
      * Initialize dependencies.
      *
-     * @var \Magento\Multishipping\Helper\Data
+     * @var \Fecon\CustomMultishipping\Helper\Data
      */
     protected $helper;
 
@@ -203,7 +203,7 @@ class Multishipping extends \Magento\Framework\DataObject
      * @param \Magento\Quote\Model\Quote\Item\ToOrderItem $quoteItemToOrderItem
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Payment\Model\Method\SpecificationInterface $paymentSpecification
-     * @param \Magento\Multishipping\Helper\Data $helper
+     * @param \Fecon\CustomMultishipping\Helper\Data $helper
      * @param OrderSender $orderSender
      * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
@@ -232,7 +232,7 @@ class Multishipping extends \Magento\Framework\DataObject
         \Magento\Quote\Model\Quote\Item\ToOrderItem $quoteItemToOrderItem,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Payment\Model\Method\SpecificationInterface $paymentSpecification,
-        \Magento\Multishipping\Helper\Data $helper,
+        \Fecon\CustomMultishipping\Helper\Data $helper,
         OrderSender $orderSender,
         PriceCurrencyInterface $priceCurrency,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,

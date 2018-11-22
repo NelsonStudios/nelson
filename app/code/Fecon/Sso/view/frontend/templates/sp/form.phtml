@@ -1,0 +1,38 @@
+<?php
+/** @var \Fecon\Sso\Block\Idp\SamlResponse $block */
+?>
+
+    <noscript>
+        <p><strong>Note:</strong> 
+        Since your browser does not support JavaScript, 
+        you must press the button below once to proceed.</p> 
+    </noscript>
+
+<form method="post" 
+        action="<?php echo htmlspecialchars($block->getDestination()); ?>">
+    <!-- Need to add this element and call click method, because calling 
+    submit() on the form causes failed submission if the form has another 
+    element with name or id of submit.
+    See: https://developer.mozilla.org/en/DOM/form.submit#Specification -->
+    <input style="display: none;" type="submit" id="postLoginSubmitButton"/>
+
+<?php
+    foreach ($block->getPostData() as $name => $value) {
+        echo $block->printItem($name, $value);
+    }
+?>
+    <noscript>
+        <button type="submit" class="btn">Submit</button>
+    </noscript>
+
+</form>
+
+<script>
+/**
+ * Automatically click the input button to redirect the user to
+ * the SSO
+ */
+window.onload = function(){
+    document.getElementById('postLoginSubmitButton').click();
+};
+</script>

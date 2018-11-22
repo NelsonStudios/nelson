@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sso" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="80" translate="label">
+            <label>SSO</label>
+            <tab>fecon</tab>
+            <resource>Fecon_Sso::config_fecon_sso</resource>
+            <group id="settings" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
+                <label>General Settings</label>
+                <field id="enabled" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="ssl_private_key" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>SSL Private Key</label>
+                    <comment>Full path to the SSL private key location on the server</comment>
+                </field>
+                <field id="ssl_certificate" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>SSL Certificate</label>
+                    <comment>Full path to the SSL certificate location on the server</comment>
+                </field>
+            </group>
+            <group id="sp_settings" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
+                <label>Service Provider Settings</label>
+                <field id="sp_entity_id" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>Service Provider Entity ID</label>
+                    <comment>The URI to the Service Provider public metadata</comment>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>SP Endpoints</label>
+                    <frontend_model>Fecon\Sso\Block\Adminhtml\System\Config\Endpoints</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="sp_name_format_id" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">
+                    <label>NameIDFormat</label>
+                    <comment>The NameIDFormat this SP should receive</comment>
+                </field>
+                <field id="sp_public_certificate" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="textarea">
+                    <label>X509Certificate</label>
+                </field>
+                <field id="validate_authnrequest" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="select">
+                    <label>Validate Authn Request</label>
+                    <comment>Whether we require signatures on authentication requests sent from this SP</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="saml20_sign_assertion" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="select">
+                    <label>Sign Assertion</label>
+                    <comment><![CDATA[Whether <saml:Assertion> elements should be signed]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

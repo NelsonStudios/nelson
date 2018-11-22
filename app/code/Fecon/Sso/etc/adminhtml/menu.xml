@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Fecon_Sso::sso_integration" title="SSO Integration" module="Fecon_Sso" sortOrder="50" resource="Fecon_Sso::config_fecon_sso" parent="Fecon::fecon_top_level"/>
+        <add id="Fecon_Sso::sso_settings" title="SSO Settings" module="Fecon_Sso" sortOrder="10" action="adminhtml/system_config/edit/section/sso" resource="Fecon_Sso::config_fecon_sso" parent="Fecon_Sso::sso_integration"/>
+    </menu>
+</config>
