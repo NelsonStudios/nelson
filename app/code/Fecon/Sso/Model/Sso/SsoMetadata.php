@@ -311,17 +311,18 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             self::ENDPOINT_ASSERTION_TYPE => $this->getEndpoints(self::ENDPOINT_ASSERTION_TYPE, $endpoints),
         ];
         if ($publicCertificate) {
-            $metadata[$spId]['keys'] = $this->getKeys($publicCertificate);
+            $metadata['keys'] = $this->getKeys($publicCertificate);
         }
         if ($nameFormatId) {
-            $metadata[$spId]['NameIDFormat'] = $nameFormatId;
+            $metadata['NameIDFormat'] = $nameFormatId;
         }
         if ($validateAuthnReq) {
-            $metadata[$spId]['validate.authnrequest'] = $validateAuthnReq;
+            $metadata['validate.authnrequest'] = $validateAuthnReq;
         }
         if ($samlSignAssrt) {
-            $metadata[$spId]['saml20.sign.assertion'] = $samlSignAssrt;
+            $metadata['saml20.sign.assertion'] = $samlSignAssrt;
         }
+        $metadata['signature.algorithm'] = \RobRichards\XMLSecLibs\XMLSecurityKey::RSA_SHA1;
 
         return $metadata;
     }
