@@ -29,8 +29,8 @@ $config = array(
 //        'NameIDPolicy' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName',
         'redirect.sign' => TRUE,
         'redirect.validate' => true,
-        'privatekey' => 'saml.pem',
-        'certificate' => 'saml.crt',
+        'privatekey' => 'key.pem',
+        'certificate' => 'cert.pem',
         'signature.algorithm' => 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
         'sign.authnrequest' => true
     /*

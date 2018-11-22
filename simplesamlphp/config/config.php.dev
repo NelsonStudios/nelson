@@ -27,7 +27,7 @@ $config = array(
      * external url, no matter where you come from (direct access or via the
      * reverse proxy).
      */
-    'baseurlpath' => 'http://development.fecon:8020/simplesaml/',
+    'baseurlpath' => 'http://172.18.0.8:8000/simplesaml/',
 
     /*
      * The 'application' configuration array groups a set configuration options
@@ -48,7 +48,7 @@ $config = array(
          * need to compute the right URLs yourself and pass them dynamically
          * to SimpleSAMLphp's API.
          */
-        'baseURL' => 'http://development.fecon:8020',
+        'baseURL' => 'http://172.18.0.8:8000',
     ),
 
     /*
