@@ -3,6 +3,7 @@
     <module name="Fecon_SytelineIntegration" setup_version="1.0.0">
         <sequence>
             <module name="Fecon_BackendConfig" />
+            <module name="Magento_Catalog" />
         </sequence>
     </module>
 </config>
