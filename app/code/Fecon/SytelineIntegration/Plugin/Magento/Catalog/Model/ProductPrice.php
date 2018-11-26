@@ -29,17 +29,18 @@ class ProductPrice
 
     /**
      * 
-     * @param \Magento\Catalog\Model\Product $subject
+     * @param \Magento\Catalog\Pricing\Price\RegularPrice $subject
      * @param float $result
      * @return float
      */
-    public function afterGetPrice(\Magento\Catalog\Model\Product $subject, $result)
+    public function afterGetValue(\Magento\Catalog\Pricing\Price\RegularPrice $subject, $result)
     {
         $returnValue = $result;
-        if ($this->sytelineHelper->existsInSyteline($subject)) {
-            $returnValue = $this->sytelineHelper->getProductPrice($subject);
+        $product = $subject->getProduct();
+        if ($this->sytelineHelper->existsInSyteline($product)) {
+            $returnValue = $this->sytelineHelper->getProductPrice($product);
         }
 
-        return $returnValue * 3;
+        return $returnValue;
     }
 }
