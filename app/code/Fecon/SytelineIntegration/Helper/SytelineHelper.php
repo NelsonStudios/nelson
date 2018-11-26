@@ -268,20 +268,18 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $productData = $this->dataTransformHelper->productToArray($product, $qty);
         $productId = $product->getId();
-        $cachePrice = $this->cacheHelper->getPrice($productId, $productData['CustomerId']);
+        $cachePrice = $this->cacheHelper->getPrice($productId, $productData['CustomerId'], $specialPrice);
         if ($cachePrice !== false) {
             $price = $cachePrice;
         } else {
             $apiResponse = $this->apiHelper->getPartInfo($productData);
-            var_dump($product->getPartNumber(), $productData, $apiResponse);die('api response');
             $price = $this->extractPriceFromResponse($apiResponse, $product->getId(), $specialPrice);
-
             if ($price !== false) {
-                $this->cacheHelper->savePrice($price, $productId, $productData['CustomerId']);
+                $this->cacheHelper->savePrice($price, $productId, $productData['CustomerId'], $specialPrice);
             }
         }
 
-        return $price;
+        return (float) $price;
     }
 
     /**
