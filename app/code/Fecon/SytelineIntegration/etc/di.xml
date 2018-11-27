@@ -40,6 +40,9 @@
         <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Sales_Model_Service_OrderService" type="Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Service\OrderService"/>
     </type>
     <type name="Magento\Catalog\Pricing\Price\RegularPrice">
-        <plugin name="Syteline_Product_Prices" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model\ProductPrice"/>
+        <plugin name="Syteline_Product_Prices_Regular" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Pricing\RegularPrice"/>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\SpecialPrice">
+        <plugin name="Syteline_Product_Prices_Special" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Pricing\SpecialPrice"/>
     </type>
 </config>
