@@ -7,25 +7,19 @@ define([
     function main(config, element) {
         var $element = $(element);
         var AjaxUrl = config.AjaxUrl;
-        var CurrentProduct = config.CurrentProduct;
+        var CurrentProduct = config.productId;
 
         $(document).ready(function () {
-            setTimeout(function () {
-                $.ajax({
-                    context: '.price-container',
-                    url: AjaxUrl,
-                    type: "POST",
-                    showLoader: true,
-                    data: {currentproduct: CurrentProduct},
-                }).done(function (data) {
-                    $('.price-container').trigger('processStart');
-                    $('#ajaxresponse').appendTo('.product-info-price');
-                    $('[data-role=priceBox]').remove();
-                    $('#ajaxresponse').html(data.output);
-                    $('.price-container').trigger('processStop');
-                    return true;
-                });
-            }, 2000);
+            $.ajax({
+                url: AjaxUrl,
+                type: "POST",
+                data: {productId: CurrentProduct}
+            }).done(function (data) {
+                $('#ajaxresponse').appendTo('.product-info-price');
+                $('[data-role=priceBox]').remove();
+                $('#ajaxresponse').html(data.output);
+                return true;
+            });
         });
 
 
