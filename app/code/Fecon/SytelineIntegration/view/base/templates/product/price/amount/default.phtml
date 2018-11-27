@@ -1,17 +1,37 @@
 <?php
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 
 // @codingStandardsIgnoreFile
-
+/** @var \Fecon\SytelineIntegration\Pricing\Render\Amount $block */
 ?>
+<?php
+if ($block->shouldReloadPrice()):
+    $ajaxurl = $block->getRenderPriceEndpointUrl();
+    $currentProductId = $block->getSaleableItem()->getId();
+?>
+<?php /** Do not display price, display a loader instead, price will be loaded with Ajax */ ?>
+<!-- Begin loading icon -->
+<div class="sk-circle"> <div class="sk-circle1 sk-child"></div><div class="sk-circle2 sk-child"></div><div class="sk-circle3 sk-child"></div><div class="sk-circle4 sk-child"></div><div class="sk-circle5 sk-child"></div><div class="sk-circle6 sk-child"></div><div class="sk-circle7 sk-child"></div><div class="sk-circle8 sk-child"></div><div class="sk-circle9 sk-child"></div><div class="sk-circle10 sk-child"></div><div class="sk-circle11 sk-child"></div><div class="sk-circle12 sk-child"></div></div>
+<!-- End loading icon -->
+<div class="price-loader-messsage">
+    <span>Retrieving your price</span>
+</div>
+<div id="ajaxresponse"></div>
+<script type="text/x-magento-init">
+        {
+            "*": {
+                "Fecon_SytelineIntegration/js/reload-price": {
+                    "AjaxUrl": "<?php echo $ajaxurl; ?>",
+                    "productId": "<?php echo $currentProductId; ?>"
+                }
+            }
+        }
+</script>
 
-<?php /** @var \Magento\Framework\Pricing\Render\Amount $block */ ?>
-
+<?php else: ?>
+<?php /** Display price normally */ ?>
 <span class="price-container <?= /* @escapeNotVerified */ $block->getAdjustmentCssClasses() ?>"
-        <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
+        <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>
+      <?php /* echo $block->shouldReloadPrice() ? "data-mage-init='{\"loader\": {}}'" : '' */ ?>>
     <?php if ($block->getDisplayLabel()): ?>
         <span class="price-label"><?= /* @escapeNotVerified */ $block->getDisplayLabel() ?></span>
     <?php endif; ?>
@@ -31,19 +51,4 @@
     <?php endif; ?>
 </span>
 
-<div id="ajaxresponse"></div>
-<?php
-//$ajaxurl = $block->getAjaxUrl();
-$ajaxurl = 'http://development.fecon:8020/syteline/price/render';
-$currentProductId = '1';
-?>
-<script type="text/x-magento-init">
-        {
-            "*": {
-                "Fecon_SytelineIntegration/js/reload-price": {
-                    "AjaxUrl": "<?php echo $ajaxurl; ?>",
-                    "CurrentProduct": "<?php echo $currentProductId; ?>"
-                }
-            }
-        }
-</script>
+<?php endif; ?>
