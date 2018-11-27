@@ -32,7 +32,6 @@ class Render extends Action
      */
     public function __construct(Context $context, PageFactory $resultPageFactory, JsonFactory $resultJsonFactory)
     {
-
         $this->resultPageFactory = $resultPageFactory;
         $this->resultJsonFactory = $resultJsonFactory;
 
@@ -44,6 +43,10 @@ class Render extends Action
      */
     public function execute()
     {
+        if (!$this->getRequest()->isAjax()) {
+            $this->_forward('noroute');
+            return;
+        }
         $result = $this->resultJsonFactory->create();
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addHandle('catalog_product_prices');
@@ -51,7 +54,8 @@ class Render extends Action
         $data = [
             'price_render' => 'product.price.render.default',
             'price_type_code' => 'final_price',
-            'zone' => 'item_view'
+            'zone' => 'item_view',
+            'product_id' => $this->getRequest()->getParam('productId')
         ];
 
         $block = $resultPage->getLayout()
