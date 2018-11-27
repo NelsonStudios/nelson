@@ -51,14 +51,15 @@ class Render extends \Magento\Catalog\Pricing\Render
         /** @var PricingRender $priceRender */
         $priceRender = $this->getLayout()->createBlock('Magento\Framework\Pricing\Render', '', ['data' => $data]);
         if ($priceRender instanceof PricingRender) {
-//            return 'Instace of PricingRender';
-//            $product = $this->getProduct();
-            $sku = '005-99-501';
-            $product = $this->productRepository->get($sku);
-            if ($product instanceof SaleableInterface) {
-                $arguments = $this->getData();
-                $arguments['render_block'] = $this;
-                return $priceRender->render($this->getPriceTypeCode(), $product, $arguments);
+            $productId = $this->getProductId();
+            try {
+                $product = $this->productRepository->getById($productId);
+                if ($product instanceof SaleableInterface) {
+                    $arguments = $this->getData();
+                    $arguments['render_block'] = $this;
+                    return $priceRender->render($this->getPriceTypeCode(), $product, $arguments);
+                }
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $exc) {
             }
         }
         return parent::_toHtml();
