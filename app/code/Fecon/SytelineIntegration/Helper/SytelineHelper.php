@@ -282,7 +282,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        return (float) $price;
+        return $price;
     }
 
     /**
