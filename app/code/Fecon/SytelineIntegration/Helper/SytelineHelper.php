@@ -4,8 +4,6 @@ namespace Fecon\SytelineIntegration\Helper;
 
 /**
  * Main Syteline Helper
- *
- * 
  */
 class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -261,15 +259,20 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param boolean $specialPrice
+     * @param boolean $forceApi     If true will force to get the response from API instead of the cache response
      * @param string $qty
      * @return float|boolean    Returns false if response has no price
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $specialPrice = false, $qty = '1')
-    {
+    public function getProductPrice(
+        \Magento\Catalog\Model\Product $product,
+        $specialPrice = false,
+        $forceApi = false,
+        $qty = '1'
+    ) {
         $productData = $this->dataTransformHelper->productToArray($product, $qty);
         $productId = $product->getId();
         $cachePrice = $this->cacheHelper->getPrice($productId, $productData['CustomerId'], $specialPrice);
-        if ($cachePrice !== false) {
+        if ($cachePrice !== false && $forceApi === false) {
             $price = $cachePrice;
         } else {
             $apiResponse = $this->apiHelper->getPartInfo($productData);
