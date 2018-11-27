@@ -33,10 +33,34 @@ class CustomPrice implements ObserverInterface
         $item = ( $item->getParentItem() ? $item->getParentItem() : $item );
         $product = $observer->getEvent()->getData('product');
         if ($this->sytelineHelper->existsInSyteline($product)) {
-            $price = $this->sytelineHelper->getProductPrice($product);
-            $item->setCustomPrice($price);
-            $item->setOriginalCustomPrice($price);
-            $item->getProduct()->setIsSuperMode(true);
+            $price = $this->getSytelineFinalPrice($product);
+            if ($price !== false) {
+                $item->setCustomPrice($price);
+                $item->setOriginalCustomPrice($price);
+                $item->getProduct()->setIsSuperMode(true);
+            }
         }
+    }
+
+    /**
+     * 
+     * @param \Magento\Catalog\Model\Product $product
+     * @return float|boolean    Returns false if the API respond with error
+     */
+    protected function getSytelineFinalPrice($product)
+    {
+        $finalPrice = false;
+        $forceAPI = true;
+        $regularPrice = $this->sytelineHelper->getProductPrice($product, false, $forceAPI);
+        $specialPrice = $this->sytelineHelper->getProductPrice($product, true, $forceAPI);
+        if ($regularPrice !== false &&
+            $specialPrice !== false
+        ) {
+            $finalPrice = ($specialPrice < $regularPrice) ? $specialPrice : $regularPrice;
+        } elseif ($regularPrice !== false) {
+            $finalPrice = $regularPrice;
+        }
+
+        return $finalPrice;
     }
 }
