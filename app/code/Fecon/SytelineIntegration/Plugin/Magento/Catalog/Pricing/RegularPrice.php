@@ -38,7 +38,10 @@ class RegularPrice
         $returnValue = $result;
         $product = $subject->getProduct();
         if ($this->sytelineHelper->existsInSyteline($product)) {
-            $returnValue = $this->sytelineHelper->getProductPrice($product);
+            $sytelinePrice = $this->sytelineHelper->getProductPrice($product);
+            if ($sytelinePrice !== false) {
+                $returnValue = $sytelinePrice;
+            }
         }
 
         return $returnValue;
