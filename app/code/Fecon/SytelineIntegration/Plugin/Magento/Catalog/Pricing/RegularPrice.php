@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model;
+namespace Fecon\SytelineIntegration\Plugin\Magento\Catalog\Pricing;
 
 /**
  * Plugin to retrieve product prices from Syteline
  */
-class ProductPrice
+class RegularPrice
 {
 
     /**
