@@ -16,7 +16,7 @@
             <!--<item name="delete" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\DeleteButton</item>-->
             <item name="cancel" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\CancelButton</item>
             <item name="save" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\SaveButton</item>
-            <item name="save_and_continue" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\SaveAndContinueButton</item>
+            <!--<item name="save_and_continue" xsi:type="string">Fecon\Shipping\Block\Adminhtml\Preorder\Edit\SaveAndContinueButton</item>-->
         </item>
     </argument>
     <dataSource name="preorder_form_data_source">
@@ -52,6 +52,21 @@
                     <item name="source" xsi:type="string">Preorder</item>
                     <item name="sortOrder" xsi:type="number">80</item>
                     <item name="dataScope" xsi:type="string">shipping_price</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="comments">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Comments</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="source" xsi:type="string">Preorder</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                    <item name="dataScope" xsi:type="string">comments</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">false</item>
                     </item>
