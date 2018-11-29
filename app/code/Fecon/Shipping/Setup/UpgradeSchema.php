@@ -47,5 +47,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $installer->endSetup();
         }
+        if (version_compare($context->getVersion(), "1.0.2", "<")) {
+            $installer = $setup;
+            $installer->startSetup();
+            $eavTable = $installer->getTable('fecon_shipping_preorder');
+            $columns = [
+                'comments' => [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Comments',
+                    'LENGTH' => '2M'
+                ]
+
+            ];
+
+            $connection = $installer->getConnection();
+            foreach ($columns as $name => $definition) {
+                $connection->addColumn($eavTable, $name, $definition);
+            }
+
+            $installer->endSetup();
+        }
     }
 }
