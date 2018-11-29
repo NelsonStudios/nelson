@@ -222,9 +222,10 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Create a order token for customer, and send email with it
      *
      * @param string $customerId
+     * @param string $comments
      * @return void
      */
-    public function addOrderTokenToCustomer($customerId)
+    public function addOrderTokenToCustomer($customerId, $comments)
     {
         $customer = $this->customerFactory->create()->load($customerId);
         $token = $this->mathRandom->getRandomString(25);
@@ -234,7 +235,7 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customerData->setCustomAttribute('order_token_created_at', $datetime);
         $customer->updateData($customerData);
         $customer->save();
-        $this->emailHelper->sendQuoteAvailableEmail($customer, $token);
+        $this->emailHelper->sendQuoteAvailableEmail($customer, $token, $comments);
     }
 
     /**

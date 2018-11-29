@@ -60,7 +60,7 @@ class Preorder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         ) {
             $object->setData(PreorderInterface::IS_AVAILABLE, 1);
             $object->setData(PreorderInterface::STATUS, PreorderInterface::STATUS_PENDING);
-            $this->customerHelper->addOrderTokenToCustomer($object->getCustomerId());
+            $this->customerHelper->addOrderTokenToCustomer($object->getCustomerId(), $object->getComments());
         }
 
         parent::_beforeSave($object);

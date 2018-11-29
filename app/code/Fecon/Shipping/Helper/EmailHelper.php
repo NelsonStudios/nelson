@@ -45,14 +45,23 @@ class EmailHelper extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
-    public function sendQuoteAvailableEmail($customer, $token)
+    /**
+     * Send quote available email
+     *
+     * @param \Magento\Customer\Model\Customer $customer
+     * @param string $token
+     * @param string $comments
+     * @return void
+     */
+    public function sendQuoteAvailableEmail($customer, $token, $comments)
     {
         $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
         
         $templateVars = array(
             'store' => $this->storeManager->getStore(),
             'customer' => $customer,
-            'token' => $token
+            'token' => $token,
+            'comments' => $comments
         );
         $from = $this->getFromSupportIdentity();
         $this->inlineTranslation->suspend();
