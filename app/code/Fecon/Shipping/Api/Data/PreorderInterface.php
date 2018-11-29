@@ -21,6 +21,7 @@ interface PreorderInterface
     const STATUS_COMPLETED = 3;
     const STATUS_CANCELED = 4;
     const CART_DATA = 'cart_data';
+    const COMMENTS = 'comments';
 
 
     /**
@@ -165,4 +166,17 @@ interface PreorderInterface
      * @return string|null
      */
     public function getCartData();
+
+    /**
+     * Get comments
+     * @return string|null
+     */
+    public function getComments();
+
+    /**
+     * Set comments
+     * @param string $comments
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setComments($comments);
 }

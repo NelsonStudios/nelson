@@ -229,4 +229,23 @@ class Preorder extends \Magento\Framework\Model\AbstractModel implements Preorde
     {
         return $this->setData(self::CART_DATA, $cartData);
     }
+
+    /**
+     * Get comments
+     * @return string|null
+     */
+    public function getComments()
+    {
+        return $this->getData(self::COMMENTS);
+    }
+
+    /**
+     * Set comments
+     * @param string $comments
+     * @return \Fecon\Shipping\Api\Data\PreorderInterface
+     */
+    public function setComments($comments)
+    {
+        return $this->setData(self::COMMENTS, $comments);
+    }
 }
