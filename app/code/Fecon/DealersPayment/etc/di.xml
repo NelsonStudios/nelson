@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\OfflinePayments\Model\Cashondelivery">
+        <plugin name="Fecon_DealersPayment_Plugin_Magento_OfflinePayments_Model_Cashondelivery" type="Fecon\DealersPayment\Plugin\Magento\OfflinePayments\Model\Cashondelivery"/>
+    </type>
+</config>
