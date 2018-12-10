@@ -45,4 +45,7 @@
     <type name="Magento\Catalog\Pricing\Price\SpecialPrice">
         <plugin name="Syteline_Product_Prices_Special" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Pricing\SpecialPrice"/>
     </type>
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Catalog_Model_Product" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model\Product"/>
+    </type>
 </config>
