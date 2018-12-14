@@ -1,0 +1,16 @@
+{
+    "name": "fecon/module-orsproducts",
+    "description": "",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Fecon\\OrsProducts\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
