@@ -89,7 +89,7 @@ abstract class AbstractAttributeSet
     }
 
     /**
-     * Create Abrasive structure for attributes
+     * Create Ors structure for attributes
      *
      * @param EavSetup $eavSetup
      */
