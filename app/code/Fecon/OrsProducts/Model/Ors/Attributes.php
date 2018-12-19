@@ -1,12 +1,9 @@
 <?php
 
-namespace Fecon\OrsProducts\Model\Abrasive;
-
-use Magento\Catalog\Model\Product;
-use Magento\Eav\Setup\EavSetup;
+namespace Fecon\OrsProducts\Model\Ors;
 
 /**
- * Class to create Abrasive attributes
+ * Class to create Ors attributes
  */
 class Attributes extends \Fecon\OrsProducts\Model\AbstractAttributes
 {
@@ -16,9 +13,9 @@ class Attributes extends \Fecon\OrsProducts\Model\AbstractAttributes
      *
      * @return array
      */
-    protected function getAbrasiveTextAttributes()
+    protected function getTextAttributes()
     {
-        $abrasiveAttributes = [
+        $orsAttributes = [
             'unspsc' => [
                 'label' => 'UNSPSC'
             ],
@@ -29,7 +26,7 @@ class Attributes extends \Fecon\OrsProducts\Model\AbstractAttributes
                 'label' => 'MfgPartNumber'
             ]
         ];
-        $attributes = $this->getTextAttributes($abrasiveAttributes);
+        $attributes = $this->mergeTextAttributes($orsAttributes);
 
 
         return $attributes;
@@ -40,9 +37,9 @@ class Attributes extends \Fecon\OrsProducts\Model\AbstractAttributes
      *
      * @return array
      */
-    protected function getAbrasiveDropdownAttributes()
+    protected function getDropdownAttributes()
     {
-        $abrasiveAttributes = [
+        $orsAttributes = [
             'web_uom' => [
                 'label' => 'WebUOM',
             ],
@@ -51,40 +48,74 @@ class Attributes extends \Fecon\OrsProducts\Model\AbstractAttributes
             ],
             'manufacturer_url' => [
                 'label' => 'Manufacturer URL'
+            ],
+            'manufacturer_logo' => [
+                'label' => 'Manufacturer Logo'
+            ],
+            'hazmat' => [
+                'label' => 'Hazmat',
+                'input' => 'boolean'
+            ],
+            'testing_and_approvals' => [
+                'label' => 'TestingAndApprovals'
+            ],
+            'minimum_order' => [
+                'label' => 'MinimumOrder'
+            ],
+            'standard_pack' => [
+                'label' => 'StandardPack'
+            ],
+            'prop_65_warning_required' => [
+                'label' => 'Prop 65 Warning Required',
+                'input' => 'boolean'
+            ],
+            'prop_65_warning_label' => [
+                'label' => 'Prop 65 Warning Label',
+                'input' => 'boolean'
+            ],
+            'prop_65_warning_message' => [
+                'label' => 'Prop 65 Warning Message'
             ]
         ];
 
-        $attributes = $this->getDropdownAttributes($abrasiveAttributes);
+        $attributes = $this->mergeDropdownAttributes($orsAttributes);
 
         return $attributes;
     }
 
     /**
-     * Create attributes for abrasive products
-     *
-     * @param EavSetup $eavSetup
-     */
-    public function createAbrasiveAttributes($eavSetup)
-    {
-        $attributes = $this->getAttributes();
-        foreach ($attributes as $attributeCode => $attributeOptions) {
-            $eavSetup->addAttribute(Product::ENTITY, $attributeCode, $attributeOptions);
-        }
-    }
-
-    /**
-     * Get all the attributes
+     * Get user defined multiselect attributes
      *
      * @return array
      */
-    protected function getAttributes()
+    protected function getMultiselectAttributes()
     {
-        $userDefinedTextAttributes = $this->getAbrasiveTextAttributes();
-        $textAttributes = $this->getTextAttributes($userDefinedTextAttributes);
-        $userDefinedDropdownAttributes = $this->getAbrasiveDropdownAttributes();
-        $dropdownAttributes = $this->getTextAttributes($userDefinedDropdownAttributes);
+        $orsAttributes = [
+            'features' => [
+                'label' => 'Features',
+            ]
+        ];
 
-        $attributes = array_merge($textAttributes, $dropdownAttributes);
+        $attributes = $this->mergeMultiselectAttributes($orsAttributes);
+
+        return $attributes;
+    }
+
+    /**
+     * Get user defined textarea attributes
+     *
+     * @return array
+     */
+    protected function getTextareaAttributes()
+    {
+        $orsAttributes = [
+            'attributes' => [
+                'label' => 'Attributes',
+            ]
+        ];
+
+        $attributes = $this->mergeTextareaAttributes($orsAttributes);
+
         return $attributes;
     }
 }

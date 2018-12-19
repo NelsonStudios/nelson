@@ -1,9 +1,9 @@
 <?php
 
-namespace Fecon\OrsProducts\Model\Abrasive;
+namespace Fecon\OrsProducts\Model\Ors;
 
 /**
- * Description of AttributeSet
+ * Class to create Ors attribute set and attribute group
  */
 class AttributeSet extends \Fecon\OrsProducts\Model\AbstractAttributeSet
 {
@@ -16,14 +16,25 @@ class AttributeSet extends \Fecon\OrsProducts\Model\AbstractAttributeSet
     protected function getAttributeSetNames()
     {
         return [
-            'abrasive' => [
-                'Abrasives Atributes' => [
+            'ORS Products' => [
+                'ORS Atributes' => [
                     'unspsc',
                     'upc',
                     'mfg_part_number',
                     'web_uom',
                     'family',
-                    'manufacturer_url'
+                    'manufacturer',
+                    'manufacturer_url',
+                    'manufacturer_logo',
+                    'hazmat',
+                    'testing_and_approvals',
+                    'minimum_order',
+                    'standard_pack',
+                    'prop_65_warning_required',
+                    'prop_65_warning_label',
+                    'prop_65_warning_message',
+                    'features',
+                    'attributes'
                 ]
             ]
         ];
