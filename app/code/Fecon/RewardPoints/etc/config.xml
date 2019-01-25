@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <aw_rewardpoints>
+            <calculation>
+                <silver_level>100</silver_level>
+                <gold_level>1000</gold_level>
+            </calculation>
+            <notifications>
+                <points_for_admin_notification>1000</points_for_admin_notification>
+                <admin_email>sales</admin_email>
+            </notifications>
+        </aw_rewardpoints>
+    </default>
+</config>

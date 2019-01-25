@@ -1,0 +1,16 @@
+{
+    "name": "fecon/module-rewardpoints",
+    "description": "Extension to modify the behavior of the Aheadworks_RewardPoints module",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Fecon\\RewardPoints\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

@@ -1,0 +1,49 @@
+
+.customer-account-index {
+    .page-wrapper {
+        .columns {
+            .column.main {
+                .block-dashboard-info {
+                    .block-content {
+                        .box-information {
+                            .box-content {
+                                .medal-image-container {
+                                    width: 20%;
+
+                                    .medal-image {
+                                        float: left;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .customer-account-index {
+        .page-wrapper {
+            #maincontent {
+                .columns {
+                    .column.main {
+                        .block-dashboard-info {
+                            .block-content {
+                                .box-information {
+                                    .box-content {
+                                        .medal-image-container {
+                                            width: 15%;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

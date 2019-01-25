@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="aw_rewardpoints">
+            <group id="calculation">
+                <field id="silver_level" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="120" translate="label" type="text" canRestore="1">
+                    <label>Points for Silver Level</label>
+                    <comment>The number of points that a customer should reach to be Silver Level</comment>
+                </field>
+                <field id="gold_level" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="140" translate="label" type="text" canRestore="1">
+                    <label>Points for Gold Level</label>
+                    <comment>The number of points that a customer should reach to be Gold Level</comment>
+                </field>
+            </group>
+            <group id="notifications">
+                <field id="points_for_admin_notification" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="80" translate="label" type="text" canRestore="1">
+                    <label>Points awarded for admin notification</label>
+                    <comment>The number of points that a customer should reach to send a notification to an administrator</comment>
+                </field>
+                <field id="admin_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="select" canRestore="1">
+                    <label>Admin Email</label>
+                    <comment>Administrator that will receive notifications when certain amount of points are awarded to a customer</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

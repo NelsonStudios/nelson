@@ -1,0 +1,35 @@
+<?php
+
+// @codingStandardsIgnoreFile
+
+/** @var \Fecon\RewardPoints\Block\Account\Dashboard\RewardsPoints $block */
+$rewardsPoints = $block->getCustomerRewardPointsBalance();
+?>
+<div class="block block-dashboard-info">
+    <div class="block-title"><strong><?= $block->escapeHtml(__('Rewards Details')) ?></strong></div>
+    <div class="block-content">
+        
+        <div class="box box-information">
+            
+            <strong class="box-title">
+                <span><?= $block->escapeHtml(__('Points Level')) ?></span>
+            </strong>
+            <div class="box-content">
+                <div class="medal-image-container">
+                    <img class="medal-image" src="<?php echo $block->getLevelImage($rewardsPoints); ?>" />
+                </div>
+                <p>
+                    <?= __('Your current balance is <strong>%1 points</strong>', $rewardsPoints) ?><br>
+                </p>
+                <p>
+                    <?= __('Your current level is <strong>%1</strong>', $block->getLevel($rewardsPoints)) ?><br>
+                </p>
+            </div>
+            <div class="box-actions">
+                <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('aw_rewardpoints/info')) ?>">
+                    <span><?= $block->escapeHtml(__('More Details')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
