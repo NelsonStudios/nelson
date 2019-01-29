@@ -6,16 +6,17 @@ $_className = $block->getCssClass();
 $_attributeLabel = $block->getAtLabel();
 $_attributeType = $block->getAtType();
 $_attributeAddAttribute = $block->getAddAttribute();
-$_attributeValue = 'Packaging wrapped out';
+$_attributeValue = null;
+if ($_code == 'documentation') {
+    $_attributeValue = $_product->getDocumentation();
+} elseif ($_code == 'applications') {
+    $_attributeValue = $_product->getApplications();
+}
+
 ?>
  
 <?php if ($_attributeValue): ?>
     <div class="packaging-content" <?php  echo $_attributeAddAttribute;?>>
+        <?php echo $_attributeValue; ?>
     </div>
-<?php endif; ?>
-
-<?php if ($_code == 'documentation'): ?>
-    <?php echo $_product->getDocumentation(); ?>
-<?php elseif ($_code == 'applications'): ?>
-    <?php echo $_product->getApplications(); ?>
 <?php endif; ?>

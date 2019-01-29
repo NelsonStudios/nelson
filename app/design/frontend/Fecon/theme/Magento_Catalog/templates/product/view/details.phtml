@@ -7,7 +7,7 @@
 // @codingStandardsIgnoreFile
 
 ?>
-<?php if ($detailedInfoGroup = $block->getGroupChildNames('detailed_info', 'getChildHtml')):?>
+<?php if (($detailedInfoGroup = $block->getGroupChildNames('detailed_info', 'getChildHtml')) && true):?>
 <?php
     $porto_helper = $this->helper('Smartwave\Porto\Helper\Data');
     $_helper = $this->helper('Smartwave\Porto\Helper\Customtabs');
@@ -34,7 +34,7 @@
                         <?php foreach ($detailedInfoGroup as $name):?>
                             <?php
                             $html = $layout->renderElement($name);
-                            if (!trim($html)) {
+                            if (empty(trim($html))) {
                                 continue;
                             }
                             $alias = $layout->getElementAlias($name);
@@ -59,6 +59,9 @@
                         if($custom_cms_tabs = $_helper->getCustomTabs($block->getProduct())) {
                             $i = 1;
                             foreach($custom_cms_tabs as $_item) {
+                                if (empty(trim($_item['tab_content']))) {
+                                    continue;
+                                }
                                 ?>
                                 <div class="data item title"
                                      aria-labeledby="tab-label-<?php /* @escapeNotVerified */ echo "custom-".$i;?>-title"
@@ -85,7 +88,7 @@
                         <?php foreach ($detailedInfoGroup as $name):?>
                             <?php
                             $html = $layout->renderElement($name);
-                            if (!trim($html)) {
+                            if (empty(trim($html))) {
                                 continue;
                             }
                             $alias = $layout->getElementAlias($name);
@@ -131,6 +134,9 @@
                         if($custom_cms_tabs = $_helper->getCustomTabs($block->getProduct())) {
                             $i = 1;
                             foreach($custom_cms_tabs as $_item) {
+                                if (empty(trim($_item['tab_content']))) {
+                                    continue;
+                                }
                                 ?>
                                 <div class="data item content" id="<?php /* @escapeNotVerified */ echo "custom-".$i; ?>">
                                     <?php /* @escapeNotVerified */ echo $_item['tab_content']; ?>
