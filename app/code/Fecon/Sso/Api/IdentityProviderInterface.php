@@ -9,7 +9,7 @@ interface IdentityProviderInterface
 {
 
     const DEFAULT_ORGANIZATION = 'FECON';
-    const DEFAULT_USER_GROUP = 'Administrator';
+    const DEFAULT_USER_GROUP = 'Normal User';
 
     /**
      * Process authentication requests.
