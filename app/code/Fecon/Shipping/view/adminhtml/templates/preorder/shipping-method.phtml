@@ -2,11 +2,16 @@
 /**
  * @var $block \Fecon\Shipping\Block\Adminhtml\Preorder\Edit\ShippingMethod
  */
+$shippingMethods = $block->getShippingTitles();
 ?>
 
+<?php if (!empty($shippingMethods)): ?>
 <section class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title"><?= /* @escapeNotVerified */ __('Shipping Method') ?></span>
+        <span class="title"><?= /* @escapeNotVerified */ __('Shipping Methods') ?></span>
     </div>
-    <span><?= $block->getShippingTitle() ?></span>
+    <?php foreach ($shippingMethods as $shippingMethod): ?>
+    <p><?= $shippingMethod ?></p>
+    <?php endforeach; ?>
 </section>
+<?php endif; ?>
