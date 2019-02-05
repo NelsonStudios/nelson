@@ -25,11 +25,6 @@
                 <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
                     <label>Title</label>
                 </field>
-                <field id="allowed_methods" translate="label" type="multiselect" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Allowed Methods</label>
-                    <source_model>Fecon\Shipping\Model\Source\Method</source_model>
-                    <can_be_empty>1</can_be_empty>
-                </field>
                 <field id="specificerrmsg" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="textarea">
                     <label>Displayed Error Message</label>
                 </field>

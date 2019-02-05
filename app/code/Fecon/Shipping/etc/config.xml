@@ -8,7 +8,6 @@
                 <title>Manually Calculated</title>
                 <name>Manual Shipping</name>
                 <price>0.00</price>
-                <allowed_methods>BEST,FREC,FREQ,OC</allowed_methods>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <sallowspecific>0</sallowspecific>
             </manualshipping>
