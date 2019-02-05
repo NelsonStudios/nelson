@@ -10,6 +10,7 @@ define([
          * @returns {Object}
          */
         setParsed: function (data) {
+            console.log(data);
             var option = this.parseData(data);
             if (data.error) {
                 return this;
@@ -26,8 +27,8 @@ define([
          */
         parseData: function (data) {
             return {
-                value: data.customer.entity_id,
-                label: data.customer.name
+                value: data.shippingMethod.entity_id,
+                label: data.shippingMethod.name
             };
         }
     });

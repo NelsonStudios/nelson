@@ -57,12 +57,17 @@
                     </item>
                 </item>
             </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
         </field>
-        <field name="shipping_method" component="Fecon_Shipping/js/components/select-customer" formElement="select">
+        <field name="shipping_method" component="Fecon_Shipping/js/components/select-shipping" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filterOptions" xsi:type="boolean">true</item>
-                    <item name="multiple" xsi:type="boolean">false</item>
+                    <item name="multiple" xsi:type="boolean">true</item>
                     <item name="showCheckbox" xsi:type="boolean">true</item>
                     <item name="disableLabel" xsi:type="boolean">true</item>
                 </item>
@@ -73,8 +78,8 @@
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
-                <label translate="true">Select Customer</label>
-                <dataScope>data.customer</dataScope>
+                <label translate="true">Shipping Method</label>
+                <dataScope>data.shipping_method</dataScope>
                 <componentType>field</componentType>
                 <listens>
                     <link name="${ $.namespace }.${ $.namespace }:responseData">setParsed</link>
@@ -83,7 +88,7 @@
             <formElements>
                 <select>
                     <settings>
-                        <options class="Fecon\Shipping\Ui\Component\Create\Form\Customer\Options"/>
+                        <options class="Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options"/>
                     </settings>
                 </select>
             </formElements>
