@@ -16,6 +16,11 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
     protected $loadedData;
 
     /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * Constructor
      *
      * @param string $name
@@ -32,10 +37,12 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $requestFieldName,
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
+        $this->serializer = $serializer;
         $this->dataPersistor = $dataPersistor;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -53,10 +60,18 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $items = $this->collection->getItems();
         foreach ($items as $model) {
             $this->loadedData[$model->getId()] = $model->getData();
+            if ($model->getData('shipping_method') != 'manualshipping_manualshipping') {
+                $shippingMethods = $this->serializer->unserialize($model->getData('shipping_method'));
+                $shippingData = [
+                    'shipping_method' => $shippingMethods
+                ];
+                $this->loadedData[$model->getId()]['data'] = $shippingData;
+            }
         }
         $data = $this->dataPersistor->get('fecon_shipping_preorder');
-        
+
         if (!empty($data)) {
+            
             $model = $this->collection->getNewEmptyItem();
             $model->setData($data);
             $this->loadedData[$model->getId()] = $model->getData();

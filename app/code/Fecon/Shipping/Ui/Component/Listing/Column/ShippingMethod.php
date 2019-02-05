@@ -2,10 +2,10 @@
 
 namespace Fecon\Shipping\Ui\Component\Listing\Column;
 
+use Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options;
+
 /**
  * Data source for Shipping Method in backend grid
- *
- * 
  */
 class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
 {
@@ -18,11 +18,17 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
     protected $manualShipping;
 
     /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
      * @param \Fecon\Shipping\Model\Carrier\ManualShipping $manualShipping
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      * @param array $components
      * @param array $data
      */
@@ -30,10 +36,12 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
         \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
         \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
         \Fecon\Shipping\Model\Carrier\ManualShipping $manualShipping,
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
         array $components = array(),
         array $data = array()
     ) {
         $this->manualShipping = $manualShipping;
+        $this->serializer = $serializer;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -55,6 +63,20 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
         return $shippingCode;
     }
 
+    protected function getShippingMethods($shippingMethod)
+    {
+        $shippingArray = $this->serializer->unserialize($shippingMethod);
+        $shippingTitles = [];
+        foreach ($shippingArray as $shipping) {
+            if (isset(Options::SHIPPING_METHODS[$shipping])) {
+                $shippingTitle = Options::SHIPPING_METHODS[$shipping];
+                $shippingTitles[] = $shippingTitle;
+            }
+        }
+
+        return implode(',', $shippingTitles);
+    }
+
     /**
      * Prepare Data Source
      *
@@ -66,9 +88,9 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 $shippingMethod = $item[\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD];
-                $shippingCode = $this->getShippingCode($shippingMethod);
-                $shippingTitle = $this->manualShipping->getCode('method', $shippingCode);
-                $item[$this->getData('name')] = $shippingTitle;
+//                $shippingCode = $this->getShippingCode($shippingMethod);
+//                $shippingTitle = $this->manualShipping->getCode('method', $shippingCode);
+                $item[$this->getData('name')] = $this->getShippingMethods($shippingMethod);
             }
         }
 
