@@ -81,23 +81,19 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         }
         $result = $this->rateResultFactory->create();
 
+        $method = $this->rateMethodFactory->create();
 
-        foreach ($this->getAllowedMethods() as $code => $name) {
-            $method = $this->rateMethodFactory->create();
+        $method->setCarrier($this->_code);
+        $method->setCarrierTitle($this->getConfigData('title'));
 
-            $method->setCarrier($this->_code);
-            $method->setCarrierTitle($this->getConfigData('title'));
+        $method->setMethod($this->_code);
+        $method->setMethodTitle($this->getConfigData('name'));
 
-            $method->setMethod($code);
-            $method->setMethodTitle($name);
-            $shippingPrice = $this->shippingHelper->getShippingPrice($code);
+        $shippingPrice = $this->shippingHelper->getShippingPrice($this->_code);
 
-            $method->setPrice($shippingPrice);
-            $method->setCost($shippingPrice);
-
-            $result->append($method);
-        }
-        
+        $method->setPrice($shippingPrice);
+        $method->setCost($shippingPrice);
+        $result->append($method);
 
         return $result;
     }
@@ -109,13 +105,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      */
     public function getAllowedMethods()
     {
-        $allowed = explode(',', $this->getConfigData('allowed_methods'));
-        $arr = [];
-        foreach ($allowed as $k) {
-            $arr[$k] = $this->getCode('method', $k);
-        }
-
-        return $arr;
+        return [$this->_code => $this->getConfigData('name')];
     }
 
 
