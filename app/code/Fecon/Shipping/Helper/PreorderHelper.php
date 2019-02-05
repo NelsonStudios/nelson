@@ -3,6 +3,7 @@
 namespace Fecon\Shipping\Helper;
 
 use Fecon\Shipping\Api\Data\PreorderInterface;
+use Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options;
 
 /**
  * Helper to create PreorderHelper from quote's data
@@ -40,6 +41,11 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customerHelper;
 
     /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -48,6 +54,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Fecon\Shipping\Api\PreorderRepositoryInterface $preorderRepository
      * @param \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory
      * @param \Fecon\Shipping\Helper\CustomerHelper $customerHelper
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -55,13 +62,15 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Fecon\Shipping\Model\PreorderFactory $preorderFactory,
         \Fecon\Shipping\Api\PreorderRepositoryInterface $preorderRepository,
         \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory $preorderCollectionFactory,
-        \Fecon\Shipping\Helper\CustomerHelper $customerHelper
+        \Fecon\Shipping\Helper\CustomerHelper $customerHelper,
+        \Magento\Framework\Serialize\SerializerInterface $serializer
     ) {
         $this->customerSession = $customerSession;
         $this->preorderFactory = $preorderFactory;
         $this->preorderRepository = $preorderRepository;
         $this->preorderCollectionFactory = $preorderCollectionFactory;
         $this->customerHelper = $customerHelper;
+        $this->serializer = $serializer;
 
         parent::__construct($context);
     }
@@ -105,7 +114,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $preorderData = [
             PreorderInterface::IS_AVAILABLE => false,
             PreorderInterface::CUSTOMER_ID => $customerId,
-            PreorderInterface::SHIPPING_METHOD => $shippingMethod,
+            PreorderInterface::SHIPPING_METHOD => $this->serializer->serialize([$shippingMethod]),
             PreorderInterface::QUOTE_ID => $quoteId,
             PreorderInterface::ADDRESS_ID => $addressId
         ];
@@ -152,7 +161,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $preorder = $preorderCollection
             ->addFieldToFilter(PreorderInterface::CUSTOMER_ID, $customerId)
             ->addFieldToFilter(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
-            ->addFieldToFilter(PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
+//            ->addFieldToFilter(PreorderInterface::SHIPPING_METHOD, ['like' => '%' . $shippingCode])
             ->getLastItem();
 
         return $preorder->getId();
@@ -167,7 +176,7 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPreorderByShippingCode($shippingCode)
     {
         $preorder = false;
-        if ($this->customerSession->isLoggedIn() && $this->hasPreorderAvailable($shippingCode)) {
+        if ($this->customerSession->isLoggedIn() && $this->hasPreorderAvailable()) {
             $preorderId = $this->getPreorderId($shippingCode);
             $preorder = $this->preorderRepository->getById($preorderId);
         }
@@ -200,5 +209,40 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $updated;
+    }
+
+    public function getPreorderFromOrder(\Magento\Sales\Api\Data\OrderInterface $order)
+    {
+        $customerId = $order->getCustomerId();
+        $quoteId = $order->getQuoteId();
+        $preorderCollection = $this->preorderCollectionFactory->create();
+        $preorderId = $preorderCollection
+            ->addFieldToFilter(PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
+            ->addFieldToFilter(PreorderInterface::QUOTE_ID, $quoteId)
+            ->getLastItem()
+            ->getId();
+        try {
+            $preorder = $this->preorderRepository->getById($preorderId);
+        } catch (\Exception $ex) {
+            $preorder = null;
+        }
+
+        return $preorder;
+    }
+
+    public function getShippingDescription($preorder)
+    {
+        $shippingMethods = $this->serializer->unserialize($preorder->getData(PreorderInterface::SHIPPING_METHOD));
+        $shippingTitles = [];
+        $shippingDescription = null;
+        if ($shippingMethods) {
+            foreach ($shippingMethods as $shippingMethod) {
+                $shippingTitles[] = Options::SHIPPING_METHODS[$shippingMethod];
+            }
+            $shippingDescription = implode(', ', $shippingTitles);
+        }
+
+        return $shippingDescription;
     }
 }
