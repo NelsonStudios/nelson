@@ -68,5 +68,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $installer->endSetup();
         }
+        if (version_compare($context->getVersion(), "1.0.3", "<")) {
+            $installer = $setup;
+            $eavTable = $installer->getTable('fecon_shipping_preorder');
+            $columnName = 'shipping_method';
+            $definition = 'MEDIUMTEXT';
+            $installer->getConnection()->modifyColumn($eavTable, $columnName, $definition);
+        }
     }
 }
