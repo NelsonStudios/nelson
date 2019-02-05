@@ -12,14 +12,22 @@ class Save extends \Magento\Backend\App\Action
     protected $dataPersistor;
 
     /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
+        \Magento\Framework\Serialize\SerializerInterface $serializer
     ) {
         $this->dataPersistor = $dataPersistor;
+        $this->serializer = $serializer;
         parent::__construct($context);
     }
 
@@ -34,6 +42,7 @@ class Save extends \Magento\Backend\App\Action
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
         if ($data) {
+            $data['shipping_method'] = $this->serializer->serialize($data['data']['shipping_method']);
             $id = $this->getRequest()->getParam('preorder_id');
         
             $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($id);
