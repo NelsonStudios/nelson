@@ -16,4 +16,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Api\Data\OrderInterface">
+        <plugin name="modify_shipping_description" type="Fecon\Shipping\Plugin\ShippingDescription"/>
+    </type>
 </config>
