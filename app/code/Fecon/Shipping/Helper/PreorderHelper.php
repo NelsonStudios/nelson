@@ -238,7 +238,9 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $shippingDescription = null;
         if ($shippingMethods) {
             foreach ($shippingMethods as $shippingMethod) {
-                $shippingTitles[] = Options::SHIPPING_METHODS[$shippingMethod];
+                if (isset(Options::SHIPPING_METHODS[$shippingMethod])) {
+                    $shippingTitles[] = Options::SHIPPING_METHODS[$shippingMethod];
+                }
             }
             $shippingDescription = implode(', ', $shippingTitles);
         }
