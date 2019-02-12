@@ -58,50 +58,13 @@ require([
         }
       });
     }
-    /**
-     * getProducstByCategory ajax function.
-     * Function to get all products under a specific category.
-     * 
-     * @param  {int} catId Category Id
-     * @return {void}
-     */
-    function getProducstByCategory(catId) {
-      var prodUrl = '<?php echo $this->getproductsbycatajaxurl(); ?>';
-      var param = '?cat=' + catId + '&ajax=1';
-      $.ajax({
-        showLoader: true,
-        url: prodUrl + param,
-        type: "GET",
-        dataType: 'json'
-      }).done(function (data) {
-        var dropdown = $('#product-dropdown');
-        dropdown.empty();
-        if(data.length != 0) {
-          dropdown.append('<option selected="true" disabled>Choose Product</option>');
-          dropdown.prop('selectedIndex', 0);
-          $.each(data, function (key, entry) {
-            dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
-          });
-        } else {
-          dropdown.append('<option selected="true">No Available Products</option>');
-          dropdown.prop('selectedIndex', 0);
-        }
-      });
-    }
 
     var dataForm = $('#contact-form');   
     dataForm.mage('validation', {});
 
-    /* Category dropdown change bind to fill products selector */
-    $('#category-dropdown').change(function() {
-      getProducstByCategory($(this).val());
-    });
     /* Send select text instead of value */
     $('#contact-form').submit(function(){
       $('#category-dropdown option:selected').val(function(){
-        return $(this).text().toUpperCase();
-      });
-      $('#product-dropdown option:selected').val(function(){
         return $(this).text().toUpperCase();
       });
     });
@@ -165,17 +128,19 @@ require([
               data-mage-init='{"validation":{}}'>
               <fieldset class="fieldset"> 
                <div>
-                <div class="field select-category required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>PRODUCT CATEGORY</label>
-                  <select id="category-dropdown" name="product_category" class="category-select" data-validate="{required:true}"></select>
+                <div class="field select-category input_outer">
+                  <label class="ask-expert-form-label">PRODUCT CATEGORY</label>
+                  <select id="category-dropdown" name="product_category" class="category-select"></select>
                 </div>
-                <div class="field select-product required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>SELECT PRODUCT</label>
-                  <select id="product-dropdown" name="product_name" class="product-select" data-validate="{required:true}"></select>
+                <div class="field name input_outer">
+                  <label class="ask-expert-form-label">PRODUCT NAME</label>
+                  <div class="control">
+                    <input name="product_name" id="product-name" placeholder="<?php /* @escapeNotVerified */ echo __('Product Name') ?>" title="<?php /* @escapeNotVerified */ echo __('Product Name') ?>"  class="input-text" type="text"/>
+                  </div>
                 </div>
-                <div class="field select-question-about required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>MY QUESTION IS ABOUT</label>
-                  <select id="question-dropdown" name="question_about" class="question-select" data-validate="{required:true}">
+                <div class="field select-question-about input_outer">
+                  <label class="ask-expert-form-label">MY QUESTION IS ABOUT</label>
+                  <select id="question-dropdown" name="question_about" class="question-select">
                     <option selected="true" disabled>PLEASE SELECT ONE</option>
                     <option>PRODUCT SUPPORT</option>
                     <option>PARTS</option>
@@ -183,9 +148,9 @@ require([
                     <option>OTHER</option>
                   </select>
                 </div>
-                <div class="field select-hearabout required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>HOW DID YOU HEAR ABOUT US?</label>
-                  <select id="hearabout-dropdown" name="hear_about" class="hearabout-select" data-validate="{required:true}">
+                <div class="field select-hearabout input_outer">
+                  <label class="ask-expert-form-label">HOW DID YOU HEAR ABOUT US?</label>
+                  <select id="hearabout-dropdown" name="hear_about" class="hearabout-select">
                     <option selected="true" disabled>PLEASE SELECT ONE</option>
                     <option>WEB SEARCH</option>
                     <option>FB/INSTAGRAM AD</option>
@@ -198,10 +163,10 @@ require([
                     <option>OTHER</option>
                   </select>
                 </div> 
-                <div class="field name required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>NAME</label>
+                <div class="field name input_outer">
+                  <label class="ask-expert-form-label">NAME</label>
                   <div class="control">
-                    <input name="name" id="name" placeholder="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>"  class="input-text" type="text" data-validate="{required:true}"/>
+                    <input name="name" id="name" placeholder="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>"  class="input-text" type="text"/>
                   </div>
                 </div>
                 <div class="field email required input_outer">
@@ -212,21 +177,13 @@ require([
                 </div>
                 <?php if($this->phonetittle() != '') {?>
                 <div class="field telephone input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>PHONE NUMBER</label>
+                  <label class="ask-expert-form-label">PHONE NUMBER</label>
                   <div class="control">
-                    <input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text" data-validate="{required:true}" />
+                    <input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text"/>
                   </div>
                 </div>
                 <?php } ?>
 
-                <?php if($this->subjecttittle() != '') {?>
-                <div class="field subject input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>SUBJECT</label>
-                  <div class="control">
-                    <input name="subject" id="subject" placeholder="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->subjecttittle()) ?>" class="input-text" type="text" data-validate="{required:true}" />
-                  </div>
-                </div>
-                <?php } ?>
               </div>
               <div class="field comment required">
               <div class="control">

@@ -30,11 +30,11 @@ class Contactblock extends Template {
      */
     protected function _prepareLayout() {
         parent::_prepareLayout();
-        if ($this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]) == $this->getUrl('askanexpert/front/index', ['_secure' => true])) {
+//        if ($this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]) == $this->getUrl('askanexpert/front/index', ['_secure' => true])) {
             $this->pageConfig->getTitle()->set($this->_mymoduleHelper->metatittle());
             $this->pageConfig->setKeywords($this->_mymoduleHelper->metakeyword());
             $this->pageConfig->setDescription($this->_mymoduleHelper->metadescription());
-        }
+//        }
         return $this;
     }
 
@@ -207,14 +207,7 @@ class Contactblock extends Template {
     {
          return $this->_mymoduleHelper->phonetittle();
     }
-    /**
-     * [subjecttittle
-     * @return boolean 
-     */
-    public function subjecttittle()
-    {
-         return $this->_mymoduleHelper->subjecttittle();
-    }
+
     /**
      * [messagetittle
      * @return boolean 

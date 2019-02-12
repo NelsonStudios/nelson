@@ -181,20 +181,6 @@
                 </item>
             </argument>
         </field>
-
-         <field name="subject">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Subject</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">askanexpert</item>
-                    <item name="dataScope" xsi:type="string">subject</item>
-                    <item name="disabled" xsi:type="boolean">true</item>
-                </item>
-            </argument>
-        </field>
-       
       <field name="message">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

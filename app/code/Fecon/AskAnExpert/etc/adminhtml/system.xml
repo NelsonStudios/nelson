@@ -103,10 +103,6 @@
                     <label>Phone Tittle Text</label>
                     <comment>Note : If this field is empty then it is disabled on frontend</comment>
                 </field>
-                <field id="subject_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Subject Tittle Text</label>
-                   <comment>Note : If this field is empty then it is disabled on frontend</comment>
-                </field>
                 <field id="message_tittle" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Message Tittle Text</label>
                     <comment>This text will display on the frontend.</comment>

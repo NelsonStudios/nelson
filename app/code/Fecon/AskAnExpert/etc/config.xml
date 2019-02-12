@@ -30,7 +30,6 @@
             	<name_tittle>Name</name_tittle>
             	<email_tittle>Email</email_tittle>
             	<phone_tittle>Phone Number</phone_tittle>
-            	<subject_tittle>Subject</subject_tittle>
             	<message_tittle>What’s on your mind?</message_tittle>
             	<submitbtn_tittle>Submit</submitbtn_tittle>
             </form_display>

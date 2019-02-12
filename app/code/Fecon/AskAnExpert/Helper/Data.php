@@ -25,7 +25,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const CF_NAME_TITTLE = 'askanexpert/form_display/name_tittle';
     const CF_EMAIL_TITTLE = 'askanexpert/form_display/email_tittle';
     const CF_PHONE_TITTLE = 'askanexpert/form_display/phone_tittle';
-    const CF_SUBJECT_TITTLE = 'askanexpert/form_display/subject_tittle';
     const CF_MESSAGE_TITTLE = 'askanexpert/form_display/message_tittle';
     const CF_BUTTON_TEXT = 'askanexpert/form_display/submitbtn_tittle';
     const XML_PATH_EMAIL_RECIPIENT = 'askanexpert/email/recipient_email';
@@ -276,18 +275,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    /**
-     * subjecttittle
-     * 
-     * @return string subjecttittle config value
-     */
-    public function subjecttittle()
-    {
-        return $this->scopeConfig->getValue(
-            self::CF_SUBJECT_TITTLE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-    }
+
     /**
      * messagetittle
      * 
