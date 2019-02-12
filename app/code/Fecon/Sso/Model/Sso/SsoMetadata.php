@@ -309,6 +309,15 @@ class SsoMetadata extends \Fecon\Sso\Model\SimpleSaml implements \Fecon\Sso\Api\
             'metadata-set' => self::REMOTE_SP_METADATA_SET,
             self::ENDPOINT_LOGOUT_TYPE => $this->getEndpoints(self::ENDPOINT_LOGOUT_TYPE, $endpoints),
             self::ENDPOINT_ASSERTION_TYPE => $this->getEndpoints(self::ENDPOINT_ASSERTION_TYPE, $endpoints),
+            'authproc' => array(
+                /* Filter to create a NameID with the "unspecified" format. */
+                3 => array(
+                    'class' => 'saml:AttributeNameID',
+                    'attribute' => 'UserName',
+                    'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+                ),
+            ),
+            'simplesaml.nameidattribute' => 'UserName'
         ];
         if ($publicCertificate) {
             $metadata['keys'] = $this->getKeys($publicCertificate);
