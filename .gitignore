@@ -84,3 +84,14 @@ atlassian*
 /simplesamlphp/vendor/*
 /simplesamlphp/config/config.php
 /simplesamlphp/cert/*
+
+### IGNORE SOME ONE-OFFS ###
+/.github/*
+/lib/internal/GnuFreeFont/
+/lib/web/css/docs/docs.css.map
+/nginx-certs/*
+/not-imported-products.php
+/package-lock.json
+/pub/media/importexport/
+*.sample
+*.log
