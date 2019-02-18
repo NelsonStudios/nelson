@@ -1,13 +1,49 @@
 .page-wrapper {
-  .page-footer {
-        .footer {
-          background-color: @color-black;
-          padding: 0 12px;
-            border-top: 6px solid @minicart-green;
-            .footer-top, .footer-middle, .footer-bottom {
-                background-color: @color-black;
-            }
-            .footer-middle {
+	.page-footer {
+		.footer {
+			padding: 30px 100px;
+			background-color: @color-dim-gray;
+			color: @color-white;
+			.footer-top {
+				display: none;
+			}
+			.footer-middle {
+				padding: 0; 
+				background-color: transparent;
+				.foot-nav {
+					margin-bottom: 30px;
+				}
+				.foot-nav li {
+					font-size: @fontsize-body;
+					line-height: @linehight-body;
+					color: @color-nobel;
+					a {
+						color: @color-whisper;
+					}
+				}
+				.foot-nav__title {
+					margin-bottom: 10px;
+					font-size: @fontsize-body;
+					line-height: @linehight-body;
+					font-weight: 700;
+					text-transform: uppercase;
+					color: @color-white;
+					a {
+						color: @color-white;
+					}
+				}
+				.foot-nav__icon {
+					display: inline-block;
+					vertical-align: top;
+					margin-right: 11px;
+					color: @color-whisper;
+				}
+				.foot-nav__icon svg {
+					display: block;
+					width: 32px;
+					height: 32px;
+				}
+/*
                 .container {
                     width: 65%;
                     margin-left: 84px;
@@ -103,7 +139,7 @@
                                 }
                             }
                             .footer-logo {
-                                background: url('../images/fecon_footer_logo.png') no-repeat;/*older browser*/
+                                background: url('../images/fecon_footer_logo.png') no-repeat;
                                 background-image: url('../images/fecon-letters.svg');
                                 background-size: contain;
                                 padding-left: 200px;
@@ -116,8 +152,20 @@
                         }
                     }
                 }
+*/
             }
-            .footer-bottom {
+			.footer-bottom {
+				min-height: 0;
+				padding: 0;
+				background-color: transparent;
+				line-height: inherit;
+				.copyrights {
+					font-size: @fontsize-bodyXS;
+					line-height: @linehight-body;
+					text-align: center;
+					color: #fff;
+				}
+/*
                 .container {
                     .custom-block {
                       display: block;
@@ -142,7 +190,20 @@
                         }
                     }
                 }
+*/
             }
         }
     }
+}
+
+
+@media screen and (max-width: 767.98px) {
+	.page-wrapper {
+		.page-footer {
+			.footer {
+				padding: 30px 20px;
+				text-align: center;
+			}
+		}
+	}
 }
