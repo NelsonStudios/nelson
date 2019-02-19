@@ -61,6 +61,9 @@ atlassian*
 !/pub/static/.htaccess
 /pub/media/porto/configed_css/
 /pub/media/email/*
+/pub/media/importexport/*
+/pub/media/mageplaza/*
+/pub/media/resized/*
 
 /var/*
 !/var/.htaccess
