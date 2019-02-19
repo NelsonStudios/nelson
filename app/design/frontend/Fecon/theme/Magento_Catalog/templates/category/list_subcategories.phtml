@@ -1,0 +1,187 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+use Magento\Framework\App\Action\Action;
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+$categoryCollection = $block->getCurrentCategory()->getChildrenCategories()->addAttributeToSelect('image_url');
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$_imagehelper = $this->helper('Magento\Catalog\Helper\Image');
+
+$_category_config = $this->helper('Smartwave\Porto\Helper\Data')->getConfig('porto_settings/category');
+$_category_grid_config = $this->helper('Smartwave\Porto\Helper\Data')->getConfig('porto_settings/category_grid');
+$category_label_config = $this->helper('Smartwave\Porto\Helper\Data')->getConfig('porto_settings/product_label');
+$_outputhelper    = $this->helper('Magento\Catalog\Helper\Output');
+$customImageHelper = $this->helper('Fecon\Catalog\Helper\ImageHelper');
+$move_actions = "";
+$flex_grid = "";
+?>
+<?php if (!$categoryCollection->count()): ?>
+    <div class="message info empty"><div><?php echo __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+    <?php echo $block->getToolbarHtml() ?>
+    <?php echo $block->getAdditionalHtml() ?>
+    <?php
+//    if ($block->getMode() == 'grid') {
+        $viewMode = 'grid';
+        $image = 'category_page_grid';
+        $hover_image = 'category_page_grid-hover';
+        $showDescription = false;
+        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+        $columns = 'columns'.$_category_grid_config['columns'];
+        $move_actions = $_category_grid_config['move_actions'];
+        if(isset($_category_grid_config['flex_grid']) && $_category_grid_config['flex_grid'])
+            $flex_grid = "flex-grid";
+//    } else {
+//        $viewMode = 'list';
+//        $image = 'category_page_list';
+//        $hover_image = 'category_page_list-hover';
+//        $showDescription = true;
+//        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+//        $columns = '';
+//    }
+//    $image_width = ($_category_config['ratio_width'])?$_category_config['ratio_width']:135;
+//    $image_height = ($_category_config['ratio_height'])?$_category_config['ratio_height']:135;
+    $image_width = 135;
+    $image_height = 135;
+    ?>
+    <div class="products wrapper <?php echo $viewMode; ?> <?php echo $columns; ?> <?php echo $flex_grid; ?> products-<?php echo $viewMode; ?>">
+        <?php $iterator = 1; ?>
+        <ol class="products list items product-items <?php if(isset($_category_config['qty_field']) && $_category_config['qty_field']):?>has-qty<?php endif;?>">
+            <?php /** @var $category \Magento\Catalog\Model\Product */ ?>
+            <?php foreach ($categoryCollection as $category): ?>
+                <?php
+                $category->load($category->getId());
+//                $hasImage = false;
+//                $_imgHtml   = '';
+//                if ($_imgUrl = $_category->getImageUrl()) {
+//                    $hasImage = true;
+//                } else {
+//                    $_imgUrl = $fallBackimage;
+//                }
+                ?>
+                <?php echo($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                <div class="product-item-info subcategory-info" data-container="product-grid">
+                    <?php // Product Image ?>
+                    <div class="product photo product-item-photo subcategory-item-photo">
+                        <a href="<?php /* @escapeNotVerified */ echo $category->getUrl() ?>" tabindex="-1">
+                        <?php
+                            $categoryImageUrl = $category->getImageUrl();
+                            if (!$categoryImageUrl) {
+                                if($_category_config['aspect_ratio']) {
+                                    $productImage = $_imagehelper->init($category, $image)->constrainOnly(FALSE)->keepAspectRatio(TRUE)->keepFrame(FALSE)->resize($image_width);
+                                } else {
+                                    $productImage = $_imagehelper->init($category, $image)->resize($image_width, $image_height);
+                                }
+                                $categoryImageUrl = $productImage->getUrl();
+                            } else {
+                                $keepAspectRatio = false;
+                                $constrainOnly = true;
+                                $keepFrame = true;
+                                $height = $image_height;
+                                if($_category_config['aspect_ratio']) {
+                                    $keepAspectRatio = true;
+                                    $constrainOnly = false;
+                                    $keepFrame = false;
+                                    $height = null;
+                                }
+                                $categoryImageUrl = $customImageHelper->resizeCategoryImage($category->getImage(), $image_width, $height, $keepAspectRatio, $constrainOnly, $keepFrame);
+                            }
+                        ?>
+                            <img class="product-image-photo default_image" src="<?php echo $categoryImageUrl; ?>" alt="<?php echo $block->escapeHtml($category->getName()); ?>"/>
+                        </a>
+                        <?php
+                            $product_label = "";
+                            if($category_label_config['sale_label']) {
+                                $orgprice = $category->getPrice();
+                                $specialprice = $category->getSpecialPrice();
+                                $specialfromdate = $category->getSpecialFromDate();
+                                $specialtodate = $category->getSpecialToDate();
+                                $today = time();
+                                if(!$specialprice)
+                                    $specialprice = $orgprice;
+                                if($specialprice < $orgprice) {
+                                    if((is_null($specialfromdate) && is_null($specialtodate)) || ($today >= strtotime($specialfromdate) && is_null($specialtodate)) || ($today <= strtotime($specialtodate) && is_null($specialfromdate)) || ($today >= strtotime($specialfromdate) && $today <= strtotime($specialtodate))){
+                                        if($category_label_config['sale_label_percent']) {
+                                            $save_percent = 100-round(($specialprice/$orgprice)*100);
+                                            $product_label .= '<div class="product-label sale-label">'.'-'.$save_percent.'%'.'</div>';
+                                        } else {
+                                            $product_label .= '<div class="product-label sale-label">'.$category_label_config['sale_label_text'].'</div>';
+                                        }
+                                    }
+                                }
+                            }
+                            if($category_label_config['new_label']) {
+                                $now = date("Y-m-d");
+                                $newsFrom= substr($category->getData('news_from_date'),0,10);
+                                $newsTo=  substr($category->getData('news_to_date'),0,10);
+
+                                if ($newsTo != '' || $newsFrom != ''){
+                                    if (($newsTo != '' && $newsFrom != '' && $now>=$newsFrom && $now<=$newsTo) || ($newsTo == '' && $now >=$newsFrom) || ($newsFrom == '' && $now<=$newsTo)) {
+                                        $product_label .= '<div class="product-label new-label">'.$category_label_config['new_label_text'].'</div>';
+                                    }
+                                }
+                            }
+                            if($product_label)
+                                echo '<div class="product-labels">'.$product_label.'</div>';
+                        ?>
+                    </div>
+                    <div class="product details product-item-details">
+                        <?php
+                            $_productNameStripped = $block->stripTags($category->getName(), null, true);
+                        ?>
+                        <strong class="product name product-item-name">
+                            <a class="product-item-link"
+                               href="<?php echo $category->getUrl() ?>">
+                                <?php echo $block->escapeHtml($category->getName()); ?>
+                            </a>
+                        </strong>
+                    </div>
+                </div>
+                <?php echo($iterator == count($categoryCollection)+1) ? '</li>' : '' ?>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+    <?php if(isset($_category_grid_config['infinite_scroller']) && $_category_grid_config['infinite_scroller']):?>
+    <div class="infinite-loader"><span class="loading"><i class="ajax-loader small animate-spin"></i><?php echo __("Loading ..."); ?></span><a href="javascript:void(0)" class="btn-load-more"><?php echo __("Load More ..."); ?></a></div>
+    <?php endif;?>
+    <?php echo $block->getToolbarHtml() ?>
+
+    <?php // if ($block->getMode() == 'grid'): ?>
+        <script type="text/javascript">
+            require([
+                'jquery'
+            ], function ($) {
+                $('.main .products.grid .product-items li.product-item:nth-child(2n)').addClass('nth-child-2n');
+                $('.main .products.grid .product-items li.product-item:nth-child(2n+1)').addClass('nth-child-2np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(3n)').addClass('nth-child-3n');
+                $('.main .products.grid .product-items li.product-item:nth-child(3n+1)').addClass('nth-child-3np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(4n)').addClass('nth-child-4n');
+                $('.main .products.grid .product-items li.product-item:nth-child(4n+1)').addClass('nth-child-4np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(5n)').addClass('nth-child-5n');
+                $('.main .products.grid .product-items li.product-item:nth-child(5n+1)').addClass('nth-child-5np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(6n)').addClass('nth-child-6n');
+                $('.main .products.grid .product-items li.product-item:nth-child(6n+1)').addClass('nth-child-6np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(7n)').addClass('nth-child-7n');
+                $('.main .products.grid .product-items li.product-item:nth-child(7n+1)').addClass('nth-child-7np1');
+                $('.main .products.grid .product-items li.product-item:nth-child(8n)').addClass('nth-child-8n');
+                $('.main .products.grid .product-items li.product-item:nth-child(8n+1)').addClass('nth-child-8np1');
+            });
+        </script>
+    <?php // endif; ?>
+<?php endif; ?>
+<?php
+    echo $block->getChildHtml('filter_toggle');
+?>
