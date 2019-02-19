@@ -2,7 +2,7 @@
 	.page-footer {
 		.footer {
 			padding: 30px 100px;
-			background-color: @color-dim-gray;
+			background-color: @color-matterhorn;
 			color: @color-white;
 			.footer-top {
 				display: none;
@@ -12,6 +12,10 @@
 				background-color: transparent;
 				.foot-nav {
 					margin-bottom: 30px;
+				}
+				.foot-nav_r {
+					font-size: 0;
+					text-align: right;
 				}
 				.foot-nav li {
 					font-size: @fontsize-body;
@@ -35,13 +39,39 @@
 				.foot-nav__icon {
 					display: inline-block;
 					vertical-align: top;
-					margin-right: 11px;
+					margin-left: 15px;
 					color: @color-whisper;
 				}
 				.foot-nav__icon svg {
 					display: block;
 					width: 32px;
 					height: 32px;
+				}
+				.foot-nav__button {
+					display: inline-block;
+					vertical-align: top;
+					margin-top: -10px;
+					padding: 2px 1.75em 0;
+					border: 2px solid @color-primary-hover;
+					font-size: @fontsize-bodyXS;
+					line-height: 3;
+					font-weight: 700;
+					text-transform: uppercase;
+					letter-spacing: 0.05em;
+					color: @color-primary-hover;
+					transition-duration: 0.25s;
+				}
+				.foot-nav__button:hover {
+					background-color: @color-primary-hover;
+					text-decoration: none;
+					color: @color-white;
+				}
+				.foot-nav__logo {
+					display: inline-block;
+					width: 188px;
+					height: 39px;
+					margin-top: -10px;
+					background: url(../images/fecon-new-logo-white.png) 50% 50%/cover no-repeat;
 				}
 /*
                 .container {
@@ -197,13 +227,38 @@
 }
 
 
-@media screen and (max-width: 767.98px) {
+@media (max-width: 991.98px) {
 	.page-wrapper {
 		.page-footer {
 			.footer {
 				padding: 30px 20px;
 				text-align: center;
+				.footer-middle {
+					.foot-nav_r {
+						text-align: center;
+					}
+					.foot-nav__logo {
+						display: none;
+					}
+				}
 			}
 		}
 	}
+}
+
+
+@media screen and (max-width: 767.98px) {
+/*
+	.page-wrapper {
+		.page-footer {
+			.footer {
+				.footer-middle {
+					.foot-nav_r {
+						text-align: left;
+					}
+				}
+			}
+		}
+	}
+*/
 }
