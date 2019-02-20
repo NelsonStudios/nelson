@@ -1,0 +1,13 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+$currentCategory = $block->getCurrentCategory();
+?>
+<?php if ((!$block->isContentMode() || $block->isMixedMode()) && !$currentCategory->getData('display_subcategories')): ?>
+    <?= $block->getProductListHtml() ?>
+<?php elseif ($currentCategory->getData('display_subcategories')): ?>
+    <?= $this->getChildHtml('subcategories_list') ?>
+<?php endif; ?>

@@ -116,6 +116,48 @@ body { overflow-x: hidden; }
         }
     }
 
+	.homepage-bar {
+		border: none;
+		background-color: @color-whisper;
+		text-align: center;
+		.container-fluid {
+			padding-right: 100px;
+			padding-left: 100px;
+			.col-lg-4 {
+				padding: 15px;
+				border-left: 1px solid #fff;
+				svg {
+					display: inline-block;
+					vertical-align: top;
+					width: 60px;
+					height: 60px;
+					line-height: 1;
+					color: @color-secondary;
+				}
+				.text-area {
+					display: inline-block;
+					vertical-align: top;
+					margin: 9px 0 9px 15px;
+					h3 {
+						font-size: @fontsize-bodyS;
+						line-height: 1.5;
+						font-weight: 700;
+						text-transform: uppercase;
+						color: @color-night-rider;
+					}
+					p {
+						font-size: @fontsize-bodyS;
+						line-height: 1.5;
+						color: @color-dim-gray;
+					}
+				}
+			}
+			.col-lg-4:first-child {
+				border-left: 0;
+			}
+		}
+	}
+/*
     .homepage-bar {
 
         .content-callout {
@@ -150,6 +192,7 @@ body { overflow-x: hidden; }
             
         }
     }
+*/
 
     body& .page-wrapper main#maincontent {
         max-width: none;

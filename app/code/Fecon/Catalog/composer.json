@@ -1,0 +1,16 @@
+{
+    "name": "fecon/module-catalog",
+    "description": "Module created to modify the Magento_Catalog module's behavior",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\Catalog\\": ""
+        }
+    }
+}

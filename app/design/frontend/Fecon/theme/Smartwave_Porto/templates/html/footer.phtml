@@ -31,44 +31,26 @@
     }
     if( $footer['footer_middle'] ){
 ?>
-    <div class="footer-middle">
-        <div class="container">
-        <?php
-            if( $footer['footer_ribbon'] ){
-        ?>
-            <div class="footer-ribbon">
-                <span><?php echo $footer['footer_ribbon_text'] ?></span>
-            </div>
-        <?php
-            }
-        ?>
-            <div class="row">
-            <?php
-                for( $i = 1; $i <= 4; $i++ ){
-                    $area = 'footer_middle_column_'.$i;
-                    $type = $footer[$area];
-                    if( $type ){
-                        echo '<div class="col-lg-' . $footer[$area.'_size'] . ' ' . (($footer[$area.'_size'] == 3)? 'left-block-1' : '') . '">';
-                    }
-                    if( $type == 'custom' && $footer[$area.'_custom'] ){
-                        $block = $this->getLayout()->createBlock('Magento\Cms\Block\Block');
-                        if($block) {
-                            $block->setBlockId($footer[$area.'_custom']);
-                        }
-                        if($block){
-                            echo $block->toHtml();
-                        }
-                    }
-                    if( $type == 'newsletter' ){
-                        echo $this->getChildHtml('footer.newsletter');
-                    }
-                    if( $type ){
-                        echo '</div>';
-                    }
-                }
-            ?>
-            </div>
-        </div>
+	<div class="footer-middle">
+		<?php if( $footer['footer_ribbon'] ){ ?>
+			<div class="footer-ribbon">
+				<span><?php echo $footer['footer_ribbon_text'] ?></span>
+			</div>
+		<?php } ?>
+		<div class="row">
+			<div class="col-md-6 col-lg-3">
+				<?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_block_3_fecon')->toHtml(); ?>
+			</div>
+			<div class="col-md-6 col-lg-3">
+				<?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_block_4_fecon')->toHtml(); ?>
+			</div>
+			<div class="col-md-6 col-lg-3">
+				<?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_block_5_fecon')->toHtml(); ?>
+			</div>
+			<div class="col-md-6 col-lg-3">
+				<?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_block_6_fecon')->toHtml(); ?>
+			</div>
+		</div>
     </div>
 <?php
     }
@@ -156,17 +138,15 @@
 <?php
     }
 ?>
-</div>
 <div class="footer-bottom">
-    <div class="container">
 <?php /* Custom footer bottom block for fecon */
     if($block && !$footer['footer_bottom']) {
         $block->setBlockId('footer_bottom_fecon_block');
     }
     if($block && !$footer['footer_bottom']){
-        echo '<div class="custom-block">'.$block->toHtml().'</div>';
+        echo $block->toHtml();
     }
 ?>
-    </div>
 </div>
-<a href="javascript:void(0)" id="totop"><em class="porto-icon-up-open"></em></a>
+</div>
+<!-- <a href="javascript:void(0)" id="totop"><em class="porto-icon-up-open"></em></a> -->
