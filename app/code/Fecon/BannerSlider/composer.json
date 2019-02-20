@@ -1,0 +1,16 @@
+{
+    "name": "fecon/module-bannerslider",
+    "description": "Module to modify the Mageplaza_BannerSlider module's behavior",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Fecon\\BannerSlider\\": ""
+        }
+    }
+}
