@@ -119,17 +119,25 @@ body { overflow-x: hidden; }
 	.homepage-bar {
 		border: none;
 		background-color: @color-whisper;
-		text-align: center;
+		text-align: left;
 		.container-fluid {
 			padding-right: 100px;
 			padding-left: 100px;
 			.col-lg-4 {
 				padding: 15px;
 				border-left: 1px solid #fff;
+				svg {
+					display: inline-block;
+					vertical-align: top;
+					width: 64px;
+					height: 64px;
+					line-height: 1;
+					color: @color-secondary;
+				}
 				.text-area {
 					display: inline-block;
 					vertical-align: top;
-					margin: 10px 0 10px 10px;
+					margin: 11px 0 11px 10px;
 					h3 {
 						font-size: @fontsize-bodyS;
 						line-height: 1.5;
@@ -142,15 +150,6 @@ body { overflow-x: hidden; }
 						line-height: 1.5;
 						color: @color-dim-gray;
 					}
-				}
-				.porto-icon-support,
-				.porto-icon-shipping,
-				.porto-icon-us-dollar {
-					display: inline-block;
-					vertical-align: top;
-					font-size: 62px;
-					line-height: 1;
-					color: @color-secondary;
 				}
 			}
 			.col-lg-4:first-child {
