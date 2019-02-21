@@ -1,8 +1,5 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="content">
-            <referenceBlock name="sidebar.main" remove="true"/>
-        </referenceContainer >
         <referenceBlock name="top_blog_link" remove="true" />
     </body>
 </page>
