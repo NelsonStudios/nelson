@@ -22,11 +22,17 @@ if ($items = $block->getBannerCollection()): ?>
                                 <img src="<?= $this->helper('\Magento\Cms\Helper\Wysiwyg\Images')->getBaseUrl() . "wysiwyg/homepage/slider/02-2.png" ?>" alt="" />
                                 <div class="content content-slide-2" style="">
                                     <p><span class="green-header"><?php echo $item->getTitle() ?></span></p>
+                                    <?php if ($item->getSubtitle()): ?>
                                     <p class="big-gray-underline white-header"><span><?php echo $item->getSubtitle() ?></span></p>
+                                    <?php endif; ?>
+                                    <?php if ($item->getImageDescription()): ?>
                                     <p class="banner-subtitle"><?php echo $item->getImageDescription() ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($item->getCtaText()): ?>
                                     <a href="<?php echo $item->getCtaLink() ?>" class="btn btn-default btn-red-slider" <?php echo ($item->getCtaTarget() == 1) ? 'target="_blank"' : '' ?>>
                                         <?php echo $item->getCtaText() ?>
                                     </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
