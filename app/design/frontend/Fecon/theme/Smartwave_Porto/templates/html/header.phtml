@@ -416,11 +416,22 @@
         <?php echo $this->getChildHtml("minicart"); ?>
         
         <?php if($header_type > 13):?>
-        <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
+        <div class="burger" onclick="document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
+<!--         <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span> -->
         <?php endif;?>
     </div>
     <div class="catalog-nav">
         <?php echo $this->getChildHtml("navigation.sections"); ?>
+    </div>
+    <div id="mobile-nav" class="mobile-nav">
+	    <?php echo $this->getChildHtml("navigation.sections"); ?>
+        <?php 
+            echo $this->getLayout()
+              ->createBlock('Magento\Cms\Block\Block')
+              ->setBlockId('porto_custom_block_for_header')
+              ->toHtml();
+        ?>
+        <div class="mobile-nav__close" onclick="document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
     </div>
 <?php endif; ?>
 </header>

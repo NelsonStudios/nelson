@@ -3,11 +3,11 @@
             .shopping-cart {
                 span.cart-img {
                     background-image: url('../images/cart-icon-white.png');
-                    padding-top: 13px;
+//                     padding-top: 13px;
                     background-repeat: no-repeat;
-                    margin-top: 15px;
-                    padding-left: 90px;
-                    padding-bottom: 50px;
+//                     margin-top: 15px;
+//                     padding-left: 90px;
+//                     padding-bottom: 50px;
                 }
             }
         }
@@ -196,8 +196,28 @@
                     }
                 }
             }
-		.block-minicart:after {
-			display: none;
+        }
+		.block-minicart::after {
+			display: none !important;
+		}
+	}
+}
+
+@media (max-width: 1199.98px) {
+	.minicart-wrapper {
+		.ui-widget-content {
+			.block-minicart {
+				top: 80px;
+			}
+		}
+	}
+}
+@media screen and (max-width: 767.98px) {
+	.minicart-wrapper {
+		.ui-widget-content {
+			.block-minicart {
+				top: 60px;
+			}
 		}
 	}
 }
