@@ -10,11 +10,8 @@
             <div class="product photo product-item-photo">
 							<?php if($canShowImg && $category->getImageUrl()):?>
                <a href="<?php echo $block->escapeUrl($category->getUrl()) ?>" tabindex="-1">
-							 <img class="product-image-photo default_image " src="<?php echo $block->escapeUrl($cat->getImageUrl()) ?>" alt=""/>
-               
-							 <!--<img class="product-image-photo hover_image" src="https://shopfecon.devphase.io/media/catalog/product/cache/5f1fe038290b55a4a54d9132509cd965/0/0/005-99-505.png" alt="FECON FLEECE JACKET, BLACK"/>
-							 <img src="<?php echo $block->escapeUrl($cat->getImageUrl()) ?>" alt="" width="<?=$this->getImageWidth();?>" height="<?=$this->getImageHeight()?>"/>
-							 -->
+							 <img class="product-image-photo default_image " src="<?php echo $block->escapeUrl($category->getImageUrl()) ?>" alt=""/>
+							 <!--<img class="product-image-photo hover_image" src="" alt=""/>-->
                </a>
 							<?php endif;?>
             </div>
