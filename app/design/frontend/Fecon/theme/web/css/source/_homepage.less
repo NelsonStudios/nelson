@@ -15,7 +15,7 @@ body { overflow-x: hidden; }
             }
         }
     }
-    #banner-slider-demo-1,
+    [id^=bannerslider-list-items-],
     .featured-callout {
 
         .btn-red-slider {
@@ -46,9 +46,15 @@ body { overflow-x: hidden; }
                 }
             }
         }
+
+        .owl-item {
+            img {
+                width: initial;
+            }
+        }
     }
 
-    #banner-slider-demo-1 {
+    [id^=bannerslider-list-items-] {
         .banner-subtitle {
             font-size:20px;
             margin-left: auto;
