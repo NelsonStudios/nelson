@@ -1,13 +1,7 @@
 <?php
 	$categories = $this->getCategoryCollection();
 	$canShowImg = $this->canShowImage();
-	$title = $block->getTitle() ? __($block->getTitle()) : 'Categories';
 ?>
-<?php if ($title):?>
-<div class="block-title">
-	<strong><?php echo $block->escapeHtml($title) ?></strong>
-</div>
-<?php endif ?>
 <div class="products wrapper grid products-grid">
    <div class="filterproducts products list items product-items owl-carousel ">
 <?php foreach($categories as $category):?>
