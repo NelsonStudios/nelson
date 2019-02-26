@@ -416,7 +416,7 @@
         <?php echo $this->getChildHtml("minicart"); ?>
         
         <?php if($header_type > 13):?>
-        <div class="burger" onclick="document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
+        <div class="burger" onclick="this.classList.toggle('burger_active'); document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
 <!--         <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span> -->
         <?php endif;?>
     </div>
@@ -431,7 +431,7 @@
               ->setBlockId('porto_custom_block_for_header')
               ->toHtml();
         ?>
-        <div class="mobile-nav__close" onclick="document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
+<!--         <div class="mobile-nav__close" onclick="document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div> -->
     </div>
 <?php endif; ?>
 </header>

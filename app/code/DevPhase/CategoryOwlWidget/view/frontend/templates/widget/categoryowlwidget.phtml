@@ -4,7 +4,13 @@
 ?>
 <div class="products wrapper grid products-grid">
    <div class="filterproducts products list items product-items owl-carousel ">
-<?php foreach($categories as $category):?>
+<?php 
+foreach($categories as $category):?>
+<!-- healy
+<?php 
+var_dump($category->getUrl());
+?>
+-->
       <div class="item product product-item">
          <div class="product-item-info" data-container="product-grid">
             <div class="product photo product-item-photo">
