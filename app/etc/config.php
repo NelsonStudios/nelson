@@ -6,6 +6,7 @@ return [
         'Magento_Eav' => 1,
         'Magento_Theme' => 1,
         'Magento_Customer' => 1,
+        'DevPhase_CategoryFeatured' => 1,
         'DevPhase_CategoryOwlWidget' => 1,
         'DevPhase_CategoryWidget' => 1,
         'DevPhase_Feeds' => 1,

@@ -46,6 +46,12 @@ class CategoryOwlWidget extends \Magento\Framework\View\Element\Template impleme
         return $childCategories;
     }
     
+    public function getCategoryImage($cat_id) {
+        $category = $this->_categoryFactory->create();
+        $category->load($cat_id);
+        $cat_img = $category->getImageUrl();
+        return $cat_img;
+		}
     /**
     * Get the width of product image
     * @return int

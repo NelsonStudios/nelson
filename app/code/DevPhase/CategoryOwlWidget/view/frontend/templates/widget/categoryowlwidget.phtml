@@ -5,19 +5,15 @@
 <div class="products wrapper grid products-grid">
    <div class="filterproducts products list items product-items owl-carousel ">
 <?php 
-foreach($categories as $category):?>
-<!-- healy
-<?php 
-var_dump($category->getUrl());
+foreach($categories as $category):
+	$catImageUrl = $this->getCategoryImage($category->getId());
 ?>
--->
       <div class="item product product-item">
          <div class="product-item-info" data-container="product-grid">
             <div class="product photo product-item-photo">
-							<?php if($canShowImg && $category->getImageUrl()):?>
+							<?php if($canShowImg && $catImageUrl):?>
                <a href="<?php echo $block->escapeUrl($category->getUrl()) ?>" tabindex="-1">
-							 <img class="product-image-photo default_image " src="<?php echo $block->escapeUrl($category->getImageUrl()) ?>" alt=""/>
-							 <!--<img class="product-image-photo hover_image" src="" alt=""/>-->
+							 <img class="product-image-photo default_image " src="<?php echo $block->escapeUrl($catImageUrl) ?>" alt=""/>
                </a>
 							<?php endif;?>
             </div>
