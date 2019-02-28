@@ -33,17 +33,9 @@ class CategoryFeaturedWidget extends \Magento\Framework\View\Element\Template im
     */
     public function getCategoryCollection()
     {
-        $category = $this->_categoryFactory->create();
+        $categoriesCollection = $this->_categoryFactory->create()->getCollection()->addAttributeToSelect('*')->addAttributeToFilter('featured_category',1)->addAttributeToFilter('is_active',1);
         
-        $rootCatID = NULL;
-        if($this->getData('parentcat') > 0)
-            $rootCatID = $this->getData('parentcat'); 
-        else
-            $rootCatID = $this->_storeManager->getStore()->getRootCategoryId();
-
-        $category->load($rootCatID);
-        $childCategories = $category->getChildrenCategories();
-        return $childCategories;
+        return $categoriesCollection;
     }
     
     public function getCategoryImage($cat_id) {
