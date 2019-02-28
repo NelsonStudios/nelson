@@ -238,4 +238,47 @@ class DataHandler
 
         return $isValid;
     }
+
+    /**
+     * Validate if the $data is valid to make the Web Service call
+     *
+     * @param array $data
+     * @param array $errors
+     * @return boolean
+     */
+    public function isValidGetAddressesData($data, &$errors = [])
+    {
+        $requiredFields = $this->getAddressesRequiredFields();
+        $isValidData = $this->validField($data, $requiredFields, $errors);
+        
+        return $isValidData;
+    }
+
+    /**
+     * Get Required fields for GetAddresses Web Service
+     *
+     * @return array
+     */
+    protected function getAddressesRequiredFields()
+    {
+        return [
+            'CustomerId'
+        ];
+    }
+
+    /**
+     * Parse data to pass to the Web Service GetAddresses
+     *
+     * @param array $data
+     * @return \stdClass
+     */
+    public function parseGetAddressesData($data)
+    {
+        $partInfo = new \stdClass();
+        $partInfo->ErpGetSiteAddressesRequest = new \stdClass();
+        $partInfo->ErpGetSiteAddressesRequest->SiteInfo = new \stdClass();
+        $partInfo->ErpGetSiteAddressesRequest->SiteInfo->CustomerId = $data['CustomerId'];
+
+        return $partInfo;
+    }
 }
