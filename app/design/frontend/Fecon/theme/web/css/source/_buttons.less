@@ -12,8 +12,8 @@
     a.action.primary,
     a.post-read-more {
         color: @color-white;
-        background-color: @color-primary;
-        border-color: @color-primary;
+        background-color: @color-secondary;
+        border-color: @color-secondary;
         font-weight: 500;
         font-family: @font-family-name__verb;
         padding: 10px 18px !important;
@@ -21,11 +21,10 @@
         font-size: 14px !important;
         height: auto!important;
         transition-duration: 0.25s;
-        transition-property: border-color, background-color;
         &:hover, &:active, &:focus {
             color: @color-white;
-            background-color: @color-primary-hover;
-            border-color: @color-primary-hover;
+            background-color: @color-secondary-hover;
+            border-color: @color-secondary-hover;
             font-weight: 500;
             font-family: @font-family-name__verb;
         }
@@ -46,21 +45,22 @@
             .actions-primary {
                 form {
                     button.action.tocart.primary {
-                        color: @fecon-theme-color;
+                        color: @color-secondary;
                         background-color: @color-white;
-                        border-color: @fecon-theme-color;
+                        border-width: 2px;
+                        border-color: @color-secondary;
                         font-weight: 500;
                         font-family: @font-family-name__verb;
                         height: 42px;
                         width: auto;
-                        font-size: 17px;
+                        font-size: @fontsize-body;
                         &:before {
                             content: none;
                         }
                         &:hover, &:active, &:focus {
                             color: @color-white;
-                            background-color: @fecon-theme-color;
-                            border-color: @fecon-theme-color;
+                            background-color: @color-secondary;
+                            border-color: @color-secondary;
                             font-weight: 500;
                             font-family: @font-family-name__verb;
                         }
