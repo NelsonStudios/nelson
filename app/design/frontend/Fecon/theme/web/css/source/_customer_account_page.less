@@ -1,8 +1,24 @@
+/*
 .message.notice a {
   color: @fecon-theme-color;
   &:hover {
     color: @fecon-theme-color!important;
   }
+}
+*/
+.message.notice {
+	margin-bottom: 20px;
+	background-color: @color-primary;
+	color: @color-white;
+}
+.message.notice a {
+	text-decoration: underline;
+}
+.message.notice a:hover {
+	text-decoration: none;
+}
+.message.notice > *:first-child:before {
+	color: #fff;
 }
 .customer-account-index,
 .customer-account-login,
@@ -25,9 +41,11 @@
 .multishipping-checkout-overview,
 .sales-order-view {
     .page-wrapper {
-        background: url('../images/background_fecon.png') repeat;
+//         background: url('../images/background_fecon.png') repeat;
         #maincontent {
-            background: url('../images/background_fecon.png') repeat;
+	        padding-right: 100px;
+	        padding-left: 100px;
+//             background: url('../images/background_fecon.png') repeat;
             .page-title-wrapper {
                 .page-title {
                     color: @fecon-theme-color;
@@ -44,6 +62,10 @@
                     .form-newsletter-manage,
                     .form.password.reset,
                     .multicheckout.address.form {
+	                    border: none;
+	                    background-color: @color-whisper;
+	                    box-shadow: none;
+/*
                         box-shadow: 6px 10px 49px @color-gray-darken1;
                         border: none;
                         border-top: 4px solid @fecon-theme-color;
@@ -51,8 +73,9 @@
                         background: linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 600%),
                         linear-gradient(to right, @color-gray-darken3, transparent, @color-gray-darken3 200%),
                         repeating-linear-gradient(-70deg, @color-soft-black, @color-soft-black 22px, @color-white 23px, @color-white 24px);
+*/
                         .fieldset, .block-customer-login, .block-new-customer, .title, .items.data.table {
-                            color: @color-white;
+                            color: @color-night-rider;
                             .legend {
                                 color: @fecon-theme-color;
                             }
@@ -349,4 +372,65 @@
       border: 1px solid @border-color__base;
     }
   }
+}
+
+
+@media (max-width: 1199.98px) {
+.customer-account-index,
+.customer-account-login,
+.customer-account-logout,
+.customer-account-logoutsuccess,
+.customer-account-create,
+.customer-account-forgotpassword,
+.customer-account-createpassword,
+.customer-address-index,
+.customer-address-form,
+.customer-account-edit,
+.newsletter-manage-index,
+.wishlist-index-share,
+.wishlist-index-index,
+.multishipping-checkout-login,
+.multishipping-checkout-addresses,
+.multishipping-checkout-address-newshipping,
+.multishipping-checkout-shipping,
+.multishipping-checkout-billing,
+.multishipping-checkout-overview,
+.sales-order-view {
+    .page-wrapper {
+        #maincontent {
+	        padding-right: 30px;
+	        padding-left: 30px;
+	    }
+	}
+}
+}
+
+@media screen and (max-width: 767.98px) {
+.customer-account-index,
+.customer-account-login,
+.customer-account-logout,
+.customer-account-logoutsuccess,
+.customer-account-create,
+.customer-account-forgotpassword,
+.customer-account-createpassword,
+.customer-address-index,
+.customer-address-form,
+.customer-account-edit,
+.newsletter-manage-index,
+.wishlist-index-share,
+.wishlist-index-index,
+.multishipping-checkout-login,
+.multishipping-checkout-addresses,
+.multishipping-checkout-address-newshipping,
+.multishipping-checkout-shipping,
+.multishipping-checkout-billing,
+.multishipping-checkout-overview,
+.sales-order-view {
+    .page-wrapper {
+        #maincontent {
+	        padding-right: 20px;
+	        padding-left: 20px;
+	    }
+	}
+}
 }
