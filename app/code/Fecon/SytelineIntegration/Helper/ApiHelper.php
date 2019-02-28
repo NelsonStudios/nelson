@@ -73,6 +73,24 @@ class ApiHelper extends SoapClient
     }
 
     /**
+     * Call the GetAddresses Web Service
+     *
+     * @param array $data
+     * @return mixed
+     */
+    public function getAddresses($data)
+    {
+        if ($this->dataHandler->isValidGetAddressesData($data, $errors)) {
+            $getAddressesData = $this->dataHandler->parseGetAddressesData($data);
+            $response = $this->execRequest("GetAddresses", $getAddressesData);
+        } else {
+            $response = ['errors' => $errors];
+        }
+
+        return $response;
+    }
+
+    /**
      * Returns the Soap Types
      *
      * @return mixed
