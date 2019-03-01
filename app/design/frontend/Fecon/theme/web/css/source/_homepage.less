@@ -192,6 +192,14 @@ body { overflow-x: hidden; }
 					margin-top: 30px;
 					padding: 0 15px;
 				}
+				.product-item:hover {
+					.product-item-info {
+						box-shadow: none;
+					}
+					.product-item-photo {
+						box-shadow: 0 0 8px 0 rgba(0,0,0,0.1);
+					}
+				}
 				.product-item-photo {
 					position: relative;
 					overflow: hidden;
@@ -255,14 +263,10 @@ body { overflow-x: hidden; }
 				}
 			}
 			.owl-item {
+				padding-bottom: 8px;
 				.product-item {
 					width: 100%;
 					padding: 0 15px !important;
-				}
-				.product-item:hover {
-					.product-item-info {
-						box-shadow: none;
-					}
 				}
 				.product-item-photo {
 					background-color: transparent;
