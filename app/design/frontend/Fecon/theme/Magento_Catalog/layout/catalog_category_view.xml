@@ -4,5 +4,6 @@
         <referenceBlock name="category.products">
             <block class="Magento\Catalog\Block\Category\View" name="subcategories_list" template="category/list_subcategories.phtml"/>
         </referenceBlock>
+        <referenceBlock name="category.image" remove="true"/>
     </body>
 </page>

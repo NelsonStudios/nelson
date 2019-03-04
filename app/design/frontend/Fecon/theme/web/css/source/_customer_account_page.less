@@ -6,17 +6,21 @@
   }
 }
 */
+.message.info,
 .message.notice {
 	margin-bottom: 20px;
 	background-color: @color-primary;
 	color: @color-white;
 }
+.message.info a,
 .message.notice a {
 	text-decoration: underline;
 }
+.message.info a:hover,
 .message.notice a:hover {
 	text-decoration: none;
 }
+.message.info > *:first-child:before,
 .message.notice > *:first-child:before {
 	color: #fff;
 }
