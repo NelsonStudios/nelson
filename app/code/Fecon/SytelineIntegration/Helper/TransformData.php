@@ -256,4 +256,23 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $sytelineCustomerId;
     }
+
+    /**
+     * Generate array data to send via GetPartInfo Web Service
+     *
+     * @return array
+     */
+    public function customerToArray()
+    {
+        $defaultCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
+        $customer = $this->getCustomer();
+        $customerId = $this->getSytelineCustomerId($customer);
+        if ($customerId == $defaultCustomerId) {
+            $customerId = null;
+        }
+
+        return [
+            "CustomerId" => $customerId
+        ];
+    }
 }
