@@ -147,6 +147,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
                 $hasErrors = true;
                 $errors['errors'][] = $response->SubmitCartResponse->Message;
             }
+        } elseif (isset($response->ErpGetAddressesResponse)) {
+            if (!isset($response->ErpGetAddressesResponse->SiteAddress)) {
+                $hasErrors = true;
+                $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetAddresses';
+            }
         }
 
         return $hasErrors;
@@ -164,6 +169,9 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         foreach ($errors['errors'] as $error) {
             $entity = $orderId ? 'Order' . ' Id: ' . $orderId : 'Product' . ' Id: ' . $productId;
+            if (!$orderId && !$productId) {
+                $entity = 'GetAddresses Endpoint';
+            }
 
             $this->logger->err($entity . ' - Error: ' . $error);
         }
@@ -309,5 +317,67 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $price;
+    }
+
+    /**
+     * Retrieve current logged-in Customer's addresses from Syteline
+     *
+     * @return array
+     */
+    public function getCustomerSytelineAddresses()
+    {
+        $customerData = $this->dataTransformHelper->customerToArray();
+        $apiResponse = $this->apiHelper->getAddresses($customerData);
+        $addresses = $this->parseGetAddressesResponse($apiResponse);
+
+        return $addresses;
+    }
+
+    /**
+     * Parse GetAddresses web service response
+     *
+     * @param array|\stdClass $response
+     * @return array
+     */
+    protected function parseGetAddressesResponse($response)
+    {
+        $addresses = [];
+        if (is_array($response)) {
+            $errors = $response;
+        } else {
+            if (!$this->responseHasErrors($response, $errors)) {
+                $addresses = $this->formatAddresses($response);
+            }
+        }
+        if (isset($errors) && !empty($errors)) {
+            $this->logDataErrors($errors);
+        }
+
+        return $addresses;
+    }
+
+    /**
+     * Format response when is successful
+     *
+     * @param \stdClass $response
+     * @return array
+     */
+    protected function formatAddresses($response)
+    {
+        $addresses = [];
+        foreach ($response->ErpGetAddressesResponse->SiteAddress as $responseAddress) {
+            $address = [];
+            $address['CustomerId'] = $responseAddress->CustomerId;
+            $address['Line1'] = $responseAddress->Line1;
+            $address['Line2'] = $responseAddress->Line2;
+            $address['Line3'] = $responseAddress->Line3;
+            $address['City'] = $responseAddress->City;
+            $address['State'] = $responseAddress->State;
+            $address['Zipcode'] = $responseAddress->Zipcode;
+            $address['Country'] = $responseAddress->Country;
+            $addresses[] = $address;
+        }
+
+        return $addresses;
     }
 }
