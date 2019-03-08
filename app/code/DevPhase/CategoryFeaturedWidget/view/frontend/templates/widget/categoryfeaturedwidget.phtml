@@ -1,0 +1,31 @@
+<?php
+	$categories = $this->getCategoryCollection();
+	$canShowImg = $this->canShowImage();
+?>
+<div class="products wrapper grid products-grid">
+   <div class="filterproducts products list items product-items">
+<?php 
+foreach($categories as $category):
+	$catImageUrl = $this->getCategoryImage($category->getId());
+?>
+      <div class="item product product-item">
+         <div class="product-item-info" data-container="product-grid">
+            <div class="product photo product-item-photo">
+							<?php if($canShowImg && $catImageUrl):?>
+               <a href="<?php echo $block->escapeUrl($category->getUrl()) ?>" tabindex="-1">
+							 <img class="product-image-photo default_image " src="<?php echo $block->escapeUrl($catImageUrl) ?>" alt=""/>
+               </a>
+							<?php endif;?>
+            </div>
+            <div class="product details product-item-details">
+               <strong class="product name product-item-name">
+               <a class="product-item-link"
+                  href="<?php echo $block->escapeUrl($category->getUrl()) ?>">
+               <?php echo $block->escapeHtml($category->getName()) ?><span class="arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path fill="#fff" d="M187.8 264.5L41 412.5c-4.7 4.7-12.3 4.7-17 0L4.2 392.7c-4.7-4.7-4.7-12.3 0-17L122.7 256 4.2 136.3c-4.7-4.7-4.7-12.3 0-17L24 99.5c4.7-4.7 12.3-4.7 17 0l146.8 148c4.7 4.7 4.7 12.3 0 17z" class=""></path></svg></span></a>
+               </strong>
+            </div>
+         </div>
+      </div>					
+<?php	endforeach; ?>
+   </div>
+</div>

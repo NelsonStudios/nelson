@@ -265,7 +265,9 @@
                 left: 0;
                 height: 50px;
                 .lib-css(background, @toolbar-background);
+                font-family: inherit !important;
                 z-index: 1;
+                font-size: 14px !important;
                 line-height: 32px;
             }
             .filter-options {
@@ -368,6 +370,10 @@
             display: none;
         }
         &-content {
+	        .items {
+		        list-style: none;
+		        padding: 0;
+	        }
             .item {
                 margin: @indent__s 0;
             }
