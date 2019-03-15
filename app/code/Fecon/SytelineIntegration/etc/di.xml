@@ -48,4 +48,7 @@
     <type name="Magento\Catalog\Model\Product">
         <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Catalog_Model_Product" type="Fecon\SytelineIntegration\Plugin\Magento\Catalog\Model\Product"/>
     </type>
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Sales_Model_Order" type="Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Order"/>
+    </type>
 </config>
