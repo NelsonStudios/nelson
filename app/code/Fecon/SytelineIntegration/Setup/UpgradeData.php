@@ -22,10 +22,11 @@ class UpgradeData implements UpgradeDataInterface
     public function upgrade(
         ModuleDataSetupInterface $setup, ModuleContextInterface $context
     ) {
-        $setup->startSetup();
+        $installer = $setup;
+        $installer->startSetup();
         if (version_compare($context->getVersion(), "1.0.1", "<")) {
             /** @var CustomerSetup $customerSetup */
-            $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
+            $customerSetup = $this->customerSetupFactory->create(['setup' => $installer]);
             $sytelineAttribute = [
                 'label' => 'Is Syteline Address',
                 'visible' => false,
@@ -41,6 +42,19 @@ class UpgradeData implements UpgradeDataInterface
             );
             $isSytelineAddressAttribute->save();
         }
-        $setup->endSetup();
+
+        if (version_compare($context->getVersion(), "1.0.2", "<")) {
+            $installer->getConnection()->addColumn(
+                $installer->getTable('sales_order'),
+                'syteline_id',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'length' => 32,
+                    'comment' => 'Syteline Id'
+                ]
+            );
+        }
+
+        $installer->endSetup();
     }
 }
