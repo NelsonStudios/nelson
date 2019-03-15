@@ -359,7 +359,7 @@ class Cart implements CartInterface {
         }
     }
     /**
-     * submitCart function | check: https://tracker.serfe.com/view.php?id=52950#c442215
+     * submitCart function
      *  Steps to get this working
      *   - Check if customer exists, if not return error response.
      *   - Get customer token in order to perform further requests.

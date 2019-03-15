@@ -293,7 +293,6 @@ class Customer implements CustomerInterface {
             ->setFirstname($customerData['firstname'])
             ->setLastname($customerData['lastname']);
             //Magento require a phone number value, but is not coming in request from Documoto, we must set a default value:
-            //Confirmed with Matt, note https://tracker.serfe.com/view.php?id=56329#c444298
             $address->setTelephone('0');
 
         if(!empty($customerAddressData[$addressType]['SiteAddress']['Line1'])

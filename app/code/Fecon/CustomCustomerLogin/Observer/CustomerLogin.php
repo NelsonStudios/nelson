@@ -35,7 +35,7 @@ class CustomerLogin implements ObserverInterface
     /**
      * Execute function to handle post-login:
      * 
-     * Here the system will try to: (check diagram https://tracker.serfe.com/file_download.php?file_id=57045&type=bug)
+     * Here the system will try to:
      * 
      * - Validate if user has a Documoto account
      *   - If it has Documoto account:
