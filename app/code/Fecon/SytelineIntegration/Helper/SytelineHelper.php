@@ -55,6 +55,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $cacheHelper;
 
     /**
+     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     */
+    protected $orderRepository;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -63,6 +68,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper
      * @param \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param EmailHelper $emailHelper
      * @param CacheHelper $cacheHelper
      */
@@ -73,6 +79,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Fecon\SytelineIntegration\Helper\TransformData $dataTransformHelper,
         \Fecon\SytelineIntegration\Helper\SubmissionHelper $submissionHelper,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         EmailHelper $emailHelper,
         CacheHelper $cacheHelper
     ) {
@@ -83,6 +90,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->productRepository = $productRepository;
         $this->emailHelper = $emailHelper;
         $this->cacheHelper = $cacheHelper;
+        $this->orderRepository = $orderRepository;
 
         parent::__construct($context);
     }
@@ -235,6 +243,9 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if (empty($errors) && !$this->responseHasErrors($apiResponse, $errors)) {
             $successfullRequest = true;
             $this->submissionHelper->createSubmission($orderId, $orderData, $apiResponse, $successfullRequest);
+            $order->setData('real_order_id', $apiResponse->SubmitCartResponse->ExternalOrderID);
+            $order->setData('syteline_id', $apiResponse->SubmitCartResponse->ExternalOrderID);
+            $this->orderRepository->save($order);
         } else {
             $successfullRequest = false;
             $this->logDataErrors($errors, $orderId);
