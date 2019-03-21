@@ -20,6 +20,14 @@
                     <comment>Full path to the SSL certificate location on the server</comment>
                 </field>
             </group>
+            <group id="customer_settings" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
+                <label>Customers Settings</label>
+                <field id="organizations" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="0" translate="label" type="text">
+                    <label>Organizations</label>
+                    <frontend_model>Fecon\Sso\Block\Adminhtml\System\Config\Organizations</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
             <group id="sp_settings" showInDefault="1" showInStore="0" showInWebsite="1" translate="label">
                 <label>Service Provider Settings</label>
                 <field id="sp_entity_id" showInDefault="1" showInStore="0" showInWebsite="1" canRestore="1" translate="label" type="text">

@@ -3,5 +3,7 @@
     <menu>
         <add id="Fecon_Sso::sso_integration" title="SSO Integration" module="Fecon_Sso" sortOrder="50" resource="Fecon_Sso::config_fecon_sso" parent="Fecon::fecon_top_level"/>
         <add id="Fecon_Sso::sso_settings" title="SSO Settings" module="Fecon_Sso" sortOrder="10" action="adminhtml/system_config/edit/section/sso" resource="Fecon_Sso::config_fecon_sso" parent="Fecon_Sso::sso_integration"/>
+        <add id="Fecon_Sso::sso_organization" title="Organization" module="Fecon_Sso" sortOrder="50" action="fecon_sso/organization/index" resource="Fecon_Sso::config_fecon_sso" parent="Fecon_Sso::sso_integration"/>
+        <add id="Fecon_Sso::sso_usergroup" title="User Groups" module="Fecon_Sso" sortOrder="90" action="fecon_sso/usergroup/index" resource="Fecon_Sso::config_fecon_sso" parent="Fecon_Sso::sso_integration"/>
     </menu>
 </config>

@@ -4,4 +4,30 @@
     <preference for="Fecon\Sso\Api\SsoInterface" type="Fecon\Sso\Model\Sso"/>
     <preference for="Fecon\Sso\Api\IdentityProviderInterface" type="Fecon\Sso\Model\IdentityProvider"/>
     <preference for="Fecon\Sso\Api\Sso\SsoMetadataInterface" type="Fecon\Sso\Model\Sso\SsoMetadata"/>
+    <preference for="Fecon\Sso\Api\OrganizationRepositoryInterface" type="Fecon\Sso\Model\OrganizationRepository"/>
+    <preference for="Fecon\Sso\Api\Data\OrganizationInterface" type="Fecon\Sso\Model\Data\Organization"/>
+    <preference for="Fecon\Sso\Api\Data\OrganizationSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Fecon\Sso\Model\ResourceModel\Organization\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">fecon_sso_organization</argument>
+            <argument name="resourceModel" xsi:type="string">Fecon\Sso\Model\ResourceModel\Organization\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="fecon_sso_organization_listing_data_source" xsi:type="string">Fecon\Sso\Model\ResourceModel\Organization\Grid\Collection</item>
+                <item name="fecon_sso_usergroup_listing_data_source" xsi:type="string">Fecon\Sso\Model\ResourceModel\UserGroup\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Fecon\Sso\Api\UserGroupRepositoryInterface" type="Fecon\Sso\Model\UserGroupRepository"/>
+    <preference for="Fecon\Sso\Api\Data\UserGroupInterface" type="Fecon\Sso\Model\Data\UserGroup"/>
+    <preference for="Fecon\Sso\Api\Data\UserGroupSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Fecon\Sso\Model\ResourceModel\UserGroup\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">fecon_sso_usergroup</argument>
+            <argument name="resourceModel" xsi:type="string">Fecon\Sso\Model\ResourceModel\UserGroup\Collection</argument>
+        </arguments>
+    </virtualType>
 </config>
