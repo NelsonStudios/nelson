@@ -9,7 +9,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 /**
  * Get Organization options
  */
-class Options implements \Magento\Framework\Data\OptionSourceInterface
+class Options extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
 
     /**
@@ -52,7 +52,7 @@ class Options implements \Magento\Framework\Data\OptionSourceInterface
     /**
      * @return array|null
      */
-    public function toOptionArray()
+    public function getAllOptions()
     {
         $this->options = [
             [
