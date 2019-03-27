@@ -30,4 +30,7 @@
             <argument name="resourceModel" xsi:type="string">Fecon\Sso\Model\ResourceModel\UserGroup\Collection</argument>
         </arguments>
     </virtualType>
+    <type name="Magento\Customer\Model\Metadata\Form">
+        <plugin name="fix_sso_customer_group_plugin" type="Fecon\Sso\Plugin\Customer\Model\Metadata\Form"/>
+    </type>
 </config>
