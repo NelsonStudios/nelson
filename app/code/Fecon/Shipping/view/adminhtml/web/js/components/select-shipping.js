@@ -10,7 +10,6 @@ define([
          * @returns {Object}
          */
         setParsed: function (data) {
-            console.log(data);
             var option = this.parseData(data);
             if (data.error) {
                 return this;
