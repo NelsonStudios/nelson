@@ -6,6 +6,9 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Customer\Api\CustomerMetadataInterface;
+use Magento\Eav\Model\Config;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 
 /**
  * IdentityProvider class
@@ -51,6 +54,16 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
     protected $serializer;
 
     /**
+     * @var Config
+     */
+    protected $eavConfig;
+
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
      * Constructor
      *
      * @param \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory
@@ -58,13 +71,17 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      * @param Context $context
      * @param UrlInterface $urlInterface
      * @param SerializerInterface $serializer
+     * @param Config $eavConfig
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         \Fecon\Sso\Api\Sso\SsoMetadataInterfaceFactory $metadataFactory,
         \Magento\Customer\Model\Session $session,
         Context $context,
         UrlInterface $urlInterface,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        Config $eavConfig,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->metadata = $metadataFactory->create();
         $this->id = $this->metadata->getIdentityProviderId();
@@ -73,6 +90,8 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         $this->resultFactory = $context->getResultFactory();
         $this->urlInterface = $urlInterface;
         $this->serializer = $serializer;
+        $this->customerRepository = $customerRepository;
+        $this->eavConfig = $eavConfig;
     }
 
     /**
@@ -240,11 +259,15 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
      */
     protected function getAttributes()
     {
+        $customer = $this->customerRepository->getById($this->session->getCustomerId());
         $userName = $this->getUserName();
+        $customerGroup = $this->getCustomerGroups($customer);
+        $organization = $this->getCustomerOrganization($customer);
+
         return [
             'UserName' => [$userName],
-            'Organization' => [self::DEFAULT_ORGANIZATION],
-            'UserGroup' => [self::DEFAULT_USER_GROUP]
+            'Organization' => $organization ? [$organization] : [self::DEFAULT_ORGANIZATION],
+            'UserGroup' => $customerGroup ? : [self::DEFAULT_USER_GROUP]
         ];
     }
 
@@ -393,5 +416,53 @@ class IdentityProvider implements \Fecon\Sso\Api\IdentityProviderInterface
         }
 
         return $resultRedirect;
+    }
+
+    /**
+     * Get customer's groups
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @return array
+     */
+    protected function getCustomerGroups($customer)
+    {
+        $customerGroups = [];
+        $customerAttribute = $customer->getCustomAttribute('sso_customer_group');
+        if ($customerAttribute) {
+            $groupsIds = explode(',', $customerAttribute->getValue());
+            $attribute = $this->eavConfig->getAttribute(CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER, 'sso_customer_group');
+            $options = $attribute->getFrontend()->getSelectOptions();
+            foreach ($options as $option) {
+                if (in_array($option['value'], $groupsIds)) {
+                    $customerGroups[] = $option['label'];
+                }
+            }
+        }
+
+        return $customerGroups;
+    }
+
+    /**
+     * Get customer's organization
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @return string|null
+     */
+    protected function getCustomerOrganization($customer)
+    {
+        $organization = null;
+        $customerOrganization = $customer->getCustomAttribute('organization');
+        if ($customerOrganization) {
+            $organizationId = $customerOrganization->getValue();
+            $attribute = $this->eavConfig->getAttribute(CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER, 'organization');
+            $options = $attribute->getFrontend()->getSelectOptions();
+            foreach ($options as $option) {
+                if ($option['value'] == $organizationId) {
+                    $organization = $option['label'];
+                }
+            }
+        }
+
+        return $organization;
     }
 }
