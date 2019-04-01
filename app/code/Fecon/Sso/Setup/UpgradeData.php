@@ -8,26 +8,50 @@ use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Eav\Setup\EavSetupFactory;
+use Fecon\Sso\Import\ImportUserGroup;
+use Fecon\Sso\Import\ImportOrganization;
 
 class UpgradeData implements UpgradeDataInterface
 {
 
+    /**
+     * @var CustomerSetupFactory
+     */
     protected $customerSetupFactory;
 
+    /**
+     * @var EavSetupFactory
+     */
     protected $eavSetupFactory;
+
+    /**
+     * @var ImportOrganization
+     */
+    protected $organizationImporter;
+
+    /**
+     * @var ImportUserGroup
+     */
+    protected $userGroupImporter;
 
     /**
      * Constructor
      *
-     * @param \Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory
+     * @param CustomerSetupFactory $customerSetupFactory
+     * @param EavSetupFactory $eavSetupFactory
+     * @param ImportUserGroup $userGroupImporter
+     * @param ImportOrganization $organizationImporter
      */
     public function __construct(
-    CustomerSetupFactory $customerSetupFactory,
-        EavSetupFactory $eavSetupFactory
-    )
-    {
+        CustomerSetupFactory $customerSetupFactory,
+        EavSetupFactory $eavSetupFactory,
+        ImportUserGroup $userGroupImporter,
+        ImportOrganization $organizationImporter
+    ) {
         $this->customerSetupFactory = $customerSetupFactory;
         $this->eavSetupFactory = $eavSetupFactory;
+        $this->userGroupImporter = $userGroupImporter;
+        $this->organizationImporter = $organizationImporter;
     }
 
     /**
@@ -74,6 +98,11 @@ class UpgradeData implements UpgradeDataInterface
             $eavSetup->updateAttribute(
                 $customerEntityType, 'organization', 'frontend_input', 'select'
             );
+        }
+
+        if (version_compare($context->getVersion(), "1.0.3", "<")) {
+            $this->organizationImporter->importOrganizations('organizations.csv', true);
+            $this->userGroupImporter->importUserGroups('user-groups.csv', true);
         }
     }
 }
