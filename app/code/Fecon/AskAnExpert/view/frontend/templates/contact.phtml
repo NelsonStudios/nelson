@@ -13,201 +13,193 @@ if (!empty($xml) && false === $xml) {
 }
 ?>
 <script type="text/javascript">
-require([
-  'jquery',
-  'jquery/ui',
-  'mage/mage'
-], function ($) {
-  $('document').ready(function() {
-    getCategories();
-    /**
-     * getCategories ajax function.
-     * Function to get all categories.
-     * 
-     * @return {void} 
-     */
-    function getCategories() {
-      var catUrl = '<?php echo $this->getcategoryajaxurl(); ?>';
-      var param = '?ajax=1';
-      $.ajax({
-        showLoader: true,
-        url: catUrl + param,
-        type: "GET",
-        dataType: 'json'
-      }).done(function (data) {
-        var dropdown = $('#category-dropdown');
-        dropdown.empty();
-        if(data.length != 0) {
-          dropdown.append('<option selected="true" disabled>Choose Category</option>');
-          dropdown.prop('selectedIndex', 0);
-          var catAlreadyDisplayed = [];
-          $.each(data, function (key, entry) {
-            if(entry.entity_id != 1 && entry.entity_id != 2) {
-              catAlreadyDisplayed.push(entry.entity_id);
-              if(entry.children_count == 0) {
-                dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
-              }
-              if(entry.children_count > 0 && !catAlreadyDisplayed.includes(entry.entity_id)) {
-                dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
-              }
-            }
-          });
-        } else {
-          dropdown.append('<option selected="true" disabled>No Available Categories</option>');
-          dropdown.prop('selectedIndex', 0);
-        }
-      });
-    }
+		require([
+				'jquery',
+				'jquery/ui',
+				'mage/mage'
+		], function($) {
+				$('document').ready(function() {
+						getCategories();
+						/**
+						 * getCategories ajax function.
+						 * Function to get all categories.
+						 * 
+						 * @return {void} 
+						 */
+						function getCategories() {
+								var catUrl = '<?php echo $this->getcategoryajaxurl(); ?>';
+								var param = '?ajax=1';
+								$.ajax({
+										showLoader: true,
+										url: catUrl + param,
+										type: "GET",
+										dataType: 'json'
+								}).done(function(data) {
+										var dropdown = $('#category-dropdown');
+										dropdown.empty();
+										if (data.length != 0) {
+												dropdown.append('<option selected="true" disabled>Choose Category</option>');
+												dropdown.prop('selectedIndex', 0);
+												var catAlreadyDisplayed = [];
+												$.each(data, function(key, entry) {
+														if (entry.entity_id != 1 && entry.entity_id != 2) {
+																catAlreadyDisplayed.push(entry.entity_id);
+																if (entry.children_count == 0) {
+																		dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
+																}
+																if (entry.children_count > 0 && !catAlreadyDisplayed.includes(entry.entity_id)) {
+																		dropdown.append($('<option></option>').attr('value', entry.entity_id).text(entry.name));
+																}
+														}
+												});
+										} else {
+												dropdown.append('<option selected="true" disabled>No Available Categories</option>');
+												dropdown.prop('selectedIndex', 0);
+										}
+								});
+						}
 
-    var dataForm = $('#contact-form');   
-    dataForm.mage('validation', {});
+						var dataForm = $('#contact-form');
+						dataForm.mage('validation', {});
 
-    /* Send select text instead of value */
-    $('#contact-form').submit(function(){
-      $('#category-dropdown option:selected').val(function(){
-        return $(this).text().toUpperCase();
-      });
-    });
-  });
-});
+						/* Send select text instead of value */
+						$('#contact-form').submit(function() {
+								$('#category-dropdown option:selected').val(function() {
+										return $(this).text().toUpperCase();
+								});
+						});
+				});
+		});
 </script>
-<head>
-  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-  <meta charset="utf-8">
-  <title>Info windows</title>
-  </head>
-  <body>
-    <div class="main_block">
-      <div class="map_container">
-        <div class="page_title">
-          <div class="aae-description">
-            <?php echo $this->pagedescription(); ?>
-          </div>
-          <h2><?php echo $this->pageheading(); ?></h2>
-        </div>
-<div class="contact_container">
-  <div class="inner_container">
-    <ul>
-      <?php if ($this->getphone() != '' && $this->getenablestoreinfo() == true) {?>
-        <li>
-          <h3>Phone Number</h3>
-          <p><?php echo $this->getphone(); ?>
-            <br>
-            <br></p>
-          </li>
-          <li class="divider"></li>
-          <?php } ?>
-          <?php if ($this->getStoreName() != '' && $this->getenablestoreinfo() == true) { ?>
-          <li> 
-            <h3><?php echo $this->getStoreName(); ?></h3>
-            <p><?php echo $this->getstreet1() . ' ' . $this->getstreet2() . ' ' . $this->getcity() . ',' . $this->getzip();?>
-              <br>
-              <br></p>
-            </li>
-            <li class="divider"></li>
-            <?php } ?>
-             <?php if ($this->getstoreemail() != '' && $this->getenableemailus() == true) { ?>
-              <li class="last email-us">
-                <h3>Email Us</h3>
-                <p><a href="#"><?php echo $this->getstoreemail(); ?></a>
-                </li>
-                <?php } ?>
-              </ul>
-            </div>
-          </div>
-          <div class="clear"></div>
-          <div class="form_block">
-            <div class="inner_container">
-              <form class="form contact"
-              action="<?php /* @escapeNotVerified */ echo $block->getFormAction(); ?>"
-              id="contact-form"
-              name="contact-form"
-              onsubmit="return handle_recaptcha()"
-              method="post"
-              data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
-              data-mage-init='{"validation":{}}'>
-              <fieldset class="fieldset"> 
-               <div>
-                <div class="field select-category input_outer">
-                  <label class="ask-expert-form-label">PRODUCT CATEGORY</label>
-                  <select id="category-dropdown" name="product_category" class="category-select"></select>
-                </div>
-                <div class="field name input_outer">
-                  <label class="ask-expert-form-label">PRODUCT NAME</label>
-                  <div class="control">
-                    <input name="product_name" id="product-name" placeholder="<?php /* @escapeNotVerified */ echo __('Product Name') ?>" title="<?php /* @escapeNotVerified */ echo __('Product Name') ?>"  class="input-text" type="text"/>
-                  </div>
-                </div>
-                <div class="field select-question-about input_outer">
-                  <label class="ask-expert-form-label">MY QUESTION IS ABOUT</label>
-                  <select id="question-dropdown" name="question_about" class="question-select">
-                    <option selected="true" disabled>PLEASE SELECT ONE</option>
-                    <option>PRODUCT SUPPORT</option>
-                    <option>PARTS</option>
-                    <option>CUSTOMER SERVICE</option>
-                    <option>OTHER</option>
-                  </select>
-                </div>
-                <div class="field select-hearabout input_outer">
-                  <label class="ask-expert-form-label">HOW DID YOU HEAR ABOUT US?</label>
-                  <select id="hearabout-dropdown" name="hear_about" class="hearabout-select">
-                    <option selected="true" disabled>PLEASE SELECT ONE</option>
-                    <option>WEB SEARCH</option>
-                    <option>FB/INSTAGRAM AD</option>
-                    <option>TRADE SHOW</option>
-                    <option>MAGAZINE</option>
-                    <option>FECON DEALER/PARTNER</option>
-                    <option>YOUTUBE AD</option>
-                    <option>PRIOR KNOWLEDGE</option>
-                    <option>WORD OF MOUTH</option>
-                    <option>OTHER</option>
-                  </select>
-                </div> 
-                <div class="field name input_outer">
-                  <label class="ask-expert-form-label">NAME</label>
-                  <div class="control">
-                    <input name="name" id="name" placeholder="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>"  class="input-text" type="text"/>
-                  </div>
-                </div>
-                <div class="field email required input_outer">
-                  <label class="ask-expert-form-label"><span class="required">*</span>EMAIL</label>
-                  <div class="control">
-                    <input name="email" id="email" placeholder="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>"  class="input-text" type="email" data-validate="{required:true, 'validate-email':true}"/>
-                  </div>
-                </div>
-                <?php if($this->phonetittle() != '') {?>
-                <div class="field telephone input_outer">
-                  <label class="ask-expert-form-label">PHONE NUMBER</label>
-                  <div class="control">
-                    <input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text"/>
-                  </div>
-                </div>
-                <?php } ?>
+<div class="main_block">
+		<div class="map_container">
+				<div class="page_title">
+						<div class="aae-description">
+								<?php echo $this->pagedescription(); ?>
+						</div>
+						<h2><?php echo $this->pageheading(); ?></h2>
+				</div>
 
-              </div>
-              <div class="field comment required">
-              <div class="control">
-                <textarea name="message" class="input-text" placeholder="<?php /* @escapeNotVerified */ echo __($this->messagetittle()) ?>" id="comment" title="<?php /* @escapeNotVerified */ echo __($this->messagetittle()) ?>" class="input-text" cols="1" rows="6" data-validate="{required:true}"></textarea>
-              </div>
-            </div>
-            <?php if($this->isCaptchaEnabled()) { ?>
-              <div class="g-recaptcha" name="recaptcha" id="recaptcha" style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;" data-sitekey="<?php echo $this->getsitekey(); ?>"></div>
-              <?php } ?>
-             <!-- <?php echo $block->getChildHtml('form.additional.info'); ?> -->
-            </fieldset>
-            <div class="actions-toolbar">
-              <div class="primary">
-                <input type="hidden" name="ip" id="ip" value="<?php echo $ip; ?>" />
-                <input type="hidden" name="country" id="country" value="<?php echo ((!empty($country)) ? $country : 'N/A'); ?>" />
-                <input type="hidden" name="hideit" id="hideit" value="" />
-                <button type="submit" name="submit" id="submit"  title="<?php /* @escapeNotVerified */ echo __($this->buttontext()) ?>" class="action submit primary">
-                  <span><?php /* @escapeNotVerified */ echo __($this->buttontext()) ?></span>
-                </button>
-              </div>
-            </div>
-          </form>
-        <div class="clear"></div>
-      </div>
-    </div>
-  </div>
-</body>
+				<div class="contact_container">
+						<div class="inner_container">
+								<ul>
+										<?php if ($this->getphone() != '' && $this->getenablestoreinfo() == true) {?>
+												<li>
+														<h3>Phone Number</h3>
+														<p>
+																<?php echo $this->getphone(); ?>
+																		<br>
+																		<br>
+														</p>
+												</li>
+												<li class="divider"></li>
+												<?php } ?>
+														<?php if ($this->getStoreName() != '' && $this->getenablestoreinfo() == true) { ?>
+																<li>
+																		<h3><?php echo $this->getStoreName(); ?></h3>
+																		<p>
+																				<?php echo $this->getstreet1() . ' ' . $this->getstreet2() . ' ' . $this->getcity() . ',' . $this->getzip();?>
+																						<br>
+																						<br>
+																		</p>
+																</li>
+																<li class="divider"></li>
+																<?php } ?>
+																		<?php if ($this->getstoreemail() != '' && $this->getenableemailus() == true) { ?>
+																				<li class="last email-us">
+																						<h3>Email Us</h3>
+																						<p><a href="#"><?php echo $this->getstoreemail(); ?></a>
+																				</li>
+																				<?php } ?>
+								</ul>
+						</div>
+				</div>
+				<div class="clear"></div>
+				<div class="form_block">
+						<div class="inner_container">
+								<form class="form contact" action="<?php /* @escapeNotVerified */ echo $block->getFormAction(); ?>" id="contact-form" name="contact-form" onsubmit="return handle_recaptcha()" method="post" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>" data-mage-init='{"validation":{}}'>
+										<fieldset class="fieldset">
+												<div>
+														<div class="field select-category input_outer">
+																<label class="ask-expert-form-label">PRODUCT CATEGORY</label>
+																<select id="category-dropdown" name="product_category" class="category-select"></select>
+														</div>
+														<div class="field name input_outer">
+																<label class="ask-expert-form-label">PRODUCT NAME</label>
+																<div class="control">
+																		<input name="product_name" id="product-name" placeholder="<?php /* @escapeNotVerified */ echo __('Product Name') ?>" title="<?php /* @escapeNotVerified */ echo __('Product Name') ?>" class="input-text" type="text" />
+																</div>
+														</div>
+														<div class="field select-question-about input_outer">
+																<label class="ask-expert-form-label">MY QUESTION IS ABOUT</label>
+																<select id="question-dropdown" name="question_about" class="question-select">
+																		<option selected="true" disabled>PLEASE SELECT ONE</option>
+																		<option>PRODUCT SUPPORT</option>
+																		<option>PARTS</option>
+																		<option>CUSTOMER SERVICE</option>
+																		<option>OTHER</option>
+																</select>
+														</div>
+														<div class="field select-hearabout input_outer">
+																<label class="ask-expert-form-label">HOW DID YOU HEAR ABOUT US?</label>
+																<select id="hearabout-dropdown" name="hear_about" class="hearabout-select">
+																		<option selected="true" disabled>PLEASE SELECT ONE</option>
+																		<option>WEB SEARCH</option>
+																		<option>FB/INSTAGRAM AD</option>
+																		<option>TRADE SHOW</option>
+																		<option>MAGAZINE</option>
+																		<option>FECON DEALER/PARTNER</option>
+																		<option>YOUTUBE AD</option>
+																		<option>PRIOR KNOWLEDGE</option>
+																		<option>WORD OF MOUTH</option>
+																		<option>OTHER</option>
+																</select>
+														</div>
+														<div class="field name input_outer">
+																<label class="ask-expert-form-label">NAME</label>
+																<div class="control">
+																		<input name="name" id="name" placeholder="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->nametittle()) ?>" class="input-text" type="text" />
+																</div>
+														</div>
+														<div class="field email required input_outer">
+																<label class="ask-expert-form-label"><span class="required">*</span>EMAIL</label>
+																<div class="control">
+																		<input name="email" id="email" placeholder="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->emailtittle()) ?>" class="input-text" type="email" data-validate="{required:true, 'validate-email':true}" />
+																</div>
+														</div>
+														<?php if($this->phonetittle() != '') {?>
+																<div class="field telephone input_outer">
+																		<label class="ask-expert-form-label">PHONE NUMBER</label>
+																		<div class="control">
+																				<input name="phone" id="telephone" placeholder="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" title="<?php /* @escapeNotVerified */ echo __($this->phonetittle()) ?>" class="input-text" type="text" />
+																		</div>
+																</div>
+																<?php } ?>
+
+												</div>
+												<div class="field comment required">
+														<div class="control">
+																<textarea name="message" class="input-text" placeholder="<?php /* @escapeNotVerified */ echo __($this->messagetittle()) ?>" id="comment" title="<?php /* @escapeNotVerified */ echo __($this->messagetittle()) ?>" class="input-text" cols="1" rows="6" data-validate="{required:true}"></textarea>
+														</div>
+												</div>
+												<?php if($this->isCaptchaEnabled()) { ?>
+														<div class="g-recaptcha" name="recaptcha" id="recaptcha" style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;" data-sitekey="<?php echo $this->getsitekey(); ?>"></div>
+														<?php } ?>
+																<!-- <?php echo $block->getChildHtml('form.additional.info'); ?> -->
+										</fieldset>
+										<div class="actions-toolbar">
+												<div class="primary">
+														<input type="hidden" name="ip" id="ip" value="<?php echo $ip; ?>" />
+														<input type="hidden" name="country" id="country" value="<?php echo ((!empty($country)) ? $country : 'N/A'); ?>" />
+														<input type="hidden" name="hideit" id="hideit" value="" />
+														<button type="submit" name="submit" id="submit" title="<?php /* @escapeNotVerified */ echo __($this->buttontext()) ?>" class="action submit primary">
+																<span><?php /* @escapeNotVerified */ echo __($this->buttontext()) ?></span>
+														</button>
+												</div>
+										</div>
+								</form>
+								<div class="clear"></div>
+						</div>
+				</div>
+		</div>
+</div>
