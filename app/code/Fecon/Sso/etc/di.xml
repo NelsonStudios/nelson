@@ -33,4 +33,7 @@
     <type name="Magento\Customer\Model\Metadata\Form">
         <plugin name="fix_sso_customer_group_plugin" type="Fecon\Sso\Plugin\Customer\Model\Metadata\Form"/>
     </type>
+    <type name="Magento\Customer\Controller\Account\Login">
+        <plugin name="add_login_session_messages" type="Fecon\Sso\Plugin\Customer\Controller\Account\Login"/>
+    </type>
 </config>
