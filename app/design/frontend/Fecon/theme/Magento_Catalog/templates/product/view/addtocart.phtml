@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 
 // @codingStandardsIgnoreFile
 
@@ -16,17 +12,10 @@
         <?php if ($block->shouldRenderQuantity()): ?>
         <div class="field qty">
             <div class="control">
-                <select name="qty" id="qty" title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
-                   class="input-text qty" data-validate="<?php echo $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>">
-                   <?php $i = 1 ; ?>
-                    <?php 
-                     while( $i < 51) { ?>
-                        <option value="<?php echo $block->getProductDefaultQty() * $i; ?>"><?php echo $block->getProductDefaultQty() * $i; ?></option>
-                        <?php $i++; ?>
-                     <?php } ?>
-                </select>
-                <span class="icon-down-chevron"></span>
-                <label class="qty-label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+                <input id="qty" name=" qty" value="1" type="number" size="4" title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" class="input-text qty" maxlength="3" data-validate="{required:true,'validate-greater-than-zero':true}">
+                <label class="qty-label" for="qty">
+                    <span><?php /* @escapeNotVerified */ echo __('Qty') ?></span>
+                </label>
             </div>
         </div>
         <?php endif; ?>
