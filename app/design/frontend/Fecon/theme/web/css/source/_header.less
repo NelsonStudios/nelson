@@ -66,6 +66,23 @@
 						text-decoration: none;
 						color: @color-night-rider;
 					}
+					> span {
+						display: block;
+						padding: 1px 0 0;
+						font-size: @fontsize-bodyS;
+						line-height: 39px;
+						color: @color-nobel;
+						cursor: pointer;
+						transition-duration: 0.25s;
+						transition-property: color;
+						-webkit-user-select: none;
+					}
+					> span:hover {
+						color: @color-night-rider;
+					}
+					.action.switch:after {
+						line-height: 39px;
+					}
 				}
 				li:last-child {
 					display: none;
@@ -415,6 +432,7 @@
 
 #google_translate_element {
 	position: relative;
+	right: auto !important;
 	float: right;
 	margin: 10px 15px 10px 0;
 	padding-right: 30px;

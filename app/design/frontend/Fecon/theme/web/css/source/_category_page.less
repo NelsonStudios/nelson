@@ -123,8 +123,12 @@ body {
                                         .product-item-details {
                                             strong.product-item-name {
                                                 a.product-item-link {
+	                                                display: block;
+	                                                overflow: hidden;
                                                     font-size: 20px;
                                                     font-weight: 500;
+                                                    text-overflow: ellipsis;
+                                                    white-space: nowrap;
                                                     color: @color-black;
                                                 }
                                             }

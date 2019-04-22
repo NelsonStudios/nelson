@@ -240,10 +240,13 @@ body { overflow-x: hidden; }
 						a {
 							position: relative;
 							display: block;
+							overflow: hidden;
 							padding: 15px;
 							font-size: @fontsize-bodyXL !important;
 							line-height: @linehight-heading;
 							text-transform: uppercase;
+							white-space: nowrap;
+							text-overflow: ellipsis;
 							color: #fff;
 							.arrow {
 								position: relative;
