@@ -245,7 +245,7 @@ class Customer implements CustomerInterface {
         //$documotoCustomerId = $this->request->getParam('Username');// Enable for testing only.
         try {
             $collection = $this->customerCollection
-              ->addAttributeToSelect(array('id', 'firstname', 'customer_id',  'email'))
+              ->addAttributeToSelect(array('id', 'firstname', 'customer_number',  'email'))
               ->addAttributeToFilter('username', array('eq' => $documotoCustomerUsername))
               ->load();
         } catch(\Excepetion $e) {

@@ -247,10 +247,10 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getSytelineCustomerId($customer)
     {
         $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
-        //if customer is logged in and attribute 'syteline_customer_id' is not empty, 
+        //if customer is logged in and attribute 'customer_number' is not empty, 
         //then, we should use the customer ID from syteline not default from config
-        if ($customer && $customer->getCustomAttribute('syteline_customer_id') ) {
-            $customerId = $customer->getCustomAttribute('syteline_customer_id')->getValue();
+        if ($customer && $customer->getCustomAttribute('customer_number') ) {
+            $customerId = $customer->getCustomAttribute('customer_number')->getValue();
             $sytelineCustomerId = $customerId ? $customerId : $sytelineCustomerId;
         }
 

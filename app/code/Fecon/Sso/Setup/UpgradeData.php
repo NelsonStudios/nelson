@@ -108,5 +108,16 @@ class UpgradeData implements UpgradeDataInterface
                 ->setData('default_value', 1);
             $attribute->save();
         }
+
+        if (version_compare($context->getVersion(), "1.0.5", "<")) {
+            $eavSetup->removeAttribute(
+                \Magento\Customer\Model\Customer::ENTITY,
+                'syteline_customer_id'
+            );
+            $eavSetup->removeAttribute(
+                \Magento\Customer\Model\Customer::ENTITY,
+                'customer_id'
+            );
+        }
     }
 }
