@@ -85,9 +85,6 @@ class UpgradeData implements UpgradeDataInterface
             ]);
             $attribute->save();
 
-
-
-
             $customerEntityType = $eavSetup->getEntityTypeId(\Magento\Customer\Model\Customer::ENTITY);
             $eavSetup->updateAttribute(
                 $customerEntityType, 'organization', 'backend_type', 'int'
@@ -103,6 +100,13 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), "1.0.3", "<")) {
             $this->organizationImporter->importOrganizations('organizations.csv', true);
             $this->userGroupImporter->importUserGroups('user-groups.csv', true);
+        }
+
+        if (version_compare($context->getVersion(), "1.0.4", "<")) {
+            // Set is_documoto_user as true by default
+            $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'is_documoto_user')
+                ->setData('default_value', 1);
+            $attribute->save();
         }
     }
 }
