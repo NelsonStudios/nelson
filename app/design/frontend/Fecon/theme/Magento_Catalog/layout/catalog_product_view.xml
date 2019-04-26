@@ -13,12 +13,17 @@
                 </arguments>
             </block>
         </referenceContainer>
-        <referenceBlock name="product.info.details">  
-            <referenceBlock name="product.info.description">
+        <referenceBlock name="product.info.details">
+            <referenceBlock name="product.info.description" remove="true" />
+            <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.features" as="features" template="Magento_Catalog::product/view/features.phtml" group="detailed_info">
                 <arguments>
+                    <argument name="at_call" xsi:type="string">getDescription</argument>
+                    <argument name="at_code" xsi:type="string">description</argument>
+                    <argument name="css_class" xsi:type="string">features</argument>
+                    <argument name="at_label" xsi:type="string">none</argument>
                     <argument name="title" translate="true" xsi:type="string">Features</argument>
                 </arguments>
-            </referenceBlock>
+            </block>
             <block class="Magento\Catalog\Block\Product\View\Description" name="documentation.tab" template="Magento_Catalog::product/view/applications.phtml" group="detailed_info">
                 <arguments>
                     <argument name="at_call" xsi:type="string">getDocumentation</argument>
@@ -37,6 +42,14 @@
                     <argument name="at_label" xsi:type="string">applications</argument>
                     <argument name="add_attribute" xsi:type="string">itemprop="applications"</argument>
                     <argument name="title" translate="true" xsi:type="string">Applications</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\View\Description" name="product.specifications" template="Magento_Catalog::product/view/specifications.phtml" group="detailed_info">
+                <arguments>
+                    <argument name="at_code" xsi:type="string">attributes</argument>
+                    <argument name="css_class" xsi:type="string">specifications</argument>
+                    <argument name="at_label" xsi:type="string">specifications</argument>
+                    <argument name="title" translate="true" xsi:type="string">Specifications</argument>
                 </arguments>
             </block>
         </referenceBlock>

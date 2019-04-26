@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Product view template
+ *
+ * @see \Magento\Catalog\Block\Product\View\Description
+ */
+?>
+<?php
+$product = $block->getProduct();
+$className = $block->getCssClass();
+$attributesValue = $product->getResource()->getAttribute('attributes')->getFrontend()->getValue($product);
+$priceUnitAtt = $product->getResource()->getAttribute('price_unit');
+$count = 1;
+?>
+
+<?php if ($attributesValue): ?>
+<?php
+    $attributesArray = explode('|', $attributesValue);
+?>
+<div class="product <?= /* @escapeNotVerified */ $className ?>">
+    <table class="table table-striped">
+        <tbody>
+            <?php foreach ($attributesArray as $attribute): ?>
+            <?php
+                $data = explode('=', $attribute);
+                if (!isset($data[0]) || !isset($data[1])) {
+                    continue;
+                }
+            ?>
+            <tr class="<?php if(($count++%2) == 0):?>even<?php else:?>odd<?php endif;?>">
+                <td class="label"><?= $block->escapeHtml(__($data[0])); ?></td>
+                <td class="data"><?= $block->escapeHtml(__($data[1])); ?></td>
+            </tr>
+            <?php endforeach; ?>
+            <?php if ($priceUnitAtt): ?>
+            <tr class="<?php if(($count++%2) == 0):?>even<?php else:?>odd<?php endif;?>">
+                <td class="label"><?= $block->escapeHtml(__($priceUnitAtt->getStoreLabel())); ?></td>
+                <td><?= $block->escapeHtml(__($priceUnitAtt->getFrontend()->getValue($product))); ?></td>
+            </tr>
+            <?php endif; ?>
+        <tbody>
+    </table>
+</div>
+<?php endif; ?>
