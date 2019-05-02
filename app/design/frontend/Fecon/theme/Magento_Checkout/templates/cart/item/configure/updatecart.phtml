@@ -1,0 +1,57 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+?>
+<?php $_product = $block->getProduct(); ?>
+<?php $buttonTitle = __('Update Cart'); ?>
+<?php $minimumOrderAtt = $_product->getResource()->getAttribute('minimum_order');?>
+<?php $minimumOrder = $minimumOrderAtt->getFrontend()->getValue($_product); ?>
+<?php if ($_product->isSaleable()): ?>
+    <div class="box-tocart update">
+        <fieldset class="fieldset">
+            <?php if ($block->shouldRenderQuantity()): ?>
+            <div class="field qty">
+                <div class="control">
+                    <input id="qty" name=" qty" value="1" type="number" size="4" title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" class="input-text qty" maxlength="3" data-validate="{required:true,'validate-greater-than-zero':true}">
+                    <label class="qty-label" for="qty">
+                        <span>
+                            <?php /* @escapeNotVerified */ echo __('Qty') ?>
+                        </span>
+                    </label>
+                </div>
+                <?php if (!empty($minimumOrder)): ?>
+                <div class="field minimum-order-field">
+                    <?php /* @escapeNotVerified */ echo '[ ' . __($minimumOrder) . ' ]'; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= /* @escapeNotVerified */ $buttonTitle ?>"
+                        class="action primary tocart"
+                        id="product-updatecart-button">
+                    <span><?= /* @escapeNotVerified */ $buttonTitle ?></span>
+                </button>
+                <?= $block->getChildHtml('', true) ?>
+            </div>
+        </fieldset>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "#product_addtocart_form": {
+                "validation": {},
+                "addToCart": {
+                    "cartButtonId": "#product-updatecart-button",
+                    "cartForm": "#product_addtocart_form"
+                }
+            }
+        }
+    </script>
+<?php endif; ?>
