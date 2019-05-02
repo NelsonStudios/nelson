@@ -1,0 +1,70 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Product view template
+ *
+ * @see \Magento\Catalog\Block\Product\View\Description $block
+ */
+?>
+<?php
+$product = $block->getProduct();
+$className = $block->getCssClass();
+$attributesValue = $product->getResource()->getAttribute('attributes')->getFrontend()->getValue($product);
+$count = 1;
+
+$specifications = [];
+//  Attributes Attribute
+if ($attributesValue) {
+    $attributesArray = explode('|', $attributesValue);
+
+    foreach ($attributesArray as $attribute) {
+        $data = explode('=', $attribute);
+
+        if (isset($data[0]) || isset($data[1])) {
+            $specifications[$data[0]] = $data[1];
+        }
+    }
+}
+
+//  Price Unit Attribute
+$priceUnitAtt = $product->getResource()->getAttribute('price_unit');
+if ($priceUnitAtt) {
+    $value = $priceUnitAtt->getFrontend()->getValue($product);
+    if (!empty($value)) {
+        $specifications[$priceUnitAtt->getStoreLabel()] = $value;
+    }
+}
+
+//  Price List Attribute
+$priceListAtt = $product->getResource()->getAttribute('price_list');
+if ($priceListAtt) {
+    $value = $priceListAtt->getFrontend()->getValue($product);
+    if (!empty($value)) {
+        $specifications[$priceListAtt->getStoreLabel()] = $value;
+    }
+}
+
+ksort($specifications);
+
+?>
+
+<?php if (!empty($specifications)): ?>
+    <div class="product <?= /* @escapeNotVerified */ $className ?>">
+        <table class="table table-striped">
+            <tbody>
+                <?php foreach ($specifications as $label => $value): ?>
+                    <tr class="<?php if(($count++%2) == 0):?>even<?php else:?>odd<?php endif;?>">
+                        <td class="label"><?= $label; ?></td>
+                        <td class="data"><?= $value; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <tbody>
+        </table>
+    </div>
+<?php endif; ?>

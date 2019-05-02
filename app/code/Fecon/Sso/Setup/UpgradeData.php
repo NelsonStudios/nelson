@@ -10,6 +10,9 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Eav\Setup\EavSetupFactory;
 use Fecon\Sso\Import\ImportUserGroup;
 use Fecon\Sso\Import\ImportOrganization;
+use Magento\Catalog\Model\Product;
+use Magento\Eav\Model\Attribute\GroupRepository;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 
 class UpgradeData implements UpgradeDataInterface
 {
@@ -35,23 +38,39 @@ class UpgradeData implements UpgradeDataInterface
     protected $userGroupImporter;
 
     /**
+     * @var GroupRepository
+     */
+    protected $groupRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+     protected $searchCriteriaBuilder;
+
+    /**
      * Constructor
      *
      * @param CustomerSetupFactory $customerSetupFactory
      * @param EavSetupFactory $eavSetupFactory
      * @param ImportUserGroup $userGroupImporter
      * @param ImportOrganization $organizationImporter
+     * @param GroupRepository $groupRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         CustomerSetupFactory $customerSetupFactory,
         EavSetupFactory $eavSetupFactory,
         ImportUserGroup $userGroupImporter,
-        ImportOrganization $organizationImporter
+        ImportOrganization $organizationImporter,
+        GroupRepository $groupRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->customerSetupFactory = $customerSetupFactory;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->userGroupImporter = $userGroupImporter;
         $this->organizationImporter = $organizationImporter;
+        $this->groupRepository = $groupRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -117,6 +136,51 @@ class UpgradeData implements UpgradeDataInterface
             $eavSetup->removeAttribute(
                 \Magento\Customer\Model\Customer::ENTITY,
                 'customer_id'
+            );
+        }
+
+        if (version_compare($context->getVersion(), "1.0.6", "<")) {
+            $searchCriteria = $this->searchCriteriaBuilder
+                                ->addFilter('attribute_group_code', 'ors-atributes', 'eq')->create();
+
+            $group = $this->groupRepository->getList($searchCriteria)->getItems();
+
+            if ($group) {
+                $groupId = reset($group)->getAttributeGroupId();
+                $groupWithWrongName = $this->groupRepository->get($groupId);
+                $groupWithWrongName->setAttributeGroupName('ORS Attributes');
+                $groupWithWrongName->setAttributeGroupCode('ors-attributes');
+                $this->groupRepository->save($groupWithWrongName);
+            }
+        }
+
+        if (version_compare($context->getVersion(), "1.0.7", "<")) {
+            $attributeCode = 'price_list';
+            $eavSetup->removeAttribute(Product::ENTITY, $attributeCode);
+
+            $eavSetup->addAttribute(
+                Product::ENTITY,
+                $attributeCode,
+                [
+                    'type' => 'decimal',
+                    'label' => 'List Price',
+                    'input' => 'price',
+                    'backend' => \Magento\Catalog\Model\Product\Attribute\Backend\Price::class,
+                    'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_GLOBAL,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => true,
+                    'default' => null,
+                    'searchable' => false,
+                    'filterable' => false,
+                    'comparable' => false,
+                    'visible_on_front' => false,
+                    'used_in_product_listing' => false,
+                    'unique' => false,
+                    'apply_to' => '',
+                    'system' => 1,
+                    'group' => 'ORS Attributes',
+                ]
             );
         }
     }
