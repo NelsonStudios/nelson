@@ -6,6 +6,7 @@
 ?>
 <?php $_product = $block->getProduct(); ?>
 <?php $buttonTitle = __('Add to Cart'); ?>
+<?php $minimumOrder = $_product->getResource()->getAttribute('minimum_order')->getFrontend()->getValue($_product); ?>
 <?php if ($_product->isSaleable()): ?>
 <div class="box-tocart">
     <div class="fieldset">
@@ -14,7 +15,10 @@
             <div class="control">
                 <input id="qty" name=" qty" value="1" type="number" size="4" title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" class="input-text qty" maxlength="3" data-validate="{required:true,'validate-greater-than-zero':true}">
                 <label class="qty-label" for="qty">
-                    <span><?php /* @escapeNotVerified */ echo __('Qty') ?></span>
+                    <span><?php /* @escapeNotVerified */ echo __('Qty') ?>
+                        <?php if (!empty($minimumOrder)): ?>
+                            <?php /* @escapeNotVerified */ echo '[ ' . __($minimumOrder) . ' ]'; ?></span>
+                        <?php endif; ?>
                 </label>
             </div>
         </div>
