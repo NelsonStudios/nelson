@@ -17,7 +17,7 @@ class AttributeSet extends \Fecon\OrsProducts\Model\AbstractAttributeSet
     {
         return [
             'ORS Products' => [
-                'ORS Atributes' => [
+                'ORS Attributes' => [
                     'unspsc',
                     'upc',
                     'mfg_part_number',
