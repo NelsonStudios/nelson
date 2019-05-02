@@ -13,6 +13,7 @@ use Fecon\Sso\Import\ImportOrganization;
 use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Attribute\GroupRepository;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 
 class UpgradeData implements UpgradeDataInterface
 {
@@ -48,6 +49,11 @@ class UpgradeData implements UpgradeDataInterface
      protected $searchCriteriaBuilder;
 
     /**
+     * @var ProductAttributeRepositoryInterface
+     */
+    protected $productAttributeRepository;
+
+    /**
      * Constructor
      *
      * @param CustomerSetupFactory $customerSetupFactory
@@ -56,6 +62,7 @@ class UpgradeData implements UpgradeDataInterface
      * @param ImportOrganization $organizationImporter
      * @param GroupRepository $groupRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductAttributeRepositoryInterface $productAttributeRepository
      */
     public function __construct(
         CustomerSetupFactory $customerSetupFactory,
@@ -63,7 +70,8 @@ class UpgradeData implements UpgradeDataInterface
         ImportUserGroup $userGroupImporter,
         ImportOrganization $organizationImporter,
         GroupRepository $groupRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductAttributeRepositoryInterface $productAttributeRepository
     ) {
         $this->customerSetupFactory = $customerSetupFactory;
         $this->eavSetupFactory = $eavSetupFactory;
@@ -71,6 +79,7 @@ class UpgradeData implements UpgradeDataInterface
         $this->organizationImporter = $organizationImporter;
         $this->groupRepository = $groupRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->productAttributeRepository = $productAttributeRepository;
     }
 
     /**
@@ -182,6 +191,20 @@ class UpgradeData implements UpgradeDataInterface
                     'group' => 'ORS Attributes',
                 ]
             );
+        }
+
+        if (version_compare($context->getVersion(), "1.0.8", "<")) {
+            $searchCriteria = $this->searchCriteriaBuilder
+                                ->addFilter('is_filterable', 1, 'eq')->create();
+
+            $productAttributesFilterables = $this->productAttributeRepository->getList($searchCriteria)->getItems();
+
+            foreach ($productAttributesFilterables as $filterableAttribute) {
+                $attribute = $this->productAttributeRepository->get($filterableAttribute->getAttributeCode());
+                $attribute->setIsFilterableInSearch(1);
+                $this->productAttributeRepository->save($attribute);
+                $attribute->unsetData();
+            }
         }
     }
 }
