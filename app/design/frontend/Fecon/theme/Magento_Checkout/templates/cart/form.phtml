@@ -1,8 +1,4 @@
 <?php
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
 
 // @codingStandardsIgnoreFile
 
@@ -42,6 +38,9 @@
         <?php endif ?>
     </div>
     <div class="cart main actions">
+        <?php if (true): ?>
+            <span class="red-text"><?= __('* These products may be on backorder') ?></span>
+        <?php endif; ?>
         <?php if ($block->getContinueShoppingUrl()): ?>
             <a class="action continue"
                href="<?= $block->escapeUrl($block->getContinueShoppingUrl()) ?>"
