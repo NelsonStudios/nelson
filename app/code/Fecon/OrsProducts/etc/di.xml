@@ -11,4 +11,5 @@
             </argument>
         </arguments>
     </type>
+    <preference for="Fecon\OrsProducts\Api\DataParserInterface" type="Fecon\OrsProducts\Model\DataParser"/>
 </config>
