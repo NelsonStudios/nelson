@@ -53,6 +53,25 @@ class AddressHelper
      */
     protected $dataRegionFactory;
 
+    /**
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper
+     */
+    protected $configHelper;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Customer\Model\Session $session
+     * @param \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+     * @param \Magento\Customer\Api\Data\AddressInterfaceFactory $addressDataFactory
+     * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param \Magento\Directory\Model\RegionFactory $regionFactory
+     * @param \Magento\Customer\Api\Data\RegionInterfaceFactory $dataRegionFactory
+     * @param \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
+     */
     public function __construct(
         \Magento\Customer\Model\Session $session,
         \Fecon\SytelineIntegration\Helper\SytelineHelper $sytelineHelper,
@@ -62,7 +81,8 @@ class AddressHelper
         \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
-        \Magento\Customer\Api\Data\RegionInterfaceFactory $dataRegionFactory
+        \Magento\Customer\Api\Data\RegionInterfaceFactory $dataRegionFactory,
+        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper
     ) {
         $this->session = $session;
         $this->sytelineHelper = $sytelineHelper;
@@ -73,6 +93,7 @@ class AddressHelper
         $this->countryCollectionFactory = $countryCollectionFactory;
         $this->regionFactory = $regionFactory;
         $this->dataRegionFactory = $dataRegionFactory;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -265,5 +286,23 @@ class AddressHelper
             ->setRegionId($region->getId());
 
         return $regionData;
+    }
+
+    /**
+     * Validate if customer has default Syteline Id
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @return boolean
+     */
+    protected function hasDefaultSytelineId($customer)
+    {
+        $customerId = $customer->getCustomAttribute('customer_number')->getValue();
+        $defaultId = $this->configHelper->getDefaultSytelineCustomerId();
+        $hasDefaultSytelineId = false;
+        if (!$customerId || $customerId === $defaultId) {
+            $hasDefaultSytelineId = true;
+        }
+
+        return $hasDefaultSytelineId;
     }
 }
