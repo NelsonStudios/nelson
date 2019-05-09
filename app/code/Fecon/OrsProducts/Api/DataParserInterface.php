@@ -8,7 +8,7 @@ namespace Fecon\OrsProducts\Api;
 interface DataParserInterface
 {
 
-    const CSV_DIRECTORY = '/var/partsimport/';
+    const CSV_DIRECTORY = '/var/orsimport/';
 
     /**
      * Reads the data from CSV file and returns an array with it

@@ -18,11 +18,18 @@ class Import extends Command
      */
     protected $dataParser;
 
+    /**
+     * @var \Fecon\OrsProducts\Model\Importer
+     */
+    protected $productImporter;
+
     public function __construct(
         \Fecon\OrsProducts\Api\DataParserInterface $dataParser,
+        \Fecon\OrsProducts\Model\Importer $productImporter,
         $name = null
     ) {
         $this->dataParser = $dataParser;
+        $this->productImporter = $productImporter;
         parent::__construct($name);
     }
 
@@ -39,6 +46,8 @@ class Import extends Command
         if ($csvRawData === false) {
             $output->writeln("<error>File " . $file . " does not exists</error>");
             return;
+        } else {
+            $this->productImporter->runImport($csvRawData, $output);
         }
     }
 

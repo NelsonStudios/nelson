@@ -5,7 +5,7 @@ namespace Fecon\OrsProducts\Model\Handler;
 /**
  * Description of SimpleProduct
  */
-class SimpleProduct implements \Fecon\OrsProducts\Api\HandlerInterface
+class SimpleProduct extends BaseHandler
 {
     //put your code here
 }

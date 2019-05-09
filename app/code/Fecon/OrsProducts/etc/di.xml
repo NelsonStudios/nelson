@@ -12,9 +12,16 @@
         </arguments>
     </type>
     <preference for="Fecon\OrsProducts\Api\DataParserInterface" type="Fecon\OrsProducts\Model\DataParser"/>
+    <preference for="Fecon\OrsProducts\Api\ImporterInterface" type="Fecon\OrsProducts\Model\Importer"/>
+    <preference for="Fecon\OrsProducts\Api\HandlerInterface" type="Fecon\OrsProducts\Model\Handler\BaseHandler"/>
     <virtualType name="Fecon\OrsProducts\Model\OrsProductsImporter" type="Fecon\OrsProducts\Model\Importer">
         <arguments>
             <argument name="imporHandler" xsi:type="object">Fecon\OrsProducts\Model\Handler\SimpleProduct</argument>
         </arguments>
     </virtualType>
+    <type name="Fecon\OrsProducts\Console\Command\Import">
+        <arguments>
+            <argument name="productImporter" xsi:type="object">Fecon\OrsProducts\Model\OrsProductsImporter</argument>
+        </arguments>
+    </type>
 </config>

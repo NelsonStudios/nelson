@@ -24,6 +24,9 @@ class Importer implements \Fecon\OrsProducts\Api\ImporterInterface
      */
     public function runImport($rawData, $output)
     {
-        
+        foreach ($rawData as $row) {
+            $success = $this->imporHandler->processData($row);
+        }
+        $output->writeln("\n\n<info>Job Finished</info>");
     }
 }

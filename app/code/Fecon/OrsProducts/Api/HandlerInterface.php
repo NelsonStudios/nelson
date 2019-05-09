@@ -7,5 +7,13 @@ namespace Fecon\OrsProducts\Api;
  */
 interface HandlerInterface
 {
-    //put your code here
+
+    /**
+     * Process raw data
+     *
+     * @param array $row
+     * @param string $message
+     * @return boolean
+     */
+    public function processData($row, &$message = '');
 }
