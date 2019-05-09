@@ -4,6 +4,10 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="Update" xsi:type="object">Fecon\OrsProducts\Console\Command\Update</item>
+                <item name="UpdatePrice" xsi:type="object">Fecon\OrsProducts\Console\Command\UpdatePrice</item>
+                <item name="Delete" xsi:type="object">Fecon\OrsProducts\Console\Command\Delete</item>
+                <item name="Import" xsi:type="object">Fecon\OrsProducts\Console\Command\Import</item>
+                <item name="AddSkuPrefix" xsi:type="object">Fecon\OrsProducts\Console\Command\AddSkuPrefix</item>
             </argument>
         </arguments>
     </type>
