@@ -103,7 +103,7 @@ class AddressHelper
     {
         $sytelineAddresses = $this->sytelineHelper->getCustomerSytelineAddresses();
         $customer = $this->getCustomer();
-        if ($customer) {
+        if ($customer && !$this->hasDefaultSytelineId($customer)) {
             $customerAddresses = $customer->getAddresses();
             $this->sync($customerAddresses, $sytelineAddresses, $customer);
         }
