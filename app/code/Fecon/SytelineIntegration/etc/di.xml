@@ -51,4 +51,6 @@
     <type name="Magento\Sales\Model\Order">
         <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Sales_Model_Order" type="Fecon\SytelineIntegration\Plugin\Magento\Sales\Model\Order"/>
     </type>
+    <preference for="Magento\Checkout\Block\Cart\Item\Renderer" type="Fecon\SytelineIntegration\Block\Cart\Item\Renderer"/>
+    <preference for="Magento\Checkout\Block\Cart\Grid" type="Fecon\SytelineIntegration\Block\Cart\Grid"/>
 </config>
