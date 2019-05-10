@@ -8,6 +8,9 @@ namespace Fecon\OrsProducts\Api;
 interface HandlerInterface
 {
 
+    const TYPE_STRING = 'string';
+    const TYPE_SELECT = 'select';
+
     /**
      * Process raw data
      *
