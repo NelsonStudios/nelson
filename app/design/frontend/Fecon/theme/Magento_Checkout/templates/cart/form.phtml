@@ -38,8 +38,8 @@
         <?php endif ?>
     </div>
     <div class="cart main actions">
-        <?php if (true): ?>
-            <span class="red-text"><?= __('* These products may be on backorder') ?></span>
+        <?php if ($block->shouldDisplayBackorderWarning()): ?>
+            <span class="red-text float-left"><?= __('* These products may be on backorder') ?></span>
         <?php endif; ?>
         <?php if ($block->getContinueShoppingUrl()): ?>
             <a class="action continue"

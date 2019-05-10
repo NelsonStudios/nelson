@@ -33,13 +33,13 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
                     <?php if ($block->hasProductUrl()):?>
                         <a href="<?= /* @escapeNotVerified */ $block->getProductUrl() ?>">
                             <?= $block->escapeHtml($block->getProductName()) ?>
-                            <?php if (true): ?>
+                            <?php if (!$block->isInStockOnSyteline()): ?>
                                 <?= __('<span class="red-text">*</span>') ?>
                             <?php endif; ?>
                         </a>
                     <?php else: ?>
                         <?= $block->escapeHtml($block->getProductName()) ?>
-                        <?php if (false): ?>
+                        <?php if (!$block->isInStockOnSyteline()): ?>
                             <?= __('<span class="red-text">*</span>') ?>
                         <?php endif; ?>
                     <?php endif; ?>
