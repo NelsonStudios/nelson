@@ -43,6 +43,11 @@ class Grid extends \Magento\Checkout\Block\Cart\Grid
         parent::__construct($context, $customerSession, $checkoutSession, $catalogUrlBuilder, $cartHelper, $httpContext, $itemCollectionFactory, $joinProcessor, $data);
     }
 
+    /**
+     * Validate if one or more products are out of stock on Syteline to decide if the warning should be displayed
+     *
+     * @return boolean
+     */
     public function shouldDisplayBackorderWarning()
     {
         $shouldDisplay = false;
