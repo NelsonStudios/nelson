@@ -4,6 +4,7 @@
         <sequence>
             <module name="Fecon_BackendConfig" />
             <module name="Magento_Catalog" />
+            <module name="Magento_Checkout"/>
         </sequence>
     </module>
 </config>

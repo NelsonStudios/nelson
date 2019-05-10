@@ -53,5 +53,11 @@
                 </arguments>
             </block>
         </referenceBlock>
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Catalog\Block\Product\View"
+                name="product.info.minimum.order"
+                template="Magento_Catalog::product/view/minimum_order.phtml"
+                before="product.info.price"/>
+        </referenceContainer>
     </body>
 </page>
