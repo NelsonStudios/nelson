@@ -3,13 +3,19 @@
 namespace Fecon\OrsProducts\Helper;
 
 /**
- * CategoryHelper
+ * Category Helper
  */
 class CategoryHelper
 {
 
+    /**
+     * @var \Magento\Framework\App\ObjectManager
+     */
     protected $objectManager;
 
+    /**
+     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
+     */
     protected $collecionFactory;
 
     public function __construct(
@@ -42,7 +48,7 @@ class CategoryHelper
     {
         $category = false;
         $categoryName = array_pop($path);
-        $collection = $this->collecionFactory
+        $collection = $this->collectionFactory
             ->create()
             ->addAttributeToFilter('name', $categoryName)
             ->setPageSize(1);
