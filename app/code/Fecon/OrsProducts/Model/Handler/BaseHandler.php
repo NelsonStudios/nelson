@@ -3,7 +3,7 @@
 namespace Fecon\OrsProducts\Model\Handler;
 
 /**
- * 
+ * Base Handler
  */
 class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
 {
@@ -13,8 +13,14 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
      */
     protected $configuration = [];
 
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
     protected $productRepository;
 
+    /**
+     * @var \Magento\Catalog\Api\Data\ProductInterfaceFactory
+     */
     protected $productFactory;
 
     /**
@@ -52,6 +58,17 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
      */
     protected $productResource;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Catalog\Api\Data\ProductInterfaceFactory $productFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Product\Website\Link $productWebsiteLink
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \Magento\Catalog\Api\CategoryLinkManagementInterface $categoryLinkManagement
+     * @param \Fecon\OrsProducts\Helper\CategoryHelper $categoryHelper
+     * @param \Magento\Catalog\Model\ResourceModel\Product $productResource
+     */
     public function __construct(
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Catalog\Api\Data\ProductInterfaceFactory $productFactory,
@@ -79,6 +96,11 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         return true;
     }
 
+    /**
+     * 
+     * @param array $rawData
+     * @param string $message
+     */
     public function createProduct($rawData, &$message = '')
     {
         $product = $this->productFactory->create();
@@ -97,10 +119,26 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         $product->setWeight($weight);
         $product = $this->setCustomAttributes($product, $rawData);
 
-        $product = $this->productRepository->save($product);
-        
+        try {
+            $product = $this->productRepository->save($product);
+            $success = true;
+            $message = 'Product ' . $product->getName() . ' created';
+        } catch (\Exception $ex) {
+            $success = false;
+            $message = $ex->getMessage();
+        }
+
+        return $success;
     }
 
+    /**
+     * Update $product data
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $rawData
+     * @param string $message
+     * @return boolean
+     */
     public function updateProduct($product, $rawData, &$message = '')
     {
         $success = true;
@@ -120,6 +158,13 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         return $success;
     }
 
+    /**
+     * Extract $attribute value from $data
+     *
+     * @param string $attribute
+     * @param array $data
+     * @return string
+     */
     protected function getAttributeValue($attribute, $data)
     {
         $position = $this->configuration[$attribute]['position'];
@@ -135,11 +180,23 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         return $rawValue;
     }
 
+    /**
+     * Get the default attribute set that will be assigned to new products
+     *
+     * @return int
+     */
     public function getAttributeSetId()
     {
         return 4;   // Default attribute set id
     }
 
+    /**
+     * Set configured custom attributes to $product
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $rawData
+     * @return \Magento\Catalog\Api\Data\ProductInterface
+     */
     protected function setCustomAttributes($product, $rawData)
     {
         foreach ($this->customAttributes as $customAttribute) {
@@ -150,17 +207,33 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         return $product;
     }
 
+    /**
+     * Assign product to website
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     */
     protected function assignProductToWebsite($product)
     {
         $websiteIds = $this->getWebsiteIds();
         $this->productWebsiteLink->saveWebsiteIds($product, $websiteIds);
     }
 
+    /**
+     * Get the default websites that will be assigned to new products
+     *
+     * @return array
+     */
     public function getWebsiteIds()
     {
         return [1];
     }
 
+    /**
+     * Update $product stock
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $rawData
+     */
     protected function updateProductStock($product, $rawData)
     {
         $manageStock = $this->getAttributeValue('manage_stock', $rawData);
@@ -174,6 +247,12 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         $this->stockRegistry->updateStockItemBySku($product->getSku(), $stockItem);
     }
 
+    /**
+     * Assign $product to categories
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $rawData
+     */
     protected function assignProductToCategories($product, $rawData)
     {
         $categoriesIds = $this->getCategoriesIds($rawData);
@@ -183,6 +262,12 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         );
     }
 
+    /**
+     * Extract categories ids from $rawData
+     *
+     * @param array $rawData
+     * @return array
+     */
     public function getCategoriesIds($rawData)
     {
         $categoriesIds = [];

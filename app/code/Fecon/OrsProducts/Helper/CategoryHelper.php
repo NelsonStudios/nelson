@@ -18,6 +18,11 @@ class CategoryHelper
      */
     protected $collecionFactory;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $collecionFactory
+     */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $collecionFactory
     ) {
@@ -25,6 +30,12 @@ class CategoryHelper
         $this->objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     }
 
+    /**
+     * Create category based on the given $path
+     *
+     * @param string[] $path
+     * @return \Magento\Catalog\Model\Category
+     */
     public function createCategory($path)
     {
         $categoryName = array_pop($path);
@@ -44,6 +55,12 @@ class CategoryHelper
         return $category;
     }
 
+    /**
+     * Get last category of the given $path filtering by name
+     *
+     * @param string[] $path
+     * @return \Magento\Catalog\Model\Category
+     */
     public function getCategory($path)
     {
         $category = false;
