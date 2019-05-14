@@ -8,21 +8,7 @@ namespace Fecon\OrsProducts\Model\Handler;
 class SimpleProduct extends BaseHandler
 {
 
-    protected $configuration = [];
-
-    protected $productRepository;
-
-    protected $productFactory;
-
-    public function __construct(
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Catalog\Api\Data\ProductInterfaceFactory $productFactory
-    ) {
-        $this->productRepository = $productRepository;
-        $this->productFactory = $productFactory;
-    }
-
-    public function configure()
+    public function configureAttributePositions()
     {
         if (empty($this->configuration)) {
             $this->configuration = [
@@ -76,7 +62,7 @@ class SimpleProduct extends BaseHandler
                 ],
                 'name' => [
                     'position' => 12,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_HTML
                 ],
                 'hazmat' => [
                     'position' => 13,
@@ -84,7 +70,7 @@ class SimpleProduct extends BaseHandler
                 ],
                 'description' => [
                     'position' => 14,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_HTML
                 ],
                 'testing_and_approvals' => [
                     'position' => 15,
@@ -112,9 +98,38 @@ class SimpleProduct extends BaseHandler
                 ],
                 'attributes' => [
                     'position' => 21,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_HTML
                 ]
             ];
+        }
+    }
+
+    public function configureCustomAttributes()
+    {
+        $this->customAttributes = [];
+    }
+
+    public function configureAttributesToUpdate()
+    {
+        $this->attributesToUpdate = [
+            'unspsc',
+            'upc',
+            'mfg_part_number',
+            'description',
+            'attributes'
+        ];
+    }
+
+    public function configure()
+    {
+        if (empty($this->configuration)) {
+            $this->configureAttributePositions();
+        }
+        if (empty($this->customAttributes)) {
+            $this->configureCustomAttributes();
+        }
+        if (empty($this->attributesToUpdate)) {
+            $this->configureAttributesToUpdate();
         }
     }
 
@@ -123,21 +138,22 @@ class SimpleProduct extends BaseHandler
      */
     public function processData($row, &$message = '')
     {
-        $sku = $this->getProductSku($row);
+        $this->configure();
+        $sku = $this->getAttributeValue('sku', $row);
         try {
             $product = $this->productRepository->get($sku);
-            $isNew = false;
+            $success = $this->updateProduct($product, $row, $message);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-            $product = $this->productFactory->create();
-            $isNew = true;
+//            $success = $this->createProduct($row, $message);
+            $message = $e->getMessage();
+            $success = false;
         }
-        return true;
+
+        return $success;
     }
 
-    protected function getProductSku($data)
+    public function getAttributeSetId()
     {
-        $position = $this->configuration['sku']['position'];
-
-        return $data[$position];
+        return 13;  // ORS Products
     }
 }
