@@ -10,6 +10,7 @@ interface HandlerInterface
 
     const TYPE_STRING = 'string';
     const TYPE_SELECT = 'select';
+    const TYPE_HTML = 'html';
 
     /**
      * Process raw data
