@@ -94,9 +94,11 @@ atlassian*
 /lib/web/css/docs/docs.css.map
 /nginx-certs/*
 /not-imported-products.php
+/merge-csv-files.php
 /package-lock.json
 /pub/media/importexport/
 *.sample
 *.log
 *.sql
 /pub/danglog.php
+/*.sh
