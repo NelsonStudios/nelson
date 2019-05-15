@@ -38,7 +38,7 @@ class SimpleProduct extends BaseHandler
                 ],
                 'web_uom' => [
                     'position' => 6,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'categories' => [
                     'position' => 7,
@@ -46,11 +46,11 @@ class SimpleProduct extends BaseHandler
                 ],
                 'family' => [
                     'position' => 8,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'manufacturer' => [
                     'position' => 9,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'manufacturer_url' => [
                     'position' => 10,
@@ -66,7 +66,7 @@ class SimpleProduct extends BaseHandler
                 ],
                 'hazmat' => [
                     'position' => 13,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'description' => [
                     'position' => 14,
@@ -78,11 +78,11 @@ class SimpleProduct extends BaseHandler
                 ],
                 'minimum_order' => [
                     'position' => 16,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'standard_pack' => [
                     'position' => 17,
-                    'type' => self::TYPE_STRING
+                    'type' => self::TYPE_SELECT
                 ],
                 'prop_65_warning_required' => [
                     'position' => 18,
@@ -99,6 +99,10 @@ class SimpleProduct extends BaseHandler
                 'attributes' => [
                     'position' => 21,
                     'type' => self::TYPE_HTML
+                ],
+                'part_number' => [
+                    'position' => 0,
+                    'type' => self::TYPE_STRING
                 ]
             ];
         }
@@ -116,7 +120,8 @@ class SimpleProduct extends BaseHandler
             'upc',
             'mfg_part_number',
             'description',
-            'attributes'
+            'attributes',
+            'part_number'
         ];
     }
 
