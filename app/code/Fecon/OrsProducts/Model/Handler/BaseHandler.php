@@ -59,6 +59,11 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
     protected $productResource;
 
     /**
+     * @var \Fecon\OrsProducts\Helper\AttributeHelper
+     */
+    protected $attributeHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
@@ -76,7 +81,8 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \Magento\Catalog\Api\CategoryLinkManagementInterface $categoryLinkManagement,
         \Fecon\OrsProducts\Helper\CategoryHelper $categoryHelper,
-        \Magento\Catalog\Model\ResourceModel\Product $productResource
+        \Magento\Catalog\Model\ResourceModel\Product $productResource,
+        \Fecon\OrsProducts\Helper\AttributeHelper $attributeHelper
     ) {
         $this->productRepository = $productRepository;
         $this->productFactory = $productFactory;
@@ -85,6 +91,7 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         $this->categoryLinkManagement = $categoryLinkManagement;
         $this->categoryHelper = $categoryHelper;
         $this->productResource = $productResource;
+        $this->attributeHelper = $attributeHelper;
     }
 
     /**
@@ -175,6 +182,8 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
             $value = $rawValue;
         } elseif ($this->configuration[$attribute]['type'] == self::TYPE_HTML) {
             $value = htmlspecialchars($rawValue);
+        } elseif ($this->configuration[$attribute]['type'] == self::TYPE_SELECT) {
+            $value = $this->attributeHelper->createOrGetId($attribute, $rawValue);
         }
 
         return $rawValue;
