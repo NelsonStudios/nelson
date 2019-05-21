@@ -138,7 +138,8 @@ class SimpleProduct extends BaseHandler
             'minimum_order',
             'standard_pack',
             'meta_title',
-            'meta_description'
+            'meta_description',
+            'family'
         ];
     }
 
@@ -156,7 +157,8 @@ class SimpleProduct extends BaseHandler
             'minimum_order',
             'standard_pack',
             'meta_title',
-            'meta_description'
+            'meta_description',
+            'family'
         ];
     }
 
