@@ -3,7 +3,7 @@
     $minimumOrder = $_product->getResource()->getAttribute('minimum_order')->getFrontend()->getValue($_product);
 ?>
 
-<?php if (!empty($minimumOrder)): ?>
+<?php if (!empty($minimumOrder) && false): ?>
 <div class="product-minimum-order">
     <h2 class="minimum-order">
         <span><?php /* @escapeNotVerified */ echo '[ ' . __($minimumOrder) . ' ]'; ?></span>

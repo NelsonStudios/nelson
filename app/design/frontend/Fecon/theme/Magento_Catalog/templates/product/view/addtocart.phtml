@@ -7,7 +7,9 @@
 <?php $_product = $block->getProduct(); ?>
 <?php $buttonTitle = __('Add to Cart'); ?>
 <?php $minimumOrderAtt = $_product->getResource()->getAttribute('minimum_order');?>
-<?php $minimumOrder = $minimumOrderAtt->getFrontend()->getValue($_product); ?>
+<?php $webUomAtt = $_product->getResource()->getAttribute('web_uom');?>
+<?php $minimumOrder = $minimumOrderAtt ? $minimumOrderAtt->getFrontend()->getValue($_product): null; ?>
+<?php $webUom = $webUomAtt ? $webUomAtt->getFrontend()->getValue($_product): null; ?>
 <?php if ($_product->isSaleable()): ?>
 <div class="box-tocart">
     <div class="fieldset">
@@ -21,9 +23,9 @@
                     </span>
                 </label>
             </div>
-            <?php if (!empty($minimumOrder)): ?>
+            <?php if (!empty($minimumOrder) && !empty($webUom)): ?>
             <div class="field minimum-order-field">
-                <?php /* @escapeNotVerified */ echo 'x ' . __($minimumOrder); ?>
+                <?php /* @escapeNotVerified */ echo 'x ' . __('[ ' . $minimumOrder . ' / ' . $webUom . ' ]'); ?>
             </div>
             <?php endif; ?>
         </div>
