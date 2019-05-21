@@ -1,0 +1,13 @@
+<?php
+/** @var \Magento\Theme\Block\Html\Breadcrumbs $block */
+/** @var \Magento\Catalog\ViewModel\Product\Breadcrumbs $viewModel */
+$viewModel = $block->getData('viewModel');
+?>
+<div class="breadcrumbs" data-mage-init='{
+    "breadcrumbs": {
+        "categoryUrlSuffix": "<?= $block->escapeHtml($viewModel->getCategoryUrlSuffix()); ?>",
+        "useCategoryPathInUrl": <?= (int)$viewModel->isCategoryUsedInProductUrl(); ?>,
+        "product": "<?= $block->escapeJs($viewModel->getProductName()); ?>"
+    }
+}'>
+</div>

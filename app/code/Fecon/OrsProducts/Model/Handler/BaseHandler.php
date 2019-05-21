@@ -112,22 +112,31 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
     {
         $product = $this->productFactory->create();
         $sku = $this->getAttributeValue('sku', $rawData);
+        if (strpos($sku, 'EC-') !== 0) {
+            $sku = 'EC-' . $sku;
+        }
         $name = $this->getAttributeValue('name', $rawData);
-        $price = $this->getAttributeValue('price', $rawData);
-        $weight = $this->getAttributeValue('weight', $rawData);
+        $minimumOrder = $this->getAttributeValue('minimum_order_raw', $rawData);
+        $webUom = $this->getAttributeValue('web_uom_raw', $rawData);
+        if ($minimumOrder && $webUom) {
+            $name = $name . " - [ " . $minimumOrder . " / " . $webUom . " ]";
+        }
         $attributeSetId = $this->getAttributeSetId();
         $product->setSku($sku);
         $product->setName($name);
         $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE);
         $product->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH);
-        $product->setPrice($price);
+        $product->setPrice(0);
         $product->setAttributeSetId($attributeSetId);
         $product->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
-        $product->setWeight($weight);
+        $product->setWeight(1);
+        $product->setData('exists_in_syteline', 1);
         $product = $this->setCustomAttributes($product, $rawData);
 
         try {
             $product = $this->productRepository->save($product);
+            $this->assignProductToCategories($product, $rawData);
+            $this->updateProductStock($product, $rawData);
             $success = true;
             $message = 'Product ' . $product->getName() . ' created';
         } catch (\Exception $ex) {
@@ -152,10 +161,9 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
         try {
             foreach ($this->attributesToUpdate as $attribute) {
                 $value = $this->getAttributeValue($attribute, $rawData);
-                $product->setCustomAttribute($attribute, $value);
+                $product->setData($attribute, $value);
                 $this->productResource->saveAttribute($product, $attribute);
             }
-            $this->assignProductToCategories($product, $rawData);
             $message = 'Product ' . $product->getName() . ' updated';
         } catch (\Exception $ex) {
             $success = false;
@@ -186,7 +194,7 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
             $value = $this->attributeHelper->createOrGetId($attribute, $rawValue);
         }
 
-        return $rawValue;
+        return $value;
     }
 
     /**
@@ -210,7 +218,7 @@ class BaseHandler implements \Fecon\OrsProducts\Api\HandlerInterface
     {
         foreach ($this->customAttributes as $customAttribute) {
             $value = $this->getAttributeValue($customAttribute, $rawData);
-            $product->setCustomAttribute($customAttribute, $value);
+            $product->setData($customAttribute, $value);
         }
 
         return $product;

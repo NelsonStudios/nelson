@@ -13,6 +13,11 @@ class Importer implements \Fecon\OrsProducts\Api\ImporterInterface
      */
     protected $imporHandler;
 
+    /**
+     * Constructor
+     *
+     * @param \Fecon\OrsProducts\Api\HandlerInterface $imporHandler
+     */
     public function __construct(
         \Fecon\OrsProducts\Api\HandlerInterface $imporHandler
     ) {
@@ -24,6 +29,7 @@ class Importer implements \Fecon\OrsProducts\Api\ImporterInterface
      */
     public function runImport($rawData, $output)
     {
+        array_shift($rawData);  // Ignore first line of CSV file (headers)
         foreach ($rawData as $row) {
             $success = $this->imporHandler->processData($row, $message);
             if ($success) {

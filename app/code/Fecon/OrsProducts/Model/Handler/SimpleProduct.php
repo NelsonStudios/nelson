@@ -68,7 +68,7 @@ class SimpleProduct extends BaseHandler
                     'position' => 13,
                     'type' => self::TYPE_SELECT
                 ],
-                'description' => [
+                'short_description' => [
                     'position' => 14,
                     'type' => self::TYPE_HTML
                 ],
@@ -103,6 +103,22 @@ class SimpleProduct extends BaseHandler
                 'part_number' => [
                     'position' => 0,
                     'type' => self::TYPE_STRING
+                ],
+                'meta_title' => [
+                    'position' => 12,
+                    'type' => self::TYPE_HTML
+                ],
+                'meta_description' => [
+                    'position' => 14,
+                    'type' => self::TYPE_HTML
+                ],
+                'minimum_order_raw' => [
+                    'position' => 16,
+                    'type' => self::TYPE_STRING
+                ],
+                'web_uom_raw' => [
+                    'position' => 6,
+                    'type' => self::TYPE_STRING
                 ]
             ];
         }
@@ -110,7 +126,21 @@ class SimpleProduct extends BaseHandler
 
     public function configureCustomAttributes()
     {
-        $this->customAttributes = [];
+        $this->customAttributes = [
+            'unspsc',
+            'upc',
+            'mfg_part_number',
+            'short_description',
+            'attributes',
+            'part_number',
+            'manufacturer',
+            'web_uom',
+            'minimum_order',
+            'standard_pack',
+            'meta_title',
+            'meta_description',
+            'family'
+        ];
     }
 
     public function configureAttributesToUpdate()
@@ -119,9 +149,16 @@ class SimpleProduct extends BaseHandler
             'unspsc',
             'upc',
             'mfg_part_number',
-            'description',
+            'short_description',
             'attributes',
-            'part_number'
+            'part_number',
+            'manufacturer',
+            'web_uom',
+            'minimum_order',
+            'standard_pack',
+            'meta_title',
+            'meta_description',
+            'family'
         ];
     }
 
@@ -145,13 +182,26 @@ class SimpleProduct extends BaseHandler
     {
         $this->configure();
         $sku = $this->getAttributeValue('sku', $row);
+        $found = true;
         try {
             $product = $this->productRepository->get($sku);
             $success = $this->updateProduct($product, $row, $message);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-//            $success = $this->createProduct($row, $message);
             $message = $e->getMessage();
-            $success = false;
+            $found = false;
+        }
+        if (!$found) {
+            if (strpos($sku, 'EC-') !== 0) {
+                try {
+                    $sku = 'EC-' . $sku;
+                    $product = $this->productRepository->get($sku);
+                    $success = $this->updateProduct($product, $row, $message);
+                    $found = true;
+                } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) { }
+            }
+            if (!$found) {
+                $success = $this->createProduct($row, $message);
+            }
         }
 
         return $success;
@@ -160,5 +210,69 @@ class SimpleProduct extends BaseHandler
     public function getAttributeSetId()
     {
         return 13;  // ORS Products
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateProduct($product, $rawData, &$message = '')
+    {
+        $success = parent::updateProduct($product, $rawData, $message);
+        $specialFieldsSuccess = $this->updateSpecialFields($product, $rawData, $message);
+
+        return $success && $specialFieldsSuccess;
+    }
+
+    /**
+     * Update $product special fields
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $rawData
+     * @param string $message
+     * @return boolean
+     */
+    protected function updateSpecialFields($product, $rawData, &$message = '')
+    {
+        $success = true;
+        try {
+            $product->setData('exists_in_syteline', 1);
+            $this->productResource->saveAttribute($product, 'exists_in_syteline');
+            $name = $this->getAttributeValue('name', $rawData);
+            $minimumOrder = $this->getAttributeValue('minimum_order_raw', $rawData);
+            $webUom = $this->getAttributeValue('web_uom_raw', $rawData);
+            if ($minimumOrder && $webUom) {
+                $newName = $name . " - [ " . $minimumOrder . " / " . $webUom . " ]";
+                $product->setData('name', $newName);
+                $this->productResource->saveAttribute($product, 'name');
+            }
+            $sku = $product->getSku();
+            if (strpos($sku, 'EC-') !== 0) {
+                $newSku = 'EC-' . $sku;
+                $product->setData('sku', $newSku);
+                $this->productRepository->save($product);
+            }
+            $message = 'Product ' . $product->getName() . ' updated';
+        } catch (\Exception $ex) {
+            $success = false;
+            $message = $ex->getMessage();
+        }
+
+        return $success;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function updateProductStock($product, $rawData)
+    {
+        $manageStock = 0;
+        $qty = 0;
+        $isInStock = 1;
+        $stockItem = $this->stockRegistry->getStockItemBySku($product->getSku());
+        $stockItem->setManageStock($manageStock);
+        $stockItem->setUseConfigManageStock(0);
+        $stockItem->setIsInStock($isInStock);
+        $stockItem->setQty($qty);
+        $this->stockRegistry->updateStockItemBySku($product->getSku(), $stockItem);
     }
 }

@@ -296,7 +296,8 @@ class AddressHelper
      */
     protected function hasDefaultSytelineId($customer)
     {
-        $customerId = $customer->getCustomAttribute('customer_number')->getValue();
+        $customerNumberAttribute = $customer->getCustomAttribute('customer_number');
+        $customerId = $customerNumberAttribute ? $customerNumberAttribute->getValue() : null;
         $defaultId = $this->configHelper->getDefaultSytelineCustomerId();
         $hasDefaultSytelineId = false;
         if (!$customerId || $customerId === $defaultId) {
