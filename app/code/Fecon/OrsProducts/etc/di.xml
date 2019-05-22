@@ -24,4 +24,14 @@
             <argument name="productImporter" xsi:type="object">Fecon\OrsProducts\Model\OrsProductsImporter</argument>
         </arguments>
     </type>
+    <virtualType name="Fecon\OrsProducts\Model\OrsPriceImporter" type="Fecon\OrsProducts\Model\Importer">
+        <arguments>
+            <argument name="imporHandler" xsi:type="object">Fecon\OrsProducts\Model\Handler\PriceHandler</argument>
+        </arguments>
+    </virtualType>
+    <type name="Fecon\OrsProducts\Console\Command\UpdatePrice">
+        <arguments>
+            <argument name="productImporter" xsi:type="object">Fecon\OrsProducts\Model\OrsPriceImporter</argument>
+        </arguments>
+    </type>
 </config>
