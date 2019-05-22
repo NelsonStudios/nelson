@@ -18,6 +18,12 @@
         $custom_block->setBlockId($static_block_tab);
     }
     $tab_style = "";
+    foreach ($detailedInfoGroup as $key => $tab) {
+        if ($tab == 'product.specifications') {
+            unset($detailedInfoGroup[$key]);
+            array_unshift($detailedInfoGroup, 'product.specifications');
+        }
+    }
     if(isset($product_config['tab_style']) && $product_config['tab_style'])
         $tab_style = $product_config['tab_style'];
 ?>

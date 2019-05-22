@@ -55,9 +55,14 @@
         </referenceBlock>
         <referenceContainer name="product.info.main">
             <block class="Magento\Catalog\Block\Product\View"
-                name="product.info.minimum.order"
-                template="Magento_Catalog::product/view/minimum_order.phtml"
-                before="product.info.price"/>
+                   name="product.info.minimum.order"
+                   template="Magento_Catalog::product/view/minimum_order.phtml"
+                   before="product.info.price"/>
         </referenceContainer>
+        <referenceBlock name="product.info.overview">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magento_Catalog::product/view/short_description.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>
