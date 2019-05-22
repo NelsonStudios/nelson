@@ -12,8 +12,35 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Delete extends Command
 {
 
-    const NAME_ARGUMENT = "name";
-    const NAME_OPTION = "option";
+    const NAME_ARGUMENT = "file";
+
+    /**
+     * @var \Fecon\OrsProducts\Api\DataParserInterface
+     */
+    protected $dataParser;
+
+    /**
+     * @var \Fecon\OrsProducts\Model\DeleteProducts 
+     */
+    protected $productEraser;
+
+    /**
+     * Constructor
+     *
+     * @param \Fecon\OrsProducts\Model\DeleteProducts $productEraser
+     * @param \Fecon\OrsProducts\Api\DataParserInterface $dataParser
+     * @param string|null $name
+     */
+    public function __construct(
+        \Fecon\OrsProducts\Model\DeleteProducts $productEraser,
+        \Fecon\OrsProducts\Api\DataParserInterface $dataParser,
+        $name = null
+    ) {
+        parent::__construct($name);
+        $this->productEraser = $productEraser;
+        $this->dataParser = $dataParser;
+        
+    }
 
     /**
      * {@inheritdoc}
@@ -22,9 +49,15 @@ class Delete extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $name = $input->getArgument(self::NAME_ARGUMENT);
-        $option = $input->getOption(self::NAME_OPTION);
-        $output->writeln("Hello " . $name);
+        $file = $input->getArgument(self::NAME_ARGUMENT);
+        
+        $csvRawData = $this->dataParser->readCsv($file);
+        if ($csvRawData === false) {
+            $output->writeln("<error>File " . $file . " does not exists</error>");
+            return;
+        } else {
+            $this->productEraser->deleteProducts($output, $csvRawData);
+        }
     }
 
     /**
@@ -32,11 +65,10 @@ class Delete extends Command
      */
     protected function configure()
     {
-        $this->setName("fecon_orsproducts:delete");
+        $this->setName("orsproducts:delete");
         $this->setDescription("Delete ORS products that have not been update in the last date update");
         $this->setDefinition([
-            new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),
-            new InputOption(self::NAME_OPTION, "-a", InputOption::VALUE_NONE, "Option functionality")
+            new InputArgument(self::NAME_ARGUMENT, InputArgument::REQUIRED, "File")
         ]);
         parent::configure();
     }
