@@ -32,9 +32,9 @@ class Importer implements \Fecon\OrsProducts\Api\ImporterInterface
         array_shift($rawData);  // Ignore first line of CSV file (headers)
         foreach ($rawData as $row) {
             $success = $this->imporHandler->processData($row, $message);
-            if ($success) {
+            if ($success && !empty($message)) {
                 $output->writeln("<info>" . $message . "</info>");
-            } else {
+            } elseif (!$success && !empty($message)) {
                 $output->writeln("<error>" . $message . "</error>");
             }
         }

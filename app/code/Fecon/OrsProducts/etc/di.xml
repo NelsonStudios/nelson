@@ -8,6 +8,7 @@
                 <item name="Delete" xsi:type="object">Fecon\OrsProducts\Console\Command\Delete</item>
                 <item name="Import" xsi:type="object">Fecon\OrsProducts\Console\Command\Import</item>
                 <item name="AddSkuPrefix" xsi:type="object">Fecon\OrsProducts\Console\Command\AddSkuPrefix</item>
+                <item name="UpdateImage" xsi:type="object">Fecon\OrsProducts\Console\Command\UpdateImage</item>
             </argument>
         </arguments>
     </type>
@@ -32,6 +33,16 @@
     <type name="Fecon\OrsProducts\Console\Command\UpdatePrice">
         <arguments>
             <argument name="productImporter" xsi:type="object">Fecon\OrsProducts\Model\OrsPriceImporter</argument>
+        </arguments>
+    </type>
+    <virtualType name="Fecon\OrsProducts\Model\OrsImageImporter" type="Fecon\OrsProducts\Model\Importer">
+        <arguments>
+            <argument name="imporHandler" xsi:type="object">Fecon\OrsProducts\Model\Handler\ImageUpdater</argument>
+        </arguments>
+    </virtualType>
+    <type name="Fecon\OrsProducts\Console\Command\UpdateImage">
+        <arguments>
+            <argument name="productImporter" xsi:type="object">Fecon\OrsProducts\Model\OrsImageImporter</argument>
         </arguments>
     </type>
 </config>

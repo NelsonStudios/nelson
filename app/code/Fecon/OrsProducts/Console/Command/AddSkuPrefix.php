@@ -12,8 +12,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 class AddSkuPrefix extends Command
 {
 
-    const NAME_ARGUMENT = "name";
-    const NAME_OPTION = "option";
+    /**
+     * @var \Fecon\OrsProducts\Model\SkuPrefix 
+     */
+    protected $productUpdater;
+
+    /**
+     * Constructor
+     *
+     * @param \Fecon\OrsProducts\Model\SkuPrefix $productUpdater
+     * @param string|null $name
+     */
+    public function __construct(
+        \Fecon\OrsProducts\Model\SkuPrefix $productUpdater,
+        $name = null
+    ) {
+        parent::__construct($name);
+        $this->productUpdater = $productUpdater;
+        
+    }
 
     /**
      * {@inheritdoc}
@@ -22,9 +39,7 @@ class AddSkuPrefix extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
-        $name = $input->getArgument(self::NAME_ARGUMENT);
-        $option = $input->getOption(self::NAME_OPTION);
-        $output->writeln("Hello " . $name);
+        $this->productUpdater->updateSkus($output);
     }
 
     /**
@@ -32,12 +47,8 @@ class AddSkuPrefix extends Command
      */
     protected function configure()
     {
-        $this->setName("fecon_orsproducts:addskuprefix");
+        $this->setName("orsproducts:addskuprefix");
         $this->setDescription("Add a prefix to all ORS products");
-        $this->setDefinition([
-            new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),
-            new InputOption(self::NAME_OPTION, "-a", InputOption::VALUE_NONE, "Option functionality")
-        ]);
         parent::configure();
     }
 }
