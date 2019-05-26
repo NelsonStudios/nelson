@@ -93,15 +93,17 @@ class ImageUpdater extends BaseHandler
             if (!$baseImage) {
                 $newBaseImage = $this->getAttributeValue('base_image', $rawData);
                 $absolutePath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
-                $product->setData('image', $absolutePath. "import/" . $newBaseImage);
-                $this->productRepository->save($product);
+                $imagePath = $absolutePath. "import/" . $newBaseImage;
+                $flags = ['image','thumbnail','small_image'];
+                $product->addImageToMediaGallery($imagePath, $flags, false, false);
+                $product->save();
                 $message = 'Product ' . $product->getName() . ' updated';
             } else {
                 $message = '';
             }
         } catch (\Exception $ex) {
             $success = false;
-            $message = $ex->getMessage();
+            $message = $ex->getMessage() . ", image: " . $imagePath;
         }
 
         return $success;
