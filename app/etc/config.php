@@ -13,6 +13,7 @@ return [
         'DevPhase_Feeds' => 1,
         'Magento_Backend' => 1,
         'Magento_Config' => 1,
+        'Extait_AdminNotify' => 1,
         'Fecon_AskAnExpert' => 1,
         'Fecon_BackendConfig' => 1,
         'Mageplaza_Core' => 1,
