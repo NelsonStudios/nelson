@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2dea6250fda89859b67ca4da6ac6611",
+    "content-hash": "b5d6dadbf7b5db6cbbc57383e76a549a",
     "packages": [
         {
             "name": "amzn/amazon-pay-and-login-with-amazon-core-module",
@@ -3497,6 +3497,11 @@
                 "magento/module-customer-sample-data": "Sample Data version:100.2.*"
             },
             "type": "magento2-module",
+            "extra": {
+                "patches_applied": {
+                    "Reset password throws error since 2.2.6": "patches/composer/github-issue-18256.diff"
+                }
+            },
             "autoload": {
                 "files": [
                     "registration.php"
