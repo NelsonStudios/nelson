@@ -120,17 +120,18 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getAvailability($response, $productId)
     {
-        $available = false;
-        if (is_array($response)) {
-            $errors = $response;
-        } else {
-            if (!$this->responseHasErrors($response, $errors)) {
-                $available = ($response->ErpGetPartInfoResponse->Availability == $this::SYTELINE_AVAIALABLE_STATUS);
-            }
-        }
-        if (isset($errors) && !empty($errors)) {
-            $this->logDataErrors($errors, null, $productId);
-        }
+//        $available = false;
+//        if (is_array($response)) {
+//            $errors = $response;
+//        } else {
+//            if (!$this->responseHasErrors($response, $errors)) {
+//                $available = ($response->ErpGetPartInfoResponse->Availability == $this::SYTELINE_AVAIALABLE_STATUS);
+//            }
+//        }
+//        if (isset($errors) && !empty($errors)) {
+//            $this->logDataErrors($errors, null, $productId);
+//        }
+        $available = true;
 
         return $available;
     }
@@ -146,7 +147,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $hasErrors = false;
         if (isset($response->ErpGetPartInfoResponse)) {
-            if (!isset($response->ErpGetPartInfoResponse->Availability)) {
+//            if (!isset($response->ErpGetPartInfoResponse->Availability)) {
+//                $hasErrors = true;
+//                $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetPartInfo';
+//            }
+            if (!isset($response->ErpGetPartInfoResponse->RetailPrice) || $response->ErpGetPartInfoResponse->RetailPrice == 0) {
                 $hasErrors = true;
                 $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetPartInfo';
             }
