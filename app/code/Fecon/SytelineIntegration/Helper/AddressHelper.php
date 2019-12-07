@@ -194,10 +194,8 @@ class AddressHelper
         }
         $countryName = $this->getCountryName($magentoAddress->getCountryId());
         if ($addressAreEqual &&
-            $sytelineAddress['City'] == $magentoAddress->getCity() &&
             $sytelineAddress['State'] == $magentoAddress->getRegion()->getRegionCode() &&
-            $sytelineAddress['Zipcode'] == $magentoAddress->getPostcode() &&
-            $sytelineAddress['Country'] == $countryName
+            $sytelineAddress['Zipcode'] == $magentoAddress->getPostcode()
         ) {
             $equals = true;
         }
