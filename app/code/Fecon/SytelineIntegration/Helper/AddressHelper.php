@@ -260,10 +260,12 @@ class AddressHelper
     protected function getCountryId($countryName)
     {
         $countryId = 'US';
-        $countryCollection = $this->countryCollectionFactory->create();
-        foreach ($countryCollection as $country) {
-            if ($countryName == $country->getName()) {
-                $countryId = $country->getId();
+        if ($countryName) {
+            $countryCollection = $this->countryCollectionFactory->create();
+            foreach ($countryCollection as $country) {
+                if ($countryName == $country->getName()) {
+                    $countryId = $country->getId();
+                }
             }
         }
 
