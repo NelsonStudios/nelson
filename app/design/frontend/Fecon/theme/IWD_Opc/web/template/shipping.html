@@ -1,5 +1,21 @@
 <div class="iwd_opc_column iwd_opc_address_column" data-bind="visible: !quoteIsVirtual">
     <div class="iwd_opc_alternative_column">
+        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Ship To'"></div>
+        <div tabindex="-1" class="iwd_opc_column_content">
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <input type="text"
+                        tabindex="-1"
+                        data-validate="{required:true}"
+                        class="input-text"
+                        data-bind="attr: {placeholder: $t('Company Name / ATTN'), title: $t('Company Name / ATTN')}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="iwd_opc_alternative_column">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Address'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
 
@@ -27,10 +43,6 @@
             </div>
         </div>
     </div>
-</div>
-
-
-<div class="iwd_opc_column iwd_opc_shipping_column" data-bind="visible: !quoteIsVirtual">
     <div class="iwd_opc_alternative_column">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Method'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
@@ -110,33 +122,85 @@
                     <!-- /ko -->
                 </div>
             </div>
-            <!-- ko if: isShowDelimiterAfterShippingMethods -->
-            <div class="iwd_opc_section_delimiter"></div>
-            <!-- /ko -->
-            <!-- ko if: isShowComment -->
-            <div class="fieldset">
-                <div class="field">
-                    <div class="control">
-                                <textarea
-                                        rows="1"
-                                        data-bind="
-                                        value: commentValue,
-                                        afterRender: textareaAutoSize,
-                                        attr: {
-                                            title: $t('Account Number / Comment'),
-                                            placeholder: $t('Account Number / Comment'),
-                                            id: 'comment',
-                                            name: 'comment'
-                                        }"/>
-                    </div>
-                </div>
-            </div>
-            <!-- /ko -->
             <!-- ko if: isShowGiftMessage -->
             <!-- ko foreach: getRegion('gift-message') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
         </div>
+    </div>
+    <div class="iwd_opc_alternative_column">
+        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Purchase Order Number'"></div>
+        <div tabindex="-1" class="iwd_opc_column_content">
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <input type="text"
+                        tabindex="-1"
+                        data-validate="{required:false}"
+                        class="input-text"
+                        data-bind="attr: {placeholder: $t('PO Number'), title: $t('PO Number')}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="iwd_opc_alternative_column">
+        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Serial Number'"></div>
+        <div tabindex="-1" class="iwd_opc_column_content">
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <input type="text"
+                        tabindex="-1"
+                        data-validate="{required:false}"
+                        class="input-text"
+                        data-bind="attr: {placeholder: $t('Serial Number'), title: $t('Serial Number')}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="iwd_opc_alternative_column">
+        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Do you want this order applied as your monthly stock order if all requirements are met?'"></div>
+        <div tabindex="-1" class="iwd_opc_column_content">
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <select class="select"
+                                id="order_monthly_stock"
+                                name="order_monthly_stock"
+                                data-validate="{required:false}">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="iwd_opc_alternative_column">
+        <!-- ko if: isShowDelimiterAfterShippingMethods -->
+        <div class="iwd_opc_section_delimiter"></div>
+        <!-- /ko -->
+        <!-- ko if: isShowComment -->
+        <div class="fieldset">
+            <div class="field">
+                <div class="control">
+                    <textarea
+                        rows="1"
+                        data-bind="
+                        value: commentValue,
+                        afterRender: textareaAutoSize,
+                        attr: {
+                            title: $t('Account Number / Comment'),
+                            placeholder: $t('Account Number / Comment'),
+                            id: 'comment',
+                            name: 'comment'
+                        }"/>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
     </div>
 </div>
