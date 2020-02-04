@@ -2,6 +2,8 @@
 
 namespace Fecon\SytelineIntegration\Helper;
 
+use Magento\Framework\Serialize\SerializerInterface;
+
 /**
  * Transform Magento entities to arrays, in order to use with the Syteline Web Services
  *
@@ -43,6 +45,11 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customerRepository;
 
     /**
+    * @var SerializerInterface
+    */
+   private $serializer;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -60,7 +67,8 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        SerializerInterface $serializer
     ) {
         parent::__construct($context);
 
@@ -70,6 +78,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $this->configHelper = $configHelper;
         $this->customerSession = $customerSession;
         $this->customerRepository = $customerRepository;
+        $this->serializer = $serializer;
     }
     /**
      * Transform Magento order to array
@@ -100,11 +109,11 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
             "request" => [
                 "Comments" => (string) $order->getCustomerNote(),
                 "EmailAddress" => (string) $order->getCustomerEmail(),
-                "AccountNumber" => "",
+                "AccountNumber" => $this->getAccountNumber($order),
                 "ShipVia" => "BEST",
                 "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
-                "OrderStock" => "Yes",
+                "OrderStock" => $this->getOrderStock($order),
                 "OrderPhoneNumber" => (string) $shippingAddress->getTelephone(),
                 "DigabitERPTransactionType" => "Order",
                 "DigabitERPTransactionStatus" => "SUBMITTED"
@@ -274,5 +283,40 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         return [
             "CustomerId" => $customerId
         ];
+    }
+
+    protected function getSytelineExtraField($order, $key)
+    {
+        $data = $this->serializer->unserialize($order->getSytelineCheckoutExtraFields());
+        $value = '';
+        if (isset($data[$key])) {
+            $value = $data[$key];
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     * @return string
+     */
+    protected function getAccountNumber($order)
+    {
+        return $this->getSytelineExtraField($order, 'purchaseOrderNumber');
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     * @return string
+     */
+    protected function getOrderStock($order)
+    {
+        $orderStock = 'Yes';
+        $orderData = $this->getSytelineExtraField($order, 'orderStock');
+        if ($orderData) {
+            $orderStock = $orderData;
+        }
+
+        return $orderStock;
     }
 }
