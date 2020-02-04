@@ -5,15 +5,24 @@ namespace Fecon\SytelineIntegration\Setup;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Quote\Setup\QuoteSetupFactory;
+use Magento\Sales\Setup\SalesSetupFactory;
 
 class UpgradeData implements UpgradeDataInterface
 {
 
     protected $customerSetupFactory;
+    private $salesSetupFactory;
+    private $quoteSetupFactory;
 
-    public function __construct(\Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory)
-    {
+    public function __construct(
+        \Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory,
+        QuoteSetupFactory $quoteSetupFactory,
+        SalesSetupFactory $salesSetupFactory
+    ) {
         $this->customerSetupFactory = $customerSetupFactory;
+        $this->quoteSetupFactory = $quoteSetupFactory;
+        $this->salesSetupFactory = $salesSetupFactory;
     }
 
     /**
@@ -51,6 +60,28 @@ class UpgradeData implements UpgradeDataInterface
                     'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                     'length' => 32,
                     'comment' => 'Syteline Id'
+                ]
+            );
+        }
+        if (version_compare($context->getVersion(), "1.1.0", "<")) {
+            $quoteSetup = $this->quoteSetupFactory->create(['setup' => $setup]);
+            $quoteSetup->addAttribute('quote', 'syteline_checkout_extra_fields',
+                [
+                    'type' => 'text',
+                    'length' => null,
+                    'visible' => false,
+                    'required' => false,
+                    'grid' => false
+                ]
+            );
+            $salesSetup = $this->salesSetupFactory->create(['setup' => $setup]);
+            $salesSetup->addAttribute('order', 'syteline_checkout_extra_fields',
+                [
+                    'type' => 'text',
+                    'length' => null,
+                    'visible' => false,
+                    'required' => false,
+                    'grid' => false
                 ]
             );
         }
