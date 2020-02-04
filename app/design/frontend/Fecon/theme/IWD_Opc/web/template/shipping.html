@@ -6,6 +6,7 @@
                 <div class="field">
                     <div class="control">
                         <input type="text"
+                        id="syteline_company_name"
                         tabindex="-1"
                         data-validate="{required:true}"
                         class="input-text"
@@ -153,6 +154,7 @@
                 <div class="field">
                     <div class="control">
                         <input type="text"
+                        id="syteline_serial_number"
                         tabindex="-1"
                         data-validate="{required:false}"
                         class="input-text"
@@ -162,6 +164,7 @@
             </div>
         </div>
     </div>
+    <!-- ko if: canDisplaySytelineFields -->
     <div class="iwd_opc_alternative_column">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Do you want this order applied as your monthly stock order if all requirements are met?'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
@@ -172,14 +175,15 @@
                                 id="syteline_order_monthly_stock"
                                 name="order_monthly_stock"
                                 data-validate="{required:false}">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- /ko -->
     <div class="iwd_opc_alternative_column">
         <!-- ko if: isShowDelimiterAfterShippingMethods -->
         <div class="iwd_opc_section_delimiter"></div>

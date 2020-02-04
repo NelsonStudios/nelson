@@ -15,7 +15,9 @@ define([
         getSytelineExtraFields: function () {
             return {
                 purchaseOrderNumber: $('#syteline_purchase_order_number').val(),
-                orderStock: $('#syteline_order_monthly_stock').val()
+                orderStock: $('#syteline_order_monthly_stock').val(),
+                companyName: $('#syteline_company_name').val(),
+                serialNumber: $('#syteline_serial_number').val()
             };
         }
     };

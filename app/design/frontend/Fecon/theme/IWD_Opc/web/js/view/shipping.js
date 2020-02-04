@@ -99,6 +99,7 @@ define(
             shippingRateGroupsCaption: ko.observable(null),
             shippingRatesCaption: ko.observable(null),
             isShippingRatesVisible: ko.observable(false),
+            canDisplaySytelineFields: ko.observable(false),
 
             isRatesLoading: shippingService.isLoading,
             initialize: function () {
@@ -277,6 +278,13 @@ define(
                         self.isShippingRatesVisible(false);
                     }
                 });
+                quote.paymentMethod.subscribe(function(){
+                    if (quote.paymentMethod().method === "cashondelivery") {
+                        self.canDisplaySytelineFields(true);
+                    } else {
+                        self.canDisplaySytelineFields(false);
+                    }
+                }, null, 'change');
 
                 return this;
             },
