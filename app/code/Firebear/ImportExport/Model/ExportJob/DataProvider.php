@@ -32,7 +32,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
      * @var \Magento\Framework\Json\DecoderInterface
      */
     protected $jsonDecoder;
-    
+
     protected $pool;
 
     /**
@@ -75,7 +75,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         if (isset($this->loadedData)) {
             return $this->loadedData;
         }
-        $items      = $this->collection->getItems();
+        $items = $this->collection->addEventToResult()->getItems();
         $jsonFields = [
             \Firebear\ImportExport\Model\ExportJob::BEHAVIOR_DATA,
             \Firebear\ImportExport\Model\ExportJob::EXPORT_SOURCE,

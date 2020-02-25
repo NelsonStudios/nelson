@@ -6,8 +6,13 @@
 
 namespace Firebear\ImportExport\Model\Export\RowCustomizer;
 
-use Magento\CatalogImportExport\Model\Export\RowCustomizerInterface;
+use Firebear\ImportExport\Model\Export\Product\Bundle\RowCustomizer as BundleRowCustomizer;
 
+/**
+ * Class Composite
+ *
+ * @package Firebear\ImportExport\Model\Export\RowCustomizer
+ */
 class Composite extends \Magento\CatalogImportExport\Model\Export\RowCustomizer\Composite
 {
 
@@ -20,7 +25,7 @@ class Composite extends \Magento\CatalogImportExport\Model\Export\RowCustomizer\
     {
         foreach ($this->customizers as $key => $className) {
             if ($key == 'bundleProduct') {
-                $className = 'Firebear\ImportExport\Model\Export\Product\Bundle\RowCustomizer';
+                $className = BundleRowCustomizer::class;
             }
             $dataRow = $this->objectManager->get($className)->addData($dataRow, $productId);
         }
@@ -30,12 +35,13 @@ class Composite extends \Magento\CatalogImportExport\Model\Export\RowCustomizer\
     /**
      * @param mixed $collection
      * @param int[] $productIds
+     * @return mixed
      */
     public function prepareData($collection, $productIds)
     {
         foreach ($this->customizers as $key => $className) {
             if ($key == 'bundleProduct') {
-                $className = 'Firebear\ImportExport\Model\Export\Product\Bundle\RowCustomizer';
+                $className = BundleRowCustomizer::class;
             }
             $this->objectManager->get($className)->prepareData($collection, $productIds);
         }

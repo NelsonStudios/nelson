@@ -6,24 +6,23 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
+use Firebear\ImportExport\Api\Data\ImportInterface;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Json\EncoderInterface;
-use Magento\Backend\Model\Session;
 use Firebear\ImportExport\Model\Job\MappingFactory;
-use Firebear\ImportExport\Helper\Data;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class Save
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Save extends JobController
 {
     /**
-     * @var EncoderInterface
+     * @var SerializerInterface
      */
-    protected $jsonEncoder;
+    protected $serializer;
 
     /**
      * @var MappingFactory
@@ -31,24 +30,15 @@ class Save extends JobController
     protected $mappingFactory;
 
     /**
-     * @var Session
+     * @var array
      */
-    protected $session;
-
-    /**
-     * @var Data
-     */
-    protected $helper;
-
-    /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
     protected $additionalFields = [
         'platforms',
         'clear_attribute_value',
         'remove_product_association',
+        'remove_product_website',
+        'remove_all_customer_address',
+        'remove_product_categories',
         'type_file',
         'configurable_switch',
         'configurable_create',
@@ -56,54 +46,66 @@ class Save extends JobController
         'configurable_field',
         'configurable_part',
         'configurable_symbols',
+        'round_up_prices',
+        'round_up_special_price',
+        'copy_simple_value',
         'language',
         'reindex',
         'generate_url',
-        'xml_switch'
+        'xml_switch',
+        'root_category_id',
+        'replace_default_value',
+        'remove_current_mappings',
+        'remove_images',
+        'remove_images_dir',
+        'remove_related_product',
+        'remove_crosssell_product',
+        'remove_upsell_product',
+        'disable_products',
+        'product_supplier',
+        'send_email',
+        'translate_attributes',
+        'translate_store_ids',
+        'translate_version',
+        'translate_key',
+        'translate_referer',
+        'xlsx_sheet',
+        'cron_groups',
+        'image_resize'
     ];
 
     /**
      * Save constructor.
      *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param EncoderInterface $jsonEncoder
+     * @param SerializerInterface $serializer
      * @param MappingFactory $mappingFactory
-     * @param Data $helper
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JsonFactory $jsonFactory,
-        JobRepositoryInterface $repository,
-        EncoderInterface $jsonEncoder,
-        MappingFactory $mappingFactory,
-        Data $helper
+        SerializerInterface $serializer,
+        MappingFactory $mappingFactory
     ) {
-        $this->jsonFactory = $jsonFactory;
-        $this->jsonEncoder = $jsonEncoder;
-        $this->session = $context->getSession();
+        parent::__construct($context);
+
+        $this->serializer = $serializer;
         $this->mappingFactory = $mappingFactory;
-        $this->helper = $helper;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
     }
 
     /**
-     * @return $this
+     * @return \Firebear\ImportExport\Controller\Adminhtml\Job\Save|\Magento\Backend\Model\View\Result\Redirect
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $data = $this->getRequest()->getPostValue();
         if ($data) {
             $jobId = $this->getRequest()->getParam('entity_id');
             if (isset($data['is_active']) && $data['is_active'] === 'true') {
-                $data['is_active'] = Job::STATUS_ENABLED;
+                $data['is_active'] = ImportInterface::STATUS_ENABLED;
             }
             if (!$jobId) {
                 $model = $this->jobFactory->create();
@@ -119,13 +121,16 @@ class Save extends JobController
                     return $resultRedirect->setPath('*/*/');
                 }
             }
-
+            $data['import_source'] = $data['import_source'] ?? '';
             // Prepare Behavior Data
             $this->spliteBeahivorData($data);
             // Prepare Source Data
             $this->spliteSourceData($data);
             $model->addData($data);
             $dataMapWithDeleteData = [];
+            if (isset($data['source_data_attribute_values_map'])) {
+                $dataMapWithDeleteData = $data['source_data_attribute_values_map'];
+            }
             if (isset($data['source_data_categories_map'])) {
                 foreach ($data['source_data_categories_map'] as $categoryMapItems) {
                     if (!isset($categoryMapItems['delete'])) {
@@ -166,7 +171,7 @@ class Save extends JobController
                     $this->messageManager->addSuccessMessage(__('Job was saved successfully.'));
                 }
                 // clear previously saved data from session
-                $this->session->setFormData(false);
+                $this->_session->setFormData(false);
                 // check if 'Save and Continue'
                 if ($this->getRequest()->isAjax()) {
                     return $resultJson->setData($newModel->getId());
@@ -180,7 +185,7 @@ class Save extends JobController
             } catch (\Exception $e) {
                 // display error message
                 $this->messageManager->addErrorMessage($e->getMessage());
-                $this->session->setFormData($data);
+                $this->_session->setFormData($data);
                 if ($this->getRequest()->isAjax()) {
                     return $resultJson->setData(false);
                 }
@@ -208,10 +213,13 @@ class Save extends JobController
         $behaviorFields = $jobModel->getBehaviorFormFields();
         $data['behavior_data']['behavior'] = $behavior;
         foreach ($behaviorFields as $field) {
+            if (!isset($data[$field])) {
+                continue;
+            }
             $data['behavior_data'][$field] = $data[$field];
             unset($data[$field]);
         }
-        $data['behavior_data'] = $this->jsonEncoder->encode($data['behavior_data']);
+        $data['behavior_data'] = $this->serializer->serialize($data['behavior_data']);
         unset($data['behavior']);
     }
 
@@ -245,7 +253,17 @@ class Save extends JobController
             $data['source_data']['configurable_variations'] = $confData;
         }
 
-        $data['source_data'] = $this->jsonEncoder->encode($data['source_data']);
+        if (isset($data['copy_simple_value'])) {
+            $confData = [];
+            foreach ($data['copy_simple_value'] as $row) {
+                if (!(isset($row['delete']) && $row['delete'] == true)) {
+                    $confData[] = $row['copy_simple_value_attributes'];
+                }
+            }
+            $data['source_data']['copy_simple_value'] = $confData;
+        }
+
+        $data['source_data'] = $this->serializer->serialize($data['source_data']);
     }
 
     /**

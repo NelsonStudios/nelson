@@ -21,7 +21,7 @@ class Options implements OptionSourceInterface
     protected $options;
 
     /**
-     * @var Import
+     * @var Config
      */
     protected $config;
 

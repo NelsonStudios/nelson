@@ -6,22 +6,25 @@
 
 namespace Firebear\ImportExport\Model\Import\Source;
 
-use Magento\Framework\Filesystem\Directory\Read as DirectoryRead;
+use Firebear\ImportExport\Exception\XmlException as FirebearXmlException;
+use Firebear\ImportExport\Model\Source\Platform\PlatformInterface;
+use Firebear\ImportExport\Traits\Import\Map as ImportMap;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem\Directory\Read as Directory;
 use Magento\ImportExport\Model\Import\AbstractSource;
-use Firebear\ImportExport\Exception\XmlException;
+use SimpleXMLIterator;
 
 /**
  * XML Import Adapter
  */
 class Xml extends AbstractSource
 {
-
-    use \Firebear\ImportExport\Traits\Import\Map;
+    use ImportMap;
 
     const CREATE_ATTRIBUTE = 'create_attribute';
 
     /**
-     * @var XMLReader
+     * @var SimpleXMLIterator
      */
     protected $reader;
 
@@ -35,14 +38,18 @@ class Xml extends AbstractSource
 
     protected $mimeTypes = [
         'text/xml',
-        //  'text/plain',
+          'text/plain',
         'application/excel',
         'application/xml',
         'application/vnd.ms-excel',
         'application/vnd.msexcel'
     ];
 
-
+    /**
+     * Platform
+     *
+     * @var \Firebear\ImportExport\Model\Source\Platform\PlatformInterface
+     */
     protected $platform;
 
     /**
@@ -59,38 +66,60 @@ class Xml extends AbstractSource
      */
     protected $_items = [];
 
+    /**
+     * Object attributes
+     *
+     * @var array
+     */
+    protected $_data = [];
 
     /**
      * Initialize Adapter
      *
      * @param array $file
-     * @param DirectoryRead $directory
-     * @throws \Exception
-     * @throws XmlException
+     * @param Directory $directory
+     * @param PlatformInterface $platform
+     * @param array $data
+     *
+     * @throws LocalizedException
+     * @throws FirebearXmlException
      */
     public function __construct(
         $file,
-        DirectoryRead $directory
+        Directory $directory,
+        PlatformInterface $platform = null,
+        $data = []
     ) {
-        $result = $this->checkMimeType($directory->getAbsolutePath($file));
+        $this->_data = $data;
+        $filePath = $file;
+        if (0 !== strpos($file, $directory->getAbsolutePath())) {
+            $filePath =  $directory->getAbsolutePath($file);
+        }
+
+        $result = $this->checkMimeType($filePath);
 
         if ($result !== true) {
-            throw new \Exception($result);
+            throw new LocalizedException($result);
         }
 
         libxml_use_internal_errors(true);
+
+        $this->platform = $platform;
         $this->reader = simplexml_load_file(
-            $directory->getAbsolutePath($file),
-            "SimpleXMLIterator"
+            $filePath,
+            SimpleXMLIterator::class
         );
 
         if (false === $this->reader) {
-            throw new \XmlException(libxml_get_errors());
+            throw new FirebearXmlException(libxml_get_errors());
         }
 
         $this->reader->rewind();
 
         $this->getColumns();
+        parent::__construct(
+            $this->_colNames
+        );
     }
 
     /**
@@ -159,7 +188,6 @@ class Xml extends AbstractSource
                                         $subItem[(string)$subField] = (string)$subFieldValue;
                                     }
                                     $this->_items[$subKey][] = $subItem;
-
                                 }
                                 $item[$field] = '';
                             } else {
@@ -197,9 +225,6 @@ class Xml extends AbstractSource
             $diffArray = array_diff($colNames, $this->_colNames);
             $this->_colNames = array_merge($this->_colNames, $diffArray);
             $this->_colQty = count($this->_colNames);
-        }
-        if (empty($this->_colNames)) {
-            throw new \InvalidArgumentException('Empty column names');
         }
     }
 
@@ -257,25 +282,6 @@ class Xml extends AbstractSource
     public function valid()
     {
         return $this->_lock ? true : $this->reader->valid();
-    }
-
-    /**
-     * @param $data
-     * @return $this
-     */
-    public function setMap($data)
-    {
-        $this->maps = $data;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMap()
-    {
-        return $this->maps;
     }
 
     /**

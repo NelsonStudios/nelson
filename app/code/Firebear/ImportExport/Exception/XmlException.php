@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Exception;
 use Magento\Framework\Phrase;
 use Magento\Framework\Phrase\Renderer\Placeholder;
 
+/**
+ * Class XmlException
+ *
+ * @package Firebear\ImportExport\Exception
+ */
 class XmlException extends \Magento\Framework\Exception\LocalizedException
 {
 

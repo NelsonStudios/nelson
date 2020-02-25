@@ -21,14 +21,14 @@ class SpoutMessageObserver implements ObserverInterface
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $_messageManager;
-    
+
     /**
      * Spout helper
      *
      * @var \Firebear\ImportExport\Helper\Spout
      */
-    protected $_helper; 
-    
+    protected $_helper;
+
     /**
      * Initialize observer
      *
@@ -39,10 +39,10 @@ class SpoutMessageObserver implements ObserverInterface
         ManagerInterface $messageManager,
         Helper $helper
     ) {
-		$this->_messageManager = $messageManager;
-		$this->_helper = $helper;
+        $this->_messageManager = $messageManager;
+        $this->_helper = $helper;
     }
-    
+
     /**
      * Add order condition to the SalesRule management
      *
@@ -52,10 +52,12 @@ class SpoutMessageObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         if (!$this->_helper->isSpoutInstall()) {
-			$this->_messageManager->addNoticeMessage(
-				__('To use the ODS and XLSX file format, you need to install the library Spout (composer require box/spout).')
-			);
+            $this->_messageManager->addNoticeMessage(
+                __(
+                    'To use the ODS and XLSX file format, you need to install '.
+                    'the library Spout (composer require box/spout:~2.7).'
+                )
+            );
         }
-
     }
 }

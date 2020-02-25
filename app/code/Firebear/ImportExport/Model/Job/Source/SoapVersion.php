@@ -22,8 +22,8 @@ class SoapVersion implements OptionSourceInterface
     public function toOptionArray()
     {
         return [
-            ['value' => SOAP_1_1, 'label' => 'SOAP_1_1'],
-            ['value' => SOAP_1_2, 'label' => 'SOAP_1_2'],
+            ['value' => 'SOAP_1_1', 'label' => 'SOAP_1_1'],
+            ['value' => 'SOAP_1_2', 'label' => 'SOAP_1_2'],
         ];
     }
 }

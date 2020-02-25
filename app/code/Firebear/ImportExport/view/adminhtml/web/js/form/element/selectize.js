@@ -34,54 +34,54 @@ define(
                     multiselectFocus: false
                 },
 
-               initialize: function () {
-                   this._super();
-                   this.on('search', this.onSeacrh.bind(this));
-                   this.on('value', this.onUpdateValue.bind(this));
-                   this.changeOptions();
+                initialize: function () {
+                    this._super();
+                    this.on('search', this.onSeacrh.bind(this));
+                    this.on('value', this.onUpdateValue.bind(this));
+                    this.changeOptions();
 
-                   return this;
-               },
-               initObservable: function () {
-                   this._super()
+                    return this;
+                },
+                initObservable: function () {
+                    this._super()
                        .observe(['options', 'value', 'classes', 'search', 'revert', 'listVisible', 'multiselectFocus']);
-                   return this;
-               },
-               openList: function() {
-                 this.revert(true);
-               },
-               onSeacrh: function(value) {
-                   this.filterValues(value);
-               },
-               onUpdateValue: function(value) {
-                   this.value(value);
-               },
-               changeOptions: function() {
-                   var options = this.options();
-                   _.each(options, function(item) {
-                       item.visible = "block";
-                   });
-                   this.setOptions(options);
-               },
-               filterValues: function(value) {
-                   var options = this.options();
-                   _.each(options, function(item) {
-                       if(item.label.toLowerCase().indexOf(value.toLowerCase()) !== -1) {
-                           item.visible = 'block';
-                       } else {
-                           item.visible = 'none';
-                       }
-                   });
+                    return this;
+                },
+                openList: function () {
+                    this.revert(true);
+                },
+                onSeacrh: function (value) {
+                    this.filterValues(value);
+                },
+                onUpdateValue: function (value) {
+                    this.value(value);
+                },
+                changeOptions: function () {
+                    var options = this.options();
+                    _.each(options, function (item) {
+                        item.visible = "block";
+                    });
+                    this.setOptions(options);
+                },
+                filterValues: function (value) {
+                    var options = this.options();
+                    _.each(options, function (item) {
+                        if (item.label.toLowerCase().indexOf(value.toLowerCase()) !== -1) {
+                            item.visible = 'block';
+                        } else {
+                            item.visible = 'none';
+                        }
+                    });
 
-                   this.setOptions([]);
-                   this.setOptions(options);
-               },
-               getList: function () {
-                   return this.options();
-               },
-               changeValue: function(value, parent) {
-                   parent.value(value.value);
-               },
+                    this.setOptions([]);
+                    this.setOptions(options);
+                },
+                getList: function () {
+                    return this.options();
+                },
+                changeValue: function (value, parent) {
+                    parent.value(value.value);
+                },
                 onFocusIn: function (ctx, event) {
                     !this.cacheUiSelect ? this.cacheUiSelect = event.target : false;
                     this.multiselectFocus(true);

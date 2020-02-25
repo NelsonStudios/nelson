@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Ui\Component\Form\System;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 
+/**
+ * Class Field
+ *
+ * @package Firebear\ImportExport\Ui\Component\Form\System
+ */
 class Field extends \Magento\Ui\Component\Form\Field
 {
 

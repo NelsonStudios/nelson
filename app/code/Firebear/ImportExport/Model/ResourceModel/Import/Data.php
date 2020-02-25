@@ -1,11 +1,16 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 namespace Firebear\ImportExport\Model\ResourceModel\Import;
 
+/**
+ * Class Data
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Import
+ */
 class Data extends \Magento\ImportExport\Model\ResourceModel\Import\Data
 {
     /**
@@ -66,6 +71,17 @@ class Data extends \Magento\ImportExport\Model\ResourceModel\Import\Data
     }
 
     /**
+     * Clean all bunches from table.
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function cleanBunches()
+    {
+        return $this->getConnection()->delete($this->getMainTable());
+    }
+
+    /**
      * @param $entity
      * @param $behavior
      * @param null $jobId
@@ -78,7 +94,7 @@ class Data extends \Magento\ImportExport\Model\ResourceModel\Import\Data
         $behavior,
         $jobId = null,
         $file = null,
-        array $data
+        array $data = []
     ) {
         return $this->getConnection()->insert(
             $this->getMainTable(),
@@ -163,17 +179,17 @@ class Data extends \Magento\ImportExport\Model\ResourceModel\Import\Data
 
         return $stmt->fetch();
     }
-    
+
     /**
      * @return integer
-     */    
+     */
     public function getCount($job, $file)
     {
         $select = $this->getConnection()->select()
-			->from($this->getMainTable(), ['COUNT(*)'])
-			->where('job_id=?', $job)
-			->where('file=?', $file);
-			
-		return $this->getConnection()->fetchOne($select);
-    }    
+            ->from($this->getMainTable(), ['COUNT(*)'])
+            ->where('job_id=?', $job)
+            ->where('file=?', $file);
+
+        return $this->getConnection()->fetchOne($select);
+    }
 }

@@ -25,7 +25,7 @@ define(
                     typeFile:'',
                     platform: '',
                     imports: {
-                        setOptions: '${$.parentName}.platforms:value',
+                        setOptions: '${$.ns}.${$.ns}.settings.platforms:value',
                         setSource: '${$.ns}.${$.ns}.source.type_file:value',
                         setEntity: '${$.ns}.${$.ns}.settings.entity:value'
                     }
@@ -52,7 +52,7 @@ define(
                 },
                 setSource: function (value) {
                     var entity = registry.get(this.ns + '.' + this.ns + '.settings.entity');
-                    if (entity !== 'undefined') {
+                    if (entity !== undefined) {
                         this.entity = entity.value();
                     }
                     this.typeFile = value;
@@ -65,17 +65,26 @@ define(
 
                     this.prepareOptions();
                 },
-                prepareOptions: function() {
+                prepareOptions: function () {
                     this.options([]);
                     var self = this;
                     var newList = [];
-
                     if (this.platform !== '' && this.typeFile) {
                         var data = this.defaultOptions;
 
                         _.each(
                             data,
                             function (element) {
+                                if (element.type === self.platform && element.entity === 'github_link') {
+                                    var url = element.href;
+                                    var newObject = {
+                                        href:   url,
+                                        label:  element.label,
+                                        type:   element.type,
+                                        target: '_blank'
+                                    };
+                                    newList.push(newObject);
+                                }
                                 var url = element.href + 'source/' + self.typeFile;
 
                                 if (typeof self.entity !== undefined && self.entity) {
@@ -86,7 +95,8 @@ define(
                                     var newObject = {
                                         href:   url,
                                         label:  element.label,
-                                        type:   element.type
+                                        type:   element.type,
+                                        target: '_self'
                                     };
                                     newList.push(newObject);
                                 }

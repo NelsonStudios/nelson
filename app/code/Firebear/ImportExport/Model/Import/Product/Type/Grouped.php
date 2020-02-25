@@ -14,7 +14,11 @@ use Magento\ImportExport\Model\Import;
  */
 class Grouped extends \Magento\GroupedImportExport\Model\Import\Product\Type\Grouped
 {
+    use \Firebear\ImportExport\Traits\Import\Product\Type;
+
     protected $fireLinks;
+
+    public static $specialAttributes = ['_associated_sku', '_associated_default_qty', '_associated_position'];
 
     public function __construct(
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\Set\CollectionFactory $attrSetColFac,
@@ -57,6 +61,7 @@ class Grouped extends \Magento\GroupedImportExport\Model\Import\Product\Type\Gro
         $oldSku = $this->_entityModel->getOldSku();
         $attributes = $this->links->getAttributes();
         $productData = [];
+        $params = $this->_entityModel->getParameters();
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $linksData = [
                 'product_ids' => [],
@@ -73,14 +78,14 @@ class Grouped extends \Magento\GroupedImportExport\Model\Import\Product\Type\Gro
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum) || empty($associatedSkusQty)) {
                     continue;
                 }
-                $associatedSkusAndQtyPairs = explode(Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR, $associatedSkusQty);
+                $associatedSkusAndQtyPairs = explode($params['_import_multiple_value_separator'], $associatedSkusQty);
                 $position = 0;
                 foreach ($associatedSkusAndQtyPairs as $associatedSkuAndQty) {
                     ++$position;
                     $associatedSkuAndQty = explode(self::SKU_QTY_DELIMITER, $associatedSkuAndQty);
                     $associatedSku = isset($associatedSkuAndQty[0]) ? trim($associatedSkuAndQty[0]) : null;
                     if (!isset($newSku[$associatedSku]) && !isset($oldSku[$associatedSku])) {
-                        if (strpos($this->_entityModel->getProductMetadata()->getVersion(), '2.2') !== false) {
+                        if (version_compare($this->_entityModel->getProductMetadata()->getVersion(), '2.2.0', '>=')) {
                             $associatedSku = strtolower($associatedSku);
                         }
                     }

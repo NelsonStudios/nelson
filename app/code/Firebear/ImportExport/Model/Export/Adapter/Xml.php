@@ -21,36 +21,36 @@ class Xml extends AbstractAdapter
      * @var \XMLWriter
      */
     protected $writer;
-    
+
     /**
      * Xslt Converter
      *
      * @var \Firebear\ImportExport\Model\Output\Xslt
-     */    
+     */
     protected $xslt;
-    
+
     /**
      * Xsl Document
      *
      * @var string
-     */	
-	protected $xsl;
+     */
+    protected $xsl;
 
     /**
      * Adapter Data
      *
      * @var []
-     */     
+     */
     protected $_data;
-    
+
     /**
      * Initialize Adapter
-     * 
+     *
      * @param Filesystem $filesystem
      * @param \XMLWriter $writer
-     * @param Xslt $xslt     
+     * @param Xslt $xslt
      * @param null $destination
-     * @param [] $data      
+     * @param [] $data
      */
     public function __construct(
         Filesystem $filesystem,
@@ -62,27 +62,15 @@ class Xml extends AbstractAdapter
         $this->writer = $writer;
         $this->xslt = $xslt;
         $this->_data = $data;
-        
-        if (!empty($data['xml_switch']) && isset($data['xslt'])) {
-			$this->xsl = $data['xslt'];
-        }        
-        
-        register_shutdown_function([$this, 'destruct']);
-        
-        parent::__construct(
-			$filesystem, 
-			$destination
-		);
-    }
 
-    /**
-     * Object destructor.
-     *
-     * @return void
-     */
-    public function destruct()
-    {
-       // $this->writer->flush();
+        if (!empty($data['xml_switch']) && isset($data['xslt'])) {
+            $this->xsl = $data['xslt'];
+        }
+
+        parent::__construct(
+            $filesystem,
+            $destination
+        );
     }
 
     /**
@@ -108,7 +96,7 @@ class Xml extends AbstractAdapter
     {
         return 'text/xml';
     }
-    
+
     /**
      * Get contents of export file
      *
@@ -117,10 +105,10 @@ class Xml extends AbstractAdapter
     public function getContents()
     {
         $this->writer->endDocument();
-		$result = $this->writer->outputMemory();
-		return $this->xsl 
-			? $this->xslt->convert($result, $this->xsl)
-			: $result;
+        $result = $this->writer->outputMemory();
+        return $this->xsl
+            ? $this->xslt->convert($result, $this->xsl)
+            : $result;
     }
 
     /**
@@ -147,7 +135,7 @@ class Xml extends AbstractAdapter
             foreach ($rowData as $key => $value) {
                 if (is_array($value)) {
                     $this->recursiveAdd($key, $value);
-                } else {
+                } elseif (is_string($key)) {
                     $this->writer->writeElement($key, $value);
                 }
             }

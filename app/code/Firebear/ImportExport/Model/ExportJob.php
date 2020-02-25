@@ -8,6 +8,7 @@ namespace Firebear\ImportExport\Model;
 
 use Magento\Framework\Model\AbstractModel;
 use Firebear\ImportExport\Api\Data\ExportInterface;
+use Firebear\ImportExport\Model\ResourceModel\ExportJob as ResourceModelExportJob;
 
 /**
  * Class ExportJob
@@ -16,28 +17,9 @@ use Firebear\ImportExport\Api\Data\ExportInterface;
  */
 class ExportJob extends AbstractModel implements ExportInterface
 {
-    /**
-     * ExportJob constructor.
-     *
-     * @param \Magento\Framework\Model\Context                                        $context
-     * @param \Magento\Framework\Registry                                             $registry
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null            $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null                      $resourceCollection
-     * @param array                                                                   $data
-     */
-    public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-    }
-
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\ResourceModel\ExportJob');
+        $this->_init(ResourceModelExportJob::class);
     }
 
     /**
@@ -105,7 +87,7 @@ class ExportJob extends AbstractModel implements ExportInterface
     }
 
     /**
-     * @return date|null
+     * @return string|null
      */
     public function getFileUpdatedAt()
     {
@@ -120,7 +102,9 @@ class ExportJob extends AbstractModel implements ExportInterface
         return $this->getData(self::EXPORT_SOURCE);
     }
 
-
+    /**
+     * @return string
+     */
     public function getXslt()
     {
         return $this->getData(self::XSLT);
@@ -129,7 +113,7 @@ class ExportJob extends AbstractModel implements ExportInterface
     /**
      * @param $jobId
      *
-     * @return AbstractInterface
+     * @return ExportJob
      */
     public function setId($jobId)
     {
@@ -219,13 +203,18 @@ class ExportJob extends AbstractModel implements ExportInterface
     /**
      * @param $source
      *
-     * @return ExportInterface
+     * @return ExportJob
      */
     public function setExportSource($source)
     {
         $this->setData(self::EXPORT_SOURCE, $source);
     }
 
+    /**
+     * @param $xslt
+     *
+     * @return ExportJob
+     */
     public function setXslt($xslt)
     {
         return $this->setData(self::XSLT, $xslt);

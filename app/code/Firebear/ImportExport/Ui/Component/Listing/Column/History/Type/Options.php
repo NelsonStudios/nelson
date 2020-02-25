@@ -7,7 +7,6 @@
 namespace Firebear\ImportExport\Ui\Component\Listing\Column\History\Type;
 
 use Magento\Framework\Data\OptionSourceInterface;
-use Firebear\ImportExport\Model\Source\Config;
 
 /**
  * Class Options
@@ -21,12 +20,12 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
+        $options = [];
+
         $options[] = ['label' => 'Admin', 'value' => 'admin'];
         $options[] = ['label' => 'Cron', 'value' => 'cron'];
         $options[] = ['label' => 'Command', 'command'];
 
-        $this->options = $options;
-
-        return $this->options;
+        return $options;
     }
 }

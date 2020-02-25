@@ -6,11 +6,17 @@
 
 namespace Firebear\ImportExport\Model\ResourceModel\ExportJob\Grid;
 
-use Magento\Framework\Api\Search\SearchResultInterface;
-use Magento\Framework\Search\AggregationInterface;
 use Firebear\ImportExport\Model\ResourceModel\ExportJob\Collection as ExportJobCollection;
+use Magento\Framework\Api\Search\AggregationInterface;
+use Magento\Framework\Api\Search\SearchResultInterface;
 use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
 
+/**
+ * Class Collection
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\ExportJob\Grid
+ */
 class Collection extends ExportJobCollection implements SearchResultInterface
 {
     /**
@@ -19,18 +25,17 @@ class Collection extends ExportJobCollection implements SearchResultInterface
     protected $aggregations;
 
     /**
-     * @param \Magento\Framework\Data\Collection\EntityFactoryInterface    $entityFactory
-     * @param \Psr\Log\LoggerInterface                                     $logger
+     * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
+     * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
-     * @param \Magento\Framework\Event\ManagerInterface                    $eventManager
-     * @param \Magento\Store\Model\StoreManagerInterface                   $storeManager
-     * @param string                                                       $mainTable
-     * @param string                                                       $eventPrefix
-     * @param string                                                       $eventObject
-     * @param string                                                       $resourceModel
-     * @param string                                                       $model
-     * @param string|null                                                  $connection
-     * @param \Magento\Framework\Model\ResourceModel\Db\AbstractDb         $resource
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param string $mainTable
+     * @param string $eventPrefix
+     * @param string $eventObject
+     * @param string $resourceModel
+     * @param string $model
+     * @param AdapterInterface|null $connection
+     * @param \Magento\Framework\Model\ResourceModel\Db\AbstractDb|null $resource
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -39,12 +44,11 @@ class Collection extends ExportJobCollection implements SearchResultInterface
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         $mainTable,
         $eventPrefix,
         $eventObject,
         $resourceModel,
-        $model = 'Magento\Framework\View\Element\UiComponent\DataProvider\Document',
+        $model = Document::class,
         AdapterInterface $connection = null,
         \Magento\Framework\Model\ResourceModel\Db\AbstractDb $resource = null
     ) {

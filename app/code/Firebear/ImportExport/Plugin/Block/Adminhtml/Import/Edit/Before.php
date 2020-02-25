@@ -6,9 +6,13 @@
 
 namespace Firebear\ImportExport\Plugin\Block\Adminhtml\Import\Edit;
 
-use Magento\Framework\App\Action\Context;
 use Magento\Backend\Model\UrlInterface;
 
+/**
+ * Class Before
+ *
+ * @package Firebear\ImportExport\Plugin\Block\Adminhtml\Import\Edit
+ */
 class Before
 {
     /**
@@ -18,11 +22,10 @@ class Before
 
     /**
      * Before constructor.
-     * @param Context $context
+     *
      * @param UrlInterface $backendUrl
      */
     public function __construct(
-        Context $context,
         UrlInterface $backendUrl
     ) {
         $this->url = $backendUrl;
@@ -40,7 +43,9 @@ class Before
         $html = '<div id="messages"><div class="messages">';
         $html .= '<div class="message message-notice"><div>' .
             __(
-                'You have installed and enabled FireBear Studio Improved Import / Export extension - to use it please go to System -> %1 / %2. We don\'t improve and not make any changes on default Magento 2 Import / Export behaviour!',
+                'You have installed and enabled FireBear Studio Improved Import / Export extension - '.
+                'to use it please go to System -> %1 / %2. We don\'t improve and not make any changes on '.
+                'default Magento 2 Import / Export behaviour!',
                 "<a href=" . $this->url->getUrl('import/job/index') . ">Import Jobs</a>",
                 "<a href=" . $this->url->getUrl('import/export_job/index') . ">Export Jobs</a>"
             ) . '</div></div>';

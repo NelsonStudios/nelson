@@ -7,19 +7,14 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Json\DecoderInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Component\ComponentRegistrar;
 use Magento\Framework\Component\ComponentRegistrarInterface;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
-use Magento\Framework\App\Response\Http\FileFactory;
-use Magento\Framework\App\Filesystem\DirectoryList;
 
 /**
  * Action Download
@@ -36,11 +31,6 @@ class Download extends Job
     private $componentRegistrar;
 
     /**
-     * @var ResponseInterface
-     */
-    private $response;
-
-    /**
      * @var ReadFactory
      */
     private $readFactory;
@@ -53,27 +43,22 @@ class Download extends Job
     /**
      * Download constructor.
      *
-     * @param Context                     $context
-     * @param Registry                    $coreRegistry
-     * @param JobFactory                  $jobFactory
-     * @param JobRepositoryInterface      $repository
+     * @param Context $context
      * @param ComponentRegistrarInterface $componentRegistrar
-     * @param ReadFactory                 $readFactory
+     * @param ReadFactory $readFactory
+     * @param FileFactory $fileFactory
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
         ComponentRegistrarInterface $componentRegistrar,
         ReadFactory $readFactory,
         FileFactory $fileFactory
     ) {
+        parent::__construct($context);
+
         $this->componentRegistrar = $componentRegistrar;
-        $this->response           = $context->getResponse();
-        $this->readFactory        = $readFactory;
+        $this->readFactory = $readFactory;
         $this->fileFactory = $fileFactory;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
     }
 
     /**

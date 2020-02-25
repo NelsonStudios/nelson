@@ -11,6 +11,11 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Ui\Component\Listing\Columns\Column;
 use Firebear\ImportExport\Model\Job;
 
+/**
+ * Class Frequency
+ *
+ * @package Firebear\ImportExport\Ui\Component\Grid\Column
+ */
 class Frequency extends Column
 {
 
@@ -51,7 +56,7 @@ class Frequency extends Column
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item[$fieldName])) {
                     $mode = $item[$fieldName];
-                    $value = $frequencyModes[$mode]['title'];
+                    $value = $frequencyModes[$mode]['title'] ?? '';
                     $item[$fieldName] = $value;
                 }
             }

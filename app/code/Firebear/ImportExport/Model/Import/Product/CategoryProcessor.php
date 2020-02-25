@@ -6,10 +6,20 @@
 
 namespace Firebear\ImportExport\Model\Import\Product;
 
+use Firebear\ImportExport\Model\Import\Product;
 use Magento\Framework\Stdlib\DateTime;
 
+/**
+ * Class CategoryProcessor
+ *
+ * @package Firebear\ImportExport\Model\Import\Product
+ */
 class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Product\CategoryProcessor
 {
+    /**
+     * Delimiter in category path.
+     */
+    const DELIMITER_CATEGORY = '/';
 
     protected $generateUrl;
 
@@ -24,6 +34,8 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
         'url_key',
         'url_path'
     ];
+
+    private $categoryProductPosition = [];
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
@@ -40,45 +52,126 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
     }
 
     /**
+     * @return $this|\Magento\CatalogImportExport\Model\Import\Product\CategoryProcessor
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function initCategories()
+    {
+        if (empty($this->categories)) {
+            $collection = $this->categoryColFactory->create();
+            $collection->addAttributeToSelect('name')
+                ->addAttributeToSelect('url_key')
+                ->addAttributeToSelect('url_path');
+            $collection->setStoreId(\Magento\Store\Model\Store::DEFAULT_STORE_ID);
+            /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+            foreach ($collection as $category) {
+                $structure = explode(self::DELIMITER_CATEGORY, $category->getPath());
+                $pathSize = count($structure);
+
+                $this->categoriesCache[$category->getId()] = $category;
+                if ($pathSize > 1) {
+                    $path = [];
+                    for ($i = 1; $i < $pathSize; $i++) {
+                        $cat = $collection->getItemById((int)$structure[$i]);
+                        if (\is_object($cat)) {
+                            $name = $cat->getName();
+                            $path[] = $this->quoteDelimiter($name);
+                        }
+                    }
+                    /** @var string $index */
+                    $index = $this->standardizeString(
+                        implode(self::DELIMITER_CATEGORY, $path)
+                    );
+                    $this->categories[$index] = $category->getId();
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Quoting delimiter character in string.
+     *
+     * @param string $string
+     * @return string
+     */
+    private function quoteDelimiter($string)
+    {
+        return str_replace(self::DELIMITER_CATEGORY, '\\' . self::DELIMITER_CATEGORY, $string);
+    }
+
+    /**
+     * Standardize a string.
+     * For now it performs only a lowercase action, this method is here to include more complex checks in the future
+     * if needed.
+     *
+     * @param string $string
+     * @return string
+     */
+    private function standardizeString($string)
+    {
+        return mb_strtolower($string);
+    }
+
+    /**
      * @param $rowData
+     * @param $separator
      * @return array
      */
     public function getRowCategories($rowData, $separator)
     {
+        $catData = $catPosData = $explodeCatPosData = [];
         $categoryIds = [];
-        if (isset($rowData[\Firebear\ImportExport\Model\Import\Product::COL_CATEGORY])
-            && $rowData[\Firebear\ImportExport\Model\Import\Product::COL_CATEGORY]) {
-            if (!empty($rowData[\Firebear\ImportExport\Model\Import\Product::COL_CATEGORY])) {
-                $catData = explode(
-                    $separator,
-                    $rowData[\Firebear\ImportExport\Model\Import\Product::COL_CATEGORY]
-                );
-
-                foreach ($catData as $cData) {
-                    if ($cData == '/' || $cData == '') {
-                        continue;
-                    }
-                    $secondCategory = null;
-                    if (is_numeric($cData)) {
-                        $collectionId = $this->categoryColFactory->create()->addFieldToFilter('entity_id', $cData);
-                        if ($collectionId->getSize()) {
-                            $secondCategory = $collectionId->getFirstItem()->getId();
-                        }
-                    } else {
-                        $collection = $this->categoryColFactory->create()->addFieldToFilter('path', $cData);
-                        if ($collection->getSize()) {
-                            $secondCategory = $cData;
-                        }
-                    }
-                    if (empty($secondCategory)) {
-                        try {
-                            $secondCategory = $this->upsertCategory($cData);
-                        } catch (\Magento\Framework\Exception\AlreadyExistsException $e) {
-                            $this->addFailedCategory($cData, $e);
-                        }
-                    }
-                    $categoryIds[] = $secondCategory;
+        $colCategoryNotEmpty = !empty($rowData[Product::COL_CATEGORY]);
+        if ($colCategoryNotEmpty) {
+            $catData = explode($separator, $rowData[Product::COL_CATEGORY]);
+        }
+        if (!empty($rowData[Product::COL_CATEGORY . '_position'])) {
+            $catPosDataValue = explode($separator, $rowData[Product::COL_CATEGORY . '_position']);
+            foreach ($catPosDataValue as $value) {
+                if (empty($value)) {
+                    continue;
                 }
+                $catPos = explode(Product::PAIR_NAME_VALUE_SEPARATOR, $value);
+                $catPosData[] = $catPos[0];
+                $explodeCatPosData[$catPos[0]] = $catPos[1];
+            }
+        }
+
+        $this->setRowCategoryPosition();
+        $catData = (!empty($catData)) ? $catData : $catPosData;
+        foreach ($catData as $cData) {
+            if ($cData == '/' || $cData == '') {
+                continue;
+            }
+            $secondCategory = null;
+            if (is_numeric($cData)) {
+                $collectionId = $this->categoryColFactory->create()->addFieldToFilter('entity_id', $cData);
+                if ($collectionId->getSize()) {
+                    $secondCategory = $collectionId->getFirstItem()->getId();
+                }
+            } else {
+                $collection = $this->categoryColFactory->create()->addFieldToFilter('path', $cData);
+                if ($collection->getSize()) {
+                    $secondCategory = $cData;
+                }
+            }
+            if (empty($secondCategory)) {
+                if ($colCategoryNotEmpty) {
+                    $secondCategory = $this->upsertCategory($cData);
+                } else {
+                    /** @var string $index */
+                    $index = mb_strtolower($cData);
+                    $secondCategory = $this->categories[$index] ?? null;
+                }
+            }
+
+            if (!empty($secondCategory) && isset($explodeCatPosData[$cData])) {
+                $this->categoryProductPosition[$secondCategory] = $explodeCatPosData[$cData];
+            }
+
+            if ($colCategoryNotEmpty) {
+                $categoryIds[] = $secondCategory;
             }
         }
 
@@ -86,11 +179,29 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
     }
 
     /**
-     * @param string $name
+     * @return array
+     */
+    public function getRowCategoryPosition()
+    {
+        return $this->categoryProductPosition;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setRowCategoryPosition($value = [])
+    {
+        $this->categoryProductPosition = $value;
+        return $this;
+    }
+
+    /**
+     * @param $categoryName
      * @param int $parentId
      * @return null
      */
-    protected function createCategory($name, $parentId)
+    protected function createCategory($categoryName, $parentId)
     {
         /** @var \Magento\Catalog\Model\Category $category */
         $category = $this->categoryFactory->create();
@@ -99,17 +210,23 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
         }
         $category->setPath($parentCategory->getPath());
         $category->setParentId($parentId);
-        $category->setName($name);
+        $category->setName($this->unquoteDelimiter($categoryName));
         $category->setIsActive(true);
         $category->setIncludeInMenu(true);
         $category->setAttributeSetId($category->getDefaultAttributeSetId());
+        $urlKey = $this->checkUrlKeyDuplicates(
+            $category->formatUrlKey($categoryName),
+            $category,
+            0
+        );
+        $category->setUrlKey($urlKey);
         try {
             $category->save();
             $this->categoriesCache[$category->getId()] = $category;
         } catch (\Exception $e) {
             $this->addFailedCategory($category, $e);
         }
-		
+
         return $category->getId();
     }
 
@@ -135,13 +252,14 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
             $select = $resource->getConnection()->select()->from(
                 ['url_rewrite' => $resource->getTable('url_rewrite')],
                 ['request_path', 'store_id']
-            )->where('request_path LIKE "%' . $url . '.html"');
+            )->where('request_path LIKE "%' . $url . '"')
+                ->orWhere('request_path LIKE "%' . $url . '.html"');
             $urlKeyDuplicates = $resource->getConnection()->fetchAssoc(
                 $select
             );
             if (count($urlKeyDuplicates) > 0) {
                 $url = $this->checkUrlKeyDuplicates(
-                    $category->formatUrlKey($category->getName()) . "-" . $number,
+                    $category->formatUrlKey($category->getName()) . '-' . $number,
                     $category,
                     $number + 1
                 );
@@ -278,5 +396,16 @@ class CategoryProcessor extends \Magento\CatalogImportExport\Model\Import\Produc
         }
 
         return $this;
+    }
+
+    /**
+     * Remove quoting delimiter in string.
+     *
+     * @param string $string
+     * @return string
+     */
+    private function unquoteDelimiter($string)
+    {
+        return str_replace('\\' . self::DELIMITER_CATEGORY, self::DELIMITER_CATEGORY, $string);
     }
 }

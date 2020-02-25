@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Source\Config;
 
 use Magento\Framework\Config\ConverterInterface;
 
+/**
+ * Class Converter
+ *
+ * @package Firebear\ImportExport\Model\Source\Config
+ */
 class Converter implements ConverterInterface
 {
     /**

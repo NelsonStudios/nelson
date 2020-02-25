@@ -2,6 +2,11 @@
 
 namespace Firebear\ImportExport\Model\Source\Type;
 
+/**
+ * Class File
+ *
+ * @package Firebear\ImportExport\Model\Source\Type
+ */
 class File extends AbstractType
 {
     /**
@@ -68,13 +73,28 @@ class File extends AbstractType
             if (isset($info['extension'])) {
                 $file .=  '.' . $info['extension'];
             }
-            $this->writeFile($file);
+            $file = $this->prepareFilePath($file);
+            $result = $this->writeFile($file);
         } catch (\Exception $e) {
             $errors[] = $e->getMessage();
+            if (empty($errors)) {
+                $errors[] = __('No products with tier prices in catalog found.');
+            }
             $result = false;
-            $errors[] = __('Folder for import / export don\'t have enough permissions! Please set 775');
         }
 
         return [$result, $file, $errors];
+    }
+
+    /**
+     * @param $path
+     * @return mixed|null|string|string[]
+     */
+    public function prepareFilePath($path)
+    {
+        $path = str_replace(['\\'], DIRECTORY_SEPARATOR, $path);
+        $path = preg_replace('|([/]+)|s', DIRECTORY_SEPARATOR, $path);
+        $path = rtrim($path, DIRECTORY_SEPARATOR);
+        return $path;
     }
 }

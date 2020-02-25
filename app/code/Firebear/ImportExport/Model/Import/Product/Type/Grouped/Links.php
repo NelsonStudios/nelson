@@ -6,9 +6,7 @@
 
 namespace Firebear\ImportExport\Model\Import\Product\Type\Grouped;
 
-use Magento\CatalogImportExport\Model\Import\Product;
 use Magento\Framework\App\ResourceConnection;
-use Magento\ImportExport\Model\Import;
 
 /**
  * Class Downloadable
@@ -58,11 +56,17 @@ class Links extends \Magento\GroupedImportExport\Model\Import\Product\Type\Group
         return $this->behavior;
     }
 
+    /**
+     * @param array $productIds
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     protected function deleteOldLinks($productIds)
     {
         $jobId = $this->fireImportFactory->create()->getFireDataSourceModel()->getUniqueColumnData('job_id');
         $importJobData = $this->importJobRepository->getById($jobId);
         $sourceData = $this->jsonDecoder->decode($importJobData->getSourceData());
+        $relationTable = $this->productLink->getTable('catalog_product_relation');
         if ($this->getBehavior() != \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND
             || (isset($sourceData['remove_product_association']) && $sourceData['remove_product_association'] == 1)
         ) {
@@ -70,6 +74,14 @@ class Links extends \Magento\GroupedImportExport\Model\Import\Product\Type\Group
                 $this->productLink->getMainTable(),
                 $this->connection->quoteInto(
                     'product_id IN (?) AND link_type_id = ' . $this->getLinkTypeId(),
+                    $productIds
+                )
+            );
+            // Remove Product Relations form catalog_product_relation
+            $this->connection->delete(
+                $relationTable,
+                $this->connection->quoteInto(
+                    'parent_id IN (?)',
                     $productIds
                 )
             );

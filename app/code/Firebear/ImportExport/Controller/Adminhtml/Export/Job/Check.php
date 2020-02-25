@@ -6,13 +6,9 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Context;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Job as JobController;
 use Firebear\ImportExport\Helper\Additional;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
 
 /**
  * Class Check
@@ -23,43 +19,22 @@ class Check extends JobController
     const SOURCE = 'export_source';
 
     /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var Data
+     * @var Additional
      */
     protected $helper;
 
     /**
-     * @var \Magento\Framework\Json\DecoderInterface
-     */
-    protected $jsonDecoder;
-
-    /**
      * Check constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param \Magento\Framework\Json\DecoderInterface $jsonDecoder
      * @param Additional $helper
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
         Additional $helper
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
+        parent::__construct($context);
         $this->helper = $helper;
-        $this->jsonDecoder = $jsonDecoder;
     }
 
     /**
@@ -68,7 +43,7 @@ class Check extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $result = false;
         if ($this->getRequest()->isAjax()) {
             $formData = $this->getRequest()->getParam('form_data');

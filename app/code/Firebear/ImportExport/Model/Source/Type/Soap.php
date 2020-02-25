@@ -6,7 +6,10 @@
 
 namespace Firebear\ImportExport\Model\Source\Type;
 
-use Magento\Framework\Filesystem\DriverPool;
+use Exception;
+use Magento\Framework\Exception\LocalizedException;
+use SoapClient;
+use function array_merge;
 
 /**
  * Class Rest
@@ -15,8 +18,6 @@ use Magento\Framework\Filesystem\DriverPool;
  */
 class Soap extends AbstractType
 {
-    const XML_FILENAME_EXTENSION = '.xml';
-
     /**
      * @var string
      */
@@ -30,8 +31,9 @@ class Soap extends AbstractType
     /**
      * Download remote source file to temporary directory
      *
-     * @return bool|strxing
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return bool|string
+     * @throws LocalizedException
+     * @throws \SoapFault
      */
     public function uploadSource()
     {
@@ -44,19 +46,21 @@ class Soap extends AbstractType
                     if (!is_dir($dirname)) {
                         mkdir($dirname, 0775, true);
                     }
-                } catch (\Exception $e) {
-                    throw new  \Magento\Framework\Exception\LocalizedException(
+                } catch (Exception $e) {
+                    throw new  LocalizedException(
                         __(
                             "Can't create local file /var/import/soap'. Please check files permissions. "
                             . $e->getMessage()
                         )
                     );
                 }
-                $options = $this->getOptionsData($this->getData('options'));
+                $options = $this->getSoapOptions();
                 try {
-                    $response = $client->__soapCall($this->getData('soap_call'), [$options]);
-                } catch (\Exception $e) {
-                    throw new \Magento\Framework\Exception\LocalizedException(__("Soap Call Error %s", $e->getMessage()));
+                    $client->__soapCall($this->getData('soap_call'), [$options]);
+                } catch (Exception $e) {
+                    throw new LocalizedException(
+                        __("Soap Call Error %1", $e->getMessage())
+                    );
                 }
                 $fileMetadata = str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $client->__getLastResponse());
                 $fileMetadata = preg_replace('/\\sxmlns="\\S+"/', '', $fileMetadata);
@@ -64,14 +68,79 @@ class Soap extends AbstractType
                 if ($fileMetadata) {
                     $this->fileName = $this->getImportPath() . '/' . $fileName;
                 } else {
-                    throw new \Magento\Framework\Exception\LocalizedException(__("No content from API call"));
+                    throw new LocalizedException(__("No content from API call"));
                 }
             }
 
             return $this->fileName;
         } else {
-            throw new  \Magento\Framework\Exception\LocalizedException(__("Can't initialize %s client", $this->code));
+            throw new  LocalizedException(__("Can't initialize %1 client", $this->code));
         }
+    }
+
+    /**
+     * Prepare and return Driver client
+     *
+     * @return SoapClient
+     * @throws \SoapFault
+     */
+    protected function _getSourceClient()
+    {
+        if (!$this->client) {
+            $wsdl = $this->getData('request_url');
+            $soapOptions = $this->getSoapOptions();
+            $this->client = new SoapClient($wsdl . '?wsdl', $soapOptions);
+        }
+        return $this->client;
+    }
+
+    /**
+     * @return array
+     */
+    private function getSoapOptions()
+    {
+        $soapOptions = $this->getOptionsData($this->getData('options'));
+        $defaultSoapOptions = [
+            'trace' => true,
+            'soap_version' => $this->getData('soap_version') == 'SOAP_1_2' ? SOAP_1_2 : SOAP_1_1,
+            'stream_context' => stream_context_create(
+                [
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]
+            ),
+        ];
+        $soapOptions = array_merge($soapOptions, $defaultSoapOptions);
+        return $soapOptions;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return array data
+     */
+    public function getOptionsData($data)
+    {
+        $data = trim(preg_replace('/\s+/', '', $data));
+        $data = json_decode($data, null);
+        return (array)$data;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    public function convertUrlToFilename($url)
+    {
+        $parsedUrl = parse_url($url);
+        $filename = str_replace('.', '_', $parsedUrl['host'])
+            . str_replace('/', '_', $parsedUrl['path'])
+            . constant("self::" . strtoupper($this->getData('type_file')) . "_FILENAME_EXTENSION");
+
+        return $filename;
     }
 
     /**
@@ -107,8 +176,7 @@ class Soap extends AbstractType
                     $filePath,
                     $read->readAll()
                 );
-            } catch (\Exception $e) {
-
+            } catch (Exception $e) {
             }
         }
 
@@ -140,8 +208,7 @@ class Soap extends AbstractType
                     $filePath,
                     $read->readAll()
                 );
-            } catch (\Exception $e) {
-
+            } catch (Exception $e) {
             }
         }
 
@@ -158,59 +225,5 @@ class Soap extends AbstractType
     public function checkModified($timestamp)
     {
         return true;
-    }
-
-    /**
-     * Prepare and return Driver client
-     *
-     * @return \SoapClient
-     */
-    protected function _getSourceClient()
-    {
-        if (!$this->client) {
-
-            $wsdl = $this->getData('request_url');
-
-            $this->client = new \SoapClient($wsdl . '?wsdl', [
-                'trace'          => true,
-                'soap_version'   => (int)$this->getData('soap_version'),
-                "stream_context" => stream_context_create(
-                    [
-                        'ssl' => [
-                            'verify_peer'      => false,
-                            'verify_peer_name' => false,
-                        ],
-                    ]
-                ),
-            ]);
-        }
-        return $this->client;
-    }
-
-    /**
-     * @param string      $data
-     *
-     * @return array data
-     */
-    public function getOptionsData($data)
-    {
-        $data = trim(preg_replace('/\s+/', '', $data));
-        $data = json_decode($data, null);
-        return (array)$data;
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    public function convertUrlToFilename($url)
-    {
-        $parsedUrl = parse_url($url);
-        $filename = str_replace('.', '_', $parsedUrl['host'])
-            . str_replace('/', '_', $parsedUrl['path'])
-            . constant("self::" . strtoupper($this->getData('type_file')) . "_FILENAME_EXTENSION");
-
-        return $filename;
     }
 }

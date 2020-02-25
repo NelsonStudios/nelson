@@ -49,7 +49,7 @@ class Options implements OptionSourceInterface
             $sources[] = [
                 'label' => $type['label'],
                 'value' => $typeName,
-                'depends' => ($type['depends']) ? explode(',',$type['depends']) : $type['depends'],
+                'depends' => ($type['depends']) ? explode(',', $type['depends']) : $type['depends'],
                 'api' => isset($type['api']) && $type['api'] === '1'? "1" : "0"
             ];
         }

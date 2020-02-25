@@ -5,12 +5,27 @@
 
 namespace Firebear\ImportExport\Plugin\Model\Import\Product\Type\Bundle;
 
+use Magento\Catalog\Model\ResourceModel\Product\Relation;
+
+/**
+ * Class RelationsDataSaver
+ *
+ * @package Firebear\ImportExport\Plugin\Model\Import\Product\Type\Bundle
+ */
 class RelationsDataSaver
 {
-    protected $managment;
+    /**
+     * @var Relation
+     */
+    protected $management;
 
+    /**
+     * RelationsDataSaver constructor.
+     *
+     * @param Relation $management
+     */
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Product\Relation $management
+        Relation $management
     ) {
         $this->management = $management;
     }

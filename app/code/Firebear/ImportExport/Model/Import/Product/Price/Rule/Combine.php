@@ -7,11 +7,17 @@
 namespace Firebear\ImportExport\Model\Import\Product\Price\Rule;
 
 use Magento\CatalogRule\Model\Rule\Condition\Combine as MagentoCombine;
+use Magento\CatalogRule\Model\Rule\Condition\Product;
 
+/**
+ * Class Combine
+ *
+ * @package Firebear\ImportExport\Model\Import\Product\Price\Rule
+ */
 class Combine extends MagentoCombine
 {
 
-    const CONDITION_PRODUCT = "Magento\CatalogRule\Model\Rule\Condition\Product";
+    const CONDITION_PRODUCT = Product::class;
 
     /**
      * @var \Magento\CatalogRule\Model\Rule\Condition\ProductFactory
@@ -31,7 +37,7 @@ class Combine extends MagentoCombine
     ) {
         $this->productFactory = $conditionFactory;
         parent::__construct($context, $conditionFactory, $data);
-        $this->setType(\Magento\CatalogRule\Model\Rule\Condition\Combine::class);
+        $this->setType(MagentoCombine::class);
     }
 
     /**

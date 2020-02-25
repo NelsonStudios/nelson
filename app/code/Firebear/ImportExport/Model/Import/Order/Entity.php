@@ -17,81 +17,114 @@ class Entity extends AbstractAdapter
      *
      */
     const ENTITY_TYPE_CODE = 'order';
-    
+
     /**
      * Entity Id Column Name
      *
      */
-    const COLUMN_ENTITY_ID = 'entity_id'; 
-    
-    /**
-     * Increment Id Column Name
-     *
-     */
-    const COLUMN_INCREMENT_ID = 'increment_id'; 
-	
+    const COLUMN_ENTITY_ID = 'entity_id';
+
     /**
      * Customer Id Column Name
      *
      */
-    const COLUMN_CUSTOMER_ID = 'customer_id'; 
-    
-	
+    const COLUMN_CUSTOMER_ID = 'customer_id';
+
     /**
      * Customer Email Column Name
      *
      */
-    const COLUMN_CUSTOMER_EMAIL = 'customer_email';     
+    const COLUMN_CUSTOMER_EMAIL = 'customer_email';
 
     /**
      * Store Id Column Name
      *
      */
     const COLUMN_STORE_ID = 'store_id';
-    
+
     /**
      * Error Codes
-     */    
-    const ERROR_DUPLICATE_INCREMENT_ID = 'duplicateOrderIncrementId'; 
-    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateOrderEntityId';
-	const ERROR_INCREMENT_ID_IS_EMPTY = 'orderIncrementIdIsEmpty';
-	const ERROR_ENTITY_ID_IS_EMPTY = 'orderEntityIdIsEmpty';
-	const ERROR_STORE_ID_IS_EMPTY = 'orderStoreIdIsEmpty';
-	
+     */
+    const ERROR_DUPLICATE_INCREMENT_ID = 'duplicateOrderIncrementId';
+    const ERROR_INCREMENT_ID_IS_EMPTY = 'orderIncrementIdIsEmpty';
+
     /**
      * Validation Failure Message Template Definitions
      *
      * @var array
      */
     protected $_messageTemplates = [
-        self::ERROR_DUPLICATE_ENTITY_ID => 'Order entity_id is found more than once in the import file',
         self::ERROR_DUPLICATE_INCREMENT_ID => 'Order increment_id is found more than once in the import file',
         self::ERROR_INCREMENT_ID_IS_EMPTY => 'Order increment_id is empty',
-        self::ERROR_ENTITY_ID_IS_EMPTY => 'Order entity_id is empty',
-		self::ERROR_STORE_ID_IS_EMPTY => 'Order store_id is empty',
     ];
-    
+
     /**
      * Order Entity Table Name
      *
      * @var string
      */
     protected $_mainTable = 'sales_order';
-    
+
     /**
      * Order Status Table Name
      *
      * @var string
      */
-    protected $_statusTable = 'sales_order_status';  
-    
+    protected $_statusTable = 'sales_order_status';
+
     /**
      * Order Status Collection
      *
      * @var array
      */
     protected $_status;
-    
+
+    /**
+     *
+     *
+     * @var array
+     */
+    protected $_baseFields = [
+        'discount_amount',
+        'discount_canceled',
+        'discount_invoiced',
+        'discount_refunded',
+        'grand_total',
+        'shipping_amount',
+        'shipping_canceled',
+        'shipping_invoiced',
+        'shipping_refunded',
+        'shipping_tax_amount',
+        'shipping_tax_refunded',
+        'subtotal',
+        'subtotal_canceled',
+        'subtotal_invoiced',
+        'subtotal_refunded',
+        'tax_amount',
+        'tax_canceled',
+        'tax_invoiced',
+        'tax_refunded',
+        'to_global_rate',
+        'to_order_rate',
+        'total_canceled',
+        'total_invoiced',
+        'total_invoiced_cost',
+        'total_offline_refunded',
+        'total_online_refunded',
+        'total_paid',
+        'total_qty_ordered',
+        'total_refunded',
+        'adjustment_negative',
+        'adjustment_positive',
+        'shipping_discount_amount',
+        'subtotal_incl_tax',
+        'total_due',
+        'discount_tax_compensation_amount',
+        'discount_tax_compensation_invoiced',
+        'discount_tax_compensation_refunded',
+        'shipping_incl_tax',
+    ];
+
     /**
      * Retrieve The Prepared Data
      *
@@ -100,12 +133,24 @@ class Entity extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		$this->prepareStatus($rowData);
-		return (!$this->isEmptyRow($rowData)) 
-			? $rowData 
-			: false;		
+        parent::prepareRowData($rowData);
+        $this->prepareStatus($rowData);
+        return (!$this->isEmptyRow($rowData))
+            ? $rowData
+            : false;
     }
-    
+
+    /**
+     * Is Empty Row
+     *
+     * @param array $rowData
+     * @return bool
+     */
+    public function isEmptyRow($rowData)
+    {
+        return empty($rowData['increment_id']);
+    }
+
     /**
      * Retrieve Entity Id If Entity Is Present In Database
      *
@@ -118,11 +163,11 @@ class Entity extends AbstractAdapter
         /** @var $select \Magento\Framework\DB\Select */
         $select = $this->_connection->select();
         $select->from($this->getMainTable(), 'entity_id')
-			->where('increment_id = :increment_id');
-        
+            ->where('increment_id = :increment_id');
+
         return $this->_connection->fetchOne($select, $bind);
-    } 
-    
+    }
+
     /**
      * Prepare Data For Update
      *
@@ -144,32 +189,70 @@ class Entity extends AbstractAdapter
             $entityId = $this->_getNextEntityId();
             $this->_newEntities[$rowData[self::COLUMN_INCREMENT_ID]] = $entityId;
         }
-        
-		$this->orderIdsMap[$this->_getEntityId($rowData)] = $entityId;
-		
-		$customerId = null;
-		$customerGroupId = 0;
-		if (isset($rowData[self::COLUMN_CUSTOMER_EMAIL])) {
-			$customerId = $this->getCustomerId(
-				$rowData[self::COLUMN_CUSTOMER_EMAIL],
-				$rowData[self::COLUMN_STORE_ID]
-			);
-			if ($customerId) {
-				$customerGroupId = $this->getCustomerGroupId($customerId);
-			}
-		}
+
+        $this->orderIdsMap[$rowData[self::COLUMN_INCREMENT_ID]] = $entityId;
+        $customerId = null;
+        $customerGroupId = 0;
+        if (isset($rowData[self::COLUMN_CUSTOMER_EMAIL])) {
+            $customerId = $this->getCustomerId(
+                $rowData[self::COLUMN_CUSTOMER_EMAIL],
+                $rowData[self::COLUMN_STORE_ID] ?? 0
+            );
+            if ($customerId) {
+                $customerGroupId = $this->getCustomerGroupId($customerId);
+            }
+        }
+
+        if (!isset($rowData['base_to_order_rate']) || $rowData['base_to_order_rate'] == 1) {
+            foreach ($this->_baseFields as $field) {
+                if (isset($rowData[$field]) && !isset($rowData['base_' . $field])) {
+                    $rowData['base_' . $field] = $rowData[$field];
+                } elseif (!isset($rowData[$field])) {
+                    // set default values
+                    $rowData[$field] = $rowData['base_' . $field] = 0;
+                }
+            }
+
+            if (isset($rowData['shipping_discount_tax_compensation_amount']) &&
+                !isset($rowData['base_shipping_discount_tax_compensation_amnt'])
+            ) {
+                $rowData['base_shipping_discount_tax_compensation_amnt'] =
+                    $rowData['shipping_discount_tax_compensation_amount'];
+            } else {
+                $rowData['base_shipping_discount_tax_compensation_amnt'] =
+                    $rowData['shipping_discount_tax_compensation_amount'] = 0;
+            }
+
+            foreach (['global_currency_code', 'base_currency_code', 'store_currency_code'] as $field) {
+                if (!isset($rowData[$field]) && isset($rowData['order_currency_code'])) {
+                    $rowData[$field] = $rowData['order_currency_code'];
+                }
+            }
+        }
+
+        if (empty($rowData['tax_amount'])) {
+            if (!empty($rowData['subtotal'])) {
+                $rowData['subtotal_incl_tax'] = $rowData['subtotal'];
+            }
+            if (!empty($rowData['shipping_amount'])) {
+                $rowData['shipping_incl_tax'] = $rowData['shipping_amount'];
+            }
+            if (!empty($rowData['base_shipping_amount'])) {
+                $rowData['base_shipping_incl_tax'] = $rowData['base_shipping_amount'];
+            }
+        }
 
         $entityRow = [
             'created_at' => $createdAt,
             'updated_at' => $updatedAt,
             'is_virtual' => empty($rowData['is_virtual']) ? 0 : 1,
-			'customer_id' => $customerId,
-			'customer_group_id' => $customerGroupId,
-			'customer_is_guest' => $customerId ? 0 : 1,
+            'customer_id' => $customerId,
+            'customer_group_id' => $customerGroupId,
+            'customer_is_guest' => $customerId ? 0 : 1,
             'entity_id' => $entityId
-        ];        
-		/* prepare data */
-		$entityRow = $this->_prepareEntityRow($entityRow, $rowData);
+        ];
+        /* prepare data */
+        $entityRow = $this->_prepareEntityRow($entityRow, $rowData);
         if ($newEntity) {
             $toCreate[] = $entityRow;
         } else {
@@ -180,7 +263,7 @@ class Entity extends AbstractAdapter
             self::ENTITIES_TO_UPDATE_KEY => $toUpdate
         ];
     }
-	
+
     /**
      * Prepare Data For Replace
      *
@@ -190,21 +273,19 @@ class Entity extends AbstractAdapter
     protected function _prepareDataForReplace(array $rowData)
     {
         $toUpdate = [];
-		$entityId = empty($rowData[self::COLUMN_INCREMENT_ID])
-			? $this->_getEntityId($rowData)
-			: $this->_getExistEntityId($rowData);
-			
-		$this->orderIdsMap[$entityId] = $entityId;		
-		$entityRow = [
+        $entityId = $this->_getExistEntityId($rowData);
+
+        $this->orderIdsMap[$rowData[self::COLUMN_INCREMENT_ID]] = $entityId;
+        $entityRow = [
             self::COLUMN_ENTITY_ID => $entityId
         ];
-		/* prepare data */
-		$toUpdate[] = $this->_prepareEntityRow($entityRow, $rowData);
+        /* prepare data */
+        $toUpdate[] = $this->_prepareEntityRow($entityRow, $rowData);
         return [
             self::ENTITIES_TO_UPDATE_KEY => $toUpdate
-        ];	
-    } 
-    
+        ];
+    }
+
     /**
      * Retrieve Id For Delete
      *
@@ -214,11 +295,11 @@ class Entity extends AbstractAdapter
     protected function _getIdForDelete(array $rowData)
     {
         if (!empty($rowData[self::COLUMN_INCREMENT_ID])) {
-			return $this->_getExistEntityId($rowData);
+            return $this->_getExistEntityId($rowData);
         }
         return parent::_getIdForDelete($rowData);
     }
-    
+
     /**
      * Validate Row Data For Add/Update Behaviour
      *
@@ -233,13 +314,9 @@ class Entity extends AbstractAdapter
             if (isset($this->_newEntities[$incrementId])) {
                 $this->addRowError(self::ERROR_DUPLICATE_INCREMENT_ID, $rowNumber);
             }
-			
-			if (empty($rowData[self::COLUMN_STORE_ID])) {
-				$this->addRowError(self::ERROR_STORE_ID_IS_EMPTY, $rowNumber);
-			}
-		}
+        }
     }
-	
+
     /**
      * Validate Row Data For Replace Behaviour
      *
@@ -251,7 +328,7 @@ class Entity extends AbstractAdapter
     {
         $this->_checkDisjunctionKey($rowData, $rowNumber);
     }
-    
+
     /**
      * Validate Row Data For Delete Behaviour
      *
@@ -262,8 +339,8 @@ class Entity extends AbstractAdapter
     protected function _validateRowForDelete(array $rowData, $rowNumber)
     {
         $this->_checkDisjunctionKey($rowData, $rowNumber);
-    } 
-    
+    }
+
     /**
      * Delete List Of Entities
      *
@@ -274,23 +351,23 @@ class Entity extends AbstractAdapter
     {
         parent::_deleteEntities($toDelete);
         foreach ([
-			'sales_order_grid',
-			'sales_shipment_grid', 
-			'sales_invoice_grid', 
-			'sales_creditmemo_grid'] as $table) {
-			$column = ($table == 'sales_order_grid') ? self::COLUMN_ENTITY_ID : 'order_id';
-			$condition = $this->_connection->quoteInto(
-				$column . ' IN (?)', 
-				$toDelete
-			);
-			$this->_connection->delete(
-				$this->_resource->getTableName($table), 
-				$condition
-			);
-		}
+            'sales_order_grid',
+            'sales_shipment_grid',
+            'sales_invoice_grid',
+            'sales_creditmemo_grid'] as $table) {
+            $column = ($table == 'sales_order_grid') ? self::COLUMN_ENTITY_ID : 'order_id';
+            $condition = $this->_connection->quoteInto(
+                $column . ' IN (?)',
+                $toDelete
+            );
+            $this->_connection->delete(
+                $this->_resource->getTableName($table),
+                $condition
+            );
+        }
         return $this;
     }
-    
+
     /**
      * Prepare Status
      *
@@ -299,33 +376,33 @@ class Entity extends AbstractAdapter
      */
     public function prepareStatus(array $rowData)
     {
-		if (empty($rowData['status']) || empty($rowData['status_label'])) {
-			return;
-		}
-		if (null === $this->_status) {
-			$this->_status = $this-> _getStatusCollection();
-		}
-		if (!in_array($rowData['status'], $this->_status)) {
-			$this->saveStatus($rowData['status'], $rowData['status_label']);
-		}
+        if (empty($rowData['status']) || empty($rowData['status_label'])) {
+            return;
+        }
+        if (null === $this->_status) {
+            $this->_status = $this-> _getStatusCollection();
+        }
+        if (!in_array($rowData['status'], $this->_status)) {
+            $this->saveStatus($rowData['status'], $rowData['status_label']);
+        }
     }
-    
+
     /**
      * Save Status
      *
      * @param string $status
-     * @param string $label    
+     * @param string $label
      * @return void
      */
     public function saveStatus($status, $label)
     {
-		$this->_status[] = $status;
-		$this->_connection->insert(
-			$this->getStatusTable(), 
-			['status' => $status, 'label' => $label]
-		);
+        $this->_status[] = $status;
+        $this->_connection->insert(
+            $this->getStatusTable(),
+            ['status' => $status, 'label' => $label]
+        );
     }
-    
+
     /**
      * Retrieve Status Collection
      *
@@ -336,10 +413,10 @@ class Entity extends AbstractAdapter
         /** @var $select \Magento\Framework\DB\Select */
         $select = $this->_connection->select();
         $select->from($this->getStatusTable(), 'status');
-        
+
         return $this->_connection->fetchCol($select);
     }
-    
+
     /**
      * Retrieve Status Table Name
      *
@@ -348,7 +425,7 @@ class Entity extends AbstractAdapter
     public function getStatusTable()
     {
         return $this->_resource->getTableName(
-			$this->_statusTable
-		);  
-    } 
+            $this->_statusTable
+        );
+    }
 }

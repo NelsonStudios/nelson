@@ -11,14 +11,21 @@ use Magento\ImportExport\Model\Import;
 use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
 use Firebear\ImportExport\Model\Import\ImportAdapterInterface;
 use Firebear\ImportExport\Model\Import\Context;
-use Firebear\ImportExport\Traits\General as GeneralTrait;
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
+use Firebear\ImportExport\Model\ResourceModel\Order\Helper;
 
 /**
  * Order Abstract Import Adapter
  */
 abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterInterface
 {
-    use GeneralTrait;
+    use ImportTrait;
+
+    /**
+     * Entity Type Code
+     *
+     */
+    const ENTITY_TYPE_CODE = 'order';
 
     /**
      * Keys Which Used To Build Result Data Array For Future Update
@@ -26,6 +33,61 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     const ENTITIES_TO_CREATE_KEY = 'entities_to_create';
 
     const ENTITIES_TO_UPDATE_KEY = 'entities_to_update';
+
+    /**
+     * Entity Id Column Name
+     *
+     */
+    const COLUMN_ENTITY_ID = 'entity_id';
+
+    /**
+     * Order Item Id Column Name
+     *
+     */
+    const COLUMN_ORDER_ITEM_ID = 'order_item_id';
+
+    /**
+     * Shipment Id Column Name
+     *
+     */
+    const COLUMN_SHIPMENT_ID = 'parent_id';
+
+    /**
+     * Payment Id Column Name
+     *
+     */
+    const COLUMN_PAYMENT_ID = 'payment_id';
+
+    /**
+     * Invoice Id Column Name
+     *
+     */
+    const COLUMN_INVOICE_ID = 'parent_id';
+
+    /**
+     * Creditmemo Id Column Name
+     *
+     */
+    const COLUMN_CREDITMEMO_ID = 'parent_id';
+
+    /**
+     * Tax Id Column Name
+     *
+     */
+    const COLUMN_TAX_ID = 'tax_id';
+
+    /**
+     * Increment Id Column Name
+     *
+     */
+    const COLUMN_INCREMENT_ID = 'increment_id';
+
+    /**
+     * Error Codes
+     */
+    const ERROR_ENTITY_ID_IS_EMPTY = 'entityIdIsEmpty';
+    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateEntityId';
+    const ERROR_INCREMENT_ID_IS_EMPTY = 'incrementIdIsEmpty';
 
     /**
      * Id Of Next Entity Row
@@ -98,13 +160,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     protected $_messageTemplates = [];
 
     /**
-     * Logger
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $_logger;
-
-    /**
      * Main Table Name
      *
      * @var string
@@ -152,7 +207,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      * @var string
      */
     protected $_productTable = 'catalog_product_entity';
-    
+
     /**
      * Resource Connection
      *
@@ -161,12 +216,22 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     protected $_resource;
 
     /**
+     * Current order increment id;
+     *
+     * @var string
+     */
+    protected $_currentOrderId;
+
+    /**
      * Initialize Import
      *
      * @param Context $context
+     * @param Helper $resourceHelper
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
-        Context $context
+        Context $context,
+        Helper $resourceHelper
     ) {
         $this->_logger = $context->getLogger();
         $this->_resource = $context->getResource();
@@ -177,7 +242,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
             $context->getDataSourceModel(),
             $context->getConfig(),
             $context->getResource(),
-            $context->getResourceHelper(),
+            $resourceHelper,
             $context->getStringUtils(),
             $context->getErrorAggregator()
         );
@@ -397,14 +462,17 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
                     $this->getErrorAggregator()->addRowToSkip($rowNumber);
                     continue;
                 }
+
                 /* behavior selector */
                 switch ($this->getBehavior()) {
                     case Import::BEHAVIOR_DELETE:
                         $toDelete[] = $this->_getIdForDelete($rowData);
                         break;
                     case Import::BEHAVIOR_REPLACE:
-                        $data = $this->_prepareDataForReplace($rowData);
-                        $toUpdate = array_merge($toUpdate, $data[self::ENTITIES_TO_UPDATE_KEY]);
+                        $toDelete[] = $this->_getIdForDelete($rowData);
+                        $this->_deleteEntities($toDelete);
+                        $data = $this->_prepareDataForUpdate($rowData);
+                        $toCreate = array_merge($toCreate, $data[self::ENTITIES_TO_CREATE_KEY]);
                         break;
                     case Import::BEHAVIOR_ADD_UPDATE:
                         $data = $this->_prepareDataForUpdate($rowData);
@@ -417,7 +485,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
             if ($toCreate || $toUpdate) {
                 $this->_saveEntities($toCreate, $toUpdate);
             }
-            if ($toDelete) {
+            if ($toDelete && $this->getBehavior() == Import::BEHAVIOR_DELETE) {
                 $this->_deleteEntities($toDelete);
             }
         }
@@ -432,6 +500,9 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      */
     public function prepareRowData(array $rowData)
     {
+        if (!empty($rowData[self::COLUMN_INCREMENT_ID])) {
+            $this->_currentOrderId = $rowData[self::COLUMN_INCREMENT_ID];
+        }
         return $rowData;
     }
 
@@ -443,7 +514,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      */
     public function isEmptyRow($rowData)
     {
-        if ($this->getBehavior() == Import::BEHAVIOR_DELETE) {
+        if ($this->getBehavior() == Import::BEHAVIOR_DELETE && !empty($rowData['increment_id'])) {
             return false;
         }
         /* check empty field */
@@ -477,17 +548,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     }
 
     /**
-     * Retrieve Exploded Field
-     *
-     * @param string $field
-     * @return array|bool
-     */
-    protected function _explodeField($field)
-    {
-        return $this->_fieldProcessor->explode($field, $this->_getSeparator());
-    }
-	
-    /**
      * Retrieve Extracted Field
      *
      * @param array $rowData
@@ -496,24 +556,24 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      */
     protected function _extractField($rowData, $prefix)
     {
-		if (isset($rowData[$prefix]) && 
-			is_array($rowData[$prefix])
-		) {
-			/* from nested format (xml, json etc) */
-			return $rowData[$prefix];
-		}
-		/* from plain format (csv, ods, xlsx etc) */
-		$data = [];
-		foreach ($rowData as $field => $value) {
-			if (false === strpos($field, ':')) {
-				continue;
-			}
-			list($fieldPrefix, $field) = explode(':', $field);
-			if ($fieldPrefix == $prefix) {
-				$data[$field] = $value;
-			}
-		}
-		return $data;
+        if (isset($rowData[$prefix]) &&
+            is_array($rowData[$prefix])
+        ) {
+            /* from nested format (xml, json etc) */
+            return $rowData[$prefix];
+        }
+        /* from plain format (csv, ods, xlsx etc) */
+        $data = [];
+        foreach ($rowData as $field => $value) {
+            if (false === strpos($field, ':')) {
+                continue;
+            }
+            list($fieldPrefix, $field) = explode(':', $field);
+            if ($fieldPrefix == $prefix) {
+                $data[$field] = $value;
+            }
+        }
+        return $data;
     }
 
     /**
@@ -536,7 +596,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     protected function _getOrderId(array $rowData)
     {
         if (null !== $this->orderIdsMap) {
-            $orderId = $rowData[static::COLUMN_ORDER_ID];
+            $orderId = $this->_currentOrderId;
             if (isset($this->orderIdsMap[$orderId])) {
                 return $this->orderIdsMap[$orderId];
             }
@@ -548,7 +608,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      * Retrieve Order Item Id If Order Item Is Present In Database
      *
      * @param array $rowData
-     * @return bool|int
+     * @return null|int
      */
     protected function _getOrderItemId(array $rowData)
     {
@@ -558,7 +618,7 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
                 return $this->itemIdsMap[$itemId];
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -694,18 +754,39 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     protected function _saveEntities(array $toCreate, array $toUpdate)
     {
         if ($toCreate) {
-            $this->_connection->insertMultiple(
-                $this->getMainTable(),
-                $toCreate
-            );
+            foreach ($toCreate as $bind) {
+                try {
+                    $this->_connection->insert(
+                        $this->getMainTable(),
+                        $bind
+                    );
+                } catch (\Exception $exception) {
+                    $this->addLogWriteln(
+                        __('Issue on create at %1 for bind %2', $this->getMainTable(), $bind),
+                        $this->getOutput(),
+                        'error'
+                    );
+                    $this->_logger->critical($exception->getMessage());
+                }
+            }
         }
-        if ($toUpdate) {
-            $this->_connection->insertOnDuplicate(
-                $this->getMainTable(),
-                $toUpdate,
-                $this->_getEntityFieldsToUpdate($toUpdate)
+        try {
+            if ($toUpdate) {
+                $this->_connection->insertOnDuplicate(
+                    $this->getMainTable(),
+                    $toUpdate,
+                    $this->_getEntityFieldsToUpdate($toUpdate)
+                );
+            }
+        } catch (\Exception $exception) {
+            $this->addLogWriteln(
+                __('Issue on update at %1 for bind %2', $this->getMainTable(), $this->jsonHelper->jsonEncode($this->_getEntityFieldsToUpdate($toUpdate))),
+                $this->getOutput(),
+                'error'
             );
+            $this->_logger->critical($exception->getMessage());
         }
+
         return $this;
     }
 
@@ -793,7 +874,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
         return !$this->getErrorAggregator()->isRowInvalid($rowNumber);
     }
 
-
     /**
      * Validate Row Data For Replace Behaviour
      *
@@ -819,7 +899,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
      * @return void
      */
     abstract protected function _validateRowForUpdate(array $rowData, $rowNumber);
-
 
     /**
      * Validate Row Data For Delete Behaviour
@@ -1117,7 +1196,6 @@ abstract class AbstractAdapter extends AbstractEntity implements ImportAdapterIn
     {
         return $this->_resource->getTableName(
             $this->_mainTable
-
         );
     }
 

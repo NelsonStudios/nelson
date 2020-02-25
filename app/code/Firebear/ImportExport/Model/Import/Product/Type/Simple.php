@@ -14,6 +14,8 @@ use Magento\ImportExport\Model\Import;
  */
 class Simple extends \Magento\CatalogImportExport\Model\Import\Product\Type\Simple
 {
+    use \Firebear\ImportExport\Traits\Import\Product\Type;
+
     /**
      * AbstractType constructor
      *
@@ -37,5 +39,4 @@ class Simple extends \Magento\CatalogImportExport\Model\Import\Product\Type\Simp
         $this->eavConfig = $eavConfig;
         parent::__construct($attrSetColFac, $prodAttrColFac, $resource, $params, $metadataPool);
     }
-
 }

@@ -6,25 +6,30 @@
 
 namespace Firebear\ImportExport\Model\ExportJob;
 
-use Magento\Backend\App\Area\FrontNameResolver;
+use Firebear\ImportExport\Api\ExportJobRepositoryInterface;
+use Firebear\ImportExport\Helper\Additional;
+use Firebear\ImportExport\Model\ExportFactory;
+use Firebear\ImportExport\Model\ExportJobFactory;
 use Magento\Backend\Model\UrlInterface;
-use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\State;
 use Magento\Framework\Json\DecoderInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Api\StoreResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\App\RequestInterface;
-use Firebear\ImportExport\Model\ExportFactory;
-use Firebear\ImportExport\Model\ExportJobFactory;
-use Firebear\ImportExport\Api\ExportJobRepositoryInterface;
-use Firebear\ImportExport\Helper\Additional;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Console\Console;
 
+/**
+ * Class Processor
+ *
+ * @package Firebear\ImportExport\Model\ExportJob
+ */
 class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 {
+    use \Firebear\ImportExport\Traits\General;
+
     const SOURCE = 'export_source';
 
     const SOURCE_DATA_SYSTEM = 'source_data_system';
@@ -73,6 +78,8 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
     const DIVIDED_ATTRIBUTES = 'divided_additional';
 
+    const ONLY_ADMIN = 'only_admin';
+
     const XSLT = 'xslt';
 
     const XML_SWITCH = 'xml_switch';
@@ -99,7 +106,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
     protected $exportJobRepository;
 
     /**
-     * @var Data
+     * @var Additional
      */
     protected $helper;
 
@@ -141,9 +148,17 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
     protected $translator;
 
     public $inConsole;
+    /** @var \Psr\Log\LoggerInterface  */
+    protected $_logger;
+
+    /**
+     * @var State
+     */
+    protected $state;
 
     /**
      * Processor constructor.
+     *
      * @param DecoderInterface $jsonDecoder
      * @param StoreManagerInterface $storeManager
      * @param StoreResolverInterface $storeResolver
@@ -158,7 +173,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
      * @param ConsoleOutput $output
      * @param \Magento\Framework\App\AreaList $areaList
      * @param \Magento\Framework\Locale\Resolver $locale
-     * @param \Magento\Framework\App\State $state
+     * @param State $state
      * @param \Magento\Backend\App\ConfigInterface $backendConfig
      * @param \Magento\Framework\TranslateInterface $translator
      * @param \Magento\Backend\Model\Locale\ManagerFactory $manager
@@ -178,7 +193,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         ConsoleOutput $output,
         \Magento\Framework\App\AreaList $areaList,
         \Magento\Framework\Locale\Resolver $locale,
-        \Magento\Framework\App\State $state,
+        State $state,
         \Magento\Backend\App\ConfigInterface $backendConfig,
         \Magento\Framework\TranslateInterface $translator,
         \Magento\Backend\Model\Locale\ManagerFactory $manager
@@ -196,6 +211,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         $this->manager = $manager;
         $this->inConsole = 0;
         $this->translator = $translator;
+        $this->_logger = $logger;
         parent::__construct($jsonDecoder, $storeManager, $storeResolver, $request, $logger, $timezone, $backendUrl);
     }
 
@@ -211,7 +227,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
     public function prepareJob($jobId)
     {
-        $this->setLogger($this->logger);
+        $this->setLogger($this->_logger);
         $data = parent::prepareJob($jobId);
         if (isset($data['language']) && $data['language']) {
             $this->changeLocal($data['language']);
@@ -256,7 +272,6 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         return $source;
     }
 
-
     /**
      * @param $data
      *
@@ -290,7 +305,6 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
         $allFields = 0;
         $deps = [];
         $exportFilterTable = [];
-        $exportFilter['tier_price'] = '';
         $exportFilter[\Magento\Catalog\Model\Category::KEY_UPDATED_AT] = [
             '01.01.1970 00:00:00',
             $this->timezone->date()
@@ -395,6 +409,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
                 self::DEPENDENCIES => $deps,
                 self::LANGUAGE => $language,
                 self::DIVIDED_ATTRIBUTES => $sourceData['divided_additional'],
+                self::ONLY_ADMIN => $sourceData['only_admin'] ?? 0,
                 self::XSLT => $this->getJob()->getXslt()
             ];
         }
@@ -419,23 +434,31 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
      */
     public function run($data)
     {
+        $response = '';
         $model = $this->getProcessModel();
-        $model->setLogger($this->logger);
+        $model->setLogger($this->_logger);
         $model->setData($data);
         $entity = $data[self::SOURCE_ENTITY];
-        $this->addLogComment(__('Entity %1', $data['entity']), $this->output, 'info');
+        $this->addLogComment([__('Entity %1', $data['entity'])]);
         $source = $this->getSource($entity);
         $source->setData($data[self::EXPORT_SOURCE]);
-        list($result, $file, $errors) = $source->run($model);
+        if ($data[self::SOURCE_ENTITY] === 'rest') {
+            list($result, $file, $errors, $response) = $source->run($model);
+        } else {
+            list($result, $file, $errors) = $source->run($model);
+        }
 
         if ($result) {
             $this->setExportFile($file);
+            if ($response !== '' && $response) {
+                $this->addLogWriteln($response, $this->output, 'info');
+            }
         } else {
             foreach ($errors as $error) {
-                $this->logger->debug($error);
+                $this->_logger->debug($error);
+                $this->addLogWriteln($error, $this->output, 'error');
             }
         }
-
         return $result;
     }
 
@@ -449,7 +472,7 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
                 $this->source = $this->helper->getSourceModelByType($entity);
             } catch (\Exception $e) {
                 $this->addLogComment($e->getMessage(), $this->output, 'error');
-                $this->logger->critical($e);
+                $this->_logger->critical($e);
             }
         }
 
@@ -465,24 +488,18 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
     public function addLogComment($debugData, OutputInterface $output = null, $type = null)
     {
 
-       // if ($this->debugMode) {
-        $this->logger->debug($debugData);
-      //  }
-
-        if ($output) {
-            switch ($type) {
-                case 'error':
-                $debugData = '<error>' . $debugData . '</error>';
-                break;
-                case 'info':
-                $debugData = '<info>' . $debugData . '</info>';
-                break;
-                default:
-                $debugData = '<comment>' . $debugData . '</comment>';
-                break;
+        if (is_scalar($debugData)) {
+            $this->addLogWriteln($debugData, null, $type);
+        } elseif ($debugData instanceof \Magento\Framework\Phrase) {
+            $this->addLogWriteln($debugData->__toString(), null, $type);
+        } else {
+            foreach ($debugData as $message) {
+                if ($message instanceof \Magento\Framework\Phrase) {
+                    $this->addLogWriteln($message->__toString(), null, $type);
+                } else {
+                    $this->addLogWriteln($message, null, $type);
+                }
             }
-
-            $output->writeln($debugData);
         }
 
         return $this;
@@ -490,10 +507,12 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
     /**
      * @param $logger
+     *
+     * @return mixed
      */
     public function setLogger($logger)
     {
-        $this->logger = $logger;
+        $this->_logger = $logger;
     }
 
     /**
@@ -511,7 +530,6 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
     {
         $this->exportFile = $file;
     }
-
 
     /**
      * @param $local
@@ -552,7 +570,6 @@ class Processor extends \Firebear\ImportExport\Model\AbstractProcessor
 
         $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
     }
-
 
     public function revertLocale()
     {

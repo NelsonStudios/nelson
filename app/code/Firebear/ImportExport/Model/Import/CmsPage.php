@@ -8,7 +8,7 @@
 namespace Firebear\ImportExport\Model\Import;
 
 use Firebear\ImportExport\Helper\Additional;
-use Firebear\ImportExport\Traits\General;
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
 use Magento\Cms\Api\Data\PageInterface;
 use Magento\Cms\Api\PageRepositoryInterface;
 use Magento\Cms\Model\PageFactory as CmsPageFactory;
@@ -30,17 +30,19 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Theme\Model\ResourceModel\Theme\Collection;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-// use Magento\ImportExport\Model\Import\AbstractEntity;
-
+/**
+ * Class CmsPage
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class CmsPage extends AbstractEntity
 {
-    use General;
+    use ImportTrait;
 
     /**
      * Column category url key.
      */
     const COL_URL = 'identifier';
-
 
     /**
      * Column cms page_id.
@@ -51,7 +53,6 @@ class CmsPage extends AbstractEntity
      * Column cms store_view_code.
      */
     const COL_STORE_VIEW_CODE = 'store_view_code';
-
 
     /**
      * Core event manager proxy
@@ -78,8 +79,6 @@ class CmsPage extends AbstractEntity
     protected $resource;
     protected $pagesUrl;
 
-    protected $duplicateFields = [];
-
     /**
      * @var Registry
      */
@@ -92,15 +91,9 @@ class CmsPage extends AbstractEntity
      */
     protected $pages = [];
 
-    /**
-     * @var ConsoleOutput
-     */
-    protected $output;
-
     protected $sourceType;
     protected $pageResourceFactory;
     protected $additional;
-
 
     protected $pageFields = [
         PageInterface::PAGE_ID,
@@ -217,13 +210,12 @@ class CmsPage extends AbstractEntity
                 $collection = $this->collectionFactory->create();
                 $collection->addStoreFilter($store);
 
-                /* @var $collection \Magento\Cms\Model\ResourceModel\Page\Collection */
+                /** @var \Magento\Cms\Model\Page $page */
                 foreach ($collection as $page) {
-                    $this->pages[$page->getIdentifier()] = $page->getPageId();
+                    $this->pages[$page->getIdentifier()] = $page->getId();
                 }
             }
         }
-
     }
 
     public function getAllFields()
@@ -231,11 +223,6 @@ class CmsPage extends AbstractEntity
         return array_unique(
             $this->pageFields
         );
-    }
-
-    public function setLogger($logger)
-    {
-        $this->_logger = $logger;
     }
 
     /**
@@ -303,7 +290,6 @@ class CmsPage extends AbstractEntity
                         $rowNum
                     );
                 }
-
             }
         }
         return $this;
@@ -353,7 +339,11 @@ class CmsPage extends AbstractEntity
                 $rowData = $this->joinIdenticalyData($rowData);
                 $rowData = $this->customChangeData($rowData);
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('page with name: %1 is not valided', $rowData['title']), $this->output, 'info');
+                    $this->addLogWriteln(
+                        __('page with name: %1 is not valided', $rowData['title']),
+                        $this->output,
+                        'info'
+                    );
                     continue;
                 }
                 $time = explode(" ", microtime());

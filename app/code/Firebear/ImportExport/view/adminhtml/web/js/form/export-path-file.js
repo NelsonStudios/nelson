@@ -20,7 +20,7 @@ define(
                 },
                 onChangeValue: function (value) {
                     if (this.isShown) {
-                       this.value('');
+                        this.value('');
                     }
                 }
             }

@@ -19,6 +19,10 @@ interface ImportInterface extends AbstractInterface
 
     const XSLT = 'xslt';
 
+    const TRANSLATE_FROM = "translate_from";
+
+    const TRANSLATE_TO = "translate_to";
+
     /**
      * Get Import Source
      *
@@ -27,18 +31,16 @@ interface ImportInterface extends AbstractInterface
     public function getImportSource();
 
     /**
-     * @return serialize
+     * @return string
      */
     public function getMapping();
 
     /**
-     *
-     * @return serialize
+     * @return string
      */
     public function getPriceRules();
 
     /**
-     *
      * @return string
      */
     public function getXslt();
@@ -53,21 +55,44 @@ interface ImportInterface extends AbstractInterface
     /**
      * @param $mapping
      *
-     * @return serialize
+     * @return ImportInterface
      */
     public function setMapping($mapping);
 
     /**
      * @param $priceRules
      *
-     * @return serialize
+     * @return ImportInterface
      */
     public function setPriceRules($priceRules);
 
     /**
      * @param $xslt
      *
-     * @return string
+     * @return ImportInterface
      */
     public function setXslt($xslt);
+
+    /**
+     * @return mixed
+     */
+    public function getTranslateFrom();
+
+    /**
+     * @return mixed
+     */
+    public function getTranslateTo();
+    /**
+     * @param $val
+     *
+     * @return mixed
+     */
+    public function setTranslateFrom($val);
+
+    /**
+     * @param $val
+     *
+     * @return mixed
+     */
+    public function setTranslateTo($val);
 }

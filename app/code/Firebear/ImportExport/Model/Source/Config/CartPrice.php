@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Source\Config;
 
 use Magento\Framework\Option\ArrayInterface;
 
+/**
+ * Class CartPrice
+ *
+ * @package Firebear\ImportExport\Model\Source\Config
+ */
 class CartPrice implements ArrayInterface
 {
     /**
@@ -31,9 +36,16 @@ class CartPrice implements ArrayInterface
         ['value'=>'discount_amount','label'=>__('Discount Amount')]
         ];
     }
-    public function toArray() {
+    public function toArray()
+    {
         return [
-        0=>__('name'),1=>__('is_active'),2=>__('website_ids'),3=>__('customer_group_ids'),4=>__('coupon_type'),5=>__('coupon_code'),6=>__('discount_amount')
+            __('name'),
+            __('is_active'),
+            __('website_ids'),
+            __('customer_group_ids'),
+            __('coupon_type'),
+            __('coupon_code'),
+            __('discount_amount')
         ];
     }
 }

@@ -15,7 +15,7 @@ define(
         return Element.extend(
             {
                 defaults: {
-                      listens: {
+                    listens: {
                         "value": "onChangeValue",
                         "${$.ns}.${$.ns}.source.type_file:value": "onFormatValue"
                     }
@@ -48,7 +48,10 @@ define(
                                 }
                                 var map = reg.get(this.ns + '.' + this.ns + '.source_data_map_container.source_data_map');
                                 var mapCategory = reg.get(this.ns + '.' + this.ns + '.source_data_map_container_category.source_data_categories_map');
-                                map.deleteRecords();
+                                var removeMapping = reg.get(this.ns + '.' + this.ns + '.source.remove_current_mappings');
+                                if (removeMapping !== undefined && removeMapping.value() == 1) {
+                                    map.deleteRecords();
+                                }
                                 map._updateCollection();
                                 mapCategory.deleteRecords();
                                 mapCategory._updateCollection();

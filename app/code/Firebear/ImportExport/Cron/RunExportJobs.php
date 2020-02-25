@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Cron;
 
 use Firebear\ImportExport\Model\ExportJob\Processor;
 
+/**
+ * Class RunExportJobs
+ *
+ * @package Firebear\ImportExport\Cron
+ */
 class RunExportJobs
 {
     /**

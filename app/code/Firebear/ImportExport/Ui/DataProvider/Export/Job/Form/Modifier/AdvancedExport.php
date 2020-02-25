@@ -6,9 +6,10 @@
 
 namespace Firebear\ImportExport\Ui\DataProvider\Export\Job\Form\Modifier;
 
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Magento\Framework\Stdlib\ArrayManager;
 use Firebear\ImportExport\Model\Source\Export\Config;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 
 /**
  * Data provider for advanced inventory form
@@ -29,21 +30,27 @@ class AdvancedExport implements ModifierInterface
      * @var \Firebear\ImportExport\Model\Export\Dependencies\Config
      */
     protected $configExDi;
+    /** @var \Magento\Framework\ObjectManagerInterface */
+    protected $objectManager;
 
     /**
      * AdvancedExport constructor.
+     *
      * @param ArrayManager $arrayManager
      * @param Config $config
      * @param \Firebear\ImportExport\Model\Export\Dependencies\Config $configExDi
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
      */
     public function __construct(
         ArrayManager $arrayManager,
         Config $config,
-        \Firebear\ImportExport\Model\Export\Dependencies\Config $configExDi
+        \Firebear\ImportExport\Model\Export\Dependencies\Config $configExDi,
+        ObjectManagerInterface $objectManager
     ) {
         $this->arrayManager = $arrayManager;
         $this->config = $config;
         $this->configExDi = $configExDi;
+        $this->objectManager = $objectManager;
     }
 
     /**
@@ -95,7 +102,7 @@ class AdvancedExport implements ModifierInterface
                         'required-entry' => true
                     ];
                 }
-                if (isset($values['component']) && ($values['component'])) {
+                if (isset($values['component']) && $values['component']) {
                     $localConfig['component'] = $values['component'];
                 }
                 if (isset($values['validation'])) {
@@ -104,15 +111,26 @@ class AdvancedExport implements ModifierInterface
                 if (isset($values['notice']) && $values['notice']) {
                     $localConfig['notice'] = __($values['notice']);
                 }
+                if (isset($values['formElement']) && $values['formElement']) {
+                    $localConfig['formElement'] = $values['formElement'];
+                }
                 $sortOrder += 10;
                 $config = array_merge($generalConfig, $localConfig);
-                $childrenArray[$nameSource . $typeName . "_" . $name] = [
+                $childrenArray[$nameSource . $typeName . '_' . $name] = [
                     'arguments' => [
                         'data' => [
                             'config' => $config
                         ],
                     ]
                 ];
+                if (isset($values['options']) && $values['options']) {
+                    $childrenArray[$nameSource . $typeName . '_' . $name]['arguments']['data']['options'] = $this
+                        ->objectManager->create($values['options']);
+                }
+                if (isset($values['source_options']) && $values['source_options']) {
+                    $childrenArray[$nameSource . $typeName . '_' . $name]['arguments']['data']['source_options'] = $this
+                        ->objectManager->create($values['source_options']);
+                }
             }
         }
 
@@ -142,7 +160,7 @@ class AdvancedExport implements ModifierInterface
             if (isset($type['fields'])) {
                 foreach ($type['fields'] as $name => $values) {
                     $localConfig = [
-                        'label' => $values['label'],
+                        'label' => $type['label'].' '.__('Entities'),
                         'sortOrder' => $sortOrder,
                         'valuesForOptions' => [
                             $typeName => $typeName
@@ -171,13 +189,14 @@ class AdvancedExport implements ModifierInterface
     }
 
     /**
-     * @return void
+     * @param array $meta
+     *
+     * @return array
      */
-    private function prepareMeta()
+    private function prepareMeta($meta)
     {
         $meta['source'] = ['children' => $this->addFieldSource()];
         $meta['behavior'] = ['children' => $this->addFieldsDependencies()];
-
         return $meta;
     }
 }

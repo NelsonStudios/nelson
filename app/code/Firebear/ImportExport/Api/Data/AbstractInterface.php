@@ -81,7 +81,7 @@ interface AbstractInterface
     public function getSourceData();
 
     /**
-     * @return date|null
+     * @return string|null
      */
     public function getFileUpdatedAt();
 

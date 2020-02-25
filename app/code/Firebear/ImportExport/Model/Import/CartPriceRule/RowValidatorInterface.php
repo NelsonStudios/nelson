@@ -8,7 +8,7 @@ namespace Firebear\ImportExport\Model\Import\CartPriceRule;
 interface RowValidatorInterface extends \Magento\Framework\Validator\ValidatorInterface
 {
     const ERROR_INVALID_TITLE= 'InvalidValueTITLE';
-  
+
     const ERROR_TITLE_IS_EMPTY = 'EmptyTITLE';
 
     /**

@@ -24,7 +24,13 @@ define(
                 },
                 toggleVisibility: function (selected) {
                     this.isShown = (selected in this.valuesForOptions);
-                    var bool = reg.get(this.ns + '.' + this.ns + '.source.check_button').showMap();
+                    var button = reg.get(this.ns + "." + this.ns + ".source.check_button");
+                    var bool = 1;
+                    if (button !== undefined) {
+                        if (button.component == 'Firebear_ImportExport/js/components/button-check') {
+                            bool = button.showMap();
+                        }
+                    }
                     this.visible((this.isShown == true && bool == 1) ? true : false);
                     if (this.openOnShow) {
                         this.opened((this.isShown == true && bool == 1) ? true : false);

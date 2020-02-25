@@ -7,46 +7,33 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Firebear\ImportExport\Ui\Component\Form\Categories\Options as CategoryOptions;
 
+/**
+ * Class Downcategories
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Downcategories extends JobController
 {
     /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var \Firebear\ImportExport\Ui\Component\Form\Categories\Options
+     * @var CategoryOptions
      */
     protected $categories;
 
-
     /**
-     * Downfields constructor.
+     * Downcategories constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param \Firebear\ImportExport\Ui\Component\Form\Categories\Options $categories
+     * @param CategoryOptions $categories
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Firebear\ImportExport\Ui\Component\Form\Categories\Options $categories
+        CategoryOptions $categories
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
+        parent::__construct($context);
         $this->categories = $categories;
     }
 
@@ -56,7 +43,7 @@ class Downcategories extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         if ($this->getRequest()->isAjax()) {
             $options = $this->categories->toOptionArray();
 

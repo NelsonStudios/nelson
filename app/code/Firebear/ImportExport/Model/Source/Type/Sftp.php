@@ -6,9 +6,16 @@
 
 namespace Firebear\ImportExport\Model\Source\Type;
 
+use Firebear\ImportExport\Model\Filesystem\Io\Sftp as IoSftp;
+
+/**
+ * Class Sftp
+ *
+ * @package Firebear\ImportExport\Model\Source\Type
+ */
 class Sftp extends AbstractType
 {
-    const SFTP_SOURCE = 'Firebear\ImportExport\Model\Filesystem\Io\Sftp';
+    const SFTP_SOURCE = IoSftp::class;
 
     /**
      * @var string
@@ -146,14 +153,17 @@ class Sftp extends AbstractType
                         $currentDate = "-" . $this->timezone->date()->format($format);
                     }
                     $info = pathinfo($this->getData('file_path'));
-                    $sourceFilePath =  $info['dirname'] . '/' . $info['filename'] . $currentDate . '.' . $info['extension'];
+                    $sourceFilePath =  $info['dirname'] . '/' . $info['filename'] .
+                        $currentDate . '.' . $info['extension'];
 
                     $filePath = $this->directory->getAbsolutePath($path);
+                    $client->mkdir($info['dirname']);
                     $result = $client->write($sourceFilePath, $filePath);
                     if (!$result) {
                         $result = false;
                         $errors[] = __('File not found');
                     }
+                    $client->close();
                 } else {
                     $result = false;
                     $errors[] = __("Can't initialize %s client", $this->code);

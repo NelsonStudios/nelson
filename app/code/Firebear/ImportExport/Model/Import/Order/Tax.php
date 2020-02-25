@@ -16,7 +16,7 @@ class Tax extends AbstractAdapter
      * Entity Type Code
      *
      */
-    const ENTITY_TYPE_CODE = 'order'; 
+    const ENTITY_TYPE_CODE = 'order';
 
     /**
      * Entity Id Column Name
@@ -25,32 +25,25 @@ class Tax extends AbstractAdapter
     const COLUMN_ENTITY_ID = 'tax_id';
 
     /**
-     * Order Id Column Name
-     *
-     */
-    const COLUMN_ORDER_ID = 'order_id';     
-
-    /**
      * Code Column Name
      *
      */
-    const COLUMN_CODE = 'code'; 
+    const COLUMN_CODE = 'code';
 
     /**
      * Percent Column Name
      *
      */
-    const COLUMN_PERCENT = 'percent'; 
-    
+    const COLUMN_PERCENT = 'percent';
+
     /**
      * Error Codes
-     */       
-	const ERROR_ENTITY_ID_IS_EMPTY = 'taxEntityIdIsEmpty';
-	const ERROR_ORDER_ID_IS_EMPTY = 'taxOrderIdIsEmpty';
-	const ERROR_CODE_IS_EMPTY = 'taxCodeIsEmpty';
-	const ERROR_PERCENT_IS_EMPTY = 'taxPercentIsEmpty';	
-    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateTaxEntityId';		
-	
+     */
+    const ERROR_ENTITY_ID_IS_EMPTY = 'taxEntityIdIsEmpty';
+    const ERROR_CODE_IS_EMPTY = 'taxCodeIsEmpty';
+    const ERROR_PERCENT_IS_EMPTY = 'taxPercentIsEmpty';
+    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateTaxEntityId';
+
     /**
      * Validation Failure Message Template Definitions
      *
@@ -58,19 +51,18 @@ class Tax extends AbstractAdapter
      */
     protected $_messageTemplates = [
         self::ERROR_DUPLICATE_ENTITY_ID => 'Tax tax_id is found more than once in the import file',
-        self::ERROR_ORDER_ID_IS_EMPTY => 'Tax order_id is empty',
         self::ERROR_CODE_IS_EMPTY => 'Tax code is empty',
-        self::ERROR_PERCENT_IS_EMPTY => 'Tax percent is empty',		
-        self::ERROR_ENTITY_ID_IS_EMPTY => 'Tax tax_id is empty'     
+        self::ERROR_PERCENT_IS_EMPTY => 'Tax percent is empty',
+        self::ERROR_ENTITY_ID_IS_EMPTY => 'Tax tax_id is empty'
     ];
-    
+
     /**
      * Order Tax Table Name
      *
      * @var string
      */
-    protected $_mainTable = 'sales_order_tax';  
-	
+    protected $_mainTable = 'sales_order_tax';
+
     /**
      * Retrieve The Prepared Data
      *
@@ -79,12 +71,13 @@ class Tax extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		$rowData = $this->_extractField($rowData, 'tax');
-		return (count($rowData) && !$this->isEmptyRow($rowData)) 
-			? $rowData 
-			: false;
+        parent::prepareRowData($rowData);
+        $rowData = $this->_extractField($rowData, 'tax');
+        return (count($rowData) && !$this->isEmptyRow($rowData))
+            ? $rowData
+            : false;
     }
-    
+
     /**
      * Retrieve Entity Id If Entity Is Present In Database
      *
@@ -94,19 +87,19 @@ class Tax extends AbstractAdapter
     protected function _getExistEntityId(array $rowData)
     {
         $bind = [
-			':order_id' => $rowData[self::COLUMN_ORDER_ID],
-			':code' => $rowData[self::COLUMN_CODE],
-			':percent' => $rowData[self::COLUMN_PERCENT]
-		];
+            ':order_id' => $this->_getOrderId($rowData),
+            ':code' => $rowData[self::COLUMN_CODE],
+            ':percent' => $rowData[self::COLUMN_PERCENT]
+        ];
         /** @var $select \Magento\Framework\DB\Select */
         $select = $this->_connection->select();
         $select->from($this->getMainTable(), 'tax_id')
-			->where('order_id = :order_id')
-			->where('code = :code')
-			->where('percent = :percent');
-        
+            ->where('order_id = :order_id')
+            ->where('code = :code')
+            ->where('percent = :percent');
+
         return $this->_connection->fetchOne($select, $bind);
-    }  
+    }
 
     /**
      * Prepare Data For Update
@@ -127,14 +120,14 @@ class Tax extends AbstractAdapter
             $entityId = $this->_getNextEntityId();
             $this->_newEntities[$rowData[self::COLUMN_ENTITY_ID]] = $entityId;
         }
-		
+
         $this->taxIdsMap[$this->_getEntityId($rowData)] = $entityId;
-		$entityRow = [
-            self::COLUMN_ORDER_ID => $this->_getOrderId($rowData),           
+        $entityRow = [
+            'order_id' => $this->_getOrderId($rowData),
             self::COLUMN_ENTITY_ID => $entityId
         ];
-		/* prepare data */
-		$entityRow = $this->_prepareEntityRow($entityRow, $rowData);
+        /* prepare data */
+        $entityRow = $this->_prepareEntityRow($entityRow, $rowData);
         if ($newEntity) {
             $toCreate[] = $entityRow;
         } else {
@@ -143,9 +136,9 @@ class Tax extends AbstractAdapter
         return [
             self::ENTITIES_TO_CREATE_KEY => $toCreate,
             self::ENTITIES_TO_UPDATE_KEY => $toUpdate
-        ];		
+        ];
     }
-    
+
     /**
      * Validate Row Data For Add/Update Behaviour
      *
@@ -156,17 +149,13 @@ class Tax extends AbstractAdapter
     protected function _validateRowForUpdate(array $rowData, $rowNumber)
     {
         if ($this->_checkEntityIdKey($rowData, $rowNumber)) {
-			if (empty($rowData[self::COLUMN_ORDER_ID])) {
-				$this->addRowError(self::ERROR_ORDER_ID_IS_EMPTY, $rowNumber);
-			} 
-			
-			if (empty($rowData[self::COLUMN_CODE])) {
-				$this->addRowError(self::ERROR_CODE_IS_EMPTY, $rowNumber);
-			}
-			
-			if (empty($rowData[self::COLUMN_PERCENT])) {
-				$this->addRowError(self::ERROR_PERCENT_IS_EMPTY, $rowNumber);
-			}			
+            if (empty($rowData[self::COLUMN_CODE])) {
+                $this->addRowError(self::ERROR_CODE_IS_EMPTY, $rowNumber);
+            }
+
+            if (empty($rowData[self::COLUMN_PERCENT])) {
+                $this->addRowError(self::ERROR_PERCENT_IS_EMPTY, $rowNumber);
+            }
         }
-    } 
+    }
 }

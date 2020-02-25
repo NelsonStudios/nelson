@@ -90,7 +90,7 @@ define(
                                 form_data  : elements,
                                 source_type: source.value()
                             };
-                            var type = registry.get(self.ns + '.' + self.ns + '.source_data_map_container.platforms');
+                            var type = registry.get(self.ns + '.' + self.ns + '.settings.platforms');
                             var locale = registry.get(self.ns + '.' + self.ns + '.general.language');
                             var jobId = registry.get(self.ns + '.' + self.ns + '.general.entity_id');
                             if (type.value()) {
@@ -141,7 +141,7 @@ define(
                                             localStorage.setItem('categories', JSON.stringify(result.categories));
                                             /* check if CART PRICE RULE is the choosen entity to import */
                                             var ruleMessage=JSON.stringify(result.ruleMessages);
-                                            if(ruleMessage==undefined||ruleMessage==null) {
+                                            if (ruleMessage==undefined||ruleMessage==null) {
                                                 if ("messages" in self) {
                                                     self.messages(result.messages);
                                                 }
@@ -151,15 +151,17 @@ define(
                                             }
                                             /* show messages if CART PRICE RULE is the choosen entity to import */
                                             var show=JSON.stringify(result.show);
-                                            if(ruleMessage!=null && ruleMessage==='"Success"')
+                                            if (ruleMessage!=null && ruleMessage==='"Success"') {
                                                 self.notice($t('File validated successfully: Uploaded file is valid for cart price rule.'));
-                                            else if(ruleMessage!=null && ruleMessage==='"Error"')
+                                            } else if (ruleMessage!=null && ruleMessage==='"Error"') {
                                                 self.error([$t('Error on General: Uploaded file is not valid for cart price rule.')]);
+                                            }
                                             /* Hide mapping accordion if CART PRICE RULE is the choosen entity to import */
-                                            if (show!=null)
-                                               self.showMap(0);
-                                            else
-                                               self.showMap(1);
+                                            if (show!=null) {
+                                                self.showMap(0);
+                                            } else {
+                                                self.showMap(1);
+                                            }
                                             if ("validMap" in self) {
                                                 self.validMap = 1;
                                             }
@@ -177,7 +179,7 @@ define(
                 }
                 return form.promise();
             },
-            updateConfigurableOptions: function(options) {
+            updateConfigurableOptions: function (options) {
                 var element = registry.get(this.ns + '.' + this.ns + '.configurable.configurable_field');
                 if (element) {
                     element.updateOptions(options);

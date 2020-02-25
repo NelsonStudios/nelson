@@ -6,138 +6,69 @@
 
 namespace Firebear\ImportExport\Model\Import;
 
+use Exception;
+use Firebear\ImportExport\Helper\Data as HelperData;
+use Firebear\ImportExport\Model\ResourceModel\Import\CustomerComposite\Data as CustomerCompositeData;
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
 use Magento\CustomerImportExport\Model\Import\Address as MagentoAddress;
 use Magento\Framework\App\ObjectManager;
 use Magento\ImportExport\Model\Import\AbstractEntity;
-use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * Class Address
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class Address extends MagentoAddress
 {
-    use \Firebear\ImportExport\Traits\General;
+    use ImportTrait;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $_logger;
-
-    /**
-     * @var ConsoleOutput
-     */
-    protected $output;
-
-    protected $_debugMode;
-
-    protected $duplicateFields = [];
-    
     /**
      * Customers Ids
      *
      * @var array[]
      */
-    protected $_customerIds = [];    
+    protected $_customerIds = [];
 
     /**
-     * @param \Magento\Framework\Stdlib\StringUtils $string
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\ImportExport\Model\ImportFactory $importFactory
-     * @param \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @param ProcessingErrorAggregatorInterface $errorAggregator
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\ImportExport\Model\Export\Factory $collectionFactory
-     * @param \Magento\Eav\Model\Config $eavConfig
-     * @param \Magento\CustomerImportExport\Model\ResourceModel\Import\Customer\StorageFactory $storageFactory
-     * @param \Magento\Customer\Model\AddressFactory $addressFactory
-     * @param \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionColFactory
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Customer\Model\ResourceModel\Address\CollectionFactory $addressColFactory
-     * @param \Magento\Customer\Model\ResourceModel\Address\Attribute\CollectionFactory $attributesFactory
-     * @param \Magento\Framework\Stdlib\DateTime $dateTime
-     * @param \Magento\Customer\Model\Address\Validator\Postcode $postcodeValidator
-     * @param \Symfony\Component\Console\Output\ConsoleOutput $output
-     * @param \Firebear\ImportExport\Helper\Data $helper
-     * @param LoggerInterface $logger
-     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData
-     * @param array $data
+     * @var CustomerCompositeData
      */
-    public function __construct(
-        \Magento\Framework\Stdlib\StringUtils $string,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\ImportExport\Model\ImportFactory $importFactory,
-        \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper,
-        \Magento\Framework\App\ResourceConnection $resource,
-        ProcessingErrorAggregatorInterface $errorAggregator,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\ImportExport\Model\Export\Factory $collectionFactory,
-        \Magento\Eav\Model\Config $eavConfig,
-        \Magento\CustomerImportExport\Model\ResourceModel\Import\Customer\StorageFactory $storageFactory,
-        \Magento\Customer\Model\AddressFactory $addressFactory,
-        \Magento\Directory\Model\ResourceModel\Region\CollectionFactory $regionColFactory,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\ResourceModel\Address\CollectionFactory $addressColFactory,
-        \Magento\Customer\Model\ResourceModel\Address\Attribute\CollectionFactory $attributesFactory,
-        \Magento\Framework\Stdlib\DateTime $dateTime,
-        \Magento\Customer\Model\Address\Validator\Postcode $postcodeValidator,
-        \Symfony\Component\Console\Output\ConsoleOutput $output,
-        \Firebear\ImportExport\Helper\Data $helper,
-        LoggerInterface $logger,
-        \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData,
-        array $data = []
-    ) {
-        parent::__construct(
-            $string,
-            $scopeConfig,
-            $importFactory,
-            $resourceHelper,
-            $resource,
-            $errorAggregator,
-            $storeManager,
-            $collectionFactory,
-            $eavConfig,
-            $storageFactory,
-            $addressFactory,
-            $regionColFactory,
-            $customerFactory,
-            $addressColFactory,
-            $attributesFactory,
-            $dateTime,
-            $postcodeValidator,
-            $data
-        );
-        $this->_logger = $logger;
-        $this->output = $output;
-        $this->_debugMode = $helper->getDebugMode();
-        if (isset($data['data_source_model'])) {
-            $this->_dataSourceModel = $data['data_source_model'];
-        } else {
-            $this->_dataSourceModel = $importFireData;
-        }
-        $this->_initAddresses();
-    }
-    
+    protected $_dataSourceModel;
+
     /**
-     * Initialize existent addresses data
-     *
-     * @return $this
+     * @return MagentoAddress|void
      */
-    protected function _initAddresses()
+    protected function _initAttributes()
     {
-        /** @var $address \Magento\Customer\Model\Address */
-        foreach ($this->_addressCollection as $address) {
-            $customerId = $address->getParentId();
-            if (!isset($this->_addresses[$customerId])) {
-                $this->_addresses[$customerId] = [];
-            }
-            $addressId = $address->getId();
-            if (!in_array($addressId, $this->_addresses[$customerId])) {
-                $this->_addresses[$customerId][] = $addressId;
-            }
+        $objectManager = ObjectManager::getInstance();
+        $this->output = $objectManager->get(ConsoleOutput::class);
+
+        if ($this->_dataSourceModel instanceof \Magento\ImportExport\Model\ResourceModel\Import\Data) {
+            $this->_dataSourceModel = $objectManager
+                ->create(CustomerCompositeData::class, [
+                    'arguments' => [
+                        'entity_type' => 'address'
+                    ],
+                ]);
         }
-        return $this;
+
+        if (!$this->_logger) {
+            $this->_logger = $objectManager->get(LoggerInterface::class);
+        }
+        $this->_helper = $objectManager->get(HelperData::class);
+
+        $this->_attributes['increment_id'] = [
+            'code' => 'increment_id',
+            'is_required' => false,
+            'type' => 'int',
+            'is_static' => true
+        ];
+
+        parent::_initAttributes();
     }
-    
+
     /**
      * @return array
      */
@@ -149,6 +80,56 @@ class Address extends MagentoAddress
         return array_unique($options);
     }
 
+    public function customChangeData($rowData)
+    {
+        // Add _entity_id if field increment_id exists
+        $columnIncrementId = 'increment_id';
+        if (!empty($rowData[$columnIncrementId])) {
+            $email = strtolower($rowData[self::COLUMN_EMAIL]);
+            $website = $rowData[self::COLUMN_WEBSITE];
+            $parentId = $this->_getCustomerId($email, $website);
+
+            if ($parentId) {
+                $select = $this->_connection->select()
+                    ->from($this->_entityTable, ['entity_id'])
+                    ->where($columnIncrementId . ' = ?', $rowData[$columnIncrementId])
+                    ->where('parent_id = ?', $parentId);
+
+                $entityId = $this->_connection->fetchOne($select);
+
+                if ($entityId) {
+                    $rowData[static::COLUMN_ADDRESS_ID] = $entityId;
+                }
+            }
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param $rowData
+     * @return $this
+     */
+    public function removeCustomerAddress($rowData)
+    {
+        $email = $rowData[self::COLUMN_EMAIL] ?? '';
+        $website = $rowData[self::COLUMN_WEBSITE] ?? '';
+        if (!empty($email) && !empty($website)) {
+            $customerId = $this->_getCustomerId($rowData[self::COLUMN_EMAIL], $rowData[self::COLUMN_WEBSITE]);
+            if ($customerId) {
+                try {
+                    $this->_connection->delete(
+                        $this->_entityTable,
+                        ['parent_id IN (?)' => $customerId]
+                    );
+                } catch (Exception $e) {
+                    $this->addLogWriteln($e->getMessage(), $this->output, 'error');
+                }
+            }
+        }
+
+        return $this;
+    }
     /**
      * @return bool
      */
@@ -159,8 +140,10 @@ class Address extends MagentoAddress
             $updateRows = [];
             $attributes = [];
             $defaults = [];
-
             $deleteRowIds = [];
+            if (\method_exists($this, 'prepareCustomerData')) {
+                $this->prepareCustomerData($bunch);
+            }
             foreach ($bunch as $rowNumber => $rowData) {
                 $time = explode(" ", microtime());
                 $startTime = $time[0] + $time[1];
@@ -175,26 +158,38 @@ class Address extends MagentoAddress
                     $this->getErrorAggregator()->addRowToSkip($rowNumber);
                     continue;
                 }
-
-                if ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE) {
-                    $addUpdateResult = $this->_prepareDataForUpdate($rowData);
-                    if ($addUpdateResult['entity_row_new']) {
-                        $newRows[] = $addUpdateResult['entity_row_new'];
+                if (isset($this->_parameters['remove_all_customer_address'])
+                    && $this->_parameters['remove_all_customer_address'] == 1
+                ) {
+                    $this->removeCustomerAddress($rowData);
+                }
+                if (\Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE == $this->getBehavior($rowData)) {
+                    $updateResult = $this->_prepareDataForUpdate($rowData);
+                    if ($updateResult['entity_row_new']) {
+                        $newRows[] = $updateResult['entity_row_new'];
                     }
-                    if ($addUpdateResult['entity_row_update']) {
-                        $updateRows[] = $addUpdateResult['entity_row_update'];
+                    if ($updateResult['entity_row_update']) {
+                        $updateRows[] = $updateResult['entity_row_update'];
                     }
-                    $attributes = $this->_mergeEntityAttributes($addUpdateResult['attributes'], $attributes);
-                    $defaults = $this->_mergeEntityAttributes($addUpdateResult['defaults'], $defaults);
+                    $attributes = $this->_mergeEntityAttributes($updateResult['attributes'], $attributes);
+                    $defaults = $this->_mergeEntityAttributes($updateResult['defaults'], $defaults);
                 } elseif ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_DELETE) {
                     $deleteRowIds[] = $rowData[self::COLUMN_ADDRESS_ID];
                 }
                 $endTime = $time[0] + $time[1];
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
-                $this->addLogWriteln(__('address with email: %1 .... %2s', $email, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(
+                    __('address with email: %1 .... %2s', $email, $totalTime),
+                    $this->output,
+                    'info'
+                );
             }
-            $this->updateItemsCounterStats($newRows, $updateRows, $deleteRowIds);
+            $this->updateItemsCounterStats(
+                $newRows,
+                $updateRows,
+                $deleteRowIds
+            );
             $this->_saveAddressEntities(
                 $newRows,
                 $updateRows
@@ -208,13 +203,13 @@ class Address extends MagentoAddress
         }
         return true;
     }
-    
+
     /**
      * Set customer id
      *
      * @param string $email
      * @param string $websiteCode
-     * @param integer $customerId   
+     * @param integer $customerId
      * @return $this
      */
     public function setCustomerId($email, $websiteCode, $customerId)
@@ -222,8 +217,8 @@ class Address extends MagentoAddress
         $email = strtolower(trim($email));
         $this->_customerIds[$email][$websiteCode] = $customerId;
         return $this;
-    }  
-    
+    }
+
     /**
      * Get customer id if customer is present in database
      *
@@ -237,45 +232,31 @@ class Address extends MagentoAddress
         if (isset($this->_websiteCodeToId[$websiteCode])) {
             $websiteId = $this->_websiteCodeToId[$websiteCode];
             if (isset($this->_customerIds[$email][$websiteId])) {
-				return $this->_customerIds[$email][$websiteId];
+                return $this->_customerIds[$email][$websiteId];
             }
         }
         return parent::_getCustomerId($email, $websiteCode);
     }
-    
-    public function _mergeEntityAttributes(array $newAttributes, array $attributes)
-    {
-        return parent::_mergeEntityAttributes($newAttributes, $attributes); // TODO: Change the autogenerated stub
-    }
 
-    public function _prepareDataForUpdate(array $rowData)
+    public function _prepareDataForUpdate(array $rowData):array
     {
-		return parent::_prepareDataForUpdate($rowData); // TODO: Change the autogenerated stub     
-    }
-
-    public function _saveAddressEntities(array $addRows, array $updateRows)
-    {
-        return parent::_saveAddressEntities($addRows, $updateRows); // TODO: Change the autogenerated stub
-    }
-
-    public function _saveAddressAttributes(array $attributesData)
-    {
-        return parent::_saveAddressAttributes($attributesData); // TODO: Change the autogenerated stub
-    }
-
-    public function _saveCustomerDefaults(array $defaults)
-    {
-        return parent::_saveCustomerDefaults($defaults); // TODO: Change the autogenerated stub
-    }
-
-    public function _deleteAddressEntities(array $entityRowIds)
-    {
-        return parent::_deleteAddressEntities($entityRowIds); // TODO: Change the autogenerated stub
-    }
-
-    public function _isOptionalAddressEmpty(array $rowData)
-    {
-        return parent::_isOptionalAddressEmpty($rowData); // TODO: Change the autogenerated stub
+        $updateData = parent::_prepareDataForUpdate($rowData);
+        if ($updateData['entity_row_new'] && count($updateData['entity_row_new'])) {
+            $updateData['entity_row_new']['entity_id'] = $rowData['_entity_id'];
+            $defaults = [];
+            foreach (self::getDefaultAddressAttributeMapping() as $columnName => $attributeCode) {
+                if (!empty($rowData[$columnName]) && $rowData[self::COLUMN_ADDRESS_ID]) {
+                    $email = strtolower($rowData[self::COLUMN_EMAIL]);
+                    $customerId = $this->_getCustomerId($email, $rowData[self::COLUMN_WEBSITE]);
+                    $table = $this->_getCustomerEntity()->getResource()->getTable('customer_entity');
+                    $defaults[$table][$customerId][$attributeCode] = $rowData[self::COLUMN_ADDRESS_ID];
+                }
+            }
+            if (!empty($defaults)) {
+                $updateData['defaults'] = $defaults;
+            }
+        }
+        return $updateData;
     }
 
     protected function _saveValidatedBunches()
@@ -319,6 +300,9 @@ class Address extends MagentoAddress
                 $valid = true;
                 try {
                     $rowData = $source->current();
+                    if (\method_exists($this, 'prepareCustomerData')) {
+                        $this->prepareCustomerData([$rowData]);
+                    }
                     foreach ($rowData as $attrName => $element) {
                         if (!mb_check_encoding($element, 'UTF-8')) {
                             $valid = false;
@@ -369,24 +353,5 @@ class Address extends MagentoAddress
             }
         }
         return $this;
-    }
-
-    protected function _validateRowForDelete(array $rowData, $rowNumber)
-    {
-        if ($this->_checkUniqueKey($rowData, $rowNumber)) {
-            $email = strtolower($rowData[self::COLUMN_EMAIL]);
-            $website = $rowData[self::COLUMN_WEBSITE];
-            $addressId = $rowData[self::COLUMN_ADDRESS_ID];
-            $customerId = $this->_getCustomerId($email, $website);
-            if ($customerId === false) {
-                $this->addRowError(self::ERROR_CUSTOMER_NOT_FOUND, $rowNumber);
-            } else {
-                if (!strlen($addressId)) {
-                    $this->addRowError(self::ERROR_ADDRESS_ID_IS_EMPTY, $rowNumber);
-                } elseif (!isset($this->_addresses[$customerId]) || !in_array($addressId, $this->_addresses[$customerId])) {
-                    $this->addRowError(self::ERROR_ADDRESS_NOT_FOUND, $rowNumber);
-                }
-            }
-        }
     }
 }

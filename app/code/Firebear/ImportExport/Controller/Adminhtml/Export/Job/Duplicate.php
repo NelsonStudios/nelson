@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
+/**
+ * Class Duplicate
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Duplicate extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
     /**
@@ -17,10 +22,10 @@ class Duplicate extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
         $jobId = $this->getRequest()->getParam('entity_id');
         if ($jobId) {
             try {
-                $model = $this->exportRepository->getById($jobId);
+                $model = $this->repository->getById($jobId);
                 $model->setId(null);
                 $model->setTitle($model->getTitle() . "1");
-                $newJob =  $this->exportRepository->save($model);
+                $newJob =  $this->repository->save($model);
                 $this->messageManager->addSuccessMessage(__('You duplicate the job.'));
 
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $newJob->getId()]);

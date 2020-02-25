@@ -17,7 +17,7 @@ class Item extends AbstractAdapter
      * Entity Type Code
      *
      */
-    const ENTITY_TYPE_CODE = 'order'; 
+    const ENTITY_TYPE_CODE = 'order';
 
     /**
      * Entity Id Column Name
@@ -29,22 +29,22 @@ class Item extends AbstractAdapter
      * Invoice Id Column Name
      *
      */
-    const COLUMN_INVOICE_ID = 'parent_id';  
-	
+    const COLUMN_INVOICE_ID = 'parent_id';
+
     /**
      * Order Item Id Column Name
      *
      */
-    const COLUMN_ORDER_ITEM_ID = 'order_item_id'; 
-    
+    const COLUMN_ORDER_ITEM_ID = 'order_item_id';
+
     /**
      * Error Codes
-     */       
-	const ERROR_ENTITY_ID_IS_EMPTY = 'invoiceItemIdIsEmpty';
-	const ERROR_INVOICE_ID_IS_EMPTY = 'invoiceItemParentIdIsEmpty';
-    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateInvoiceItemId';	
-	const ERROR_ORDER_ITEM_ID_IS_EMPTY = 'invoiceItemOrderItemIdIsEmpty';
-	
+     */
+    const ERROR_ENTITY_ID_IS_EMPTY = 'invoiceItemIdIsEmpty';
+    const ERROR_INVOICE_ID_IS_EMPTY = 'invoiceItemParentIdIsEmpty';
+    const ERROR_DUPLICATE_ENTITY_ID = 'duplicateInvoiceItemId';
+    const ERROR_ORDER_ITEM_ID_IS_EMPTY = 'invoiceItemOrderItemIdIsEmpty';
+
     /**
      * Validation Failure Message Template Definitions
      *
@@ -54,7 +54,7 @@ class Item extends AbstractAdapter
         self::ERROR_DUPLICATE_ENTITY_ID => 'Invoice Item entity_id is found more than once in the import file',
         self::ERROR_ENTITY_ID_IS_EMPTY => 'Invoice Item entity_id is empty',
         self::ERROR_INVOICE_ID_IS_EMPTY => 'Invoice Item parent_id is empty',
-		self::ERROR_ORDER_ITEM_ID_IS_EMPTY => 'Invoice Item order_item_id is empty',
+        self::ERROR_ORDER_ITEM_ID_IS_EMPTY => 'Invoice Item order_item_id is empty',
     ];
 
     /**
@@ -62,9 +62,9 @@ class Item extends AbstractAdapter
      *
      * @var string
      */
-    protected $_mainTable = 'sales_invoice_item';  
+    protected $_mainTable = 'sales_invoice_item';
 
-   /**
+    /**
      * Retrieve The Prepared Data
      *
      * @param array $rowData
@@ -72,12 +72,13 @@ class Item extends AbstractAdapter
      */
     public function prepareRowData(array $rowData)
     {
-		$rowData = $this->_extractField($rowData, 'invoice_item');
-		return (count($rowData) && !$this->isEmptyRow($rowData)) 
-			? $rowData 
-			: false;
+        parent::prepareRowData($rowData);
+        $rowData = $this->_extractField($rowData, 'invoice_item');
+        return (count($rowData) && !$this->isEmptyRow($rowData))
+            ? $rowData
+            : false;
     }
-	
+
     /**
      * Retrieve Entity Id If Entity Is Present In Database
      *
@@ -87,18 +88,18 @@ class Item extends AbstractAdapter
     protected function _getExistEntityId(array $rowData)
     {
         $bind = [
-			':order_item_id' => $this->_getOrderItemId($rowData),
-			':parent_id' => $this->_getInvoiceId($rowData)
-		];
+            ':order_item_id' => $this->_getOrderItemId($rowData),
+            ':parent_id' => $this->_getInvoiceId($rowData)
+        ];
         /** @var $select \Magento\Framework\DB\Select */
         $select = $this->_connection->select();
         $select->from($this->getMainTable(), 'entity_id')
-			->where('parent_id = :parent_id')
-			->where('order_item_id = :order_item_id');
+            ->where('parent_id = :parent_id')
+            ->where('order_item_id = :order_item_id');
 
         return $this->_connection->fetchOne($select, $bind);
-    } 
-	
+    }
+
     /**
      * Prepare Data For Update
      *
@@ -118,14 +119,14 @@ class Item extends AbstractAdapter
             $entityId = $this->_getNextEntityId();
             $this->_newEntities[$rowData[self::COLUMN_ENTITY_ID]] = $entityId;
         }
-        
-		$entityRow = [           
+
+        $entityRow = [
             'entity_id' => $entityId,
-			'parent_id' => $this->_getInvoiceId($rowData),
-			'order_item_id' => $this->_getOrderItemId($rowData)
-        ];        
-		/* prepare data */
-		$entityRow = $this->_prepareEntityRow($entityRow, $rowData);
+            'parent_id' => $this->_getInvoiceId($rowData),
+            'order_item_id' => $this->_getOrderItemId($rowData)
+        ];
+        /* prepare data */
+        $entityRow = $this->_prepareEntityRow($entityRow, $rowData);
         if ($newEntity) {
             $toCreate[] = $entityRow;
         } else {
@@ -134,9 +135,9 @@ class Item extends AbstractAdapter
         return [
             self::ENTITIES_TO_CREATE_KEY => $toCreate,
             self::ENTITIES_TO_UPDATE_KEY => $toUpdate
-        ];		
+        ];
     }
-    
+
     /**
      * Validate Row Data For Add/Update Behaviour
      *
@@ -147,13 +148,13 @@ class Item extends AbstractAdapter
     protected function _validateRowForUpdate(array $rowData, $rowNumber)
     {
         if ($this->_checkEntityIdKey($rowData, $rowNumber)) {
-			if (empty($rowData[self::COLUMN_INVOICE_ID])) {
-				$this->addRowError(self::ERROR_INVOICE_ID_IS_EMPTY, $rowNumber);
-			} 
-			
-			if (empty($rowData[self::COLUMN_ORDER_ITEM_ID])) {
-				$this->addRowError(self::ERROR_ORDER_ITEM_ID_IS_EMPTY, $rowNumber);
-			} 			
+            if (empty($rowData[self::COLUMN_INVOICE_ID])) {
+                $this->addRowError(self::ERROR_INVOICE_ID_IS_EMPTY, $rowNumber);
+            }
+
+            if (empty($rowData[self::COLUMN_ORDER_ITEM_ID])) {
+                $this->addRowError(self::ERROR_ORDER_ITEM_ID_IS_EMPTY, $rowNumber);
+            }
         }
-    }      
+    }
 }

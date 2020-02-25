@@ -7,8 +7,13 @@ namespace Firebear\ImportExport\Model\Import\Source;
 
 use Magento\Framework\Filesystem\Directory\Read as Directory;
 use Magento\ImportExport\Model\Import\AbstractSource;
+use Firebear\ImportExport\Model\Import\Source\Spout\Ods\RowIterator as FirebearRowIterator;
+use Firebear\ImportExport\Model\Import\Source\Spout\Ods\Helper\CellValueFormatter as FirebearCellValueFormatter;
+use Firebear\ImportExport\Model\Source\Platform\PlatformInterface;
 use Firebear\ImportExport\Traits\Import\Map as ImportMap;
 use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\ODS\RowIterator;
+use Box\Spout\Reader\ODS\Helper\CellValueFormatter;
 use Box\Spout\Common\Type;
 
 /**
@@ -17,79 +22,86 @@ use Box\Spout\Common\Type;
 class Ods extends AbstractSource
 {
     use ImportMap;
-	
+
     /**
      * Row Iterator
      *
-     * @var \Box\Spout\Reader\ODS\RowIterator
-     */     
+     * @var RowIterator
+     */
     protected $rowIterator;
-    
+
     /**
      * Spreadsheet Reader
      *
      * @var \Box\Spout\Reader\ODS\Reader
-     */     
+     */
     protected $reader;
-    
+
     /**
      * Column Map
      *
      * @var array
-     */     
+     */
     protected $maps = [];
-    
+
     /**
      * Office Document File Extension
      *
      * @var array
-     */       
+     */
     protected $extension = 'ods';
-    
+
     /**
      * Platform
      *
-     * @var mixed
-     */    
+     * @var \Firebear\ImportExport\Model\Source\Platform\PlatformInterface
+     */
     protected $platform;
-    
+
     /**
      * Initialize Adapter
-     * 
+     *
      * @param array $file
      * @param Directory $directory
+     * @param PlatformInterface $platform
+     * @throws \Exception
      */
     public function __construct(
         $file,
-        Directory $directory
+        Directory $directory,
+        PlatformInterface $platform = null
     ) {
-		$alias = 'Box\Spout\Reader\ODS\RowIterator';
-		$original = 'Firebear\ImportExport\Model\Import\Source\Spout\Ods\RowIterator';
-		class_alias($original, $alias);
-		
-		$alias = 'Box\Spout\Reader\ODS\Helper\CellValueFormatter';
-		$original = 'Firebear\ImportExport\Model\Import\Source\Spout\Ods\Helper\CellValueFormatter';
-		class_alias($original, $alias);
-		
-		$file = $directory->getAbsolutePath($file);
-		$this->reader = ReaderFactory::create(Type::ODS);
-		$this->reader->setShouldFormatDates(true);
-		$this->reader->open($file);
-		
-		$sheetIterator = $this->reader->getSheetIterator();
-		$sheetIterator->rewind();
-		$sheet = $sheetIterator->current();
-		
-		$this->rowIterator = $sheet->getRowIterator();
-		
-		register_shutdown_function([$this, 'destruct']);
-		
-		$this->rewind();
-		parent::__construct(
-			$this->_getNextRow()
-		);
-    } 
-    
+        class_alias(FirebearRowIterator::class, RowIterator::class);
+        class_alias(FirebearCellValueFormatter::class, CellValueFormatter::class);
+
+        $this->platform = $platform;
+        $file = $directory->getAbsolutePath($file);
+        $this->reader = ReaderFactory::create(Type::ODS);
+        $this->reader->setShouldFormatDates(true);
+        $this->reader->open($file);
+
+        $sheetIterator = $this->reader->getSheetIterator();
+        $sheetIterator->rewind();
+        $sheet = $sheetIterator->current();
+
+        $this->rowIterator = $sheet->getRowIterator();
+
+        register_shutdown_function([$this, 'destruct']);
+
+        $this->rewind();
+        try {
+            $originalData = $this->_getNextRow();
+            $parseData = $platform && method_exists($platform, 'prepareData')
+                ? $platform->prepareData($originalData)
+                : $originalData;
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        parent::__construct(
+            $parseData
+        );
+    }
+
     /**
      * Rewind the \Iterator to the first element (\Iterator interface)
      *
@@ -97,20 +109,22 @@ class Ods extends AbstractSource
      */
     public function rewind()
     {
-		$this->_key = 0;
-        $this->_row = [];		
+        $this->_key = 0;
+        $this->_row = [];
         if (!$this->_colQty) {
-			// Because sheet and row data is located in the file, we can't rewind both the
-			// sheet iterator and the row iterator, as XML file cannot be read backwards.
-			// Therefore, rewinding the row iterator has been disabled.
-			// @see Box\Spout\Reader\ODS\RowIterator
-			$this->rowIterator->rewind(); 
-        }		
+            /**
+             * Because sheet and row data is located in the file, we can't rewind both the
+             * sheet iterator and the row iterator, as XML file cannot be read backwards.
+             * Therefore, rewinding the row iterator has been disabled.
+             * @see RowIterator
+             */
+            $this->rowIterator->rewind();
+        }
         if ($this->_colQty) {
-			$this->next();
+            $this->next();
         }
     }
-    
+
     /**
      * Move forward to next element (\Iterator interface)
      *
@@ -119,7 +133,7 @@ class Ods extends AbstractSource
     public function next()
     {
         $this->_key++;
-		$this->rowIterator->next();
+        $this->rowIterator->next();
         $row = $this->_getNextRow();
         if (false === $row || [] === $row) {
             $this->_row = [];
@@ -128,7 +142,7 @@ class Ods extends AbstractSource
             $this->_row = $row;
         }
     }
-    
+
     /**
      * Return the key of the current element (\Iterator interface)
      *
@@ -136,9 +150,9 @@ class Ods extends AbstractSource
      */
     public function key()
     {
-		return $this->_key;
+        return $this->_key;
     }
-    
+
     /**
      * Checks if current position is valid (\Iterator interface)
      *
@@ -146,9 +160,9 @@ class Ods extends AbstractSource
      */
     public function valid()
     {
-		return -1 !== $this->_key && $this->rowIterator->valid();
+        return -1 !== $this->_key && $this->rowIterator->valid();
     }
-    
+
     /**
      * Render next row
      *
@@ -156,9 +170,9 @@ class Ods extends AbstractSource
      */
     protected function _getNextRow()
     {
-		return $this->rowIterator->current();
+        return $this->rowIterator->current();
     }
-    
+
     /**
      * Column names getter
      *
@@ -166,9 +180,9 @@ class Ods extends AbstractSource
      */
     public function getColNames()
     {
-		return $this->replaceColumns($this->_colNames);
+        return $this->replaceColumns($this->_colNames);
     }
-    
+
     /**
      * Set Platform
      *
@@ -190,7 +204,7 @@ class Ods extends AbstractSource
     {
         return $this->platform;
     }
-	
+
     /**
      * Close file handle
      *
@@ -201,6 +215,5 @@ class Ods extends AbstractSource
         if (is_object($this->reader)) {
             $this->reader->close();
         }
-    }    
+    }
 }
- 

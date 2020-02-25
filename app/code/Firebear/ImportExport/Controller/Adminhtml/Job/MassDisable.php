@@ -6,9 +6,14 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
-use Firebear\ImportExport\Controller\Adminhtml\Job\AbstractMass;
 use Firebear\ImportExport\Api\Data\ImportInterface;
+use Firebear\ImportExport\Controller\Adminhtml\AbstractMass;
 
+/**
+ * Class MassDisable
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class MassDisable extends AbstractMass
 {
     /**

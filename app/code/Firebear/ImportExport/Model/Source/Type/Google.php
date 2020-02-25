@@ -77,7 +77,6 @@ class Google extends AbstractType
                     $read->readAll()
                 );
             } catch (\Exception $e) {
-
             }
         }
 
@@ -132,5 +131,4 @@ class Google extends AbstractType
 
         return $this->client;
     }
-
 }

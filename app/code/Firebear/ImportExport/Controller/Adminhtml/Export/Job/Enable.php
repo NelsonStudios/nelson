@@ -6,27 +6,15 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Magento\Backend\Model\View\Result\ForwardFactory;
 use Firebear\ImportExport\Api\Data\ExportInterface;
 
+/**
+ * Class Enable
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Enable extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
-    /**
-     * @var ForwardFactory
-     */
-    protected $resultForwardFactory;
-
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository,
-        ForwardFactory $resultForwardFactory
-    ) {
-        $this->resultForwardFactory = $resultForwardFactory;
-        parent::__construct($context, $coreRegistry, $exportJobFactory, $exportRepository);
-    }
-
     /**
      * Delete a job
      *
@@ -40,11 +28,11 @@ class Enable extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($jobId) {
             try {
-                $job = $this->exportRepository->getById($jobId);
+                $job = $this->repository->getById($jobId);
                 $job->setIsActive(ExportInterface::STATUS_ENABLED);
-                $this->exportRepository->save($job);
+                $this->repository->save($job);
                 $this->messageManager->addSuccessMessage(__('The job changed status.'));
-            
+
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
                 // display error message

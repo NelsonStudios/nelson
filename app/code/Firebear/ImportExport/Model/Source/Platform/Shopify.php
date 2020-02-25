@@ -21,8 +21,17 @@ use Magento\Framework\Filesystem\File\ReadFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\ClassModelFactory;
 
+/**
+ * Class Shopify
+ *
+ * @package Firebear\ImportExport\Model\Source\Platform
+ */
 class Shopify extends AbstractPlatform
 {
+    /**
+     * @var string
+     */
+    protected $separator;
 
     /**
      * @param $rowData
@@ -33,14 +42,12 @@ class Shopify extends AbstractPlatform
         $config = '';
         foreach ($rowData as $key => $item) {
             if (strpos($key, 'Option') !== false && strrpos($key, 'Name') !== false) {
-
                 if (!empty($item)) {
                     $name = str_replace("Name", "Value", $key);
                     $rowData[strtolower($item)] = str_replace("/", "|", $rowData[$name]);
                     $config .= "," . strtolower($item) . "=" . $rowData[strtolower($item)];
                 }
             }
-
         }
         if (!empty($config)) {
             $rowData['config'] = $config;
@@ -65,6 +72,9 @@ class Shopify extends AbstractPlatform
      */
     public function afterColumns($data, $maps)
     {
+        if (empty($maps)) {
+            return $data;
+        }
         $systems = [];
         foreach ($maps as $field) {
             $systems[] = $field['system'];
@@ -83,6 +93,20 @@ class Shopify extends AbstractPlatform
         return $array;
     }
 
+    /**
+     * @param $source
+     * @param $maxDataSize
+     * @param $bunchSize
+     * @param $dataSourceModel
+     * @param $parameters
+     * @param $entityTypeCode
+     * @param $behavior
+     * @param $processedRowsCount
+     * @param $separator
+     * @param Product $model
+     *
+     * @return $this
+     */
     public function saveValidatedBunches(
         $source,
         $maxDataSize,
@@ -93,7 +117,7 @@ class Shopify extends AbstractPlatform
         $behavior,
         $processedRowsCount,
         $separator,
-        $model
+        Product $model
     ) {
         $currentDataSize = 0;
         $bunchRows = [];
@@ -126,7 +150,7 @@ class Shopify extends AbstractPlatform
                     $bunchRows
                 );
                 $bunchRows = $nextRowBackup;
-                $currentDataSize = strlen(serialize($bunchRows));
+                $currentDataSize = strlen($model->getJsonHelper()->jsonEncode($bunchRows));
                 $startNewBunch = false;
                 $nextRowBackup = [];
             }

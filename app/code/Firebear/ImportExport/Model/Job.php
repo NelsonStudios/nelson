@@ -7,11 +7,17 @@
 namespace Firebear\ImportExport\Model;
 
 use Firebear\ImportExport\Api\Data\ImportInterface;
+use Firebear\ImportExport\Model\Job\Mapping;
+use Firebear\ImportExport\Model\ResourceModel\Job\Mapping\CollectionFactory;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
 /**
- * ImportExport job model
- *
+ * Class Job
+ * @package Firebear\ImportExport\Model
  */
 class Job extends AbstractModel implements ImportInterface
 {
@@ -38,7 +44,6 @@ class Job extends AbstractModel implements ImportInterface
     protected $behaviorFields = [
         'validation_strategy',
         'use_api',
-//        'type_file',
         'allowed_error_count',
         '_import_field_separator',
         '_import_multiple_value_separator',
@@ -57,7 +62,7 @@ class Job extends AbstractModel implements ImportInterface
      */
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\ResourceModel\Job');
+        $this->_init(ResourceModel\Job::class);
     }
 
     /**
@@ -71,11 +76,11 @@ class Job extends AbstractModel implements ImportInterface
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Firebear\ImportExport\Model\ResourceModel\Job\Mapping\CollectionFactory $collectionMapsFactory,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        Context $context,
+        Registry $registry,
+        CollectionFactory $collectionMapsFactory,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
@@ -224,7 +229,7 @@ class Job extends AbstractModel implements ImportInterface
                 'title' => __('Hour'),
                 'label' => __('Every hour'),
                 'value' => self::FREQUENCY_HOUR,
-                'expr' => '* */1 * * *',
+                'expr' => '0 * * * *',
             ],
             self::FREQUENCY_DAY => [
                 'title' => __('Day'),
@@ -408,7 +413,7 @@ class Job extends AbstractModel implements ImportInterface
      *
      * @return $this
      */
-    public function addMap(\Firebear\ImportExport\Model\Job\Mapping $map)
+    public function addMap(Mapping $map)
     {
         if (!$map->getId()) {
             $this->setMaps(array_merge($this->getMap(), [$map]));
@@ -480,5 +485,41 @@ class Job extends AbstractModel implements ImportInterface
     public function setXslt($xslt)
     {
         return $this->setData(self::XSLT, $xslt);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTranslateFrom()
+    {
+        return $this->getData(self::TRANSLATE_FROM);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTranslateTo()
+    {
+        return $this->getData(self::TRANSLATE_TO);
+    }
+
+    /**
+     * @param $val
+     *
+     * @return \Firebear\ImportExport\Model\Job
+     */
+    public function setTranslateFrom($val)
+    {
+        return $this->setData(self::TRANSLATE_FROM, $val);
+    }
+
+    /**
+     * @param $val
+     *
+     * @return \Firebear\ImportExport\Model\Job
+     */
+    public function setTranslateTo($val)
+    {
+        return $this->setData(self::TRANSLATE_TO, $val);
     }
 }

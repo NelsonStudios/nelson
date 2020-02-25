@@ -32,7 +32,10 @@
             jQuery('.source-fieldset').find('._required').removeClass('required-entry').prop('disabled', true);
             if (entity && entity.val()) {
                 jQuery('#upload_' + entity.val() + '_fieldset').show();
-                jQuery('#upload_' + entity.val() + '_fieldset').find('._required').addClass('required-entry').prop('disabled', false);
+                jQuery('#upload_' + entity.val() + '_fieldset')
+                    .find('._required')
+                    .addClass('required-entry')
+                    .prop('disabled', false);
             }
         };
 

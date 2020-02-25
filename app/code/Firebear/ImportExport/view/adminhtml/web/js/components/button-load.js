@@ -53,11 +53,14 @@ define(
                 },
                 action: function () {
                     var button = registry.get(this.parentName + '.validate_button');
+                    var removeMapping = registry.get(this.ns + '.' + this.ns + '.source.remove_current_mappings');
                     button.error('');
                     if (this.validateGeneral()) {
                         var map = registry.get(this.ns + '.' + this.ns + '.source_data_map_container.source_data_map');
                         var mapCategory = registry.get(this.ns + '.' + this.ns + '.source_data_map_container_category.source_data_categories_map');
-                        map.deleteRecords();
+                        if (removeMapping !== undefined && removeMapping.value() == 1) {
+                            map.deleteRecords();
+                        }
                         map._updateCollection();
                         mapCategory.deleteRecords();
                         mapCategory._updateCollection();
@@ -103,31 +106,31 @@ define(
                     var self = this;
                     var map = registry.get(this.parentName + '.source_data_map');
                     var number = map.getChildItems().length;
-                    _.each(columns, function(element, key) {
+                    _.each(columns, function (element, key) {
                         var finded = 0;
                         var number = -1;
-                        _.each(maps, function(index, num) {
+                        _.each(maps, function (index, num) {
                             if (num == element) {
                                 number = index.reference;
                             }
                         });
-                    if (number != -1) {
+                        if (number != -1) {
                             finded  = 1;
                             linked[number] = element;
                         }
                         if (!finded) {
-                        _.each(options, function(index) {
-                           if (index.label == element || index.value == element) {
-                               finded = 1;
-                           }
-                        });
+                            _.each(options, function (index) {
+                                if (index.label == element || index.value == element) {
+                                    finded = 1;
+                                }
+                            });
                         }
                         if (!finded) {
-                          nothings.push(element);
+                            nothings.push(element);
                         }
                     });
                     var defaults = {};
-                    _.each(maps, function(index, num) {
+                    _.each(maps, function (index, num) {
                         if (num == index.reference && index.default != '') {
                             defaults[index.reference] = index.default;
                         }
@@ -137,7 +140,7 @@ define(
 
                     for (var i = number; i < number + _.size(linked) + _.size(defaults); i++) {
                         map.processingAddChild(false, i, false);
-                       }
+                    }
                     _.each(
                         linked,
                         function (element, key) {
@@ -156,7 +159,7 @@ define(
                             number++;
                         }
                     );
-                    _.each(defaults, function(element, key) {
+                    _.each(defaults, function (element, key) {
                         registry.get(
                             self.parentName + ".source_data_map." + number + '.source_data_system',
                             function (system) {

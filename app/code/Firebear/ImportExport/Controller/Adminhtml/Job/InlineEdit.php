@@ -8,11 +8,7 @@
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Firebear\ImportExport\Api\Data\ImportInterface;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -23,37 +19,12 @@ use Magento\Framework\Exception\LocalizedException;
 class InlineEdit extends JobController
 {
     /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * InlineEdit constructor.
-     *
-     * @param Context                $context
-     * @param Registry               $coreRegistry
-     * @param JobFactory             $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory            $jsonFactory
-     */
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory
-    ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-    }
-
-    /**
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $error      = false;
         $messages   = [];
 
@@ -77,13 +48,13 @@ class InlineEdit extends JobController
                     $this->repository->save($job);
                 }
             } catch (LocalizedException $e) {
-                $messages[] = $this->getErrorWithPageId($job, $e->getMessage());
+                $messages[] = $this->getErrorWithJobId($job, $e->getMessage());
                 $error      = true;
             } catch (\RuntimeException $e) {
-                $messages[] = $this->getErrorWithPageId($job, $e->getMessage());
+                $messages[] = $this->getErrorWithJobId($job, $e->getMessage());
                 $error      = true;
             } catch (\Exception $e) {
-                $messages[] = $this->getErrorWithPageId(
+                $messages[] = $this->getErrorWithJobId(
                     $job,
                     __('Something went wrong while saving the job.')
                 );
@@ -97,6 +68,18 @@ class InlineEdit extends JobController
                 'error' => $error
             ]
         );
+    }
+
+    /**
+     * Add job title to error message
+     *
+     * @param ImportInterface $job
+     * @param string $errorText
+     * @return string
+     */
+    protected function getErrorWithJobId(ImportInterface $job, $errorText)
+    {
+        return '[Job ID: ' . $job->getId() . '] ' . $errorText;
     }
 
     /**

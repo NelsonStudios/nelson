@@ -22,6 +22,8 @@ class Additional extends AbstractHelper
      */
     protected $sourceFactory;
 
+    protected $sourceTypeConfig;
+
     /**
      * Additional constructor.
      * @param Context $context
@@ -29,9 +31,11 @@ class Additional extends AbstractHelper
      */
     public function __construct(
         Context $context,
-        Factory $sourceFactory
+        Factory $sourceFactory,
+        \Firebear\ImportExport\Model\Source\Config $sourceTypeConfig
     ) {
         $this->sourceFactory = $sourceFactory;
+        $this->sourceTypeConfig = $sourceTypeConfig;
         parent::__construct($context);
     }
 
@@ -44,7 +48,12 @@ class Additional extends AbstractHelper
      */
     protected function prepareSourceClassName($sourceType)
     {
-        return 'Firebear\ImportExport\Model\Source\Type\\' . ucfirst(strtolower($sourceType));
+        $config = $this->sourceTypeConfig->get();
+        if (isset($config[$sourceType])) {
+            return $config[$sourceType]['model'];
+        }
+
+        return '';
     }
 
     /**
@@ -59,7 +68,7 @@ class Additional extends AbstractHelper
     {
         $sourceClassName = $this->prepareSourceClassName($sourceType);
         if ($sourceClassName && class_exists($sourceClassName)) {
-            // @var $source \Firebear\ImportExport\Model\Source\Type\AbstractType
+            /** @var \Firebear\ImportExport\Model\Source\Type\AbstractType $source */
             $source = $this->getSourceFactory()->create($sourceClassName);
 
             return $source;

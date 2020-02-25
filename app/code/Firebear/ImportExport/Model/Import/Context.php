@@ -5,15 +5,17 @@
  */
 namespace Firebear\ImportExport\Model\Import;
 
+use Firebear\ImportExport\Model\ResourceModel\Import\Data as DataSourceModel;
+use Magento\Eav\Model\Config;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Json\Helper\Data as JsonHelper;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\StringUtils;
-use Magento\Eav\Model\Config;
 use Magento\ImportExport\Helper\Data as ImportExportData;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
 use Magento\ImportExport\Model\ResourceModel\Helper as ResourceHelper;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Psr\Log\LoggerInterface;
-use Firebear\ImportExport\Model\ResourceModel\Import\Data as DataSourceModel;
 
 /**
  * Import Adapter Context
@@ -21,82 +23,99 @@ use Firebear\ImportExport\Model\ResourceModel\Import\Data as DataSourceModel;
 class Context
 {
     /**
+     * Json Serializer
+     *
+     * @var SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * Json Helper
      *
      * @var \Magento\Framework\Json\Helper\Data
      */
     protected $jsonHelper;
-    
+
     /**
      * Import Export Data
      *
      * @var \Magento\ImportExport\Helper\Data
      */
     protected $importExportData;
-    
+
     /**
      * DB Data Source Model
      *
      * @var \Firebear\ImportExport\Model\ResourceModel\Import\Data
      */
-    protected $dataSourceModel; 
-    
+    protected $dataSourceModel;
+
     /**
      * Eav Model Config
      *
      * @var \Magento\Eav\Model\Config
      */
     protected $config;
-    
+
     /**
      * Resource Connection
      *
      * @var \Magento\Framework\App\ResourceConnection
      */
     protected $resource;
-    
+
     /**
      * Resource Helper
      *
      * @var \Magento\ImportExport\Model\ResourceModel\Helper
      */
-    protected $resourceHelper; 
-    
+    protected $resourceHelper;
+
     /**
      * String Lib
      *
      * @var \Magento\Framework\Stdlib\StringUtils
      */
     protected $string;
-    
+
     /**
      * Processing Error Aggregator
      *
      * @var \Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface
      */
-    protected $errorAggregator;    
-    
+    protected $errorAggregator;
+
+    /**
+     * Console output
+     *
+     * @var \Symfony\Component\Console\Output\ConsoleOutput
+     */
+    protected $output;
+
     /**
      * Logger
      *
      * @var \Psr\Log\LoggerInterface
      */
-    protected $logger;  
-	
+    protected $logger;
+
     /**
-     * Initialize Context
+     * Context constructor.
      *
-     * @param JsonHelper $jsonHelper
-     * @param ImportExportData $importExportData
-     * @param DataSourceModel $dataSourceModel 
-     * @param Config $config
-     * @param ResourceConnection $resource  
-     * @param ResourceHelper $resourceHelper
-     * @param StringUtils $string 
-     * @param ProcessingErrorAggregatorInterface $errorAggregator     
-     * @param Logger $logger   
+     * @param SerializerInterface $serializer
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+     * @param \Magento\ImportExport\Helper\Data $importExportData
+     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data $dataSourceModel
+     * @param \Magento\Eav\Model\Config $config
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper
+     * @param \Magento\Framework\Stdlib\StringUtils $string
+     * @param \Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface $errorAggregator
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Symfony\Component\Console\Output\ConsoleOutput $output
      */
     public function __construct(
+        SerializerInterface $serializer,
         JsonHelper $jsonHelper,
         ImportExportData $importExportData,
         DataSourceModel $dataSourceModel,
@@ -105,8 +124,10 @@ class Context
         ResourceHelper $resourceHelper,
         StringUtils $string,
         ProcessingErrorAggregatorInterface $errorAggregator,
-        LoggerInterface $logger	
+        LoggerInterface $logger,
+        ConsoleOutput $output
     ) {
+        $this->serializer = $serializer;
         $this->jsonHelper = $jsonHelper;
         $this->importExportData = $importExportData;
         $this->dataSourceModel = $dataSourceModel;
@@ -115,9 +136,20 @@ class Context
         $this->resourceHelper = $resourceHelper;
         $this->string = $string;
         $this->errorAggregator = $errorAggregator;
-        $this->logger = $logger;		
+        $this->logger = $logger;
+        $this->output = $output;
     }
-    
+
+    /**
+     * Retrieve Json Serializer
+     *
+     * @return SerializerInterface
+     */
+    public function getSerializer()
+    {
+        return $this->serializer;
+    }
+
     /**
      * Retrieve Json Helper
      *
@@ -127,7 +159,7 @@ class Context
     {
         return $this->jsonHelper;
     }
-    
+
     /**
      * Retrieve Import Export Data
      *
@@ -137,17 +169,17 @@ class Context
     {
         return $this->importExportData;
     }
-    
+
     /**
      * Retrieve Data Source Model
      *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Firebear\ImportExport\Model\ResourceModel\Import\Data
      */
     public function getDataSourceModel()
     {
         return $this->dataSourceModel;
     }
-    
+
     /**
      * Retrieve Eav Model Config
      *
@@ -157,7 +189,7 @@ class Context
     {
         return $this->config;
     }
-    
+
     /**
      * Retrieve Resource Connection
      *
@@ -167,7 +199,7 @@ class Context
     {
         return $this->resource;
     }
-    
+
     /**
      * Retrieve Resource Helper
      *
@@ -177,17 +209,17 @@ class Context
     {
         return $this->resourceHelper;
     }
-    
+
     /**
      * Retrieve String Lib
      *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Magento\Framework\Stdlib\StringUtils
      */
     public function getStringUtils()
     {
         return $this->string;
     }
-    
+
     /**
      * Retrieve Processing Error Aggregator
      *
@@ -197,14 +229,24 @@ class Context
     {
         return $this->errorAggregator;
     }
-    
+
     /**
-     * Retrieve Logger
+     * Retrieve logger
      *
      * @return \Psr\Log\LoggerInterface
      */
     public function getLogger()
     {
         return $this->logger;
-    }	    
+    }
+
+    /**
+     * Retrieve output
+     *
+     * @return \Symfony\Component\Console\Output\ConsoleOutput
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
 }

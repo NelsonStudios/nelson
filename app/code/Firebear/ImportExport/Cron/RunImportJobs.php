@@ -27,6 +27,11 @@ class RunImportJobs
     protected $helper;
 
     /**
+     * @var bool
+     */
+    protected $debugMode;
+
+    /**
      * RunImportJobs constructor.
      *
      * @param Processor $importProcessor
@@ -43,6 +48,7 @@ class RunImportJobs
      * @param $schedule
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute($schedule)
     {
@@ -58,7 +64,6 @@ class RunImportJobs
             $this->processor->inConsole = 1;
             $this->processor->setLogger($this->helper->getLogger());
             $this->processor->processScope($jobId, $file);
-            $this->helper->saveFinishHistory($history);
             $counter = $this->helper->countData($file, $jobId);
             $error = 0;
             for ($i = 0; $i < $counter; $i++) {
@@ -73,7 +78,9 @@ class RunImportJobs
                 $this->processor->processReindex($file, $jobId);
             }
             $this->processor->showErrors();
-
+            $this->processor->getImportModel()->getErrorAggregator()->clear();
+            $this->processor->getImportModel()->setNullEntityAdapter();
+            $this->helper->saveFinishHistory($history);
             return true;
         }
 

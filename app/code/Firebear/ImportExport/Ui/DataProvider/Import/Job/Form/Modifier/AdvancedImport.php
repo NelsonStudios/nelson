@@ -6,19 +6,25 @@
 
 namespace Firebear\ImportExport\Ui\DataProvider\Import\Job\Form\Modifier;
 
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
-use Magento\Framework\Stdlib\ArrayManager;
-use Firebear\ImportExport\Model\Source\Config;
-use Magento\Catalog\Model\Locator\LocatorInterface;
-use Magento\Framework\UrlInterface;
+use Firebear\ImportExport\Model\Source\Config as SourceConfig;
+use Firebear\ImportExport\Model\Source\Platform\Config as PlatformConfig;
 use Magento\Catalog\Model\Category as CategoryModel;
-use \Psr\Log\LoggerInterface;
+use Magento\Catalog\Model\Locator\LocatorInterface;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\App\Cache\Type\Block;
 use Magento\Framework\App\CacheInterface;
-use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\File\Size;
 use Magento\Framework\ObjectManagerInterface;
-
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Psr\Log\LoggerInterface;
+use Firebear\ImportExport\Ui\Component\Listing\Column\Import\Source\System\SupplierAttributeValue;
 
 /**
  * Data provider for advanced inventory form
@@ -37,9 +43,14 @@ class AdvancedImport implements ModifierInterface
     private $arrayManager;
 
     /**
-     * @var \Firebear\ImportExport\Model\Source\Config
+     * @var SourceConfig
      */
-    protected $config;
+    protected $sourceConfig;
+
+    /**
+     * @var PlatformConfig
+     */
+    protected $platformConfig;
 
     /**
      * @var \Magento\Backend\Model\UrlInterface
@@ -47,7 +58,7 @@ class AdvancedImport implements ModifierInterface
     protected $backendUrl;
 
     /**
-     * @var \Magento\Framework\File\Size
+     * @var Size
      */
     protected $fileSize;
 
@@ -67,13 +78,16 @@ class AdvancedImport implements ModifierInterface
     protected $categoryCollectionFactory;
 
     /**
+     * @var SerializerInterface
+     */
+    protected $serializer;
+
+    /**
      * @var CacheInterface
      */
     private $cacheManager;
 
-
     private $categoriesTree;
-
 
     private $logger;
 
@@ -85,28 +99,46 @@ class AdvancedImport implements ModifierInterface
      * Category tree cache id
      */
     const CATEGORY_TREE_ID = 'CATALOG_PRODUCT_CATEGORY_TREE';
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     /**
      * AdvancedImport constructor.
+     *
      * @param ArrayManager $arrayManager
      * @param \Magento\Backend\Model\UrlInterface $backendUrl
-     * @param Config $config
-     * @param \Magento\Framework\File\Size $fileSize
+     * @param SourceConfig $sourceConfig
+     * @param PlatformConfig $platformConfig
+     * @param Size $fileSize
+     * @param UrlInterface $urlBuilder
+     * @param LocatorInterface $locator
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param LoggerInterface $logger
+     * @param RequestInterface $request
+     * @param ObjectManagerInterface $objectManager
+     * @param SerializerInterface $serializer
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         ArrayManager $arrayManager,
         \Magento\Backend\Model\UrlInterface $backendUrl,
-        Config $config,
-        \Magento\Framework\File\Size $fileSize,
+        SourceConfig $sourceConfig,
+        PlatformConfig $platformConfig,
+        Size $fileSize,
         UrlInterface $urlBuilder,
         LocatorInterface $locator,
         CategoryCollectionFactory $categoryCollectionFactory,
         LoggerInterface $logger,
         RequestInterface $request,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        SerializerInterface $serializer,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->arrayManager = $arrayManager;
-        $this->config = $config;
+        $this->sourceConfig = $sourceConfig;
+        $this->platformConfig = $platformConfig;
         $this->backendUrl = $backendUrl;
         $this->fileSize = $fileSize;
         $this->urlBuilder = $urlBuilder;
@@ -115,6 +147,8 @@ class AdvancedImport implements ModifierInterface
         $this->logger = $logger;
         $this->request = $request;
         $this->objectManager = $objectManager;
+        $this->serializer = $serializer;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -148,9 +182,33 @@ class AdvancedImport implements ModifierInterface
             'source' => 'import',
             'valueUpdate' => 'afterkeydown'
         ];
-        $types = $this->config->get();
-
-        foreach ($types as $typeName => $type) {
+        $sourceConfig = [];
+        $platformForm = [];
+        $platformConfig = $this->platformConfig->get();
+        foreach ($platformConfig as $entityType => $platforms) {
+            foreach ($platforms as $platformName => $data) {
+                if (isset($data['source_fields']) && is_array($data['source_fields'])) {
+                    $prefix = $entityType . '_' . $platformName;
+                    if (empty($platformForm[$prefix])) {
+                        $platformForm[$prefix] = $prefix;
+                    }
+                    $fields = [];
+                    foreach ($data['source_fields'] as $field) {
+                        $fields[$field['id']] = $field;
+                    }
+                    $sourceConfig[$entityType . '_' . $platformName] = [
+                        'label' => '',
+                        'model' => null,
+                        'sort_order' => 5,
+                        'depends' => '',
+                        'api' => '',
+                        'fields' => $fields,
+                    ];
+                }
+            }
+        }
+        $types = $this->sourceConfig->get();
+        foreach (array_merge_recursive($sourceConfig, $types) as $typeName => $type) {
             $sortOrder = 20;
             foreach ($type['fields'] as $name => $values) {
                 $localConfig = [
@@ -159,7 +217,8 @@ class AdvancedImport implements ModifierInterface
                     'sortOrder' => $sortOrder,
                     'valuesForOptions' => [
                         $typeName => $typeName
-                    ]
+                    ],
+                    'platformForm' => $platformForm
                 ];
                 if (isset($values['componentType']) && ($values['componentType'])) {
                     $localConfig['componentType'] = $values['componentType'];
@@ -202,12 +261,6 @@ class AdvancedImport implements ModifierInterface
                 if (isset($values['formElement']) && ($values['formElement'])) {
                     $localConfig['formElement'] = $values['formElement'];
                 }
-//                if (isset($values['options']) && ($values['options'])) {
-//                    $localConfig['sourceOptions'] = json_encode([
-//                        ['value' => 'post', 'label' => 'POST'],
-//                        ['value' => 'get', 'label' => 'GET'],
-//                    ]);
-//                }
                 $sortOrder += 10;
                 $config = array_merge($generalConfig, $localConfig);
 
@@ -219,28 +272,68 @@ class AdvancedImport implements ModifierInterface
                     ]
                 ];
                 if (isset($values['options']) && ($values['options'])) {
-                    $childrenArray[$typeName . "_" . $name]['arguments']['data']['options'] = $this->objectManager->create( $values['options']);
+                    $childrenArray[$typeName . '_' . $name]['arguments']['data']['options'] =
+                        $this->objectManager->create($values['options']);
                 }
                 if (isset($values['source_options']) && ($values['source_options'])) {
-                    $childrenArray[$typeName . "_" . $name]['arguments']['data']['source_options'] = $this->objectManager->create( $values['source_options']);
+                    $childrenArray[$typeName . '_' . $name]['arguments']['data']['source_options'] =
+                        $this->objectManager->create($values['source_options']);
                 }
             }
         }
-
+        $childrenArray['type_file']['arguments']['data']['config']['platformForm'] = $platformForm;
+        $childrenArray['import_source']['arguments']['data']['config']['platformForm'] = $platformForm;
         return $childrenArray;
     }
 
     /**
-     * @return void
+     * @param array $meta
+     * @return array
      */
-    private function prepareMeta()
+    private function prepareMeta(array $meta)
     {
         $meta['source'] = ['children' => $this->addFieldSource()];
         $meta = $this->createNewCategoryModal($meta);
         $meta = $this->customizeCategoriesField($meta);
+        if ($supplierAttribute = $this->scopeConfig->getValue('firebear_importexport/general/supplier_code')) {
+            $meta = $this->disableProductManufacture($meta, $supplierAttribute);
+        }
         return $meta;
     }
 
+    /**
+     * @param array $meta
+     * @param string $supplierAttribute
+     * @return array
+     */
+    protected function disableProductManufacture(array $meta, string $supplierAttribute)
+    {
+        $meta = $this->arrayManager->set(
+            'settings',
+            $meta,
+            [
+                'children' => [
+                    'product_supplier' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'componentType' => 'field',
+                                    'dataType' => 'text',
+                                    'label' => __('Select Supplier'),
+                                    'formElement' => 'select',
+                                    'source' => 'import',
+                                    'options' => $this->objectManager->get(SupplierAttributeValue::class)
+                                        ->toOptionArray($supplierAttribute),
+                                    'sortOrder' => 71,
+                                ],
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        );
+        return $meta;
+    }
 
     /**
      * Create slide-out panel for new category creation
@@ -250,52 +343,39 @@ class AdvancedImport implements ModifierInterface
      */
     protected function createNewCategoryModal(array $meta)
     {
+        $value = [];
+        $value['arguments'] = [
+            'data' => [
+                'config' => [
+                    'isTemplate' => false,
+                    'componentType' => 'modal',
+                    'options' => ['title' => __('New Category'),],
+                    'imports' => ['state' => '!index=create_category:responseStatus'],
+                ],
+            ],
+        ];
+
+        $value['children']['create_category']['arguments']['data']['config'] = [
+            'label' => '',
+            'componentType' => 'container',
+            'component' => 'Magento_Ui/js/form/components/insert-form',
+            'dataScope' => '',
+            'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+            'render_url' => $this->urlBuilder->getUrl(
+                'mui/index/render_handle',
+                ['handle' => 'catalog_category_create', 'buttons' => 1]
+            ),
+            'autoRender' => false,
+            'ns' => 'new_category_form',
+            'externalProvider' => 'new_category_form.new_category_form_data_source',
+            'toolbarContainer' => '${ $.parentName }',
+            'formSubmitType' => 'ajax',
+        ];
+
         return $this->arrayManager->set(
             'create_category_modal',
             $meta,
-            [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'isTemplate' => false,
-                            'componentType' => 'modal',
-                            'options' => [
-                                'title' => __('New Category'),
-                            ],
-                            'imports' => [
-                                'state' => '!index=create_category:responseStatus'
-                            ],
-                        ],
-                    ],
-                ],
-                'children' => [
-                    'create_category' => [
-                        'arguments' => [
-                            'data' => [
-                                'config' => [
-                                    'label' => '',
-                                    'componentType' => 'container',
-                                    'component' => 'Magento_Ui/js/form/components/insert-form',
-                                    'dataScope' => '',
-                                    'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
-                                    'render_url' => $this->urlBuilder->getUrl(
-                                        'mui/index/render_handle',
-                                        [
-                                            'handle' => 'catalog_category_create',
-                                            'buttons' => 1
-                                        ]
-                                    ),
-                                    'autoRender' => false,
-                                    'ns' => 'new_category_form',
-                                    'externalProvider' => 'new_category_form.new_category_form_data_source',
-                                    'toolbarContainer' => '${ $.parentName }',
-                                    'formSubmitType' => 'ajax',
-                                ],
-                            ],
-                        ]
-                    ]
-                ]
-            ]
+            $value
         );
     }
 
@@ -357,41 +437,42 @@ class AdvancedImport implements ModifierInterface
      * Retrieve categories tree
      *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getCategoriesTree($filter = null)
     {
         $categoryTree = $this->getCacheManager()->load(self::CATEGORY_TREE_ID . '_' . $filter);
         if ($categoryTree) {
-            return unserialize($categoryTree);
+            return $this->serializer->unserialize($categoryTree);
         }
         if ($this->categoriesTree === null) {
             $storeId = $this->request->getParam('store');
-            /* @var $matchingNamesCollection \Magento\Catalog\Model\ResourceModel\Category\Collection */
-            $matchingNamesCollection = $this->categoryCollectionFactory->create();
+            /** @var Collection $matchingCollection */
+            $matchingCollection = $this->categoryCollectionFactory->create();
 
-            $matchingNamesCollection->addAttributeToSelect('path')
+            $matchingCollection->addAttributeToSelect('path')
                 ->addAttributeToFilter('entity_id', ['neq' => CategoryModel::TREE_ROOT_ID])
                 ->setStoreId($storeId);
 
-            $shownCategoriesIds = [];
+            $shownCategoryIds = [];
 
-            /** @var \Magento\Catalog\Model\Category $category */
-            foreach ($matchingNamesCollection as $category) {
+            /** @var CategoryModel $category */
+            foreach ($matchingCollection as $category) {
                 foreach (explode('/', $category->getPath()) as $parentId) {
-                    $shownCategoriesIds[$parentId] = 1;
+                    $shownCategoryIds[$parentId] = 1;
                 }
             }
 
-            /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
-            $collection = $this->categoryCollectionFactory->create();
+            /** @var Collection $categoryCollection */
+            $categoryCollection = $this->categoryCollectionFactory->create();
 
-            $collection->addAttributeToFilter('entity_id', ['in' => array_keys($shownCategoriesIds)])
+            $categoryCollection->addAttributeToFilter('entity_id', ['in' => array_keys($shownCategoryIds)])
                 ->addAttributeToSelect(['name', 'is_active', 'parent_id'])
                 ->setOrder('entity_id', 'ASC')
                 ->setStoreId($storeId);
 
             $categoryPaths = [];
-            foreach ($collection as $category) {
+            foreach ($categoryCollection as $category) {
                 if ($category->hasChildren()) {
                     $this->recursiveCategory($category->getChildrenCategories(), $categoryPaths);
                 }
@@ -404,11 +485,11 @@ class AdvancedImport implements ModifierInterface
         }
 
         $this->getCacheManager()->save(
-            serialize($this->categoriesTree),
+            $this->serializer->serialize($this->categoriesTree),
             self::CATEGORY_TREE_ID . '_' . $filter,
             [
-                \Magento\Catalog\Model\Category::CACHE_TAG,
-                \Magento\Framework\App\Cache\Type\Block::CACHE_TAG
+                CategoryModel::CACHE_TAG,
+                Block::CACHE_TAG
             ]
         );
 
@@ -426,7 +507,7 @@ class AdvancedImport implements ModifierInterface
     {
         $storeId = $this->request->getParam('store');
 
-        /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+        /** @var Collection $collection */
         $collection = $this->categoryCollectionFactory->create();
 
         $collection->addAttributeToFilter('entity_id', $categoryChild->getId())

@@ -6,15 +6,18 @@
 
 namespace Firebear\ImportExport\Model\Import\Source;
 
+use Magento\Framework\Filesystem\Directory\Read as Directory;
 use Magento\ImportExport\Model\Import\AbstractEntity;
+use Magento\ImportExport\Model\Import\AbstractSource;
+use Firebear\ImportExport\Model\Source\Platform\PlatformInterface;
+use Firebear\ImportExport\Traits\Import\Map as ImportMap;
 
 /**
  * CSV import adapter
  */
-class Json extends \Magento\ImportExport\Model\Import\AbstractSource
+class Json extends AbstractSource
 {
-
-    use \Firebear\ImportExport\Traits\Import\Map;
+    use ImportMap;
 
     const CREATE_ATTRIBUTE = 'create_attribute';
 
@@ -29,65 +32,69 @@ class Json extends \Magento\ImportExport\Model\Import\AbstractSource
     protected $listener;
 
     protected $maps;
-    /**
-     * Delimiter.
-     *
-     * @var string
-     */
-    protected $delimiter = ',';
-
-    /**
-     * @var string
-     */
-    protected $enclosure = '';
 
     protected $extension = 'json';
 
     protected $mimeTypes = [];
 
+    /**
+     * Platform
+     *
+     * @var \Firebear\ImportExport\Model\Source\Platform\PlatformInterface
+     */
     protected $platform;
 
     protected $entities;
 
-
     /**
-     * Json constructor.
+     * Initialize Adapter
      *
      * @param array $file
-     * @param \Magento\Framework\Filesystem\Directory\Read $directory
-     * @param string $delimiter
-     * @param string $enclosure
-     *
+     * @param Directory $directory
+     * @param PlatformInterface $platform
+     * @param array $data
      * @throws \Exception
      */
     public function __construct(
         $file,
-        \Magento\Framework\Filesystem\Directory\Read $directory,
-        $delimiter = ',',
-        $enclosure = '"'
+        Directory $directory,
+        PlatformInterface $platform = null,
+        $data = []
     ) {
         $result = $this->checkMimeType($directory->getAbsolutePath($file));
-
         if ($result !== true) {
-            throw new \Exception($result);
+            throw new \RuntimeException($result);
         }
+
+        $this->platform = $platform;
         $this->listener = new \JsonStreamingParser\Listener\InMemoryListener();
         try {
             $this->stream = fopen($directory->getAbsolutePath($file), 'r');
             $parser = new \JsonStreamingParser\Parser($this->stream, $this->listener);
             $parser->parse();
             fclose($this->stream);
-            $this->entities = current($this->listener->getJson());
+
+            $data = $this->listener->getJson();
+            $parseData = $platform && method_exists($platform, 'prepareData')
+                ? $platform->prepareData($data)
+                : $data;
+            $finalData = false;
+            foreach ($parseData as $datum) {
+                if (\is_array($datum)) {
+                    $finalData = $datum;
+                    break;
+                }
+            }
+            $this->entities = $finalData ?? [];
         } catch (\Exception $e) {
             fclose($this->stream);
             throw $e;
         }
-        if ($delimiter) {
-            $this->delimiter = $delimiter;
-        }
-        $this->enclosure = $enclosure;
-
         $this->_construct();
+
+        parent::__construct(
+            $this->_colNames
+        );
     }
 
     /**
@@ -175,26 +182,6 @@ class Json extends \Magento\ImportExport\Model\Import\AbstractSource
         $array = $this->replaceValue($this->changeFields($row));
 
         return $array;
-    }
-
-
-    /**
-     * @param $data
-     * @return $this
-     */
-    public function setMap($data)
-    {
-        $this->maps = $data;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMap()
-    {
-        return $this->maps;
     }
 
     /**

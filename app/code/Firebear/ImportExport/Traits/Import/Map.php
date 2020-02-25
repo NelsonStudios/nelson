@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait Map
 {
+    /** @var bool  */
+    protected $replaceWithDefault = false;
     /**
      * @param $data
      * @return $this
@@ -26,6 +28,9 @@ trait Map
      */
     public function getMap()
     {
+        if (!$this->maps && !is_array($this->maps)) {
+            $this->maps = [];
+        }
         return $this->maps;
     }
 
@@ -36,14 +41,11 @@ trait Map
     protected function changeFields($data)
     {
         $maps = $this->getMap();
-        $iter = [];
         if (count($maps)) {
             foreach ($maps as $field) {
-                if (isset($data[$field['import']]) && !in_array($field['import'], $iter)) {
+                if (isset($data[$field['import']])) {
                     $temp = $data[$field['import']];
-                    unset($data[$field['import']]);
                     $data[$field['system']] = $temp;
-                    $iter[] = $field['import'];
                 }
             }
         }
@@ -79,21 +81,24 @@ trait Map
         if ($this->getPlatform()) {
             $rowData = $this->getPlatform()->deleteColumns($rowData);
         }
-        $iter = [];
         $maps = $this->getMap();
         if (count($maps)) {
             foreach ($maps as $field) {
                 if ($field['default'] != '') {
-                    if (!in_array($field['import'], $iter) || empty($iter)) {
-                        if ($field['system'] == 'image') {
-                            $field['system'] = 'base_image';
-                        }
-                        $default = $field['default'];
-                        if (strlen($default)) {
+                    if ($field['system'] == 'image') {
+                        $field['system'] = 'base_image';
+                    }
+                    $default = $field['default'];
+                    if (strlen($default)) {
+                        if (isset($rowData[$field['system']])
+                            && \strlen($rowData[$field['system']]) == 0
+                            && $this->getReplaceWithDefault() == 0
+                        ) {
                             $rowData[$field['system']] = $default;
-                        }
-                        if ($field['import'] != '') {
-                            $iter[] = $field['import'];
+                        } elseif (!isset($rowData[$field['system']])) {
+                            $rowData[$field['system']] = $default;
+                        } elseif ($this->getReplaceWithDefault() == 1) {
+                            $rowData[$field['system']] = $default;
                         }
                     }
                 }
@@ -162,5 +167,22 @@ trait Map
 
         return $message;
     }
-}
 
+    /**
+     * @return bool
+     */
+    public function getReplaceWithDefault()
+    {
+        return $this->replaceWithDefault;
+    }
+
+    /**
+     * @param bool $default
+     *
+     * @return bool
+     */
+    public function setReplaceWithDefault($default = false)
+    {
+        return $this->replaceWithDefault = $default;
+    }
+}

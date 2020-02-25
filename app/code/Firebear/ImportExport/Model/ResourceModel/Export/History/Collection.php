@@ -6,8 +6,15 @@
 
 namespace Firebear\ImportExport\Model\ResourceModel\Export\History;
 
-use \Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\Export\History as ModelHistory;
+use Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\ResourceModel\Export\History as ResourceModelHistory;
 
+/**
+ * Class Collection
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Export\History
+ */
 class Collection extends AbstractCollection
 {
     /**
@@ -22,6 +29,9 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\Export\History', 'Firebear\ImportExport\Model\ResourceModel\Export\History');
+        $this->_init(
+            ModelHistory::class,
+            ResourceModelHistory::class
+        );
     }
 }

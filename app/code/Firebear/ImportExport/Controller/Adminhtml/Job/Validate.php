@@ -15,7 +15,6 @@ use Magento\Backend\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\File\Csv;
 use Magento\Framework\FilesystemFactory;
-use Magento\Framework\Json\DecoderInterface;
 use Magento\ImportExport\Block\Adminhtml\Import\Frame\Result;
 use Magento\ImportExport\Controller\Adminhtml\ImportResult as ImportResultController;
 use Magento\ImportExport\Model\Import;
@@ -24,7 +23,13 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\ImportExport\Model\Import as MagentoImportModel;
 use Magento\ImportExport\Model\Import\Adapter as ImportAdapter;
+use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class Validate
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Validate extends ImportResultController
 {
     /**
@@ -43,9 +48,9 @@ class Validate extends ImportResultController
     protected $session;
 
     /**
-     * @var DecoderInterface
+     * @var SerializerInterface
      */
-    protected $jsonDecoder;
+    protected $serializer;
 
     /**
      * @var JobModel
@@ -68,32 +73,30 @@ class Validate extends ImportResultController
     protected $fileSystem;
 
     /**
-     * @var
+     * @var Magento
      */
     protected $magentoPlatforms;
 
     /**
-     * Validate constructor.
-     *
-     * @param \Magento\Backend\App\Action\Context                         $context
+     * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\ImportExport\Model\Report\ReportProcessorInterface $reportProcessor
-     * @param \Magento\ImportExport\Model\History                         $historyModel
-     * @param \Magento\ImportExport\Helper\Report                         $reportHelper
-     * @param DecoderInterface                                            $jsonDecoder
-     * @param JobModel                                                    $factory
-     * @param Repository                                                  $repository
-     * @param Csv                                                         $csv
-     * @param FilesystemFactory                                           $fileSystem
-     * @param Magento                                                     $magentoPlatforms
-     * @param ImportResultController                                      $importResult
-     * @param ImportModel                                                 $import
+     * @param \Magento\ImportExport\Model\History $historyModel
+     * @param \Magento\ImportExport\Helper\Report $reportHelper
+     * @param SerializerInterface $serializer
+     * @param JobModel $factory
+     * @param Repository $repository
+     * @param Csv $csv
+     * @param FilesystemFactory $fileSystem
+     * @param Magento $magentoPlatforms
+     * @param ImportResultController $importResult
+     * @param ImportModel $import
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\ImportExport\Model\Report\ReportProcessorInterface $reportProcessor,
         \Magento\ImportExport\Model\History $historyModel,
         \Magento\ImportExport\Helper\Report $reportHelper,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
+        SerializerInterface $serializer,
         JobModel $factory,
         Repository $repository,
         Csv $csv,
@@ -103,14 +106,14 @@ class Validate extends ImportResultController
         ImportModel $import
     ) {
         parent::__construct($context, $reportProcessor, $historyModel, $reportHelper);
-        $this->session          = $context->getSession();
-        $this->jsonDecoder      = $jsonDecoder;
-        $this->factory          = $factory;
-        $this->repository       = $repository;
-        $this->csv              = $csv;
-        $this->fileSystem       = $fileSystem;
-        $this->import           = $import;
-        $this->importResult     = $importResult;
+        $this->session = $context->getSession();
+        $this->serializer = $serializer;
+        $this->factory = $factory;
+        $this->repository = $repository;
+        $this->csv = $csv;
+        $this->fileSystem = $fileSystem;
+        $this->import = $import;
+        $this->importResult = $importResult;
         $this->magentoPlatforms = $magentoPlatforms;
     }
 
@@ -130,8 +133,8 @@ class Validate extends ImportResultController
         $createAttrValues = $this->getRequest()->getParam('create_attr_values');
 
         $job               = $this->repository->getById($jobId);
-        $behaviorData      = $this->jsonDecoder->decode($job->getBehaviorData());
-        $sourceData        = $this->jsonDecoder->decode($job->getSourceData());
+        $behaviorData      = $this->serializer->unserialize($job->getBehaviorData());
+        $sourceData        = $this->serializer->unserialize($job->getSourceData());
         $mapAttributesData = $job->getMap();
 
         $data = array_merge(

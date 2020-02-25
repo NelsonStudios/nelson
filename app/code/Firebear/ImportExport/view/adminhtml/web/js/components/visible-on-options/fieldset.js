@@ -24,11 +24,12 @@ define(
                 /**
                  * Toggle visibility state.
                  *
-                 * @param {Number} selected
+                 * @param {String} selected
                  */
                 toggleVisibility: function (selected) {
-                    this.isShown = (selected != undefined);
+                    this.isShown = !Object.keys(this.valuesForOptions).length || (selected in this.valuesForOptions);
                     this.visible(this.inverseVisibility ? !this.isShown : this.isShown);
+
                     if (this.openOnShow) {
                         this.opened(this.inverseVisibility ? !this.isShown : this.isShown);
                     }

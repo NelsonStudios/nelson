@@ -7,14 +7,11 @@
 namespace Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Attributes;
 
 use Magento\Framework\Data\OptionSourceInterface;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
+use Magento\ConfigurableProduct\Model\ConfigurableAttributeHandler;
 use Magento\Framework\Data\Collection\AbstractDb;
-use Firebear\ImportExport\Model\Import\Product;
-use Firebear\ImportExport\Model\Import\Customer;
-use Firebear\ImportExport\Model\Import\Address;
-use Firebear\ImportExport\Model\Import\CustomerComposite;
 use Firebear\ImportExport\Model\Source\Import\Config;
 use Magento\ImportExport\Model\Import\Entity\Factory;
+use Magento\Catalog\Model\ResourceModel\Eav\Attribute as EavAttribute;
 
 /**
  * Class Options
@@ -34,34 +31,14 @@ class Options implements OptionSourceInterface
     protected $options;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory
+     * @var ConfigurableAttributeHandler
      */
-    protected $attributeFactory;
+    protected $configurableAttributeHandler;
 
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection
      */
     protected $attributeCollection;
-
-    /**
-     * @var Product
-     */
-    protected $productImportModel;
-
-    /**
-     * @var Customer
-     */
-    protected $customer;
-
-    /**
-     * @var Address
-     */
-    protected $address;
-
-    /**
-     * @var CustomerComposite
-     */
-    protected $composite;
 
     /**
      * @var Config
@@ -81,24 +58,18 @@ class Options implements OptionSourceInterface
     /**
      * Options constructor.
      *
-     * @param CollectionFactory $attributeFactory
-     * @param Product $productImportModel
+     * @param ConfigurableAttributeHandler       $configurableAttributeHandler
+     * @param Config                             $config
+     * @param Factory                            $entityFactory
+     * @param \Firebear\ImportExport\Helper\Data $helper
      */
     public function __construct(
-        CollectionFactory $attributeFactory,
-        Product $productImportModel,
-        Customer $customer,
-        Address $address,
-        CustomerComposite $composite,
+        ConfigurableAttributeHandler $configurableAttributeHandler,
         Config $config,
         Factory $entityFactory,
         \Firebear\ImportExport\Helper\Data $helper
     ) {
-        $this->attributeFactory = $attributeFactory;
-        $this->productImportModel = $productImportModel;
-        $this->customer = $customer;
-        $this->address = $address;
-        $this->composite = $composite;
+        $this->configurableAttributeHandler = $configurableAttributeHandler;
         $this->config = $config;
         $this->entityFactory = $entityFactory;
         $this->helper = $helper;
@@ -125,10 +96,8 @@ class Options implements OptionSourceInterface
     public function getAttributeCollection()
     {
 
-        $this->attributeCollection = $this->attributeFactory
-            ->create()
-            ->addVisibleFilter()
-            ->setOrder('attribute_code', AbstractDb::SORT_ORDER_ASC);
+        $this->attributeCollection = $this->configurableAttributeHandler
+            ->getApplicableAttributes();
 
         return $this->attributeCollection;
     }
@@ -140,13 +109,20 @@ class Options implements OptionSourceInterface
     {
         $attributeCollection = $this->getAttributeCollection();
         $subOptions = [];
-        foreach ($this->helper->partCollection($attributeCollection) as $attribute) {
-            $label = (!$withoutGroup) ? $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' : $attribute->getAttributeCode();
-            $subOptions[] =
-                [
-                    'label' => $label,
-                    'value' => $attribute->getAttributeCode()
-                ];
+        /**
+         * @var EavAttribute $attribute
+        */
+        foreach ($attributeCollection->getItems() as $attribute) {
+            if ($this->configurableAttributeHandler->isAttributeApplicable($attribute)) {
+                $label = (!$withoutGroup) ?
+                    $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' :
+                    $attribute->getAttributeCode();
+                $subOptions[] =
+                    [
+                        'label' => $label,
+                        'value' => $attribute->getAttributeCode()
+                    ];
+            }
         }
 
         return $subOptions;

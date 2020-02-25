@@ -1,13 +1,18 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 namespace Firebear\ImportExport\Model\ResourceModel\Import\CustomerComposite;
 
 use Firebear\ImportExport\Model\Import\CustomerComposite;
 
+/**
+ * Class Data
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Import\CustomerComposite
+ */
 class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
 {
     /**
@@ -15,14 +20,14 @@ class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
      *
      * @var string
      */
-    protected $_entityType = CustomerComposite::COMPONENT_ENTITY_CUSTOMER;
+    protected $entityType = CustomerComposite::COMPONENT_ENTITY_CUSTOMER;
 
     /**
      * Customer attributes
      *
      * @var array
      */
-    protected $_customerAttributes = [];
+    protected $customerAttributes = [];
 
     /**
      * Class constructor
@@ -35,16 +40,16 @@ class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        $connectionName = null,
+        $connection = null,
         array $arguments = []
     ) {
-        parent::__construct($context, $jsonHelper, $connectionName);
+        parent::__construct($context, $jsonHelper, $connection);
 
         if (isset($arguments['entity_type'])) {
-            $this->_entityType = $arguments['entity_type'];
+            $this->entityType = $arguments['entity_type'];
         }
         if (isset($arguments['customer_attributes'])) {
-            $this->_customerAttributes = $arguments['customer_attributes'];
+            $this->customerAttributes = $arguments['customer_attributes'];
         }
     }
 
@@ -55,19 +60,19 @@ class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
      */
     public function getNextBunch()
     {
-        $bunchRows = parent::getNextBunch();
-        if ($bunchRows != null) {
-            $rows = [];
-            foreach ($bunchRows as $rowNumber => $rowData) {
-                $rowData = $this->_prepareRow($rowData);
+        $rows = parent::getNextBunch();
+        if ($rows != null) {
+            $result = [];
+            foreach ($rows as $rowNumber => $rowData) {
+                $rowData = $this->prepareRow($rowData);
                 if ($rowData !== null) {
                     unset($rowData['_scope']);
-                    $rows[$rowNumber] = $rowData;
+                    $result[$rowNumber] = $rowData;
                 }
             }
-            return $rows;
+            return $result;
         } else {
-            return $bunchRows;
+            return $rows;
         }
     }
 
@@ -77,17 +82,17 @@ class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
      * @param array $rowData
      * @return array|null
      */
-    protected function _prepareRow(array $rowData)
+    protected function prepareRow(array $row)
     {
         $entityCustomer = CustomerComposite::COMPONENT_ENTITY_CUSTOMER;
-        if ($this->_entityType == $entityCustomer) {
-            if ($rowData['_scope'] == CustomerComposite::SCOPE_DEFAULT) {
-                return $rowData;
+        if ($this->entityType == $entityCustomer) {
+            if ($row['_scope'] == CustomerComposite::SCOPE_DEFAULT) {
+                return $row;
             } else {
                 return null;
             }
         } else {
-            return $this->_prepareAddressRowData($rowData);
+            return $this->prepareAddressRowData($row);
         }
     }
 
@@ -97,17 +102,17 @@ class Data extends \Firebear\ImportExport\Model\ResourceModel\Import\Data
      * @param array $rowData
      * @return array
      */
-    protected function _prepareAddressRowData(array $rowData)
+    protected function prepareAddressRowData(array $row)
     {
+        $prefix = CustomerComposite::COLUMN_ADDRESS_PREFIX;
         $excludedAttributes = [
             CustomerComposite::COLUMN_DEFAULT_BILLING,
             CustomerComposite::COLUMN_DEFAULT_SHIPPING,
         ];
-        $prefix = CustomerComposite::COLUMN_ADDRESS_PREFIX;
 
         $result = [];
-        foreach ($rowData as $key => $value) {
-            if (!in_array($key, $this->_customerAttributes)) {
+        foreach ($row as $key => $value) {
+            if (!in_array($key, $this->customerAttributes)) {
                 if (!in_array($key, $excludedAttributes)) {
                     $key = str_replace($prefix, '', $key);
                 }

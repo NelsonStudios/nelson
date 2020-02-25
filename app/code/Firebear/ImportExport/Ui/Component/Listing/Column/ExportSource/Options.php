@@ -44,7 +44,21 @@ class Options implements OptionSourceInterface
         $types = $this->config->get();
         $sources[] = ['label' => __('-- Please Select --'), 'value' => ''];
         foreach ($types as $typeName => $type) {
-            $sources[] = ['label' => $type['label'], 'value' => $typeName];
+            if (isset($type['depends'])) {
+                $sources[] = [
+                    'label' => $type['label'],
+                    'value' => $typeName,
+                    'depends' => explode(',', $type['depends']),
+                    'api' => isset($type['api']) && $type['api'] === '1' ? '1' : '0'
+                ];
+            } else {
+                $sources[] = [
+                    'label' => $type['label'],
+                    'value' => $typeName,
+                    'depends' => $type['depends'],
+                    'api' => isset($type['api']) && $type['api'] === '1' ? '1' : '0'
+                ];
+            }
         }
 
         $this->options = $sources;
@@ -57,11 +71,11 @@ class Options implements OptionSourceInterface
      */
     public function toArray()
     {
+        $sources = [];
         $types = $this->config->get();
         foreach ($types as $typeName => $type) {
             $sources[$typeName] = $type['label'];
         }
-
-        return $sources;
+        return $this->options = $sources;
     }
 }

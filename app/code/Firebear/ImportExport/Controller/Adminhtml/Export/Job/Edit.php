@@ -6,33 +6,33 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Magento\Framework\Controller\ResultFactory;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Context;
+use Magento\Framework\Registry;
 
+/**
+ * Class Edit
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Edit extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var Registry
      */
-    protected $resultPageFactory;
+    protected $coreRegistry;
 
     /**
      * Edit constructor.
      *
-     * @param \Magento\Backend\App\Action\Context                     $context
-     * @param \Magento\Framework\Registry                             $coreRegistry
-     * @param \Firebear\ImportExport\Model\ExportJobFactory           $exportJobFactory
-     * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository
-     * @param \Magento\Framework\View\Result\PageFactory              $resultPageFactory
+     * @param Context $context
+     * @param Registry $coreRegistry
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        Registry $coreRegistry
     ) {
-        $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context, $coreRegistry, $exportJobFactory, $exportRepository);
+        parent::__construct($context);
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -41,9 +41,9 @@ class Edit extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     public function execute()
     {
         $jobId = $this->getRequest()->getParam('entity_id');
-        $model = $this->exportJobFactory->create();
+        $model = $this->jobFactory->create();
         if ($jobId) {
-            $model = $this->exportRepository->getById($jobId);
+            $model = $this->repository->getById($jobId);
             if (!$model->getId()) {
                 $this->messageManager->addErrorMessage(__('This job is no longer exists.'));
                 /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
@@ -55,7 +55,7 @@ class Edit extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 
         $this->coreRegistry->register('export_job', $model);
 
-        $resultPage = $this->resultPageFactory->create();
+        $resultPage = $this->resultFactory->create($this->resultFactory::TYPE_PAGE);
         $resultPage->setActiveMenu('Firebear_ImportExport::export_job');
         $resultPage->getConfig()->getTitle()->prepend(__('Export Jobs'));
         $resultPage->addBreadcrumb(__('Export'), __('Export'));

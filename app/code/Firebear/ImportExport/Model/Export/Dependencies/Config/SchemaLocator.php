@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Export\Dependencies\Config;
 
 use Magento\Framework\Config\SchemaLocatorInterface;
 
+/**
+ * Class SchemaLocator
+ *
+ * @package Firebear\ImportExport\Model\Export\Dependencies\Config
+ */
 class SchemaLocator implements SchemaLocatorInterface
 {
     /**

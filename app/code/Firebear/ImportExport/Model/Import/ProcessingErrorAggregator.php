@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Import;
 
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 
+/**
+ * Class ProcessingErrorAggregator
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class ProcessingErrorAggregator extends \Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregator
 {
     /**
@@ -33,11 +38,16 @@ class ProcessingErrorAggregator extends \Magento\ImportExport\Model\Import\Error
         $errorsCount = $this->getErrorsCount([ProcessingError::ERROR_LEVEL_CRITICAL]);
         if ($errorsCount > 0
             && $this->validationStrategy == self::VALIDATION_STRATEGY_STOP_ON_ERROR
-            && $errorsCount >= $this->allowedErrorsCount
+            && $errorsCount > $this->allowedErrorsCount
         ) {
             $isExceeded = true;
         }
 
         return $isExceeded;
+    }
+
+    protected function isErrorAlreadyAdded($rowNum, $errorCode, $columnName = null)
+    {
+        return false;
     }
 }

@@ -7,27 +7,15 @@
 namespace Firebear\ImportExport\Ui\Component\Grid\Column;
 
 use Firebear\ImportExport\Model\Job;
-use Magento\Framework\View\Element\UiComponentFactory;
-use Magento\Framework\View\Element\UiComponent\ContextInterface;
-use \Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Ui\Component\Listing\Columns\Column;
 
+/**
+ * Class Status
+ *
+ * @package Firebear\ImportExport\Ui\Component\Grid\Column
+ */
 class Status extends Column
 {
-    /**
-     * @param ContextInterface $context
-     * @param UiComponentFactory $uiComponentFactory
-     * @param array $components
-     * @param array $data
-     */
-    public function __construct(
-        ContextInterface $context,
-        UiComponentFactory $uiComponentFactory,
-        array $components = [],
-        array $data = []
-    ) {
-        parent::__construct($context, $uiComponentFactory, $components, $data);
-    }
-
     /**
      * Prepare Data Source
      *

@@ -1,8 +1,9 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\Import\Product\Price;
 
 use Magento\Catalog\Model\Product;
@@ -67,7 +68,7 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      *
      * @var array
      */
-    protected static $_priceRulesData = [];
+    protected static $priceRulesData = [];
 
     /**
      * Catalog rule data
@@ -132,10 +133,9 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     protected $_ruleProductProcessor;
 
     /**
-     * @var Data\Condition\Converter
+     * @var \Magento\CatalogRule\Model\Data\Condition\Converter
      */
     protected $ruleConditionConverter;
-
 
     /**
      * Rule constructor.
@@ -359,16 +359,18 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     /**
      * {@inheritdoc}
      */
-    public function validateData(\Magento\Framework\DataObject $dataObject)
+    public function validateData(\Magento\Framework\DataObject $object)
     {
-        $result = parent::validateData($dataObject);
+        $result = parent::validateData($object);
         if ($result === true) {
             $result = [];
         }
-
-        $action = $dataObject->getData('simple_action');
-        $discount = $dataObject->getData('discount_amount');
-        $result = array_merge($result, $this->validateDiscount($action, $discount));
+        $action = $object->getData('simple_action');
+        $discount = $object->getData('discount_amount');
+        $result = array_merge(
+            $result,
+            $this->validateDiscount($action, $discount)
+        );
 
         return !empty($result) ? $result : true;
     }
@@ -381,26 +383,32 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      *
      * @return array Validation errors
      */
-    protected function validateDiscount($action, $discount)
+    protected function validateDiscount($type, $discount)
     {
-        $result = [];
-        switch ($action) {
+        $resultArray = [];
+        switch ($type) {
+            case 'by_fixed':
+            case 'to_fixed':
+                if ($discount < 0) {
+                    $resultArray[] = __('Discount value should be 0 or greater.');
+                }
+                break;
             case 'by_percent':
             case 'to_percent':
                 if ($discount < 0 || $discount > 100) {
-                    $result[] = __('Percentage discount should be between 0 and 100.');
+                    $resultArray[] = __('Percentage discount should be between 0 and 100.');
                 }
                 break;
             case 'by_fixed':
             case 'to_fixed':
                 if ($discount < 0) {
-                    $result[] = __('Discount value should be 0 or greater.');
+                    $resultArray[] = __('Discount value should be 0 or greater.');
                 }
                 break;
             default:
-                $result[] = __('Unknown action.');
+                $resultArray[] = __('Unknown action.');
         }
-        return $result;
+        return $resultArray;
     }
 
     /**
@@ -414,43 +422,53 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     public function calcProductPriceRule(Product $product, $price)
     {
         $priceRules = null;
-        $productId = $product->getId();
+        $pId = $product->getId();
         $storeId = $product->getStoreId();
-        $websiteId = $this->_storeManager->getStore($storeId)->getWebsiteId();
+        $websiteId = $this->_storeManager
+            ->getStore($storeId)
+            ->getWebsiteId();
         if ($product->hasCustomerGroupId()) {
-            $customerGroupId = $product->getCustomerGroupId();
+            $groupId = $product->getCustomerGroupId();
         } else {
-            $customerGroupId = $this->_customerSession->getCustomerGroupId();
+            $groupId = $this->_customerSession->getCustomerGroupId();
         }
-        $dateTs = $this->_localeDate->scopeTimeStamp($storeId);
-        $cacheKey = date('Y-m-d', $dateTs) . "|{$websiteId}|{$customerGroupId}|{$productId}|{$price}";
+        $dateTs = $this->_localeDate
+            ->scopeTimeStamp($storeId);
+        $cacheKey = date('Y-m-d', $dateTs)
+            . "|{$websiteId}|{$groupId}|{$pId}|{$price}";
 
-        if (!array_key_exists($cacheKey, self::$_priceRulesData)) {
-            $rulesData = $this->_getRulesFromProduct($dateTs, $websiteId, $customerGroupId, $productId);
-            if ($rulesData) {
-                foreach ($rulesData as $ruleData) {
+        if (!array_key_exists($cacheKey, self::$priceRulesData)) {
+            $rulesDataArray = $this->_getRulesFromProduct(
+                $dateTs,
+                $websiteId,
+                $groupId,
+                $pId
+            );
+            if ($rulesDataArray) {
+                foreach ($rulesDataArray as $ruleData) {
                     if ($product->getParentId()) {
                         $priceRules = $priceRules ? $priceRules : $price;
                         if ($ruleData['action_stop']) {
                             break;
                         }
                     } else {
-                        $priceRules = $this->_catalogRuleData->calcPriceRule(
-                            $ruleData['action_operator'],
-                            $ruleData['action_amount'],
-                            $priceRules ? $priceRules : $price
-                        );
+                        $priceRules = $this->_catalogRuleData
+                            ->calcPriceRule(
+                                $ruleData['action_operator'],
+                                $ruleData['action_amount'],
+                                $priceRules ? $priceRules : $price
+                            );
                         if ($ruleData['action_stop']) {
                             break;
                         }
                     }
                 }
-                return self::$_priceRulesData[$cacheKey] = $priceRules;
+                return self::$priceRulesData[$cacheKey] = $priceRules;
             } else {
-                self::$_priceRulesData[$cacheKey] = null;
+                self::$priceRulesData[$cacheKey] = null;
             }
         } else {
-            return self::$_priceRulesData[$cacheKey];
+            return self::$priceRulesData[$cacheKey];
         }
         return null;
     }
@@ -476,9 +494,9 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      * @return void
      * @codeCoverageIgnore
      */
-    public function setProductsFilter($productIds)
+    public function setProductsFilter($ids)
     {
-        $this->_productsFilter = $productIds;
+        $this->_productsFilter = $ids;
     }
 
     /**
@@ -500,7 +518,8 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     protected function _invalidateCache()
     {
         if (count($this->_relatedCacheTypes)) {
-            $this->_cacheTypesList->invalidate($this->_relatedCacheTypes);
+            $this->_cacheTypesList
+                ->invalidate($this->_relatedCacheTypes);
         }
         return $this;
     }
@@ -518,7 +537,9 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
                 $this->_getResource()->addCommitCallback([$this, 'reindex']);
             }
         } else {
-            $this->_ruleProductProcessor->getIndexer()->invalidate();
+            $this->_ruleProductProcessor
+                ->getIndexer()
+                ->invalidate();
         }
         return parent::afterSave();
     }
@@ -530,7 +551,8 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function reindex()
     {
-        $this->_ruleProductProcessor->reindexList($this->_productIds);
+        $this->_ruleProductProcessor
+            ->reindexList($this->_productIds);
     }
 
     /**
@@ -540,7 +562,9 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function afterDelete()
     {
-        $this->_ruleProductProcessor->getIndexer()->invalidate();
+        $this->_ruleProductProcessor
+            ->getIndexer()
+            ->invalidate();
         return parent::afterDelete();
     }
 
@@ -552,7 +576,10 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     public function isRuleBehaviorChanged()
     {
         if (!$this->isObjectNew()) {
-            $arrayDiff = $this->dataDiff($this->getOrigData(), $this->getStoredData());
+            $arrayDiff = $this->dataDiff(
+                $this->getOrigData(),
+                $this->getStoredData()
+            );
             unset($arrayDiff['name']);
             unset($arrayDiff['description']);
             if (empty($arrayDiff)) {
@@ -562,6 +589,74 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
         return true;
     }
 
+    // @codeCoverageIgnoreStart
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRuleId()
+    {
+        return $this->getData(self::RULE_ID);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->getData(self::NAME);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription()
+    {
+        return $this->getData(self::DESCRIPTION);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIsActive()
+    {
+        return $this->getData(self::IS_ACTIVE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSimpleAction()
+    {
+        return $this->getData(self::SIMPLE_ACTION);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDiscountAmount()
+    {
+        return $this->getData(self::DISCOUNT_AMOUNT);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFromDate()
+    {
+        return $this->getData('from_date');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \Magento\CatalogRule\Api\Data\RuleExtensionInterface|null
+     */
+    public function getExtensionAttributes()
+    {
+        return $this->_getExtensionAttributes();
+    }
+
     /**
      * Get array with data differences
      * @param array $array1
@@ -569,12 +664,12 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      *
      * @return array
      */
-    protected function dataDiff($array1, $array2)
+    protected function dataDiff($arr1, $arr2)
     {
         $result = [];
-        foreach ($array1 as $key => $value) {
-            if (array_key_exists($key, $array2)) {
-                if ($value != $array2[$key]) {
+        foreach ($arr1 as $key => $value) {
+            if (array_key_exists($key, $arr2)) {
+                if ($value != $arr2[$key]) {
                     $result[$key] = true;
                 }
             } else {
@@ -590,33 +685,20 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function getConditionsFieldSetId($formName = '')
     {
-        return $formName . 'rule_conditions_fieldset_' . $this->getId();
-    }
-
-    //@codeCoverageIgnoreStart
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRuleId()
-    {
-        return $this->getData(self::RULE_ID);
+        return $formName
+            . 'rule_conditions_fieldset_'
+            . $this->getId();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setRuleId($ruleId)
+    public function setRuleId($id)
     {
-        return $this->setData(self::RULE_ID, $ruleId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getData(self::NAME);
+        return $this->setData(
+            self::RULE_ID,
+            $id
+        );
     }
 
     /**
@@ -624,15 +706,10 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function setName($name)
     {
-        return $this->setData(self::NAME, $name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription()
-    {
-        return $this->getData(self::DESCRIPTION);
+        return $this->setData(
+            self::NAME,
+            $name
+        );
     }
 
     /**
@@ -640,23 +717,21 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function setDescription($description)
     {
-        return $this->setData(self::DESCRIPTION, $description);
+        return $this->setData(
+            self::DESCRIPTION,
+            $description
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getIsActive()
+    public function setIsActive($flag)
     {
-        return $this->getData(self::IS_ACTIVE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setIsActive($isActive)
-    {
-        return $this->setData(self::IS_ACTIVE, $isActive);
+        return $this->setData(
+            self::IS_ACTIVE,
+            $flag
+        );
     }
 
     /**
@@ -664,7 +739,10 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function getRuleCondition()
     {
-        return $this->getRuleConditionConverter()->arrayToDataModel($this->getConditions()->asArray());
+        return $this->getRuleConditionConverter()
+            ->arrayToDataModel(
+                $this->getConditions()->asArray()
+            );
     }
 
     /**
@@ -672,9 +750,12 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function setRuleCondition($condition)
     {
+        $dataCondition = $this->getRuleConditionConverter()->dataModelToArray($condition);
         $this->getConditions()
             ->setConditions([])
-            ->loadArray($this->getRuleConditionConverter()->dataModelToArray($condition));
+            ->loadArray(
+                $dataCondition
+            );
         return $this;
     }
 
@@ -689,9 +770,12 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     /**
      * {@inheritdoc}
      */
-    public function setStopRulesProcessing($isStopProcessing)
+    public function setStopRulesProcessing($flag)
     {
-        return $this->setData(self::STOP_RULES_PROCESSING, $isStopProcessing);
+        return $this->setData(
+            self::STOP_RULES_PROCESSING,
+            $flag
+        );
     }
 
     /**
@@ -705,17 +789,9 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     /**
      * {@inheritdoc}
      */
-    public function setSortOrder($sortOrder)
+    public function setSortOrder($order)
     {
-        return $this->setData(self::SORT_ORDER, $sortOrder);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSimpleAction()
-    {
-        return $this->getData(self::SIMPLE_ACTION);
+        return $this->setData(self::SORT_ORDER, $order);
     }
 
     /**
@@ -723,15 +799,10 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function setSimpleAction($action)
     {
-        return $this->setData(self::SIMPLE_ACTION, $action);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDiscountAmount()
-    {
-        return $this->getData(self::DISCOUNT_AMOUNT);
+        return $this->setData(
+            self::SIMPLE_ACTION,
+            $action
+        );
     }
 
     /**
@@ -739,15 +810,10 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
      */
     public function setDiscountAmount($amount)
     {
-        return $this->setData(self::DISCOUNT_AMOUNT, $amount);
-    }
-
-    /**
-     * @return string
-     */
-    public function getFromDate()
-    {
-        return $this->getData('from_date');
+        return $this->setData(
+            self::DISCOUNT_AMOUNT,
+            $amount
+        );
     }
 
     /**
@@ -761,38 +827,31 @@ class Rule extends \Magento\Rule\Model\AbstractModel implements RuleInterface, I
     /**
      * {@inheritdoc}
      *
-     * @return \Magento\CatalogRule\Api\Data\RuleExtensionInterface|null
-     */
-    public function getExtensionAttributes()
-    {
-        return $this->_getExtensionAttributes();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
      * @param \Magento\CatalogRule\Api\Data\RuleExtensionInterface $extensionAttributes
      * @return $this
      */
-    public function setExtensionAttributes(\Magento\CatalogRule\Api\Data\RuleExtensionInterface $extensionAttributes)
+    public function setExtensionAttributes(\Magento\CatalogRule\Api\Data\RuleExtensionInterface $attributes)
     {
-        return $this->_setExtensionAttributes($extensionAttributes);
+        return $this->_setExtensionAttributes($attributes);
     }
 
     /**
-     * @return Data\Condition\Converter
+     * @return \Magento\CatalogRule\Model\Data\Condition\Converter
      * @deprecated 100.1.0
      */
     private function getRuleConditionConverter()
     {
         if (null === $this->ruleConditionConverter) {
-            $this->ruleConditionConverter = \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(\Magento\CatalogRule\Model\Data\Condition\Converter::class);
+            $this->ruleConditionConverter =
+                \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(
+                    \Magento\CatalogRule\Model\Data\Condition\Converter::class
+                );
         }
         return $this->ruleConditionConverter;
     }
 
-    //@codeCoverageIgnoreEnd
+    // @codeCoverageIgnoreEnd
 
     /**
      * @inheritDoc

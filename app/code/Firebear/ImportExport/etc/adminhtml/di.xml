@@ -13,6 +13,11 @@
                 <item name="bundleProduct" xsi:type="string">Magento\BundleImportExport\Model\Export\RowCustomizer</item>
                 <item name="gropedProduct" xsi:type="string">Magento\GroupedImportExport\Model\Export\RowCustomizer</item>
                 <item name="configurableProduct" xsi:type="string">Magento\ConfigurableImportExport\Model\Export\RowCustomizer</item>
+                <item name="productVideoURL" xsi:type="string">Firebear\ImportExport\Model\Export\RowCustomizer\ProductVideo</item>
+                <item name="webkulMarketplace" xsi:type="string">Firebear\ImportExport\Model\Export\RowCustomizer\Integrations\Modules\WebkulMarketplace</item>
+                <item name="mageArrayMarketplace" xsi:type="string">Firebear\ImportExport\Model\Export\RowCustomizer\Integrations\Modules\MageArrayMarketplace</item>
+                <item name="wyomindAdvancedInventory" xsi:type="string">Firebear\ImportExport\Model\Export\RowCustomizer\Integrations\Modules\WyomindAdvancedInventory</item>
+                <item name="magestoreInventory" xsi:type="string">Firebear\ImportExport\Model\Export\RowCustomizer\Integrations\Modules\MageStoreInventory</item>
             </argument>
         </arguments>
     </type>

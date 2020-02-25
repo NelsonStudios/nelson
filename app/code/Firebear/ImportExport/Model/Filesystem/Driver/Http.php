@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Model\Filesystem\Driver;
 use Magento\Framework\Filesystem;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
+/**
+ * Class Http
+ *
+ * @package Firebear\ImportExport\Model\Filesystem\Driver
+ */
 class Http extends \Magento\Framework\Filesystem\Driver\Http
 {
     /**

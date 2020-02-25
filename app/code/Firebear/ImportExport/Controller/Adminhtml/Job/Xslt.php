@@ -6,86 +6,59 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
-use Firebear\ImportExport\Api\JobRepositoryInterface;
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Firebear\ImportExport\Model\Import\Platforms;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Options;
-use Magento\Backend\App\Action\Context;
+use Firebear\ImportExport\Model\ImportFactory;
+use Firebear\ImportExport\Model\Output\Xslt as OutputXslt;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Registry;
+use Magento\Framework\FilesystemFactory;
+use Magento\Framework\Filesystem\Io\File;
 
+/**
+ * Class Xslt
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Xslt extends JobController
 {
     /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var DirectoryList
-     */
-    protected $directoryList;
-
-    /**
-     * @var Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Json\DecoderInterface
-     */
-    protected $jsonDecoder;
-
-    /**
-     * @var \Magento\Framework\FilesystemFactory
+     * @var FilesystemFactory
      */
     protected $fileSystem;
 
     /**
-     * @var \Firebear\ImportExport\Model\ImportFactory
+     * @var ImportFactory
      */
     protected $importFactory;
 
+    /**
+     * @var File
+     */
     protected $file;
 
+    /**
+     * @var OutputXslt
+     */
     protected $modelOutput;
 
     /**
-     * Mapvalidate constructor.
+     * Xslt constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param DirectoryList $directoryList
-     * @param Platforms $platforms
-     * @param Data $helper
-     * @param Options $options
-     * @param \Magento\Framework\FilesystemFactory $filesystemFactory
-     * @param \Magento\Framework\Json\DecoderInterface $jsonDecoder
+     * @param FilesystemFactory $filesystemFactory
+     * @param File $file
+     * @param ImportFactory $importFactory
+     * @param OutputXslt $modelOutput
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        DirectoryList $directoryList,
-        Data $helper,
-        \Magento\Framework\FilesystemFactory $filesystemFactory,
-        \Magento\Framework\Filesystem\Io\File $file,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
-        \Firebear\ImportExport\Model\ImportFactory $importFactory,
-        \Firebear\ImportExport\Model\Output\Xslt $modelOutput
+        FilesystemFactory $filesystemFactory,
+        File $file,
+        ImportFactory $importFactory,
+        OutputXslt $modelOutput
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->directoryList = $directoryList;
-        $this->helper = $helper;
-        $this->jsonDecoder = $jsonDecoder;
+        parent::__construct($context);
+
         $this->fileSystem = $filesystemFactory;
         $this->importFactory = $importFactory;
         $this->file = $file;
@@ -100,7 +73,7 @@ class Xslt extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $messages = [];
         if ($this->getRequest()->isAjax()) {
             //read required fields from xml file
@@ -112,8 +85,8 @@ class Xslt extends JobController
                 $importData[$index] = substr($data, strpos($data, '+') + 1);
             }
             $directory = $this->fileSystem->create()->getDirectoryWrite(DirectoryList::ROOT);
-            if ($importData['import_source'] != 'file'){
-                if (!in_array($importData['import_source'], ['rest', 'soap'])){
+            if ($importData['import_source'] != 'file') {
+                if (!in_array($importData['import_source'], ['rest', 'soap'])) {
                     $importData[$importData['import_source'] . '_file_path'] = $importData['file_path'];
                 }
                 $importModel = $this->importFactory->create();

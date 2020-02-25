@@ -6,9 +6,18 @@
 
 namespace Firebear\ImportExport\Model\Source\Import\Behavior;
 
-class Product extends \Magento\ImportExport\Model\Source\Import\AbstractBehavior
+use Magento\ImportExport\Model\Source\Import\AbstractBehavior;
+use Magento\ImportExport\Model\Import;
+
+/**
+ * Class Product
+ *
+ * @package Firebear\ImportExport\Model\Source\Import\Behavior
+ */
+class Product extends AbstractBehavior
 {
     const  ONLY_UPDATE = 'update';
+    const  ONLY_ADD = 'add';
 
     /**
      * @return array
@@ -16,10 +25,11 @@ class Product extends \Magento\ImportExport\Model\Source\Import\AbstractBehavior
     public function toArray()
     {
         return [
-            \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND => __('Add/Update'),
+            Import::BEHAVIOR_APPEND => __('Add/Update'),
             self::ONLY_UPDATE => __('Only Update'),
-            \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE => __('Replace'),
-            \Magento\ImportExport\Model\Import::BEHAVIOR_DELETE => __('Delete')
+            self::ONLY_ADD => __('Only Add'),
+            Import::BEHAVIOR_REPLACE => __('Replace'),
+            Import::BEHAVIOR_DELETE => __('Delete')
         ];
     }
 
@@ -37,7 +47,7 @@ class Product extends \Magento\ImportExport\Model\Source\Import\AbstractBehavior
     public function getNotes($entityCode)
     {
         $messages = ['catalog_product' => [
-            \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE => __("Note: Product IDs will be regenerated.")
+            Import::BEHAVIOR_REPLACE => __("Note: Product IDs will be regenerated.")
         ]];
         return isset($messages[$entityCode]) ? $messages[$entityCode] : [];
     }

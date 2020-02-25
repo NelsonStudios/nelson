@@ -6,9 +6,21 @@
 
 namespace Firebear\ImportExport\Model\Source\Type;
 
+use Exception;
+use Firebear\ImportExport\Model\Filesystem\File\ReadFactory;
+use Firebear\ImportExport\Model\Source\Factory as SourceFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteFactory as DirectoryWriteFactory;
+use Magento\Framework\Filesystem\File\WriteFactory as FileWriteFactory;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\Framework\Filesystem\DriverPool;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\ValidatorException;
+use Magento\Framework\Stdlib\DateTime\Timezone;
+use Magento\Framework\App\CacheInterface;
 
 /**
  * Abstract class for import source types
@@ -27,7 +39,18 @@ abstract class AbstractType extends DataObject
      */
     const MEDIA_IMPORT_DIR = 'pub/media/import';
 
+    /**
+     * Export directory
+     */
     const EXPORT_DIR = 'var/export';
+
+    /**
+     * Files extension
+     */
+    const CSV_FILENAME_EXTENSION = '.csv';
+    const JSON_FILENAME_EXTENSION = '.json';
+    const XML_FILENAME_EXTENSION = '.xml';
+    const ODS_FILENAME_EXTENSION = '.ods';
 
     /**
      * Source type code
@@ -37,22 +60,22 @@ abstract class AbstractType extends DataObject
     protected $code;
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var ScopeConfigInterface
      */
     protected $scopeConfig;
 
     /**
-     * @var \Magento\Framework\Filesystem\Directory\WriteInterface
+     * @var WriteInterface
      */
     protected $directory;
 
     /**
-     * @var \Magento\Framework\Filesystem
+     * @var Filesystem
      */
     protected $filesystem;
 
     /**
-     * @var \Magento\Framework\Filesystem\File\ReadFactory
+     * @var ReadFactory
      */
     protected $readFactory;
 
@@ -61,50 +84,67 @@ abstract class AbstractType extends DataObject
      */
     protected $metadata = [];
 
+    /**
+     * @var mixed
+     */
     protected $client;
 
+    /**
+     * @var mixed
+     */
     protected $exportModel;
 
     /**
-     * @var \Magento\Framework\Filesystem\Directory\WriteFactory
+     * @var DirectoryWriteFactory
      */
     protected $writeFactory;
 
     /**
-     * @var \Magento\Framework\Stdlib\DateTime\Timezone
+     * @var Timezone
      */
     protected $timezone;
 
     /**
-     * @var \Magento\Framework\Filesystem\File\WriteFactory
+     * @var FileWriteFactory
      */
     protected $fileWrite;
 
     /**
-     * @var \Firebear\ImportExport\Model\Source\Factory
+     * @var SourceFactory
      */
     protected $factory;
 
     protected $formatFile;
 
     /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
+    protected $cache;
+
+    /**
      * AbstractType constructor.
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Filesystem $filesystem
-     * @param \Firebear\ImportExport\Model\Filesystem\File\ReadFactory $readFactory
-     * @param \Magento\Framework\Filesystem\Directory\WriteFactory $writeFactory
-     * @param \Magento\Framework\Filesystem\File\WriteFactory $fileWrite
-     * @param \Magento\Framework\Stdlib\DateTime\Timezone $timezone
-     * @param \Firebear\ImportExport\Model\Source\Factory $factory
+     *
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Filesystem $filesystem
+     * @param ReadFactory $readFactory
+     * @param DirectoryWriteFactory $writeFactory
+     * @param FileWriteFactory $fileWrite
+     * @param Timezone $timezone
+     * @param SourceFactory $factory
+     * @param array $data
+     *
+     * @throws FileSystemException
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Filesystem $filesystem,
-        \Firebear\ImportExport\Model\Filesystem\File\ReadFactory $readFactory,
-        \Magento\Framework\Filesystem\Directory\WriteFactory $writeFactory,
-        \Magento\Framework\Filesystem\File\WriteFactory $fileWrite,
-        \Magento\Framework\Stdlib\DateTime\Timezone $timezone,
-        \Firebear\ImportExport\Model\Source\Factory $factory
+        ScopeConfigInterface $scopeConfig,
+        Filesystem $filesystem,
+        ReadFactory $readFactory,
+        DirectoryWriteFactory $writeFactory,
+        FileWriteFactory $fileWrite,
+        Timezone $timezone,
+        SourceFactory $factory,
+        CacheInterface $cache,
+        array $data = []
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->filesystem = $filesystem;
@@ -114,6 +154,11 @@ abstract class AbstractType extends DataObject
         $this->timezone = $timezone;
         $this->fileWrite = $fileWrite;
         $this->factory = $factory;
+        $this->cache = $cache;
+
+        parent::__construct(
+            $data
+        );
     }
 
     /**
@@ -162,22 +207,43 @@ abstract class AbstractType extends DataObject
         return $this->code;
     }
 
+    /**
+     * @return mixed
+     */
     public function getClient()
     {
         return $this->client;
     }
 
+    /**
+     * @param $client
+     */
     public function setClient($client)
     {
         $this->client = $client;
     }
 
+    /**
+     * @return mixed
+     */
     abstract public function uploadSource();
 
+    /**
+     * @param $importImage
+     * @param $imageSting
+     * @return mixed
+     */
     abstract public function importImage($importImage, $imageSting);
 
+    /**
+     * @param $timestamp
+     * @return mixed
+     */
     abstract public function checkModified($timestamp);
 
+    /**
+     * @return mixed
+     */
     abstract protected function _getSourceClient();
 
     /**
@@ -197,37 +263,57 @@ abstract class AbstractType extends DataObject
     }
 
     /**
-     * return file
+     * Return file
+     *
+     * @param string $path
+     * @return bool
+     * @throws FileSystemException
+     * @throws ValidatorException
      */
     protected function writeFile($path)
     {
-        $newPath = $this->clearPath($path);
-        $dir = $this->filesystem->getDirectoryRead(DirectoryList::ROOT);
-        if (count($newPath) > 1) {
-            $fileName = array_pop($newPath);
-            $path = implode("/", $newPath);
-            if (!$dir->isExist($path)) {
-                $directory = $this->writeFactory->create($dir->getAbsolutePath($path));
-                $directory->create();
+        $result = false;
+        $directory = null;
+        $fileContent = $this->getExportModel()->export();
+        if ($fileContent) {
+            $newPath = $this->clearPath($path);
+            $dir = $this->filesystem->getDirectoryRead(DirectoryList::ROOT);
+            if (count($newPath) > 1) {
+                $fileName = array_pop($newPath);
+                $path = implode("/", $newPath);
+                if (!$dir->isExist($path)) {
+                    $directory = $this->writeFactory->create($dir->getAbsolutePath($path), DriverPool::FILE, 0775);
+                    $directory->create();
+                }
+                $path = $dir->getAbsolutePath() . $path . "/";
+            } else {
+                $fileName = array_pop($newPath);
+                $path = $dir->getAbsolutePath();
             }
-            $path = $dir->getAbsolutePath() . $path . "/";
-        } else {
-            $fileName = array_pop($newPath);
-            $path = $dir->getAbsolutePath();
-        }
-        $file = $this->fileWrite->create(
-            $path . $fileName,
-            \Magento\Framework\Filesystem\DriverPool::FILE,
-            "w"
-        );
-        $file->write($this->getExportModel()->export());
-        $file->close();
 
-        return true;
+            $page = $this->cache->load('current_page');
+
+            if (($page > 1) && ($dir->isExist($path . $fileName))) {
+                $read = $this->readFactory->create($path . $fileName, DriverPool::FILE);
+                $fileContent = $read->readAll() . $fileContent;
+            }
+
+            $file = $this->fileWrite->create(
+                $path . $fileName,
+                DriverPool::FILE,
+                "w"
+            );
+            $file->write($fileContent);
+            $file->close();
+
+            $stat = $file->stat($path . $fileName);
+            $result = !empty($stat['size']);
+        }
+        return $result;
     }
 
     /**
-     * @param $path
+     * @param string $path
      *
      * @return array
      */
@@ -253,13 +339,19 @@ abstract class AbstractType extends DataObject
             if ($client = $this->_getSourceClient()) {
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
 
         return false;
     }
 
+    /**
+     * @param string $importImage
+     * @param string $imageSting
+     * @param array $matches
+     * @throws FileSystemException
+     */
     public function setUrl($importImage, $imageSting, $matches)
     {
         $url = str_replace($matches[0], '', $importImage);
@@ -270,6 +362,10 @@ abstract class AbstractType extends DataObject
         );
     }
 
+    /**
+     * @param string $file
+     * @return $this
+     */
     public function setFormatFile($file)
     {
         $this->formatFile = $file;
@@ -277,8 +373,26 @@ abstract class AbstractType extends DataObject
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getFormatFile()
     {
         return $this->formatFile;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    public function convertUrlToFilename($url)
+    {
+        $parsedUrl = parse_url($url);
+        $filename = str_replace('.', '_', $parsedUrl['host'])
+            . str_replace('/', '_', $parsedUrl['path'])
+            . constant('self::' . strtoupper($this->getData('type_file')) . '_FILENAME_EXTENSION');
+
+        return $filename;
     }
 }

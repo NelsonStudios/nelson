@@ -1,8 +1,9 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\ResourceModel;
 
 use Magento\Framework\Exception\AlreadyExistsException;
@@ -15,6 +16,11 @@ use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\RelationComposite;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\Snapshot;
 
+/**
+ * Class Job
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel
+ */
 class Job extends AbstractDb
 {
     /**

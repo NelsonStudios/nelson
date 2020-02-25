@@ -12,6 +12,11 @@ use Magento\Ui\Component\Layout\Tabs\TabInterface;
 use Magento\Rule\Model\Condition\AbstractCondition;
 use Magento\Framework\ObjectManagerInterface;
 
+/**
+ * Class PriceConditions
+ *
+ * @package Firebear\ImportExport\Block\Adminhtml\Job\Edit
+ */
 class PriceConditions extends Generic implements TabInterface
 {
     /**
@@ -134,7 +139,6 @@ class PriceConditions extends Generic implements TabInterface
     protected function _prepareForm()
     {
         $model = $this->rule->create();
-        //$model = $this->_coreRegistry->registry('current_promo_catalog_rule');
 
         /** @var \Magento\Framework\Data\Form $form */
         $form = $this->addTabToForm($model);

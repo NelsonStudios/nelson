@@ -7,6 +7,11 @@
 
 namespace Firebear\ImportExport\Model\Export\Product;
 
+/**
+ * Class Additional
+ *
+ * @package Firebear\ImportExport\Model\Export\Product
+ */
 class Additional
 {
     /**

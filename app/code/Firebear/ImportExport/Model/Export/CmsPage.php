@@ -1,15 +1,16 @@
 <?php
 /**
- * Copyright (c) 2018. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 namespace Firebear\ImportExport\Model\Export;
 
-
 use Firebear\ImportExport\Helper\Data;
 use Firebear\ImportExport\Model\Source\Factory;
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
 use Magento\Cms\Api\Data\PageInterface;
+use Magento\Cms\Model\ResourceModel\Page\Collection;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory as TypeCollectionFactory;
@@ -25,21 +26,34 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * Class CmsPage
  * @package Firebear\ImportExport\Model\Export
  */
-class CmsPage extends AbstractEntity
+class CmsPage extends AbstractEntity implements EntityInterface
 {
-    use \Firebear\ImportExport\Traits\Export\Entity;
+    use ExportTrait;
 
-    use \Firebear\ImportExport\Traits\General;
+    /**
+     * @var Collection
+     */
+    protected $entityCollection;
 
-    /** @var CollectionFactory */
+    /**
+     * @var CollectionFactory
+     */
     protected $entityCollectionFactory;
-    /** @var LoggerInterface */
-    protected $_logger;
 
     /**
      * @var TypeCollectionFactory
      */
     protected $typeCollection;
+
+    /**
+     * @var Factory
+     */
+    protected $createFactory;
+
+    /**
+     * @var Data
+     */
+    protected $helper;
 
     protected $headerColumns = [];
 
@@ -78,6 +92,11 @@ class CmsPage extends AbstractEntity
      * @var Store
      */
     protected $store;
+
+    /**
+     * @var bool
+     */
+    protected $_debugMode;
 
     /**
      * CmsPage constructor.
@@ -139,8 +158,43 @@ class CmsPage extends AbstractEntity
                 && $this->_parameters['enable_last_entity_id'] > 0
             ) {
                 $entityCollection->addFieldToFilter(
-                    PageInterface::PAGE_ID, ['gt' => $this->_parameters['last_entity_id']]
+                    PageInterface::PAGE_ID,
+                    ['gt' => $this->_parameters['last_entity_id']]
                 );
+            }
+
+            if (isset($this->_parameters['export_filter'])) {
+                if (isset($this->_parameters['export_filter'][PageInterface::TITLE])) {
+                    $entityCollection->addFieldToFilter(
+                        PageInterface::TITLE,
+                        ['eq' => $this->_parameters['export_filter'][PageInterface::TITLE]]
+                    );
+                }
+
+                if (isset($this->_parameters['export_filter'][PageInterface::IDENTIFIER])) {
+                    $entityCollection->addFieldToFilter(
+                        PageInterface::IDENTIFIER,
+                        ['eq' => $this->_parameters['export_filter'][PageInterface::IDENTIFIER]]
+                    );
+                }
+
+                if (isset($this->_parameters['export_filter'][PageInterface::UPDATE_TIME])) {
+                    $entityCollection->addFieldToFilter(
+                        PageInterface::UPDATE_TIME,
+                        ['from' => $this->_parameters['export_filter_table'][0]['value'][0],
+                            'to' => $this->_parameters['export_filter_table'][0]['value'][1]
+                        ]
+                    );
+                }
+
+                if (isset($this->_parameters['export_filter'][PageInterface::CREATION_TIME])) {
+                    $entityCollection->addFieldToFilter(
+                        PageInterface::UPDATE_TIME,
+                        ['from' => $this->_parameters['export_filter_table'][0]['value'][0],
+                            'to' => $this->_parameters['export_filter_table'][0]['value'][1]
+                        ]
+                    );
+                }
             }
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
@@ -221,7 +275,7 @@ class CmsPage extends AbstractEntity
             $minProductsLimit = 500;
             $maxProductsLimit = 5000;
 
-            $this->itemsPerPage = intval(
+            $this->itemsPerPage = (int) (
                 ($memoryLimit * $memoryUsagePercent - memory_get_usage(true)) / $memoryPerProduct
             );
             if ($this->itemsPerPage < $minProductsLimit) {
@@ -250,10 +304,9 @@ class CmsPage extends AbstractEntity
         } catch (\Exception $e) {
             $this->_logger->critical($e);
         }
-        $newData = $this->changeData($exportData);
+        $newData = $this->changeData($exportData, PageInterface::PAGE_ID);
 
         $this->headerColumns = $this->changeHeaders($this->headerColumns);
-
 
         return $newData;
     }
@@ -295,7 +348,6 @@ class CmsPage extends AbstractEntity
         );
 
         return $this->changeHeaders($headers);
-
     }
 
     /**
@@ -313,7 +365,7 @@ class CmsPage extends AbstractEntity
             }
         }
 
-        if (count($headerColumns != count(array_keys($rowData)))) {
+        if (count($headerColumns) != count(array_keys($rowData))) {
             $newData = [];
             foreach ($headerColumns as $code) {
                 if (!isset($rowData[$code])) {
@@ -372,7 +424,7 @@ class CmsPage extends AbstractEntity
     public function getFieldColumns()
     {
         $options = [];
-        $model = $this->createFactory->create('\Magento\Cms\Model\Block');
+        $model = $this->createFactory->create(\Magento\Cms\Model\Page::class);
         $fields = $this->describeTable($model);
         $mergeFields = [];
         foreach ($fields as $key => $field) {

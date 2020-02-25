@@ -21,29 +21,31 @@ define(
             {
                 defaults: {
                     elementTmpl: 'Firebear_ImportExport/form/element/button',
-                    loadmapUrl : null,
-                    imports    : {
+                    loadmapUrl: null,
+                    imports: {
                         toggleVisibility: '${$.parentName}.import_source:value'
                     },
                     error: '',
                     notice: '',
                     showMap: 0,
                     validMap: 0,
-                    update:0,
+                    update: 0,
                     visible: false
                 },
 
-                initialize           : function () {
+                initialize: function () {
                     this._super();
 
                     return this;
                 },
-                initObservable       : function () {
+
+                initObservable: function() {
                     return this._super()
                     .observe('error showMap notice');
 
-                    },
-                _setClasses          : function () {
+                },
+
+                _setClasses: function() {
                     var additional = this.additionalClasses,
                     classes;
 
@@ -68,11 +70,13 @@ define(
 
                     return this;
                 },
-                toggleVisibility     : function (selected) {
-                    this.isShown = (selected != undefined);
+
+                toggleVisibility: function(selected) {
+                    this.isShown = true;//(selected != undefined);
                     this.visible(this.inverseVisibility ? !this.isShown : this.isShown);
                 },
-                action               : function () {
+
+                action: function () {
                     this.error('');
                     var form = registry.get(this.ns + '.' + this.ns);
                     var butonVallid = registry.get(this.ns + '.' + this.ns +".source_data_map_container.validate_button");
@@ -83,34 +87,37 @@ define(
                         this.validateGeneral();
                     }
                 },
-                validateGeneral      : function () {
+
+                validateGeneral: function() {
                     var self = this;
-                   registry.get(this.parentName, function(params) {
-                       var elems = params.elems();
-                       var errors = 0;
-                       _.each(
-                           elems,
-                           function (element) {
-                               if (element.visible() && element.componentType != 'container'
+                    registry.get(this.parentName, function (params) {
+                        var elems = params.elems();
+                        var errors = 0;
+                        _.each(
+                            elems,
+                            function (element) {
+                                if (element.visible() && element.componentType != 'container'
                                    && element.required() && !element.value()
-                               ) {
-                                   errors++;
-                               }
-                           }
-                       );
-                       if (errors > 0) {
-                           self.error($t('Please configure File Path.'))
-                           self.showMap(0);
-                       } else {
-                           self.error('');
-                           self.generateAttributesMap();
-                       }
+                                ) {
+                                    errors++;
+                                }
+                            }
+                        );
+                        if (errors > 0) {
+                            self.error($t('Please configure File Path.'))
+                            self.showMap(0);
+                        } else {
+                            self.error('');
+                            self.generateAttributesMap();
+                        }
                     });
                 },
-                loadForm: function () {
+
+                loadForm: function() {
                     this.validateGeneral();
                 },
-                generateAttributesMap: function () {
+
+                generateAttributesMap: function() {
                     this.notice('');
                     var ajaxSend = this.ajaxSend.bind(this);
                     this.getParams().then(ajaxSend);

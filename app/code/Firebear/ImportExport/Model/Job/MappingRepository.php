@@ -15,6 +15,11 @@ use Firebear\ImportExport\Model\Job\MappingFactory;
 use Firebear\ImportExport\Model\ResourceModel\Job\Mapping\CollectionFactory as CollectionFactory;
 use Firebear\ImportExport\Api\Data\ImportMappingInterface;
 
+/**
+ * Class MappingRepository
+ *
+ * @package Firebear\ImportExport\Model\Job
+ */
 class MappingRepository implements JobMappingRepositoryInterface
 {
 
@@ -67,7 +72,7 @@ class MappingRepository implements JobMappingRepositoryInterface
         $map = $this->factory->create();
         $this->resource->load($map, $id);
         if (!$map->getId()) {
-            throw new NoSuchEntityException(__('Map with id "%1" does not exist.', $jobId));
+            throw new NoSuchEntityException(__('Map with id "%1" does not exist.', $id));
         }
 
         return $map;

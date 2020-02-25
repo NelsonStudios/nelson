@@ -100,7 +100,6 @@ define(
                                         self.error($t(result.error));
                                         window.visible(false);
                                     } else {
-
                                         window.fullValue(result.result);
                                         window.visible(true);
                                         form.resolve(true);

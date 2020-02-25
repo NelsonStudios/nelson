@@ -43,7 +43,7 @@ abstract class AbstractProcessor
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    protected $_logger;
 
     /**
      * @var StoreManagerInterface
@@ -93,7 +93,7 @@ abstract class AbstractProcessor
         UrlInterface $backendUrl
     ) {
         $this->jsonDecoder = $jsonDecoder;
-        $this->logger = $logger;
+        $this->_logger = $logger;
         $this->timezone = $timezone;
         $this->storeManager = $storeManager;
         $this->storeResolver = $storeResolver;
@@ -166,7 +166,7 @@ abstract class AbstractProcessor
         try {
             $result = $this->run($data);
         } catch (\Exception $e) {
-            $this->logger->critical($e);
+            $this->_logger->critical($e);
             return false;
         }
 

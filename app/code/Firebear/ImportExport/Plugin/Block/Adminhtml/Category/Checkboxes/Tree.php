@@ -11,6 +11,11 @@
 
 namespace Firebear\ImportExport\Plugin\Block\Adminhtml\Category\Checkboxes;
 
+/**
+ * Class Tree
+ *
+ * @package Firebear\ImportExport\Plugin\Block\Adminhtml\Category\Checkboxes
+ */
 class Tree
 {
     /**
@@ -52,7 +57,6 @@ class Tree
         if ($key == 'js_form_object' && $value && isset($params['record'])) {
             return $value . $this->request->getParam('record');
         }
-
 
         return $value;
     }

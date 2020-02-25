@@ -6,35 +6,33 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
-use Magento\Framework\Controller\ResultFactory;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
+use Firebear\ImportExport\Controller\Adminhtml\Context;
+use Magento\Framework\Registry;
 
+/**
+ * Class Edit
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Edit extends \Firebear\ImportExport\Controller\Adminhtml\Job
 {
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var Registry
      */
-    protected $resultPageFactory;
+    protected $coreRegistry;
 
     /**
-     * Newedit constructor.
+     * Edit constructor.
      *
-     * @param \Magento\Backend\App\Action\Context        $context
-     * @param \Magento\Framework\Registry                $coreRegistry
-     * @param JobFactory                                 $jobFactory
-     * @param JobRepositoryInterface                     $repository
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context $context
+     * @param Registry $coreRegistry
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        Registry $coreRegistry
     ) {
-        $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
+        parent::__construct($context);
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -57,7 +55,7 @@ class Edit extends \Firebear\ImportExport\Controller\Adminhtml\Job
 
         $this->coreRegistry->register('import_job', $model);
 
-        $resultPage = $this->resultPageFactory->create();
+        $resultPage = $this->resultFactory->create($this->resultFactory::TYPE_PAGE);
         $resultPage->setActiveMenu('Firebear_ImportExport::import_job');
         $resultPage->getConfig()->getTitle()->prepend(__('Import Jobs'));
         $resultPage->addBreadcrumb(__('Import'), __('Import'));

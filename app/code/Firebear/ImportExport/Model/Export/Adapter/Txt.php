@@ -18,33 +18,33 @@ class Txt extends AbstractAdapter
      * Adapter Data
      *
      * @var []
-     */     
+     */
     protected $_data;
-    
+
     /**
      * Initialize Adapter
-     * 
+     *
      * @param Filesystem $filesystem
      * @param null $destination
-     * @param [] $data      
+     * @param [] $data
      */
     public function __construct(
-		Filesystem $filesystem, 
-		$destination = null,
-		array $data = []
-	) {
+        Filesystem $filesystem,
+        $destination = null,
+        array $data = []
+    ) {
         $this->_data = $data;
         if (isset($data['behavior_data'])) {
             $data = $data['behavior_data'];
             $this->_delimiter = $data['separator'] ?? $this->_delimiter;
-        } 
-        
+        }
+
         parent::__construct(
-			$filesystem, 
-			$destination
-		);
+            $filesystem,
+            $destination
+        );
     }
-    
+
     /**
      * Return file extension for downloading.
      *
@@ -113,7 +113,10 @@ class Txt extends AbstractAdapter
                 $element = addslashes($element);
                 $element = "\"" . $element . "\"";
             }
-            if (strpos($element, "\"") !==0 && strpos($element, " ") !== false && strpos($element, $this->_delimiter) === false) {
+            if (strpos($element, '"') !== 0 &&
+                strpos($element, ' ') !== false &&
+                strpos($element, $this->_delimiter) === false
+            ) {
                 $element = addslashes($element);
                 $element = "\"" . $element . "\"";
             }

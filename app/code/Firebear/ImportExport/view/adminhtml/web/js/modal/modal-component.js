@@ -38,7 +38,7 @@ define([
         actionRun: function () {
             this.isNotice(false);
             this.isError(false);
-            $(".debug").html('');
+            $('.debug').html('');
             var job = reg.get(this.job).data.entity_id;
             if (job == '') {
                 job = localStorage.getItem('jobId');
@@ -53,7 +53,7 @@ define([
                 .observe('loading isNotice notice isHref href error isError');
             return this;
         },
-        ajaxSend: function(file) {
+        ajaxSend: function (file) {
             this.end = 0;
             this.counter = 0;
             var job = reg.get(this.job).data.entity_id;
@@ -68,7 +68,7 @@ define([
             this.currentAjax = this.urlAjax + '?file=' + file;
             var urlAjax = this.currentAjax;
 
-            $('.run').attr("disabled", true);
+            $('.run').attr('disabled', true);
             var self = this;
             this.loading(true);
             storage.get(
@@ -80,14 +80,14 @@ define([
                         var url = self.urlCheck + '?form_key='+ window.FORM_KEY + '&job=' + job + '&file=' + file;
                         $.get(url).done(function (response) {
                             if (response.result > 0) {
-                             var urls = [];
-                             object.percent(10);
-                             object.percentWidth('10%');
-                              var step = Math.round((80 / response.result)*100)/100;
-                              var finish = false;
-                             if (response.result > 0) {
-                                finish = self.setData(response.result, 0, 0, job, file, step, object);
-                             }
+                                var urls = [];
+                                object.percent(10);
+                                object.percentWidth('10%');
+                                var step = Math.round((80 / response.result)*100)/100;
+                                var finish = false;
+                                if (response.result > 0) {
+                                    finish = self.setData(response.result, 0, 0, job, file, step, object);
+                                }
                             } else {
                                 self.finish(true);
 
@@ -98,7 +98,8 @@ define([
                                 object.value(false);
                                 self.finish(false);
                                 self.error(response.responseText);
-                            });
+                            }
+                        );
                         self.isError(false);
                     } else {
                         object.value(false);
@@ -111,14 +112,14 @@ define([
                     self.error(response.responseText);
                 }
             );
-              if (self.end != 1) {
-               setTimeout(function () {self.getDebug(urlAjax)}, 3500);
-              }
+            if (self.end != 1) {
+                setTimeout(self.getDebug.bind(self, urlAjax), 3500);
+            }
         },
-        getDebug: function(urlAjax) {
+        getDebug: function (urlAjax) {
             var object = reg.get(this.name + '.debugger.debug');
             var self = this;
-            $.get(urlAjax).done( function (response) {
+            $.get(urlAjax).done(function (response) {
                 var text = response.console;
                 var array = text.split('<span text="item"></span><br/>');
                 if (text.length > 0 && _.size(array) > 0) {
@@ -127,17 +128,17 @@ define([
                 }
                 if (text.length > 0) {
                     $('#debug-run').append(text);
-                    $(".debug").scrollTop($(".debug")[0].scrollHeight);
+                    $('.debug').scrollTop($('.debug')[0].scrollHeight);
                 }
                 if (self.end != 1) {
-                    setTimeout(self.getDebug(urlAjax), 3500);
+                    setTimeout(self.getDebug.bind(self, urlAjax), 3500);
                 }
-            }).fail(function(response) {
+            }).fail(function (response) {
                 self.finish(false);
                 self.error(response.responseText);
             });
         },
-        getFile:function(beforeUrl) {
+        getFile:function (beforeUrl) {
             var object = $.Deferred();
             var file = '';
             storage.get(
@@ -149,13 +150,13 @@ define([
                 }
             ).fail(
                 function (response) {
-                   file = null;
+                    file = null;
                     object.resolve(file);
                 }
             );
             return object.promise();
         },
-        setData:function(counter, count, error, job, file, step, object) {
+        setData:function (counter, count, error, job, file, step, object) {
             var  self = this;
             var urlData = self.urlProcess + '?form_key=' + window.FORM_KEY + '&number=' + count + '&job=' + job + '&file=' + file +'&error=' + error;
             var reindexUrl = self.reindexUrl +'?job=' + job + '&file=' + file;
@@ -171,7 +172,6 @@ define([
                             self.setData(counter, count + 1, parseInt(response.count), job, file, step, object);
                         } else {
                             self.finish(false);
-
                         }
                     }
                 ).fail(
@@ -180,7 +180,7 @@ define([
                         self.error(response.responseText);
                     }
                 );
-            } else  {
+            } else {
                 var reindex = reg.get(this.ns + '.' + this.ns+'.general.reindex');
                 if (reindex.value() == 1) {
                     storage.get(
@@ -213,30 +213,30 @@ define([
 
             return true;
         },
-        finish: function(bool) {
+        finish: function (bool) {
             var self = this;
             self.end = 1;
-            $(".run").attr("disabled", false);
+            $('.run').attr('disabled', false);
                self.loading(false);
                
               var object = reg.get(this.name + '.debugger.debug');
               object.percent(100);
               object.percentWidth('100%');
-              if (bool == false) {
+            if (bool == false) {
                 self.isNotice(false);
                 self.isError(true);
-              } else {
-                  self.isNotice(true);
-                  self.isError(false);
-                  self.notice($t('The process is over'));
-              }
+            } else {
+                self.isNotice(true);
+                self.isError(false);
+                self.notice($t('The process is over'));
+            }
         },
         toggleModal: function () {
             this._super();
            // this.isNotice(false);
             this.isHref(false);
             this.isError(false);
-            $(".debug").html('');
+            $('.debug').html('');
         },
         /**
          * Close moda

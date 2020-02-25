@@ -81,6 +81,33 @@ define(
                         'selectValue': 'onSelectValueChange'
                     }
                 },
+                configureDataScope: function () {
+                    var recordId,
+                        prefixName,
+                        suffixName;
+
+                    // Get recordId
+                    recordId = this.parentName.split('.').last();
+
+                    prefixName = this.dataScopeToHtmlArray(this.prefixName);
+                    this.elementName = this.prefixElementName + recordId;
+
+                    suffixName = '';
+
+                    if (!_.isEmpty(this.suffixName) || _.isNumber(this.suffixName)) {
+                        suffixName = '[' + this.suffixName + ']';
+                    }
+                    this.inputName = prefixName + '[' + this.elementName + ']' + suffixName;
+
+                    suffixName = '';
+
+                    if (!_.isEmpty(this.suffixName) || _.isNumber(this.suffixName)) {
+                        suffixName = '.' + this.suffixName;
+                    }
+
+                    this.exportDataLink = 'data.' + this.prefixName + '.' + this.elementName + suffixName;
+                    this.exports.value = this.provider + ':' + this.exportDataLink;
+                },
                 initialize: function () {
                     this._super();
 
@@ -116,7 +143,7 @@ define(
                                 observable(this.value);
                             });
                         },
-                        update: function(el, valueAccessor) {
+                        update: function (el, valueAccessor) {
                             var config = valueAccessor(),
                                 observable,
                                 options = {};
@@ -131,14 +158,14 @@ define(
                             }
 
                              $(el).datepicker(
-                                'setDate',
-                                moment(
-                                    observable(),
-                                    utils.convertToMomentFormat(
-                                        options.dateFormat + (options.showsTime ? ' ' + options.timeFormat : '')
-                                    )
-                                ).toDate()
-                            );
+                                 'setDate',
+                                 moment(
+                                     observable(),
+                                     utils.convertToMomentFormat(
+                                         options.dateFormat + (options.showsTime ? ' ' + options.timeFormat : '')
+                                     )
+                                 ).toDate()
+                             );
                         }
                     }
 
@@ -248,7 +275,7 @@ define(
                         $.ajax({
                             type: "POST",
                             url: this.ajaxUrl,
-                            data: {entity: value, type: type},
+                            data: {entity: entity.value(), attribute: value, type: type},
                             success: function (array) {
                                 var newData = JSON.parse(localStorage.getItem('list_filtres'));
                                 if (newData === null) {
@@ -260,8 +287,9 @@ define(
                                     finded = 1;
                                     self.changeTypes(array.type);
                                     if (array.type == 'select') {
-                                        self.caption('Select');
-
+                                        if (!('noCaption' in array)) {
+                                            self.caption('Select');
+                                        }
                                         self.setOptions(array.select);
                                     } else {
                                         self.setOptions([]);
@@ -279,7 +307,6 @@ define(
                                 parent.showSpinner(false);
                             }
                         });
-
                     }
                 },
                 setInitialValue: function () {
@@ -315,6 +342,8 @@ define(
                             this.toValue(array[1]);
                             break;
                         case 'text':
+                            this.textValue(value);
+                            break;
                         default:
                             this.textValue(value);
                     }

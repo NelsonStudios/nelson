@@ -19,8 +19,10 @@
             <xs:element name="attribute" type="attributeDeclaration" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="description" type="descriptionDeclaration" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="link" type="linkDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="field" type="fieldDeclaration" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="entity" type="xs:string" use="optional"/>
         <xs:attribute name="label" type="xs:string" use="required"/>
         <xs:attribute name="sortOrder" type="xs:integer" use="optional"/>
         <xs:attribute name="model" type="model" use="optional"/>
@@ -43,14 +45,33 @@
         <xs:attribute name="label" type="xs:string" use="required"/>
     </xs:complexType>
 
+    <xs:complexType name="fieldDeclaration">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="entity" type="xs:string" use="optional"/>
+        <xs:attribute name="componentType" type="xs:string" use="optional"/>
+        <xs:attribute name="component" type="xs:string" use="optional"/>
+        <xs:attribute name="template" type="xs:string" use="optional"/>
+        <xs:attribute name="url" type="xs:string" use="optional"/>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="label" type="xs:string" use="required"/>
+        <xs:attribute name="notice" type="xs:string" use="optional"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="required" type="xs:boolean" use="optional"/>
+        <xs:attribute name="validation" type="xs:string" use="optional"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:attribute name="options" type="xs:string" use="optional"/>
+        <xs:attribute name="source_options" type="xs:string" use="optional"/>
+        <xs:attribute name="formElement" type="xs:string" use="optional"/>
+    </xs:complexType>
+
     <xs:simpleType name="model">
         <xs:annotation>
             <xs:documentation>
-                Model name can contain only [a-zA-Z_\\\\].
+                Model name can contain only [a-zA-Z_\d\\\\].
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:pattern value="[a-zA-Z_\\\\]+" />
+            <xs:pattern value="[a-zA-Z_\d\\\\]+" />
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

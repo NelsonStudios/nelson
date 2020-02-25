@@ -23,7 +23,7 @@ class Assistant extends AbstractHelper
      *
      * @return array
      */
-    public function parsingCategories($categoryArray = [], $categorySeparator)
+    public function parsingCategories($categoryArray = [], $categorySeparator = '')
     {
         $categoryArrayAfterParse = [];
         $iterator = 1;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * @copyright: Copyright Â© 2017 Firebear Studio. All rights reserved.
+ * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 -->
@@ -35,5 +35,23 @@
         <field name="port" id="port" label="Port" type="text" required="true"/>
         <field name="username" id="username" label="Username" type="text" required="true"/>
         <field name="password" id="password" label="Password" type="text" required="true"/>
+    </type>
+    <type name="rest" label="REST API" modelInstance="Firebear\ImportExport\Model\Source\Type\Rest"
+          exists="\RestClient" sortOrder="70" depends="json,xml" api="1">
+        <field name="request_url" id="request_url" label="API Call URL" type="text"
+               required="true" notice="API Call URL" validation="no-whitespace url2"/>
+        <field name="request_method" id="request_method"
+               label="Request Method" type="text" required="true" formElement="select"
+               component="Firebear_ImportExport/js/form/export-rest-select"
+               options="Firebear\ImportExport\Model\ExportJob\Source\RestMethod"
+               source_options="Firebear\ImportExport\Model\ExportJob\Source\RestMethod"
+        />
+        <field name="request_options" id="request_options"
+               label="JSON Options" type="text" required="true" notice="JSON Options"
+               validation="validate-no-empty required-entry"
+               component="Firebear_ImportExport/js/form/export-rest-textarea"/>
+        <field name="request_body" id="request_body" label="JSON Body Request"
+               type="text" required="false" notice="JSON Body Request"
+               component="Firebear_ImportExport/js/form/export-rest-textarea"/>
     </type>
 </config>

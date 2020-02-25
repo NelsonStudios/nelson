@@ -124,7 +124,6 @@ define(
                                     if (!result) {
                                         self.error([$t('Fail! Can\'t connect ')]);
                                     } else {
-
                                         self.note($t("Success! Your connection is ready!"));
                                         form.resolve(true);
                                     }
@@ -135,7 +134,6 @@ define(
                                 dataType: "json"
                             }
                         );
-
                     }
                     return form.promise();
                 }

@@ -6,6 +6,8 @@
 
 namespace Firebear\ImportExport\Model\Filesystem;
 
+use Firebear\ImportExport\Model\Filesystem\Driver\Http;
+
 /**
  * A pool of stream wrappers
  */
@@ -17,7 +19,7 @@ class DriverPool extends \Magento\Framework\Filesystem\DriverPool
      */
     public function __construct($extraTypes = [])
     {
-        $this->types[self::HTTP] = '\Firebear\ImportExport\Model\Filesystem\Driver\Http';
+        $this->types[self::HTTP] = Http::class;
         parent::__construct($extraTypes);
     }
 }

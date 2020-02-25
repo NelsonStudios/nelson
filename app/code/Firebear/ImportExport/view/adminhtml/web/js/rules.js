@@ -1,6 +1,6 @@
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 /**
@@ -56,7 +56,6 @@ define([
 
         this.relatedInput = registry.get(inputName);
         if (typeof this.relatedInput != 'undefined') {
-
             var values = this.relatedInput.value();
             values = values.toQueryParams();
             var result = {};
@@ -103,7 +102,6 @@ define([
                     }
                 });
             } else {
-
                 var elem = jQuery(self.parent).find('.rule-param-new-child .element-value-changer')[0];
                 var children_ul_id = elem.id.replace(/__/g, ':').replace(/[^:]*$/, 'children').replace(/:/g, '__');
                 var children_ul = $(self.parent).select('#' + children_ul_id)[0];
@@ -166,7 +164,7 @@ define([
             },
             onSuccess: function (transport) {
                 if (this._processSuccess(transport)) {
-                    $(chooser).update(transport.responseText);
+                    jQuery(chooser).html(transport.responseText);
                     this.showChooserLoaded(chooser, transport);
                     jQuery(chooser).trigger('contentUpdated');
                 }

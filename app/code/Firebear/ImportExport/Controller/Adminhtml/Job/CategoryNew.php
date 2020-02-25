@@ -6,46 +6,40 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Magento\Backend\App\Action\Context;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Registry;
-use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
+/**
+ * Class CategoryNew
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class CategoryNew extends JobController
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
+     * @var CategoryCollectionFactory
      */
     private $collectionCategoryFactory;
 
     /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * CategoryNew constructor.
+     *
+     * @param Context $context
+     * @param CategoryCollectionFactory $collectionCategoryFactory
      */
-    private $jsonFactory;
-
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        CategoryCollectionFactory $collectionCategoryFactory,
-        JsonFactory $jsonFactory
+        CategoryCollectionFactory $collectionCategoryFactory
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
+        parent::__construct($context);
         $this->collectionCategoryFactory = $collectionCategoryFactory;
-        $this->jsonFactory = $jsonFactory;
     }
 
-    /**
-     * @return $this
-     */
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
 
         if ($this->getRequest()->isAjax()) {
             $newCategoryId = $this->getRequest()->getParam('categoryId');
@@ -58,11 +52,15 @@ class CategoryNew extends JobController
         }
     }
 
+    /**
+     * @param int $categoryId
+     * @return string
+     */
     private function getCategoryPathById($categoryId)
     {
         $storeId = $this->getRequest()->getParam('store');
 
-        /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+        /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
         $collection = $this->collectionCategoryFactory->create();
 
         $collection->addAttributeToFilter('entity_id', $categoryId)

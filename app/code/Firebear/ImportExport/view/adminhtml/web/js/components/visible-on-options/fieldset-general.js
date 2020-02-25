@@ -32,9 +32,10 @@ define(
                     this.isShown = (selected in this.valuesForOptions);
                     var button = reg.get(this.ns + "." + this.ns + ".source.check_button");
                     var bool = 1;
-
-                    if (button.component == 'Firebear_ImportExport/js/components/button-check') {
-                        bool = button.showMap();
+                    if (button !== undefined) {
+                        if (button.component == 'Firebear_ImportExport/js/components/button-check') {
+                            bool = button.showMap();
+                        }
                     }
                     this.visible((this.isShown == true && bool == 1) ? true : false);
                 },

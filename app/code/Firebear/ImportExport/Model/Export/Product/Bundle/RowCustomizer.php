@@ -8,11 +8,14 @@ namespace Firebear\ImportExport\Model\Export\Product\Bundle;
 
 use \Magento\Catalog\Model\Product\Type\AbstractType;
 
+/**
+ * Class RowCustomizer
+ *
+ * @package Firebear\ImportExport\Model\Export\Product\Bundle
+ */
 class RowCustomizer extends \Magento\BundleImportExport\Model\Export\RowCustomizer
 {
-
     /**
-     *
      * Mapping for shipment type
      *
      * @var array
@@ -32,12 +35,14 @@ class RowCustomizer extends \Magento\BundleImportExport\Model\Export\RowCustomiz
      */
     protected function getTypeValue($type)
     {
-        return isset($this->typeMapping[$type]) ? __($this->typeMapping[$type]) : __(self::VALUE_DYNAMIC);
+        $valueDynamic = self::VALUE_DYNAMIC;
+        return isset($this->typeMapping[$type]) ? __($this->typeMapping[$type]) : __($valueDynamic);
     }
 
     protected function getPriceViewValue($type)
     {
-        return isset($this->priceViewMapping[$type]) ? __($this->priceViewMapping[$type]) : __(self::VALUE_PRICE_RANGE);
+        $valuePriceRange = self::VALUE_PRICE_RANGE;
+        return isset($this->priceViewMapping[$type]) ? __($this->priceViewMapping[$type]) : __($valuePriceRange);
     }
 
     protected function getPriceTypeValue($type)

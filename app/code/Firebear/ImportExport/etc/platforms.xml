@@ -5,8 +5,9 @@
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="platforms.xsd">
-    <platform name="magento1" label="Magento 1" model="Firebear\ImportExport\Model\Source\Platform\Magento">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Firebear_ImportExport:etc/platforms.xsd">
+    <!--<platform name="magento1" entity="catalog_product" label="Magento 1" model="Firebear\ImportExport\Model\Source\Platform\Magento">
         <attribute code="_store" reference="_store" />
         <attribute code="store" reference="_store" />
         <attribute code="websites" reference="_product_websites" />
@@ -47,14 +48,16 @@
         <attribute code="website" reference="_product_websites" />
         <description label="1. Click 'Load Map Attributes' button to map attributes automatically."/>
         <description label="1. 2. Fill missing value for RED dropdown. This problem occurs when your file uses custom column names for required columns."/>
+        <link entity="github_link" suffix="" label="Download sample files"/>
         <link entity="catalog_product" suffix="" label="Download Sample File For Magento 1"/>
         <link entity="catalog_product" suffix="-bundle-products" label="Download Sample File For Bundle Products in Magento 1"/>
         <link entity="catalog_product" suffix="-downloadable-products" label="Download Sample File For Downloadable Products in Magento 1"/>
-    </platform>
-    <platform name="magento2" label="Magento 2">
+    </platform>-->
+<!--    <platform name="magento2" entity="catalog_product" label="Magento 2">
+        <link entity="github_link" suffix="" label="Download sample files"/>
         <link entity="catalog_product" suffix="" label="Download Sample File For Magento 2"/>
-    </platform>
-    <platform name="shopify" label="Shopify" model="Firebear\ImportExport\Model\Source\Platform\Shopify">
+    </platform>-->
+    <platform name="shopify" entity="catalog_product" label="Shopify" model="Firebear\ImportExport\Model\Source\Platform\Shopify">
         <attribute code="Variant SKU" reference="sku" />
         <attribute code="Product Name" reference="name" />
         <attribute code="Title" reference="name" />
@@ -71,6 +74,13 @@
         <attribute code="product_type" reference="product_type" default="simple"/>
         <attribute code="_attribute_set" reference="_attribute_set" default="Default"/>
     </platform>
+    <platform name="prestashop" entity="catalog_product" label="Prestashop" model="Firebear\ImportExport\Model\Source\Platform\Prestashop" >
+        <attribute code="sku" reference="sku" />
+        <attribute code="product_type" reference="product_type" default="simple"/>
+        <attribute code="_attribute_set" reference="_attribute_set" default="Default"/>
+        <attribute code="_product_websites" reference="product_websites" default="base"/>
+        <description label="A prebuilt XSLT is available with in the package, with common variable which needs to be filled in for correct import."/>
+    </platform>
    <!--<platform name="bol" label="BOL" model="Firebear\ImportExport\Model\Source\Platform\Bol">
        <attribute code="EAN" reference="sku" />
        <attribute code="ean" reference="sku" />
@@ -86,4 +96,11 @@
        <attribute code="OfferNL.sellingPrice" reference="price"/>
        <attribute code="Gender" reference="gender"/>
     </platform>-->
+    <platform name="magmi" entity="catalog_product" label="Magmi" model="Firebear\ImportExport\Model\Source\Platform\Magmi">
+        <attribute code="store" reference="_store" />
+        <attribute code="attribute_set" reference="attribute_set_code" />
+        <attribute code="category" reference="categories" />
+        <attribute code="type" reference="product_type" />
+        <attribute code="sku" reference="sku" />
+    </platform>
 </config>

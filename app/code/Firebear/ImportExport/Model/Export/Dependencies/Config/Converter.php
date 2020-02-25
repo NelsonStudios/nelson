@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Export\Dependencies\Config;
 
 use Magento\Framework\Config\ConverterInterface;
 
+/**
+ * Class Converter
+ *
+ * @package Firebear\ImportExport\Model\Export\Dependencies\Config
+ */
 class Converter implements ConverterInterface
 {
 
@@ -60,7 +65,6 @@ class Converter implements ConverterInterface
                 $result[$entityName]['fields'][$childNode->attributes->getNamedItem('name')->nodeValue] = [
                     'label' => $childNode->attributes->getNamedItem('label')->nodeValue,
                     'model' => $childNode->attributes->getNamedItem('model')->nodeValue,
-                    //'collection' => $childNode->attributes->getNamedItem('collection')->nodeValue,
                     'main_field' => $childNode->attributes->getNamedItem('main_field')->nodeValue,
                     'parent' => ($childNode->attributes->getNamedItem('parent'))
                         ? $childNode->attributes->getNamedItem('parent')->nodeValue

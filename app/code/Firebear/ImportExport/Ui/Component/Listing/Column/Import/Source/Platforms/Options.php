@@ -6,7 +6,9 @@
 
 namespace Firebear\ImportExport\Ui\Component\Listing\Column\Import\Source\Platforms;
 
+use Magento\Framework\Registry;
 use Magento\Framework\Data\OptionSourceInterface;
+use Firebear\ImportExport\Model\Import\Platforms as PlatformConfig;
 
 /**
  * Class Options
@@ -14,23 +16,37 @@ use Magento\Framework\Data\OptionSourceInterface;
 class Options implements OptionSourceInterface
 {
     /**
+     * Options array
+     *
      * @var array
      */
     protected $options;
 
     /**
+     * Platform config
+     *
      * @var \Firebear\ImportExport\Model\Import\Platforms
      */
     protected $platforms;
 
     /**
-     * Options constructor.
+     * Core registry
      *
-     * @param \Firebear\ImportExport\Model\Import\Platforms $platforms
+     * @var \Magento\Framework\Registry
+     */
+    protected $coreRegistry;
+
+    /**
+     * Initialize options
+     *
+     * @param Registry $registry
+     * @param PlatformConfig $platforms
      */
     public function __construct(
-        \Firebear\ImportExport\Model\Import\Platforms $platforms
+        Registry $registry,
+        PlatformConfig $platforms
     ) {
+        $this->coreRegistry = $registry;
         $this->platforms = $platforms;
     }
     /**
@@ -40,15 +56,17 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $options[] = ['label' => __('Select'), 'value' => ''];
-        $list = $this->platforms->toOptionArrayNames();
-  
-        foreach ($list as $data) {
-            $options[] = ['label' => $data['label'], 'value' => $data['value']];
+        if (!$this->options) {
+            $model = $this->coreRegistry->registry('import_job');
+            $options = [['label' => __('None'), 'value' => '']];
+            if ($model) {
+                $list = $this->platforms->getPlatformList(
+                    $model->getEntity()
+                );
+                $options = array_merge($options, $list['options'] ?? []);
+            }
+            $this->options = $options;
         }
-        
-        $this->options = $options;
-
-        return $this->options;
+        return $this->options ?: [];
     }
 }

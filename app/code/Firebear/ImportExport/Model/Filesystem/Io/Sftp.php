@@ -48,6 +48,24 @@ class Sftp extends \Magento\Framework\Filesystem\Io\Sftp
     }
 
     /**
+     * Creates a directory.
+     *
+     * @param string $dir
+     * @param int $mode
+     * @param bool $recursive
+     * @return bool
+     */
+    public function mkdir($dir, $mode = -1, $recursive = true)
+    {
+        if ($this->_connection->is_dir($dir)) {
+            $result = true;
+        } else {
+            $result = $this->_connection->mkdir($dir, $mode = -1, $recursive = true);
+        }
+        return $result;
+    }
+
+    /**
      * @param $filename
      * @return mixed
      */

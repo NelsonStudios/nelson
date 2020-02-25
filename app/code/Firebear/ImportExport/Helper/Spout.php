@@ -6,6 +6,7 @@
 
 namespace Firebear\ImportExport\Helper;
 
+use Box\Spout\Reader\ReaderInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 
 /**
@@ -20,18 +21,18 @@ class Spout extends AbstractHelper
      */
     public function isSpoutInstall()
     {
-        return interface_exists('Box\Spout\Reader\ReaderInterface');
+        return interface_exists(ReaderInterface::class);
     }
-    
+
     /**
      * Check whether name is allow
      *
-     * @param string $name   
+     * @param string $name
      * @return bool
      */
     public function isAllowName($name)
     {
-        $names = ['ods', 'xlsx'];
+        $names = [];
         return !in_array($name, $names) || $this->isSpoutInstall();
-    }    
+    }
 }

@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Model\Source\Import\Behavior;
 
+/**
+ * Class CmsPage
+ *
+ * @package Firebear\ImportExport\Model\Source\Import\Behavior
+ */
 class CmsPage extends \Magento\ImportExport\Model\Source\Import\AbstractBehavior
 {
     const  ONLY_UPDATE = 'update';

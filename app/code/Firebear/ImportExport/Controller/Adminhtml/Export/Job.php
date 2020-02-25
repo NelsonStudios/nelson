@@ -6,49 +6,49 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export;
 
+use Firebear\ImportExport\Api\ExportJobRepositoryInterface;
+use Firebear\ImportExport\Model\ExportJobFactory;
+use Firebear\ImportExport\Helper\Data as Helper;
+use Magento\Backend\App\Action;
+
 /**
- * Class ExportJob
+ * Class Job
  *
- * @package Firebear\ImportExport\Controller\Adminhtml
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export
  */
-abstract class Job extends \Magento\Backend\App\Action
+abstract class Job extends Action
 {
     const ADMIN_RESOURCE = 'Firebear_ImportExport::export_job';
 
     /**
-     * Core registry
-     *
-     * @var \Magento\Framework\Registry
+     * @var ExportJobFactory
      */
-    protected $coreRegistry = null;
+    protected $jobFactory;
 
     /**
-     * @var \Firebear\ImportExport\Model\ExportJobFactory
+     * @var ExportJobRepositoryInterface
      */
-    protected $exportJobFactory;
+    protected $repository;
 
     /**
-     * @var \Firebear\ImportExport\Api\ExportJobRepositoryInterface
+     * @var Helper
      */
-    protected $exportRepository;
+    protected $helper;
 
     /**
      * Job constructor.
      *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory
-     * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository
+     * @param Context $context
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository
+        Context $context
     ) {
-        $this->coreRegistry = $coreRegistry;
-        $this->exportJobFactory = $exportJobFactory;
-        $this->exportRepository = $exportRepository;
-        parent::__construct($context);
+        parent::__construct(
+            $context->getContext()
+        );
+
+        $this->jobFactory = $context->getJobFactory();
+        $this->repository = $context->getRepository();
+        $this->helper = $context->getHelper();
     }
 }

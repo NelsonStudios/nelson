@@ -169,7 +169,7 @@ define(
                                     form_data: elements,
                                     source_type: source.value()
                                 };
-                                var type = registry.get(self.ns + '.' + self.ns + '.source_data_map_container.platforms');
+                                var type = registry.get(self.ns + '.' + self.ns + '.settings.platforms');
                                 var locale = registry.get(self.ns + '.' + self.ns + '.general.language');
                                 if (type.value()) {
                                     data['type'] = type.value();

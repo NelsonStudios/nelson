@@ -6,6 +6,13 @@
 
 namespace Firebear\ImportExport\Model\Source\Type;
 
+use Magento\Framework\App\CacheInterface;
+
+/**
+ * Class Ftp
+ *
+ * @package Firebear\ImportExport\Model\Source\Type
+ */
 class Ftp extends AbstractType
 {
     /**
@@ -45,9 +52,19 @@ class Ftp extends AbstractType
         \Magento\Framework\Stdlib\DateTime\Timezone $timezone,
         \Firebear\ImportExport\Model\Source\Factory $factory,
         \Magento\Framework\Filesystem\Io\File $file,
-        \Firebear\ImportExport\Model\Filesystem\Io\Ftp $ftp
+        \Firebear\ImportExport\Model\Filesystem\Io\Ftp $ftp,
+        CacheInterface $cache
     ) {
-        parent::__construct($scopeConfig, $filesystem, $readFactory, $writeFactory, $fileWrite, $timezone, $factory);
+        parent::__construct(
+            $scopeConfig,
+            $filesystem,
+            $readFactory,
+            $writeFactory,
+            $fileWrite,
+            $timezone,
+            $factory,
+            $cache
+        );
         $this->file = $file;
         $this->ftp = $ftp;
     }
@@ -186,13 +203,16 @@ class Ftp extends AbstractType
                         $currentDate = "-" . $this->timezone->date()->format($format);
                     }
                     $info = pathinfo($this->getData('file_path'));
-                    $sourceFilePath =  $info['dirname'] . '/' . $info['filename'] . $currentDate . '.' . $info['extension'];
                     $filePath = $this->directory->getAbsolutePath($path);
-                    $result = $client->write($sourceFilePath, $filePath);
+                    $destFilePath = $info['dirname'] . DIRECTORY_SEPARATOR;
+                    $destFileName = $info['filename'] . $currentDate . '.' . $info['extension'];
+                    $client->mkdir($destFilePath, 0775, true);
+                    $result = $client->write($destFileName, $filePath);
                     if (!$result) {
                         $result = false;
                         $errors[] = __('File not found');
                     }
+                    $client->close();
                 } else {
                     $result = false;
                     $errors[] = __("Can't initialize %s client", $this->code);

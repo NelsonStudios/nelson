@@ -42,7 +42,8 @@ class CellValueFormatter
     protected $escaper;
 
     /**
-     * @param bool $shouldFormatDates Whether date/time values should be returned as PHP objects or be formatted as strings
+     * @param bool $shouldFormatDates Whether date/time values should be returned as PHP objects or
+     * be formatted as strings
      */
     public function __construct($shouldFormatDates)
     {
@@ -57,7 +58,8 @@ class CellValueFormatter
      * @see http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html#refTable13
      *
      * @param \DOMNode $node
-     * @return string|int|float|bool|\DateTime|\DateInterval|null The value associated with the cell, empty string if cell's type is void/undefined, null on error
+     * @return string|int|float|bool|\DateTime|\DateInterval|null The value associated with the cell,
+     * empty string if cell's type is void/undefined, null on error
      */
     public function extractAndFormatNodeValue($node)
     {
@@ -96,17 +98,17 @@ class CellValueFormatter
         $pNodes = $node->getElementsByTagName(self::XML_NODE_P);
         foreach ($pNodes as $pNode) {
             $currentPValue = '';
-			if ('office:annotation' == $pNode->parentNode->nodeName) {
-				continue;
-			}
+            if ('office:annotation' == $pNode->parentNode->nodeName) {
+                continue;
+            }
             foreach ($pNode->childNodes as $childNode) {
-				if ($childNode instanceof \DOMText) {
+                if ($childNode instanceof \DOMText) {
                     $currentPValue .= $childNode->nodeValue;
-                } else if ($childNode->nodeName === self::XML_NODE_S) {
+                } elseif ($childNode->nodeName === self::XML_NODE_S) {
                     $spaceAttribute = $childNode->getAttribute(self::XML_ATTRIBUTE_C);
-                    $numSpaces = (!empty($spaceAttribute)) ? intval($spaceAttribute) : 1;
+                    $numSpaces = (!empty($spaceAttribute)) ? (int) ($spaceAttribute) : 1;
                     $currentPValue .= str_repeat(' ', $numSpaces);
-                } else if ($childNode->nodeName === self::XML_NODE_A || $childNode->nodeName === self::XML_NODE_SPAN) {
+                } elseif ($childNode->nodeName === self::XML_NODE_A || $childNode->nodeName === self::XML_NODE_SPAN) {
                     $currentPValue .= $childNode->nodeValue;
                 }
             }
@@ -126,7 +128,7 @@ class CellValueFormatter
     protected function formatFloatCellValue($node)
     {
         $nodeValue = $node->getAttribute(self::XML_ATTRIBUTE_VALUE);
-        $nodeIntValue = intval($nodeValue);
+        $nodeIntValue = (int) ($nodeValue);
         // The "==" is intentionally not a "===" because only the value matters, not the type
         $cellValue = ($nodeIntValue == $nodeValue) ? $nodeIntValue : floatval($nodeValue);
         return $cellValue;

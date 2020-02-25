@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Block\Adminhtml\Import\History;
 
+/**
+ * Class Before
+ *
+ * @package Firebear\ImportExport\Block\Adminhtml\Import\History
+ */
 class Before extends \Magento\Backend\Block\Template
 {
     /**

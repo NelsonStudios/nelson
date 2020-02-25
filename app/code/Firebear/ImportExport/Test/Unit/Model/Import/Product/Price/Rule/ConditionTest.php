@@ -4,10 +4,15 @@
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
-namespace Firebear\ImportExport\Test\Unit\Model\Import;
+namespace Firebear\ImportExport\Test\Unit\Model\Import\Product\Price\Rule;
 
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager as ObjectManagerHelper;
 
+/**
+ * Class ConditionTest
+ *
+ * @package Firebear\ImportExport\Test\Unit\Model\Import
+ */
 class ConditionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectManagerHelper */

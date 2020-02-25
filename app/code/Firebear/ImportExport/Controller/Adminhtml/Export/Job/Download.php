@@ -6,14 +6,11 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Additional;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\App\Response\Http\FileFactory;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Context;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Job as JobController;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Filesystem;
 
 /**
@@ -34,22 +31,18 @@ class Download extends JobController
 
     /**
      * Download constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
      * @param Filesystem $filesystem
      * @param FileFactory $fileFactory
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
         Filesystem $filesystem,
         FileFactory $fileFactory
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
+        parent::__construct($context);
+
         $this->fileFactory = $fileFactory;
         $this->directory = $filesystem->getDirectoryRead(DirectoryList::ROOT);
     }
@@ -57,7 +50,7 @@ class Download extends JobController
     /**
      * Execute action
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function execute()
     {

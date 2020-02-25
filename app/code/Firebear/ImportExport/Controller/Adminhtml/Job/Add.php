@@ -7,39 +7,14 @@
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Job;
-use Magento\Backend\App\Action\Context;
-use Magento\Backend\Model\View\Result\ForwardFactory;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
 
+/**
+ * Class Add
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Add extends Job
 {
-    /**
-     * @var ForwardFactory
-     */
-    protected $resultForwardFactory;
-
-    /**
-     * Add constructor.
-     *
-     * @param Context                $context
-     * @param Registry               $coreRegistry
-     * @param JobFactory             $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param ForwardFactory         $resultForwardFactory
-     */
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        ForwardFactory $resultForwardFactory
-    ) {
-        $this->resultForwardFactory = $resultForwardFactory;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-    }
-
     /**
      * Create new Job
      *
@@ -48,7 +23,7 @@ class Add extends Job
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
-        $resultForward = $this->resultForwardFactory->create();
+        $resultForward = $this->resultFactory->create($this->resultFactory::TYPE_FORWARD);
         return $resultForward->forward('edit');
     }
 }

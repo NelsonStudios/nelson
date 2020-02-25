@@ -20,8 +20,6 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $this->options = [];
-
-        return $this->options;
+        return [];
     }
 }

@@ -6,12 +6,6 @@
 
 namespace Firebear\ImportExport\Ui\Component\Listing\Column\Duplicate;
 
-use Firebear\ImportExport\Model\Import\Address;
-use Firebear\ImportExport\Model\Import\CmsPage;
-use Firebear\ImportExport\Model\Import\Customer;
-use Firebear\ImportExport\Model\Import\CustomerComposite;
-use Firebear\ImportExport\Model\Import\Product;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
 use Magento\Framework\Data\OptionSourceInterface;
 
 /**
@@ -26,65 +20,15 @@ class Options implements OptionSourceInterface
     protected $options;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory
+     * @var array
      */
-    protected $attributeFactory;
-
-    /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection
-     */
-    protected $attributeCollection;
-
-    /**
-     * @var Product
-     */
-    protected $productImportModel;
-
-    /**
-     * @var Customer
-     */
-    protected $customer;
-
-    /**
-     * @var Address
-     */
-    protected $address;
-
-    /**
-     * @var CustomerComposite
-     */
-    protected $composite;
-
-    /**
-     * @var CmsPage
-     */
-    protected $cmsPage;
-
-    /**
-     * Options constructor.
-     *
-     * @param CollectionFactory $attributeFactory
-     * @param Product $productImportModel
-     * @param Customer $customer
-     * @param Address $address
-     * @param CustomerComposite $composite
-     * @param CmsPage $cmsPage
-     */
-    public function __construct(
-        CollectionFactory $attributeFactory,
-        Product $productImportModel,
-        Customer $customer,
-        Address $address,
-        CustomerComposite $composite,
-        CmsPage $cmsPage
-    ) {
-        $this->attributeFactory = $attributeFactory;
-        $this->productImportModel = $productImportModel;
-        $this->customer = $customer;
-        $this->address = $address;
-        $this->composite = $composite;
-        $this->cmsPage = $cmsPage;
-    }
+    protected $duplicateFields = [
+        'product' => ['sku', 'scope', 'url_key'],
+        'customer' => [\Magento\CustomerImportExport\Model\Import\Customer::COLUMN_EMAIL],
+        'address' => [],
+        'composite' => [\Magento\CustomerImportExport\Model\Import\Customer::COLUMN_EMAIL],
+        'cmsPage' => []
+    ];
 
     /**
      * Get options
@@ -93,12 +37,19 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $newOptions = $this->productImportModel->getDuplicateFields();
-        $newOptions = array_merge($newOptions, $this->customer->getDuplicateFields());
-        $newOptions = array_merge($newOptions, $this->address->getDuplicateFields());
-        $newOptions = array_merge($newOptions, $this->composite->getDuplicateFields());
-        $newOptions = array_merge($newOptions, $this->cmsPage->getDuplicateFields());
+        $newOptions = [];
+        foreach ($this->duplicateFields as $fields) {
+            $newOptions = array_merge($newOptions, $fields);
+        }
+
         $this->options = array_unique($newOptions);
+
+        $options = [];
+        foreach ($this->options as $option) {
+            $options[] = ['value' => $option, 'label' => $option];
+        }
+
+        $this->options = $options;
 
         return $this->options;
     }

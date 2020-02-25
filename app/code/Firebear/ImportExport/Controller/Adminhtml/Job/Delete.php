@@ -7,39 +7,14 @@
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Backend\App\Action\Context;
-use Magento\Backend\Model\View\Result\ForwardFactory;
-use Magento\Framework\Registry;
 
+/**
+ * Class Delete
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Delete extends JobController
 {
-    /**
-     * @var ForwardFactory
-     */
-    protected $resultForwardFactory;
-
-    /**
-     * Delete constructor.
-     *
-     * @param Context                $context
-     * @param Registry               $coreRegistry
-     * @param JobFactory             $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param ForwardFactory         $resultForwardFactory
-     */
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        ForwardFactory $resultForwardFactory
-    ) {
-        $this->resultForwardFactory = $resultForwardFactory;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-    }
-
     /**
      * Delete a job
      *

@@ -1,6 +1,6 @@
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 define([
@@ -12,7 +12,7 @@ define([
 
     return Select.extend({
         defaults: {
-          ajaxUrl:""
+            ajaxUrl:""
         },
         /**
          * Parse data and set it to options.
@@ -74,7 +74,7 @@ define([
             var dataJSON = JSON.parse(localStorage.getItem('list_categories'));
 
             options.push(option);
-            if(dataJSON !== null) {
+            if (dataJSON !== null) {
                 localStorage.setItem('list_categories', JSON.stringify(options));
             }
             this.options(options);

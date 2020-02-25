@@ -6,87 +6,52 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
 use Firebear\ImportExport\Model\Job\Processor;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\Import\Platforms;
-use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Options;
 use Firebear\ImportExport\Helper\Assistant;
+use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class Loadcategories
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Loadcategories extends JobController
 {
-    /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var DirectoryList
-     */
-    protected $directoryList;
-
     /**
      * @var Processor
      */
     protected $processor;
 
     /**
-     * @var Platforms
+     * @var SerializerInterface
      */
-    protected $platforms;
+    protected $serializer;
 
     /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
-     * @var \Magento\Framework\Json\DecoderInterface
-     */
-    protected $jsonDecoder;
-
-    /**
-     * @var \Firebear\ImportExport\Helper\Assistant
+     * @var Assistant
      */
     protected $ieAssistant;
 
     /**
-     * Loadmap constructor.
+     * Loadcategories constructor.
      *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param DirectoryList $directoryList
      * @param Processor $processor
+     * @param SerializerInterface $serializer
      * @param Assistant $ieAssistant
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        DirectoryList $directoryList,
-        Platforms $platforms,
         Processor $processor,
-        Options $options,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
+        SerializerInterface $serializer,
         Assistant $ieAssistant
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->directoryList = $directoryList;
-        $this->platforms = $platforms;
+        parent::__construct($context);
+
         $this->processor = $processor;
-        $this->options = $options;
-        $this->jsonDecoder = $jsonDecoder;
+        $this->serializer = $serializer;
         $this->ieAssistant = $ieAssistant;
     }
 
@@ -96,7 +61,7 @@ class Loadcategories extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $categories = [];
         if ($this->getRequest()->isAjax()) {
             //read required fields from xml file
@@ -112,7 +77,7 @@ class Loadcategories extends JobController
                     $exData = explode('+', $data);
                     $exData = $this->getContents($exData[1], '[', ']');
                     if (!empty($exData[0])) {
-                        $importData['mappingData'] = $this->jsonDecoder->decode('[' . $exData[0] . ']');
+                        $importData['mappingData'] = $this->serializer->unserialize('[' . $exData[0] . ']');
                     }
                 } else {
                     $index = strstr($data, '+', true);
@@ -123,17 +88,24 @@ class Loadcategories extends JobController
             }
             $importData['platforms'] = $type;
             $importData['locale'] = $locale;
-            if (isset($importData['type_file'])) {
+            $importData['import_source'] = $importData['import_source'] ?? '';
+            $importData['file_path'] = $importData['file_path'] ?? '';
+            if (!empty($importData['type_file'])) {
                 $this->processor->setTypeSource($importData['type_file']);
             }
-            $importData[$sourceType . '_file_path'] = $importData['file_path'];
+            if (!in_array($importData['import_source'], ['rest', 'soap'])) {
+                $importData[$sourceType . '_file_path'] = $importData['file_path'];
+            }
 
             try {
                 //load categories map
                 $importModel = $this->processor->getImportModel()->setData($importData);
                 if ($importModel->getEntity() == 'catalog_product') {
                     $categories = $importModel->getCategories($importData);
-                    $categories = $this->ieAssistant->parsingCategories($categories, $importData['categories_separator']);
+                    $categories = $this->ieAssistant->parsingCategories(
+                        $categories,
+                        $importData['categories_separator']
+                    );
                     $categories = array_unique($categories);
                 }
             } catch (\Exception $e) {
@@ -148,6 +120,12 @@ class Loadcategories extends JobController
         }
     }
 
+    /**
+     * @param string $str
+     * @param string $startDelimiter
+     * @param string $endDelimiter
+     * @return array
+     */
     public function getContents($str, $startDelimiter, $endDelimiter)
     {
         $contents = [];

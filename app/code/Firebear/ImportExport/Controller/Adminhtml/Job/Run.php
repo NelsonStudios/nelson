@@ -7,61 +7,21 @@
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
 
+/**
+ * Class Run
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Run extends JobController
 {
-    /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var Data
-     */
-    protected $helper;
-
-    /**
-     * @var \Magento\Framework\Json\DecoderInterface
-     */
-    protected $jsonDecoder;
-
-    /**
-     * Beforerun constructor.
-     * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param Data $helper
-     */
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
-        Data $helper
-    ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->helper = $helper;
-        $this->jsonDecoder = $jsonDecoder;
-    }
-
     /**
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $result = false;
         if ($this->getRequest()->isAjax()
             && $this->getRequest()->getParam('file')

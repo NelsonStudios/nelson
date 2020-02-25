@@ -3,43 +3,32 @@
  * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\Export\Adapter;
 
-use Magento\Framework\ObjectManagerInterface;
+use InvalidArgumentException;
+use Magento\ImportExport\Model\Export\Adapter\AbstractAdapter;
+use Magento\ImportExport\Model\Export\Adapter\Factory as MagentoFactory;
 
 /**
- * Export Adapter Factory
+ * Class Export Adapter Factory
+ *
+ * @package Firebear\ImportExport\Model\Export\Adapter
  */
-class Factory
+class Factory extends MagentoFactory
 {
-    /**
-     * Object Manager
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    protected $_objectManager;
-
-    /**
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     */
-    public function __construct(
-		ObjectManagerInterface $objectManager
-	) {
-        $this->_objectManager = $objectManager;
-    }
-
     /**
      * Create New Export Adapter Instance
      *
      * @param string $className
-     * @param array $data	 
-     * @return \Magento\ImportExport\Model\Export\Adapter\AbstractAdapter
-     * @throws \InvalidArgumentException
+     * @param array $data
+     * @return AbstractAdapter
+     * @throws InvalidArgumentException
      */
     public function create($className, array $data = [])
     {
         if (!$className) {
-            throw new \InvalidArgumentException('Incorrect class name');
+            throw new InvalidArgumentException('Incorrect class name');
         }
         return $this->_objectManager->create($className, $data);
     }

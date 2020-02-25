@@ -8,12 +8,18 @@ namespace Firebear\ImportExport\Model\Export;
 
 use Firebear\ImportExport\Api\Data\ExportHistoryInterface;
 use Firebear\ImportExport\Api\ExHistoryRepositoryInterface;
+use Firebear\ImportExport\Logger\Logger;
 use Firebear\ImportExport\Model\ResourceModel\Export\History as ExportHistoryResource;
 use Firebear\ImportExport\Model\ResourceModel\Export\History\CollectionFactory as ExportCollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * Class HistoryRepository
+ *
+ * @package Firebear\ImportExport\Model\Export
+ */
 class HistoryRepository implements ExHistoryRepositoryInterface
 {
 
@@ -33,24 +39,23 @@ class HistoryRepository implements ExHistoryRepositoryInterface
     protected $exportCollectionFactory;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     protected $logger;
 
     /**
      * JobRepository constructor.
+     *
      * @param ExportHistoryResource $resource
-     * @param \Firebear\ImportExport\Model\JobRegistry $jobRegistry
      * @param HistoryFactory $exportFactory
      * @param ExportCollectionFactory $exportCollectionFactory
-     * @param \Firebear\ImportExport\Logger\Logger $logger
+     * @param Logger $logger
      */
     public function __construct(
         ExportHistoryResource $resource,
-        \Firebear\ImportExport\Model\JobRegistry $jobRegistry,
-        \Firebear\ImportExport\Model\Export\HistoryFactory $exportFactory,
+        HistoryFactory $exportFactory,
         ExportCollectionFactory $exportCollectionFactory,
-        \Firebear\ImportExport\Logger\Logger $logger
+        Logger $logger
     ) {
         $this->resource = $resource;
         $this->exportFactory = $exportFactory;

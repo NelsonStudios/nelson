@@ -24,8 +24,8 @@ class DuplicateButton extends GenericButton implements ButtonProviderInterface
             $data = [
                 'label' => __('Duplicate Import Job'),
                 'on_click' => 'deleteConfirm(\'' . __(
-                        'Are you sure you want to do this?'
-                    ) . '\', \'' . $this->getDuplicateUrl() . '\')',
+                    'Are you sure you want to do this?'
+                ) . '\', \'' . $this->getDuplicateUrl() . '\')',
                 'sort_order' => 20,
             ];
         }

@@ -20,7 +20,7 @@ class Relation implements RelationInterface
     const ERROR_CODE_DUPLICATE_ENTRY = 23000;
 
     /**
-     * @var \Amasty\MultiInventory\Api\WarehouseItemRepositoryInterface
+     * @var \Firebear\ImportExport\Api\JobMappingRepositoryInterface
      */
     private $mappingRepository;
 

@@ -1,14 +1,17 @@
 <?php
 /**
- * Copyright (c) 2018. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 namespace Firebear\ImportExport\Model\Export;
 
 use Firebear\ImportExport\Helper\Data;
 use Firebear\ImportExport\Model\Source\Factory;
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
 use Magento\Cms\Api\Data\BlockInterface;
+use Magento\Cms\Model\Block;
+use Magento\Cms\Model\ResourceModel\Block\Collection;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory as TypeCollectionFactory;
@@ -24,21 +27,24 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * Class CmsBlock
  * @package Firebear\ImportExport\Model\Export
  */
-class CmsBlock extends AbstractEntity
+class CmsBlock extends AbstractEntity implements EntityInterface
 {
-    use \Firebear\ImportExport\Traits\Export\Entity;
+    use ExportTrait;
 
-    use \Firebear\ImportExport\Traits\General;
+    /**
+     * @var Collection
+     */
+    protected $entityCollection;
 
-    /** @var CollectionFactory */
+    /**
+     * @var CollectionFactory
+     */
     protected $entityCollectionFactory;
 
     /**
      * @var TypeCollectionFactory
      */
     protected $typeCollection;
-    /** @var LoggerInterface */
-    protected $_logger;
 
     /**
      * @var \Firebear\ImportExport\Model\Source\Factory
@@ -76,6 +82,10 @@ class CmsBlock extends AbstractEntity
      */
     protected $helper;
 
+    /**
+     * @var bool
+     */
+    protected $_debugMode;
 
     /**
      * CmsBlock constructor.
@@ -135,8 +145,31 @@ class CmsBlock extends AbstractEntity
                 && $this->_parameters['enable_last_entity_id'] > 0
             ) {
                 $entityCollection->addFieldToFilter(
-                    BlockInterface::BLOCK_ID, ['gt' => $this->_parameters['last_entity_id']]
+                    BlockInterface::BLOCK_ID,
+                    ['gt' => $this->_parameters['last_entity_id']]
                 );
+            }
+            if (isset($this->_parameters['export_filter'])) {
+                if (isset($this->_parameters['export_filter']['block_id'])) {
+                    $entityCollection->addFieldToFilter(
+                        BlockInterface::BLOCK_ID,
+                        ['from' => $this->_parameters['export_filter']['block_id'][0],
+                            'to' => $this->_parameters['export_filter']['block_id'][1]
+                        ]
+                    );
+                }
+                if (isset($this->_parameters['export_filter']['is_active'])) {
+                    $entityCollection->addFieldToFilter(
+                        BlockInterface::IS_ACTIVE,
+                        ['eq' => $this->_parameters['export_filter']['is_active'][0]]
+                    );
+                }
+                if (isset($this->_parameters['export_filter']['identifier'])) {
+                    $entityCollection->addFieldToFilter(
+                        BlockInterface::IDENTIFIER,
+                        ['eq' => $this->_parameters['export_filter']['identifier']]
+                    );
+                }
             }
             $this->paginateCollection($page, $this->getItemsPerPage());
             if ($entityCollection->count() == 0) {
@@ -215,7 +248,7 @@ class CmsBlock extends AbstractEntity
             $minProductsLimit = 500;
             $maxProductsLimit = 5000;
 
-            $this->itemsPerPage = intval(
+            $this->itemsPerPage = (int) (
                 ($memoryLimit * $memoryUsagePercent - memory_get_usage(true)) / $memoryPerProduct
             );
             if ($this->itemsPerPage < $minProductsLimit) {
@@ -244,10 +277,9 @@ class CmsBlock extends AbstractEntity
         } catch (\Exception $e) {
             $this->_logger->critical($e);
         }
-        $newData = $this->changeData($exportData);
+        $newData = $this->changeData($exportData, BlockInterface::BLOCK_ID);
 
         $this->headerColumns = $this->changeHeaders($this->headerColumns);
-
 
         return $newData;
     }
@@ -263,7 +295,11 @@ class CmsBlock extends AbstractEntity
         foreach ($collection as $itemId => $item) {
             $stores = [];
             $data[$itemId] = $item->getData();
-            foreach ($item->getStores() as $storeId) {
+            $itemStores = $item->getStores();
+            if (!is_array($itemStores)) {
+                $itemStores = [$itemStores];
+            }
+            foreach ($itemStores as $storeId) {
                 $store = $this->store->load($storeId);
                 if ($store->getCode() === 'admin') {
                     array_push($stores, 'All');
@@ -306,7 +342,7 @@ class CmsBlock extends AbstractEntity
             }
         }
 
-        if (count($headerColumns != count(array_keys($rowData)))) {
+        if (count($headerColumns) != count(array_keys($rowData))) {
             $newData = [];
             foreach ($headerColumns as $code) {
                 if (!isset($rowData[$code])) {
@@ -362,10 +398,13 @@ class CmsBlock extends AbstractEntity
         return [];
     }
 
+    /**
+     * @return array
+     */
     public function getFieldColumns()
     {
         $options = [];
-        $model = $this->createFactory->create('\Magento\Cms\Model\Block');
+        $model = $this->createFactory->create(Block::class);
         $fields = $this->describeTable($model);
         $mergeFields = [];
         foreach ($fields as $key => $field) {

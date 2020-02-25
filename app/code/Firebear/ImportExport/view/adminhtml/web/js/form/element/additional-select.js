@@ -14,7 +14,8 @@ define(
     function ($, _, Acstract, reg, $t) {
         'use strict';
 
-        function parseOptions(nodes, captionValue) {
+        function parseOptions(nodes, captionValue)
+        {
             var caption,
                 value;
 
@@ -36,7 +37,8 @@ define(
             };
         }
 
-        function indexOptions(data, result) {
+        function indexOptions(data, result)
+        {
             var value;
 
             result = result || {};

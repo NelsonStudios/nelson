@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright: Copyright © 2018 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
@@ -7,62 +6,82 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Firebear\ImportExport\Model\Export\Customer\Additional as CustomerAdditional;
+use Firebear\ImportExport\Model\Export\EntityInterface;
+use Firebear\ImportExport\Model\Export\Dependencies\Config as ExportConfig;
+use Firebear\ImportExport\Model\Export\Product\Additional as ProductAdditional;
+use Firebear\ImportExport\Model\Source\Factory as ModelFactory;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
+use Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory as TypeCollectionFactory;
 
+/**
+ * Class Downfiltr
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Downfiltr extends JobController
 {
     /**
-     * @var JsonFactory
+     * @var AttributeCollectionFactory
      */
-    protected $jsonFactory;
+    protected $collection;
 
     /**
-     * @var \Firebear\ImportExport\Model\ExportFactory
+     * @var ExportConfig
      */
-    protected $export;
+    protected $config;
 
     /**
-     * @var \Magento\ImportExport\Model\Source\Export\Entity
+     * @var ModelFactory
      */
-    protected $entity;
-
-    protected $customersArray = ['customer'];
+    protected $createFactory;
 
     /**
-     * Downfields constructor.
+     * @var TypeCollectionFactory
+     */
+    protected $typeCollection;
+
+    /**
+     * @var ProductAdditional
+     */
+    protected $additional;
+
+    /**
+     * @var CustomerAdditional
+     */
+    protected $additionalCust;
+
+    /**
+     * @var array
+     */
+    protected $customersArray = [
+        'customer'
+    ];
+
+    /**
+     * Downfiltr constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param \Firebear\ImportExport\Model\ExportFactory $export
-     * @param \Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export\Options $entity
+     * @param AttributeCollectionFactory $collectionFactory
+     * @param ExportConfig $config
+     * @param ModelFactory $createFactory
+     * @param TypeCollectionFactory $typeCollection
+     * @param ProductAdditional $additional
+     * @param CustomerAdditional $additionalCust
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Firebear\ImportExport\Model\ExportFactory $export,
-        \Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export\Options $entity,
-        \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory $collectionFactory,
-        \Firebear\ImportExport\Model\Export\Dependencies\Config $config,
-        \Firebear\ImportExport\Model\Source\Factory $createFactory,
-        \Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory $typeCollection,
-        \Firebear\ImportExport\Model\Export\Product\Additional $additional,
-        \Firebear\ImportExport\Model\Export\Customer\Additional $additionalCust
+        AttributeCollectionFactory $collectionFactory,
+        ExportConfig $config,
+        ModelFactory $createFactory,
+        TypeCollectionFactory $typeCollection,
+        ProductAdditional $additional,
+        CustomerAdditional $additionalCust
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->export = $export;
-        $this->entity = $entity;
+        parent::__construct($context);
+
         $this->collection = $collectionFactory;
         $this->config = $config;
         $this->createFactory = $createFactory;
@@ -77,21 +96,22 @@ class Downfiltr extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $options = [];
-        $list = [];
         $tables = $this->getFromTables();
         $extTypes = array_keys($tables);
         if ($this->getRequest()->isAjax()) {
             $entity = $this->getRequest()->getParam('entity');
             if ($entity) {
-                if (!in_array($entity, $extTypes)) {
-                    //  $options[] = $this->getFromAttributes($entity);
+                if (!in_array($entity, $extTypes) || 'advanced_pricing' == $entity) {
                     $list = $this->getFromAttributes($entity);
                     if (in_array($entity, ['advanced_pricing', 'catalog_product'])) {
                         foreach ($this->uniqualFields() as $field) {
                             $list[] = $field;
                         }
+                    }
+                    if ('advanced_pricing' == $entity) {
+                        $list = array_merge_recursive($list, $tables[$entity]);
                     }
                     if (in_array($entity, $this->customersArray)) {
                         foreach ($this->uniqualFieldsCust() as $field) {
@@ -100,14 +120,12 @@ class Downfiltr extends JobController
                     }
                     $options = $list;
                 } else {
-                    $tables = $this->getFromTables();
-
                     $options = $tables[$entity];
                 }
             }
-
-            return $resultJson->setData($options);
         }
+
+        return $resultJson->setData($options);
     }
 
     /**
@@ -146,6 +164,7 @@ class Downfiltr extends JobController
         $data = $this->config->get();
         foreach ($data as $typeName => $type) {
             $typeModel = $type['model'];
+            /** @var EntityInterface $model */
             $model = $this->createFactory->create($typeModel);
             $options += $model->getFieldsForFilter();
         }
@@ -153,11 +172,17 @@ class Downfiltr extends JobController
         return $options;
     }
 
+    /**
+     * @return array
+     */
     protected function uniqualFields()
     {
         return $this->additional->toOptionArray();
     }
 
+    /**
+     * @return array
+     */
     protected function uniqualFieldsCust()
     {
         return $this->additionalCust->toOptionArray();

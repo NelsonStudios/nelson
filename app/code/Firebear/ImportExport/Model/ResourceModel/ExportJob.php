@@ -102,6 +102,7 @@ class ExportJob extends AbstractDb
         $exportJobId = $this->getExportJobId($object, $value, $field);
         if ($exportJobId) {
             $this->entityManager->load($object, $exportJobId);
+            $this->_afterLoad($object);
         }
 
         return $this;
@@ -113,6 +114,60 @@ class ExportJob extends AbstractDb
     public function delete(AbstractModel $object)
     {
         $this->entityManager->delete($object);
+        return $this;
+    }
+
+    /**
+     * Perform actions after object load
+     *
+     * @param AbstractModel $object
+     */
+    protected function _afterLoad(AbstractModel $object)
+    {
+        $select = $this->getConnection()->select()->from(
+            $this->getTable('firebear_export_jobs_event'),
+            ['event']
+        )->where('job_id = ?', $object->getId());
+
+        $events = $this->getConnection()->fetchCol($select);
+        $object->setEvent(implode(',', $events ?: []));
+
+        return $this;
+    }
+
+    /**
+     * Perform actions after object save
+     *
+     * @param AbstractModel $object
+     * @return $this
+     */
+    protected function _afterSave(AbstractModel $object)
+    {
+        $connection = $this->getConnection();
+        if ($object->getId()) {
+            $condition = $connection->quoteInto('job_id=?', $object->getId());
+            $connection->delete(
+                $this->getTable('firebear_export_jobs_event'),
+                $condition
+            );
+        }
+        $data = [];
+        $events = is_array($object->getEvent())
+            ? $object->getEvent()
+            : explode(',', $object->getEvent());
+
+        foreach ($events as $event) {
+            $data[] = [
+                'job_id' => $object->getId(),
+                'event' => $event
+            ];
+        }
+        if (!empty($data)) {
+            $connection->insertOnDuplicate(
+                $this->getTable('firebear_export_jobs_event'),
+                $data
+            );
+        }
         return $this;
     }
 }

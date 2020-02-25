@@ -6,13 +6,21 @@
 
 namespace Firebear\ImportExport\Ui\Component\Listing\Column;
 
+use Firebear\ImportExport\Ui\Component\Listing\Column\ExportSource\Options;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
+/**
+ * Class ExportSource
+ *
+ * @package Firebear\ImportExport\Ui\Component\Listing\Column
+ */
 class ExportSource extends Column
 {
-
+    /**
+     * @var Options
+     */
     protected $options;
 
     /**
@@ -20,17 +28,26 @@ class ExportSource extends Column
      */
     protected $jsonDecoder;
 
+    /**
+     * ExportSource constructor.
+     *
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param Options $options
+     * @param \Magento\Framework\Json\DecoderInterface $jsonDecoder
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Firebear\ImportExport\Ui\Component\Listing\Column\ExportSource\Options $options,
+        Options $options,
         \Magento\Framework\Json\DecoderInterface $jsonDecoder,
         array $components = [],
         array $data = []
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
-        $this->options     = $options;
+        $this->options = $options;
         $this->jsonDecoder = $jsonDecoder;
     }
 
@@ -60,7 +77,7 @@ class ExportSource extends Column
     protected function prepareItem($item)
     {
         $result = null;
-        $list   = $this->options->toArray();
+        $list = $this->options->toArray();
         $source = $this->jsonDecoder->decode($item['export_source']);
         if (isset($source['export_source_entity']) && isset($list[$source['export_source_entity']])) {
             $result = $list[$source['export_source_entity']];

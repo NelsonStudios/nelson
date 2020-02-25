@@ -19,8 +19,8 @@ class Converter implements ConverterInterface
      *
      * @var \Firebear\ImportExport\Helper\Spout
      */
-    protected $_helper; 
-    
+    protected $_helper;
+
     /**
      * Initialize converter
      *
@@ -30,9 +30,9 @@ class Converter implements ConverterInterface
     public function __construct(
         Helper $helper
     ) {
-		$this->_helper = $helper;
+        $this->_helper = $helper;
     }
-    
+
     /**
      * Convert dom node tree to array
      *
@@ -49,15 +49,15 @@ class Converter implements ConverterInterface
             }
             $typeName = $typeNode->attributes->getNamedItem('name')->nodeValue;
             if ($this->_helper->isAllowName($typeName)) {
-				$typeLabel = $typeNode->attributes->getNamedItem('label')->nodeValue;
-				$typeModel = $typeNode->attributes->getNamedItem('model')->nodeValue;
-				$direction = $typeNode->attributes->getNamedItem('direction')->nodeValue;
-				$result[$direction][$typeName] = [
-					'label' => $typeLabel,
-					'model' => $typeModel
-				];
+                $typeLabel = $typeNode->attributes->getNamedItem('label')->nodeValue;
+                $typeModel = $typeNode->attributes->getNamedItem('model')->nodeValue;
+                $direction = $typeNode->attributes->getNamedItem('direction')->nodeValue;
+                $result[$direction][$typeName] = [
+                    'label' => $typeLabel,
+                    'model' => $typeModel
+                ];
             }
         }
         return $result;
-    }	    
+    }
 }

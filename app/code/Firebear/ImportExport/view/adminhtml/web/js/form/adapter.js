@@ -10,11 +10,11 @@ define([
     'use strict';
 
     var buttons = {
-            'reset':            '#reset',
-            'save':             '#save',
-            'saveAndContinue':  '#save_and_continue',
-            'saveAndRun':       '#save_and_run'
-        },
+        'reset':            '#reset',
+        'save':             '#save',
+        'saveAndContinue':  '#save_and_continue',
+        'saveAndRun':       '#save_and_run'
+    },
         selectorPrefix = '',
         eventPrefix;
 
@@ -24,7 +24,8 @@ define([
      * @param {Function} callback
      * @param {String} action
      */
-    function initListener(callback, action) {
+    function initListener(callback, action)
+    {
         var selector    = selectorPrefix ? selectorPrefix + ' ' + buttons[action] : buttons[action],
             elem        = $(selector)[0];
 
@@ -44,7 +45,8 @@ define([
      *
      * @param {String} action
      */
-    function destroyListener(action) {
+    function destroyListener(action)
+    {
         var selector    = selectorPrefix ? selectorPrefix + ' ' + buttons[action] : buttons[action],
             elem        = $(selector)[0];
 

@@ -57,8 +57,16 @@ define(
                     suffixName = '.' + this.suffixName;
                 }
 
-                this.dataScope = 'data.' + this.prefixName + '.' + this.elementName + suffixName;
-                this.links.value = this.provider + ':' + this.dataScope;
+                this.exportDataLink = this.dataScope = 'data.' + this.prefixName + '.' + this.elementName + suffixName;
+                this.exports.value = this.links.value = this.provider + ':' + this.dataScope;
+
+            },
+
+            /** @inheritdoc */
+            destroy: function () {
+                this._super();
+
+                this.source.remove(this.exportDataLink);
             },
 
             /**

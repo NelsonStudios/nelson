@@ -48,23 +48,6 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-
-        /*  $entities = $this->entity->toOptionArray();
-          $options  = [];
-          foreach ($entities as $key => $item) {
-              $childs = [];
-              if ($item['value']) {
-                  $fields = $this->export->create()->setData(['entity' => $item['value']])->getFields();
-                  $childs[] = ['label' => $item['label'], 'value' => $item['value']];
-                  foreach ($fields as $name => $field) {
-                      if (isset($field['optgroup-name']) && $name != $item['value']) {
-                          $childs[] = ['label' => $field['label'], 'value' => $name, 'dep' => $field['optgroup-name']];
-                      }
-                  }
-                  $options[$item['value']] = $childs;
-              }
-          }
-     */
         $options = [];
         foreach ($this->exportConfig->getEntities() as $entityName => $entityConfig) {
             $options[$entityName] = [['value' => $entityName, 'label' => __($entityConfig['label'])]];

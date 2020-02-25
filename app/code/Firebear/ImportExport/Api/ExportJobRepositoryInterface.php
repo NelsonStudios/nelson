@@ -30,7 +30,7 @@ interface ExportJobRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getById($jobId);
-    
+
     /**
      * Delete job.
      *

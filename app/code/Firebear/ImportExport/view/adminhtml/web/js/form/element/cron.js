@@ -1,5 +1,5 @@
 /**
- * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
+ * @copyright: Copyright � 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
@@ -78,7 +78,7 @@ define(
                 },
 
                 setExpr: function (expr) {
-                    if (expr.length > 1) {
+                    if (typeof expr !== 'undefined' && expr.length > 1) {
                         var newArray = expr.split(" ");
                         var self = this;
                         _.each(
@@ -126,7 +126,8 @@ define(
                     var allEmpty = 0;
 
                     _.each(
-                        this.listFields, function (field, key) {
+                        this.listFields,
+                        function (field, key) {
                             if (self[field]().length == 0) {
                                 count++;
                             }

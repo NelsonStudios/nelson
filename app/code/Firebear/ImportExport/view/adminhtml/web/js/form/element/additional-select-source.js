@@ -11,10 +11,11 @@ define(
         'uiRegistry',
         'mage/translate'
     ],
-    function ($, _, Acstract, reg, $t) {
+    function ($, _, Abstract, reg, $t) {
         'use strict';
 
-        function parseOptions(nodes, captionValue) {
+        function parseOptions(nodes, captionValue)
+        {
             var caption,
                 value;
 
@@ -36,7 +37,8 @@ define(
             };
         }
 
-        function indexOptions(data, result) {
+        function indexOptions(data, result)
+        {
             var value;
 
             result = result || {};
@@ -55,14 +57,20 @@ define(
         }
 
 
-        return Acstract.extend(
+        return Abstract.extend(
             {
                 defaults: {
+                    valuesForOptions: [],
                     imports: {
-                        setOptionsAdv: '${$.parentName}.type_file:value'
+                        setOptionsAdv: '${$.parentName}.type_file:value',
+                        toggleByPlatform: 'import_job_form.import_job_form.settings.platforms:value'
                     },
-                    sourceOptions: null
+                    sourceOptions: null,
+                    isShown: false,
+                    inverseVisibility: false,
+                    visible: true
                 },
+
                 initConfig: function (config) {
                     var options = config.options,
                         captionValue = this.captionValue || '',
@@ -79,7 +87,6 @@ define(
                     this.caption = result.caption;
                     _.extend(config, result);
                     this._super();
-
                     return this;
                 },
 
@@ -97,8 +104,15 @@ define(
                     }
                     return this;
                 },
+
                 setOptionsAdv: function (value) {
-                    var isApi = reg.get('import_job_form.import_job_form.settings.use_api').value();
+                    var useApiSettings = reg.get('import_job_form.import_job_form.settings.use_api'),
+                    isApi = '0';
+
+                    if (useApiSettings !== undefined) {
+                        isApi = useApiSettings.value();
+                    }
+
                     if (this.sourceOptions == null) {
                         this.sourceOptions = this.options();
                     }
@@ -106,13 +120,39 @@ define(
                     var prevValue = this.value();
                     var newOptions = [];
                     _.each(options, function (element, index) {
-                        if (isApi !== element.api) return;
-                        if (element.depends == "" || $.inArray(value, element.depends) !== -1) {
+                        if (isApi !== element.api) {
+                            return;
+                        }
+                        if (element.depends === "" || $.inArray(value, element.depends) !== -1) {
                             newOptions.push(element);
                         }
-                    })
-
+                    });
                     this.options(newOptions);
+                },
+
+                toggleVisibility: function (isShown) {
+                    this.isShown = isShown;
+                    this.visible(this.inverseVisibility ? !this.isShown : this.isShown);
+                    if (!this.visible()) {
+                        this.value('');
+                    }
+                },
+
+                toggleByPlatform: function (selected) {
+                    if (!selected || selected === undefined) {
+                        this.toggleVisibility(true);
+                        return;
+                    }
+
+                    var entity = reg.get(this.ns + '.' + this.ns + '.settings.entity');
+                    if (entity === undefined) {
+                        this.toggleVisibility(selected);
+                        return;
+                    }
+
+                    var value = entity.value() + '_' + selected;
+                    value = value in this.platformForm ? false : true;
+                    this.toggleVisibility(value);
                 }
             }
         )

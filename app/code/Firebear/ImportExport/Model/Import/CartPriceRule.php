@@ -7,62 +7,76 @@
 namespace Firebear\ImportExport\Model\Import;
 
 use Firebear\ImportExport\Model\Import\CartPriceRule\RowValidatorInterface as ValidatorInterface;
-use Psr\Log\LoggerInterface;
-use Magento\Framework\Json\Helper\Data;
-use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
-use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
+use Firebear\ImportExport\Model\Source\Type\AbstractType;
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Json\Helper\Data as JsonHelper;
 use Magento\ImportExport\Model\Import;
+use Magento\ImportExport\Model\Import\AbstractEntity;
+use Magento\ImportExport\Model\Import\AbstractSource;
+use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
+use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
+use Psr\Log\LoggerInterface;
 
-
-class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEntity
+/**
+ * Cart Price Rule Import
+ */
+class CartPriceRule extends AbstractEntity
 {
-    use \Firebear\ImportExport\Traits\General;
+    use ImportTrait;
 
     const TITLE = 'name';
+
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $_logger;
-    /**
-     * @var cartPriceRuleCache
+     * @var array
      */
     protected $cartPriceRuleCache = [];
+
     /**
-     * @var sourceType
+     * @var array
+     */
+    protected $validColumnNames = [
+        'name',
+        'code',
+        'uses_per_coupon',
+        'description',
+        'from_date',
+        'to_date',
+        'uses_per_customer',
+        'customer_group_ids',
+        'is_active',
+        'stop_rules_processing',
+        'sort_order',
+        'simple_action',
+        'discount_amount',
+        'discount_qty',
+        'simple_free_shipping',
+        'apply_to_shipping',
+        'times_used',
+        'is_rss',
+        'coupon_type',
+        'use_auto_generation',
+        'website_ids'
+    ];
+
+    /**
+     * @var AbstractType
      */
     protected $sourceType;
+
     /**
-     * @var \Magento\Framework\Json\Helper\Data
+     * Source model
+     *
+     * @var AbstractSource
      */
-    protected $jsonHelper;
+    protected $_source;
+
     /**
-     * @var \Magento\ImportExport\Helper\Data
+     * @var ResourceConnection
      */
-    protected $importExportData;
-    /**
-     * @var \Firebear\ImportExport\Model\ResourceModel\Import\Data
-     */
-    protected $importData;
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
-    protected $resource;
-    /**
-     * @var \Magento\ImportExport\Model\ResourceModel\Helper
-     */
-    protected $resourceHelper;
-    /**
-     * @var \Magento\Framework\Stdlib\StringUtils
-     */
-    protected $string;
-    /**
-     * @var ProcessingErrorAggregatorInterface
-     */
-    protected $errorAggregator;
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected $_resource;
+
     /**
      * @var \Firebear\ImportExport\Helper\Additional
      */
@@ -79,50 +93,61 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
     protected $condition;
 
     /**
-     * CartPriceRule constructor.
-     * @param Data $jsonHelper
-     * @param \Magento\ImportExport\Helper\Data $importExportData
-     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data $importData
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @param \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper
+     * CartPriceRule constructor
+     *
      * @param \Magento\Framework\Stdlib\StringUtils $string
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\ImportExport\Model\ImportFactory $importFactory
+     * @param \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper
+     * @param \Magento\Framework\App\ResourceConnection $resource
      * @param ProcessingErrorAggregatorInterface $errorAggregator
-     * @param LoggerInterface $logger
+     * @param JsonHelper $jsonHelper
+     * @param \Magento\ImportExport\Helper\Data $importExportData
      * @param \Firebear\ImportExport\Helper\Additional $additional
      * @param \Magento\SalesRule\Model\RuleFactory $ruleFactory
      * @param \Magento\SalesRule\Model\RuleRepository $repository
      * @param \Magento\SalesRule\Model\Converter\ToDataModel $toDataModel
+     * @param CartPriceRule\Condition $condition
+     * @param LoggerInterface $logger
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\ImportExport\Helper\Data $importExportData,
-        \Firebear\ImportExport\Model\ResourceModel\Import\Data $importData,
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper,
         \Magento\Framework\Stdlib\StringUtils $string,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\ImportExport\Model\ImportFactory $importFactory,
+        \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper,
+        ResourceConnection $resource,
         ProcessingErrorAggregatorInterface $errorAggregator,
-        LoggerInterface $logger,
+        JsonHelper $jsonHelper,
+        \Magento\ImportExport\Helper\Data $importExportData,
         \Firebear\ImportExport\Helper\Additional $additional,
         \Magento\SalesRule\Model\RuleFactory $ruleFactory,
         \Magento\SalesRule\Model\RuleRepository $repository,
         \Magento\SalesRule\Model\Converter\ToDataModel $toDataModel,
         \Firebear\ImportExport\Model\Import\CartPriceRule\Condition $condition,
+        LoggerInterface $logger,
         array $data = []
     ) {
         $this->jsonHelper = $jsonHelper;
         $this->_importExportData = $importExportData;
         $this->_resourceHelper = $resourceHelper;
-        $this->_dataSourceModel = $importData;
         $this->_resource = $resource;
-        $this->_connection = $resource->getConnection(\Magento\Framework\App\ResourceConnection::DEFAULT_CONNECTION);
-        $this->errorAggregator = $errorAggregator;
-        $this->_logger = $logger;
         $this->additional = $additional;
         $this->ruleFactory = $ruleFactory;
         $this->repository = $repository;
         $this->toDataModel = $toDataModel;
         $this->condition = $condition;
+        $this->_logger = $logger;
+
+        parent::__construct(
+            $string,
+            $scopeConfig,
+            $importFactory,
+            $resourceHelper,
+            $resource,
+            $errorAggregator,
+            $data
+        );
     }
 
     /**
@@ -134,8 +159,14 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
      */
     protected function _importData()
     {
-        if (\Magento\ImportExport\Model\Import::BEHAVIOR_APPEND == $this->getBehavior()) {
-            $this->saveEntity();
+        /* behavior selector */
+        switch ($this->getBehavior()) {
+            case Import::BEHAVIOR_REPLACE:
+                $this->saveEntity();
+                break;
+            case Import::BEHAVIOR_ADD_UPDATE:
+                $this->saveEntity();
+                break;
         }
         return true;
     }
@@ -175,11 +206,6 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
         return 'cart_price_rule';
     }
 
-    public function setLogger($logger)
-    {
-        $this->_logger = $logger;
-    }
-
     protected function _saveValidatedBunches()
     {
         $source = $this->_getSource();
@@ -216,16 +242,28 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                 $nextRowBackup = [];
             }
             if ($source->valid()) {
+                $valid = true;
                 try {
                     $rowData = $source->current();
+                    foreach ($rowData as $attrName => $element) {
+                        if (!mb_check_encoding($element, 'UTF-8')) {
+                            $valid = false;
+                            $this->addRowError(
+                                AbstractEntity::ERROR_CODE_ILLEGAL_CHARACTERS,
+                                $this->_processedRowsCount,
+                                $attrName
+                            );
+                        }
+                    }
                 } catch (\InvalidArgumentException $e) {
+                    $valid = false;
                     $this->addRowError($e->getMessage(), $this->_processedRowsCount);
+                }
+                if (!$valid) {
                     $this->_processedRowsCount++;
                     $source->next();
                     continue;
                 }
-
-                $this->_processedRowsCount++;
                 $rowData = $this->customBunchesData($rowData);
                 $rowSize = strlen($this->jsonHelper->jsonEncode($rowData));
 
@@ -238,7 +276,7 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                     $bunchRows[$source->key()] = $rowData;
                     $currentDataSize += $rowSize;
                 }
-
+                $this->_processedRowsCount++;
                 $source->next();
             }
         }
@@ -257,7 +295,6 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
      */
     protected function saveEntity()
     {
-
         $this->_initSourceType('url');
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
@@ -267,7 +304,9 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                 $rowData = $this->customChangeData($rowData);
                 if (isset($rowData['conditions'])) {
                     $rowData['conditions'] = stripslashes($rowData['conditions']);
-                    $rowData['conditions_serialized'] = $this->condition->parseCondition($this->jsonHelper->jsonDecode($rowData['conditions']));
+                    $rowData['conditions_serialized'] = $this->condition->parseCondition(
+                        $this->jsonHelper->jsonDecode($rowData['conditions'])
+                    );
                     if (count($this->condition->arrayAttr) > 0) {
                         foreach ($this->condition->arrayAttr as $attr) {
                             $this->addLogWriteln(__('The attribute %1 is not exist', $attr), $this->output, 'info');
@@ -277,7 +316,9 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                 }
                 if (isset($rowData['actions'])) {
                     $rowData['actions'] = stripslashes($rowData['actions']);
-                    $rowData['actions_serialized'] = $this->condition->parseActionCondition($this->jsonHelper->jsonDecode($rowData['actions']));
+                    $rowData['actions_serialized'] = $this->condition->parseActionCondition(
+                        $this->jsonHelper->jsonDecode($rowData['actions'])
+                    );
                     if (count($this->condition->arrayAttr) > 0) {
                         foreach ($this->condition->arrayAttr as $attr) {
                             $this->addLogWriteln(__('The attribute %1 is not exist', $attr), $this->output, 'info');
@@ -295,7 +336,11 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                     $rowData['store_labels'] = $scope;
                 }
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('rule with name: %1 is not valided', $rowData['name']), $this->output, 'info');
+                    $this->addLogWriteln(
+                        __('rule with name: %1 is not valided', $rowData['name']),
+                        $this->output,
+                        'info'
+                    );
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -328,7 +373,6 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
                         }
                         $model->setData($data);
                         $model->save();
-                       // $this->repository->save($this->toDataModel->toDataModel($model));
                     } catch (\Exception $e) {
                         $this->getErrorAggregator()->addError(
                             $e->getCode(),
@@ -364,5 +408,29 @@ class CartPriceRule extends \Magento\ImportExport\Model\Import\Entity\AbstractEn
             return $this->_parameters[Import::FIELD_FIELD_MULTIPLE_VALUE_SEPARATOR];
         }
         return Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR;
+    }
+
+    /**
+     * Inner source object getter
+     *
+     * @return AbstractSource
+     * @throws LocalizedException
+     */
+    protected function _getSource()
+    {
+        if (!$this->_source) {
+            throw new LocalizedException(__('Please specify a source.'));
+        }
+        return $this->_source;
+    }
+
+    /**
+     * Retrieve All Fields Source
+     *
+     * @return array
+     */
+    public function getAllFields()
+    {
+        return $this->validColumnNames;
     }
 }

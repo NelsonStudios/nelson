@@ -23,7 +23,6 @@ class Options implements OptionSourceInterface
 
     const SUB_DOWN = 'sub_down';
 
-
     /**
      * Get options
      *
@@ -31,7 +30,7 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $this->options = [
+        return [
             [
                 'label' => __('Сreate config product by same attribute of simple products'),
                 'value' => self::FIELD
@@ -45,15 +44,19 @@ class Options implements OptionSourceInterface
                 'value' => self::PART_DOWN
             ],
             [
-                'label' => __('Create configurable products by custom rules (the number of characters from the beginning of the line)'),
+                'label' => __(
+                    'Create configurable products by custom rules '.
+                    '(the number of characters from the beginning of the line)'
+                ),
                 'value' => self::SUB_UP
             ],
             [
-                'label' => __('Create configurable products by custom rules (the number of characters from the ending of the line)'),
+                'label' => __(
+                    'Create configurable products by custom rules '.
+                    '(the number of characters from the ending of the line)'
+                ),
                 'value' => self::SUB_DOWN
             ]
         ];
-
-        return $this->options;
     }
 }

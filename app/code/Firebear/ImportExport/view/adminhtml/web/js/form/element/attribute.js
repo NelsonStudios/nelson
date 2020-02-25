@@ -44,8 +44,11 @@ define(
                             var data = reg.get(self.provider).data;
                             var system = object.data().source_data_system;
                             var record = reg.get(object.parentName);
-                            var custom = reg.get(object.parentName).custom;
+                            var custom = object.data().custom;
 
+                            if (typeof custom === 'undefined') {
+                                custom = record.custom;
+                            }
                             var dataGen = object.data();
                             var result = _.find(dataGen, function (num, key) {
                                 return key == 'custom';
@@ -64,13 +67,13 @@ define(
                                 dataGen.custom = custom;
                             }
                             object.data(dataGen);
-                                if (_.size(data.source_data_map)) {
-                                    _.each(data.source_data_map, function (index, key) {
-                                        if (index['record_id'] == dataGen.record_id) {
-                                            data.source_data_map[key] = dataGen;
-                                        }
-                                    });
-                                }
+                            if (_.size(data.source_data_map)) {
+                                _.each(data.source_data_map, function (index, key) {
+                                    if (index['record_id'] == dataGen.record_id) {
+                                        data.source_data_map[key] = dataGen;
+                                    }
+                                });
+                            }
                             if (_.size(record.prevData)) {
                                 _.each(
                                     record.prevData,
@@ -80,7 +83,7 @@ define(
                                         }
                                     }
                                 )
-                            } else if("special_map" in data && _.size(data.special_map) > 0) {
+                            } else if ("special_map" in data && _.size(data.special_map) > 0) {
                                 _.each(
                                     data.special_map.source_data_map,
                                     function (element) {

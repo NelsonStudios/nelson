@@ -23,7 +23,13 @@ define(
                 initialize: function () {
                     this._super();
                     var self = this;
-                    var options = $.parseJSON(localStorage.getItem('columns'));
+                    var options = [];
+                    if (typeof (localStorage.getItem('columns')) !== "undefined"
+                        && localStorage.getItem('columns') !== null
+                        && localStorage.getItem('columns') !== 'undefined'
+                    ) {
+                        options = $.parseJSON(localStorage.getItem('columns'));
+                    }
                     self.updateOptions(options);
                     return this;
                 },

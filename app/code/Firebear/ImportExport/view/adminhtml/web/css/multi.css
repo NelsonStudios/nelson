@@ -17,6 +17,10 @@
     width:50px;
 }
 
+.admin__control-table tbody td {
+    vertical-align: bottom;
+}
+
 /*
 .progress-bar {
     background-color: #79a22e;

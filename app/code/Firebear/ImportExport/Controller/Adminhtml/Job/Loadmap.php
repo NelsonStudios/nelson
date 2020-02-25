@@ -6,31 +6,20 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
-use Firebear\ImportExport\Api\JobRepositoryInterface;
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Assistant;
 use Firebear\ImportExport\Model\Import\Platforms;
 use Firebear\ImportExport\Model\Job\Processor;
-use Firebear\ImportExport\Model\JobFactory;
 use Firebear\ImportExport\Model\Source\Config\CartPrice;
 use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Import\Options;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Registry;
 
+/**
+ * Class Loadmap
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Loadmap extends JobController
 {
-    /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var DirectoryList
-     */
-    protected $directoryList;
-
     /**
      * @var Processor
      */
@@ -47,55 +36,31 @@ class Loadmap extends JobController
     protected $options;
 
     /**
-     * @var \Magento\Framework\Json\DecoderInterface
-     */
-    protected $jsonDecoder;
-
-    /**
-     * @var \Firebear\ImportExport\Helper\Assistant
-     */
-    protected $ieAssistant;
-
-    /**
-     * @var \Firebear\ImportExport\Model\Source\Config\CartPrice
+     * @var CartPrice
      */
     protected $cartPrice;
-
 
     /**
      * Loadmap constructor.
      *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param DirectoryList $directoryList
+     * @param Platforms $platforms
      * @param Processor $processor
-     * @param Assistant $ieAssistant
+     * @param Options $options
+     * @param CartPrice $cartPrice
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        DirectoryList $directoryList,
         Platforms $platforms,
         Processor $processor,
         Options $options,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
-        Assistant $ieAssistant,
         CartPrice $cartPrice
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->directoryList = $directoryList;
+        parent::__construct($context);
+
         $this->platforms = $platforms;
         $this->processor = $processor;
         $this->options = $options;
-        $this->jsonDecoder = $jsonDecoder;
-        $this->ieAssistant = $ieAssistant;
         $this->cartPrice = $cartPrice;
     }
 
@@ -105,22 +70,15 @@ class Loadmap extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         if ($this->getRequest()->isAjax()) {
             //read required fields from xml file
             $type = $this->getRequest()->getParam('type');
             $locale = $this->getRequest()->getParam('language');
-            $formData = $this->getRequest()->getParam('form_data');
-            $sourceType = $this->getRequest()->getParam('source_type');
             $importData = [];
-            foreach ($formData as $data) {
-                $index = strstr($data, '+', true);
-                $index = str_replace($sourceType . '[', '', $index);
-                $index = str_replace(']', '', $index);
-                $importData[$index] = substr($data, strpos($data, '+') + 1);
-            }
             $importData['platforms'] = $type;
             $importData['locale'] = $locale;
+            $importData['import_source'] = $importData['import_source'] ?? '';
             $maps = [];
             if ($type) {
                 $mapArr = $this->platforms->getAllData($type);
@@ -131,7 +89,6 @@ class Loadmap extends JobController
             //get CSV Columns from CSV Import file
             $formData = $this->getRequest()->getParam('form_data');
             $sourceType = $this->getRequest()->getParam('source_type');
-            $importData = [];
             foreach ($formData as $data) {
                 $index = strstr($data, '+', true);
                 $index = str_replace($sourceType . '[', '', $index);
@@ -144,12 +101,12 @@ class Loadmap extends JobController
             if (isset($importData['type_file'])) {
                 $this->processor->setTypeSource($importData['type_file']);
             }
-            if (!in_array($importData['import_source'], ['rest', 'soap'])) {
+            if (!in_array($importData['import_source'], ['rest', 'soap']) && isset($importData['file_path'])) {
                 $importData[$sourceType . '_file_path'] = $importData['file_path'];
             }
 
             try {
-                $result = $this->processor->getCsvColumns($importData);
+                $result = $this->processor->getColumns($importData);
                 //load categories map
                 foreach ($result as $key => $el) {
                     if (preg_match('/^(attribute\|).+/', $el)) {
@@ -198,7 +155,7 @@ class Loadmap extends JobController
                         ]
                     );
                 } else {
-                    $collect = $this->options->toOptionArray(1);
+                    $collect = $this->options->toOptionArray(1, $importData['entity']);
                     $options = $collect[$importData['entity']];
                     return $resultJson->setData(
                         [

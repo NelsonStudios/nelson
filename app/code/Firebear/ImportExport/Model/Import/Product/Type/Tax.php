@@ -12,6 +12,11 @@ use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
 use Magento\Framework\EntityManager\MetadataPool;
 use Firebear\ImportExport\Model\Import\Product;
 
+/**
+ * Class Tax
+ *
+ * @package Firebear\ImportExport\Model\Import\Product\Type
+ */
 class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\AbstractType
 {
     /**
@@ -24,8 +29,27 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
      */
     const PAIR_VALUE_SEPARATOR = '=';
 
-
     const WEE_TAX_VARIATIONS_COLUMN = 'wee_tax_variations';
+
+    /**
+     * Error codes
+     */
+    const ERROR_ATTRIBUTE_CODE_IS_NOT_SUPER = 'attrCodeIsNotSuper';
+
+    const ERROR_INVALID_OPTION_VALUE = 'invalidOptionValue';
+
+    /**
+     * Validation failure message template definitions
+     *
+     * @var array
+     *
+     * Note: Some of these messages exceed maximum limit of 120 characters per line. Split up accordingly.
+     */
+    protected $_messageTemplates = [
+        self::ERROR_ATTRIBUTE_CODE_IS_NOT_SUPER => 'Column configurable_variations: Attribute with code ' .
+            '"%s" is not super',
+        self::ERROR_INVALID_OPTION_VALUE => 'Column configurable_variations: Invalid option value for attribute "%s"',
+    ];
 
     /**
      * @var \Magento\Framework\App\ResourceConnection
@@ -55,11 +79,21 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
     protected $productRepository;
+    /** @var \Magento\Catalog\Model\ProductTypes\ConfigInterface */
+    protected $productTypesConfig;
+    /** @var array */
+    protected $cachedOptions = [];
 
-    protected $_cachedOptions = [];
+    /**
+     * Super attributes codes in a form of code => TRUE array pairs
+     *
+     * @var array
+     */
+    protected $_superAttributes = [];
 
     /**
      * Tax constructor.
+     *
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Set\CollectionFactory $attrSetColFac
      * @param \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory $prodAttrColFac
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -67,6 +101,8 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
      * @param \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypesConfig
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $_productColFac
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\Set\CollectionFactory $attrSetColFac,
@@ -85,10 +121,39 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
     }
 
     /**
+     * Add attribute parameters to appropriate attribute set.
+     *
+     * @param string $attrSetName Name of attribute set.
+     * @param array $attrParams Refined attribute parameters.
+     * @param mixed $attribute
+     * @return \Magento\CatalogImportExport\Model\Import\Product\Type\AbstractType
+     */
+    protected function _addAttributeParams($attrSetName, array $attrParams, $attribute)
+    {
+        // save super attributes for simpler and quicker search in future
+        if ('select' == $attrParams['type'] && 1 == $attrParams['is_global']) {
+            $this->_superAttributes[$attrParams['code']] = $attrParams;
+        }
+        return parent::_addAttributeParams($attrSetName, $attrParams, $attribute);
+    }
+
+    /**
+     * Is attribute is super-attribute?
+     *
+     * @param string $attrCode
+     * @return bool
+     */
+    protected function _isAttributeSuper($attrCode)
+    {
+        return isset($this->_superAttributes[$attrCode]);
+    }
+
+    /**
      * Validate particular attributes columns.
      *
      * @param array $rowData
      * @param int $rowNum
+     *
      * @return bool
      */
     protected function _isParticularAttributesValid(array $rowData, $rowNum)
@@ -200,9 +265,8 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
      */
     protected function insertOptions()
     {
-        foreach ($this->cachedOptions as $entityId => $options) {
+        foreach ($this->cachedOptions as $options) {
             foreach ($options as $option) {
-                $newOptions = [];
                 $select = $this->connection->select()->from(
                     $this->_resource->getTableName('weee_tax'),
                     ['value_id']
@@ -213,7 +277,17 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
                 $optionIds = $this->connection->fetchAssoc(
                     $select
                 );
-                if (empty($optionIds)) {
+                if (!empty($optionIds)) {
+                    $optionIds = \array_shift($optionIds);
+                    $option = \array_merge($optionIds, $option);
+                }
+                if (isset($option['website_id'])) {
+                    $this->connection->insertOnDuplicate(
+                        $this->_resource->getTableName('weee_tax'),
+                        $option,
+                        ['entity_id', 'country', 'value', 'state', 'attribute_id', 'website_id']
+                    );
+                } else {
                     $this->connection->insertOnDuplicate(
                         $this->_resource->getTableName('weee_tax'),
                         $option,
@@ -307,19 +381,5 @@ class Tax extends \Magento\CatalogImportExport\Model\Import\Product\Type\Abstrac
         }
 
         return $this;
-    }
-
-    /**
-     * Validate row attributes. Pass VALID row data ONLY as argument.
-     *
-     * @param array $rowData
-     * @param int $rowNum
-     * @param bool $isNewProduct Optional
-     *
-     * @return bool
-     */
-    public function isRowValid(array $rowData, $rowNum, $isNewProduct = true)
-    {
-        return parent::isRowValid($rowData, $rowNum, $isNewProduct);
     }
 }

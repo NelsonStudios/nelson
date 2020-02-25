@@ -6,42 +6,20 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use gento\Backend\App\Action\Context;
-use Magento\Framework\Controller\Result\JsonFactory;
-
+/**
+ * Class InlineEdit
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class InlineEdit extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
-    /**
-     * @var JsonFactory
-     */
-    private $jsonFactory;
-
-    /**
-     * InlineEdit constructor.
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory
-     * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository
-     * @param JsonFactory $jsonFactory
-     */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository,
-        JsonFactory $jsonFactory
-    ) {
-        $this->jsonFactory = $jsonFactory;
-        parent::__construct($context, $coreRegistry, $exportJobFactory, $exportRepository);
-    }
-
     /**
      * @return mixed
      */
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $error      = false;
         $messages   = [];
         $postItems  = $this->getRequest()->getParam('items', []);
@@ -57,9 +35,9 @@ class InlineEdit extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
             $jobId = $item['entity_id'];
             try {
                 if ($jobId) {
-                    $model = $this->exportRepository->getById($jobId);
+                    $model = $this->repository->getById($jobId);
                     $model->setData($item);
-                    $this->exportRepository->save($model);
+                    $this->repository->save($model);
                 }
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $messages[] = $e->getMessage();

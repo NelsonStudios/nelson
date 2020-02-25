@@ -6,17 +6,24 @@
 
 namespace Firebear\ImportExport\Model;
 
+use Firebear\ImportExport\Model\Import\Adapter;
+use Firebear\ImportExport\Model\Source\Type\File\Config;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Firebear\ImportExport\Model\Import\Adapter;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Firebear\ImportExport\Model\Source\Type\File\Config;
 
+/**
+ * Class Import
+ *
+ * @package Firebear\ImportExport\Model
+ */
 class Import extends \Magento\ImportExport\Model\Import
 {
     use \Firebear\ImportExport\Traits\General;
 
     const FIREBEAR_ONLY_UPDATE = 'update';
+    const FIREBEAR_ONLY_ADD = 'add';
 
     /**
      * Limit displayed errors on Import History page.
@@ -95,9 +102,12 @@ class Import extends \Magento\ImportExport\Model\Import
      * @var \Magento\Framework\Filesystem\File\WriteFactory
      */
     protected $fileWrite;
+    /** @var  \Magento\ImportExport\Model\History $importHistoryModel */
+    protected $importHistoryModel;
 
     /**
      * Import constructor.
+     *
      * @param Source\ConfigInterface $config
      * @param \Firebear\ImportExport\Helper\Data $helper
      * @param \Firebear\ImportExport\Helper\Additional $additional
@@ -183,8 +193,18 @@ class Import extends \Magento\ImportExport\Model\Import
             $localeDate,
             $data
         );
-
+        $this->importHistoryModel = $importHistoryModel;
         $this->_debugMode = $helper->getDebugMode();
+    }
+
+    /**
+     * Remove large objects
+     */
+    public function __destruct()
+    {
+        if (is_object($this->_entityAdapter) && method_exists($this->_entityAdapter, '__destruct')) {
+            $this->_entityAdapter->__destruct();
+        }
     }
 
     /**
@@ -208,7 +228,7 @@ class Import extends \Magento\ImportExport\Model\Import
      *
      * @TODO change the code to show exceptions on frontend instead of 503 error.
      * @return null|string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function uploadSource()
     {
@@ -219,18 +239,29 @@ class Import extends \Magento\ImportExport\Model\Import
             try {
                 $result = $source->uploadSource();
             } catch (\Exception $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+                throw new LocalizedException(__($e->getMessage()));
             }
         }
         if ($result) {
-            $sourceFileRelative = $this->_varDirectory->getRelativePath($result);
-            $entity = $this->getEntity();
-            // $this->createHistoryReport($sourceFileRelative, $entity);
-
             return $result;
         }
 
         return parent::uploadSource();
+    }
+
+    /**
+     * Return Platform
+     *
+     * @param string $name
+     * @param string $entity
+     * @return null|\Firebear\ImportExport\Model\Source\Platform\AbstractPlatform
+     */
+    public function getPlatform($name, $entity)
+    {
+        if ($name && $entity && isset($this->platforms[$entity][$name]['model'])) {
+            return $this->factory->create($this->platforms[$entity][$name]['model']);
+        }
+        return null;
     }
 
     /**
@@ -239,15 +270,20 @@ class Import extends \Magento\ImportExport\Model\Import
      * @param \Magento\ImportExport\Model\Import\AbstractSource $source
      *
      * @return bool
+     * @throws LocalizedException
      */
     public function validateSource(\Magento\ImportExport\Model\Import\AbstractSource $source)
     {
-        $platformModel = null;
         $this->addLogWriteln(__('Begin data validation'), $this->output, 'comment');
-        if (isset($this->platforms[$this->getData('platforms')]['model'])) {
-            $platformModel = $this->factory->create($this->platforms[$this->getData('platforms')]['model']);
-        }
-        $source->setPlatform($platformModel);
+        $source->setReplaceWithDefault(
+            $this->getData('replace_default_value')
+        );
+        $source->setPlatform(
+            $this->getPlatform(
+                $this->getData('platforms'),
+                $this->getData('entity')
+            )
+        );
         try {
             if (!$source->getMap()) {
                 $source->setMap($this->getData('map'));
@@ -286,6 +322,7 @@ class Import extends \Magento\ImportExport\Model\Import
                 $summary = '';
                 if ($errorAggregator->getErrorsCount() > self::LIMIT_VISIBLE_ERRORS) {
                     $summary = __('Too many errors. Please check your debug log file.') . '<br />';
+                    $this->showErrors();
                     $this->addLogWriteln($summary, $this->output, 'error');
                 } else {
                     if ($this->getJobId()) {
@@ -323,7 +360,7 @@ class Import extends \Magento\ImportExport\Model\Import
 
     /**
      * @return Source\Type\AbstractType
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getSource()
     {
@@ -333,11 +370,21 @@ class Import extends \Magento\ImportExport\Model\Import
                 $this->source = $this->additional->getSourceModelByType($sourceType);
                 $this->source->setData($this->getData());
             } catch (\Exception $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+                throw new LocalizedException(__($e->getMessage()));
             }
         }
 
         return $this->source;
+    }
+
+    /**
+     * @param \Magento\ImportExport\Model\Import\AbstractSource $source
+     * @return $this
+     */
+    public function setSource(\Magento\ImportExport\Model\Import\AbstractSource $source)
+    {
+        $this->source = $source;
+        return $this;
     }
 
     /**
@@ -366,12 +413,13 @@ class Import extends \Magento\ImportExport\Model\Import
 
     /**
      * @param mixed $debugData
+     *
      * @return $this
      */
     public function addLogComment($debugData)
     {
 
-        if (is_array($debugData)) {
+        if (\is_array($debugData)) {
             $this->_logTrace = array_merge($this->_logTrace, $debugData);
         } else {
             $this->_logTrace[] = $debugData;
@@ -403,6 +451,7 @@ class Import extends \Magento\ImportExport\Model\Import
 
     /**
      * @return \Magento\ImportExport\Model\Import\AbstractEntity|\Magento\ImportExport\Model\Import\Entity\AbstractEntity
+     * @throws LocalizedException
      */
     protected function _getEntityAdapter()
     {
@@ -411,6 +460,11 @@ class Import extends \Magento\ImportExport\Model\Import
         $adapter->setOutput($this->output);
 
         return $adapter;
+    }
+
+    public function getEntityAdapter()
+    {
+        return $this->_getEntityAdapter();
     }
 
     /**
@@ -431,46 +485,65 @@ class Import extends \Magento\ImportExport\Model\Import
      * Load categories map
      *
      * @return mixed
+     * @throws LocalizedException
      */
     public function getCategories($sourceData)
     {
         $adapter = $this->_getEntityAdapter();
-        if ($sourceData['import_source'] != 'file') {
-            $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
-            $this->setImportSource($sourceData['import_source']);
-            $this->setData($sourceData);
-            $this->getSource()->setData($sourceData);
-            $result = null;
-            $source = $this->getSource();
-            $source->setFormatFile($sourceData['type_file']);
-            try {
-                $result = $source->uploadSource();
-            } catch (\Exception $e) {
-                $errorMessage = __($e->getMessage());
-                if (strpos($errorMessage, 'ftp_get()') !== false) {
-                    $errorMessage = __('Unable to open your file. Please make sure File Path is correct.');
-                }
-            }
-            if ($result) {
-                $another = 1;
-                $source = Adapter::findAdapterFor(
-                    $this->getTypeClass($sourceData['type_file']),
-                    $this->uploadSource(),
-                    $directory,
-                    $sourceData[Import::FIELD_FIELD_SEPARATOR]
-                );
-            } else {
-                return $errorMessage;
-            }
-        } else {
+        $errorMessage = __('Unknown Error');
+        $platform = $this->getPlatform(
+            $sourceData['platforms'] ?? null,
+            $sourceData['entity'] ?? null
+        );
+
+        if ($sourceData['import_source'] == 'file') {
             $another = 0;
             $source = Adapter::findAdapterFor(
                 $this->getTypeClass($sourceData['type_file']),
                 $sourceData['file_path'],
                 $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
-                $sourceData[Import::FIELD_FIELD_SEPARATOR]
+                $platform,
+                $sourceData
             );
+        } else {
+            $isGateway = $platform && $platform->isGateway();
+            if ($isGateway) {
+                $data['get_only_first_page'] = true;
+                $source = $platform->getSource($sourceData);
+                $this->setSource($source);
+                $this->setData($sourceData);
+                $this->getSource()->setData($sourceData);
+            } else {
+                $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
+                $this->setImportSource($sourceData['import_source']);
+                $this->setData($sourceData);
+                $this->getSource()->setData($sourceData);
+                $result = null;
+                $source = $this->getSource();
+                $source->setFormatFile($sourceData['type_file']);
+                try {
+                    $result = $source->uploadSource();
+                } catch (\Exception $e) {
+                    $errorMessage = __($e->getMessage());
+                    if (strpos($errorMessage, 'ftp_get()') !== false) {
+                        $errorMessage = __('Unable to open your file. Please make sure File Path is correct.');
+                    }
+                }
+                if ($result) {
+                    $another = 1;
+                    $source = Adapter::findAdapterFor(
+                        $this->getTypeClass($sourceData['type_file']),
+                        $this->uploadSource(),
+                        $directory,
+                        $platform,
+                        $sourceData
+                    );
+                } else {
+                    return $errorMessage;
+                }
+            }
         }
+
         if (isset($sourceData['type_file']) && $sourceData['type_file'] == 'xml' && $sourceData['xml_switch']) {
             $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
             if ($another) {
@@ -478,16 +551,19 @@ class Import extends \Magento\ImportExport\Model\Import
             } else {
                 $file = $directory->getAbsolutePath() . "/" . $sourceData['file_path'];
             }
+            if (strpos($file, $directory->getAbsolutePath()) === false) {
+                $file = $directory->getAbsolutePath() . "/" . $file;
+            }
             $dest = $this->file->read($file);
+
             try {
                 $result = $this->outputModel->convert($dest, $sourceData['xslt']);
             } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
+                throw new LocalizedException(__($e->getMessage()));
             }
 
             $pathInfo = pathinfo($file);
             $destFile = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
-            // $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
             $file = $this->fileWrite->create(
                 $destFile,
                 \Magento\Framework\Filesystem\DriverPool::FILE,
@@ -499,7 +575,8 @@ class Import extends \Magento\ImportExport\Model\Import
                 $this->getTypeClass($sourceData['type_file']),
                 $destFile,
                 $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
-                $sourceData[Import::FIELD_FIELD_SEPARATOR]
+                $platform,
+                $sourceData
             );
         }
 
@@ -508,7 +585,9 @@ class Import extends \Magento\ImportExport\Model\Import
 
         if (isset($sourceData['mappingData'])) {
             foreach ($sourceData['mappingData'] as $sourceDataMapItem) {
-                if ($sourceDataMapItem['source_data_system'] == 'categories') {
+                if (isset($sourceDataMapItem['source_data_system']) &&
+                    $sourceDataMapItem['source_data_system'] == 'categories'
+                ) {
                     $fieldName = $sourceDataMapItem['source_data_import'];
                 }
             }
@@ -527,6 +606,10 @@ class Import extends \Magento\ImportExport\Model\Import
         return get_class($this->_getEntityAdapter());
     }
 
+    /**
+     * @return array
+     * @throws LocalizedException
+     */
     public function getEntityBehaviors()
     {
         $behaviourData = [];
@@ -543,7 +626,7 @@ class Import extends \Magento\ImportExport\Model\Import
                     'notes' => $behavior->getNotes($entityCode),
                 ];
             } else {
-                throw new \Magento\Framework\Exception\LocalizedException(
+                throw new LocalizedException(
                     __('The behavior token for %1 is invalid.', $entityCode)
                 );
             }
@@ -559,24 +642,33 @@ class Import extends \Magento\ImportExport\Model\Import
         $result = $this->processImportPart($file, $offset, $job);
 
         if ($result) {
-            $this->addLogComment(
-                [
-                    __(
-                        'Checked rows: %1, checked entities: %2, invalid rows: %3, total errors: %4',
-                        $this->getProcessedRowsCount(),
-                        $this->getProcessedEntitiesCount(),
-                        $this->getErrorAggregator()->getInvalidRowsCount(),
-                        $this->getErrorAggregator()->getErrorsCount()
-                    ),
-                    __('The import was successful.'),
-                ]
-            );
-            if ($show) {
-                $this->showErrors();
+            if (!empty($this->getProcessedRowsCount())) {
+                $this->addLogComment(
+                    [
+                        __(
+                            'Checked rows: %1, checked entities: %2, invalid rows: %3, total errors: %4',
+                            $this->getProcessedRowsCount(),
+                            $this->getProcessedEntitiesCount(),
+                            $this->getErrorAggregator()->getInvalidRowsCount(),
+                            $this->getErrorAggregator()->getErrorsCount()
+                        )
+                    ]
+                );
+                if ($show) {
+                    $this->showErrors();
+                }
+                $this->getImportHistoryModel()->updateReport($this, true);
+            } else {
+                if (empty($this->getProcessedEntitiesCount())) {
+                    $this->addLogComment([__('No data imported.')]);
+                }
             }
-            $this->importHistoryModel->updateReport($this, true);
+
+            if (empty($this->getErrorAggregator()->getErrorsCount()) && !empty($this->getProcessedEntitiesCount())) {
+                $this->addLogComment([__('The import was successful.')]);
+            }
         } else {
-            $this->importHistoryModel->invalidateReport($this);
+            $this->getImportHistoryModel()->invalidateReport($this);
         }
 
         return $result;
@@ -593,6 +685,9 @@ class Import extends \Magento\ImportExport\Model\Import
         $this->_getEntityAdapter()->setErrorMessages();
     }
 
+    /**
+     * @throws LocalizedException
+     */
     public function showErrors()
     {
         foreach ($this->getErrorAggregator()->getRowsGroupedByErrorCode() as $errorMessage => $rows) {
@@ -646,5 +741,10 @@ class Import extends \Magento\ImportExport\Model\Import
     public function getFireDataSourceModel()
     {
         return $this->importFireData;
+    }
+
+    public function setNullEntityAdapter()
+    {
+        $this->_entityAdapter = null;
     }
 }

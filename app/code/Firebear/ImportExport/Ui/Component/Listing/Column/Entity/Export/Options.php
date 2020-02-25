@@ -8,8 +8,6 @@ namespace Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export;
 
 /**
  * Source export entity model
- *
- * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Options implements \Magento\Framework\Option\ArrayInterface
 {
@@ -41,13 +39,17 @@ class Options implements \Magento\Framework\Option\ArrayInterface
      */
     public function toOptionArray()
     {
-        $options = [];
-        $options[] = ['label' => __('-- Please Select --'), 'value' => ''];
+        $entities = [];
+        $options = [['label' => __('-- Please Select --'), 'value' => '']];
         foreach ($this->exportConfig->getEntities() as $entityName => $entityConfig) {
             $options[] = ['value' => $entityName, 'label' => __($entityConfig['label'])];
+            $entities[] = $entityName;
         }
         $data = $this->diExport->get();
         foreach ($data as $typeName => $type) {
+            if (in_array($typeName, $entities)) {
+                continue;
+            }
             $option = ['value' => $typeName, 'label' => $type['label']];
 
             if (isset($type['fields'])) {

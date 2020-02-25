@@ -8,9 +8,15 @@ namespace Firebear\ImportExport\Model\Import;
 
 use Magento\Framework\Module\Dir\Reader;
 
+/**
+ * Class Platforms
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class Platforms extends \Magento\Framework\DataObject
 {
     const URL_DOWNLOAD = "import/job/download";
+    const GITHUB_LINK = "https://github.com/firebearstudio/magento2-import-export-sample-files";
 
     /**
      * @var Reader
@@ -49,25 +55,34 @@ class Platforms extends \Magento\Framework\DataObject
     /**
      * @return array
      */
-    public function toOptionArrayLinks()
+    public function toOptionArrayLinks($entityType = 'catalog_product')
     {
         $list = [];
-        foreach ($this->platforms as $platform => $data) {
+        $platforms = $this->platforms[$entityType] ?? [];
+        foreach ($platforms as $platform => $data) {
             if (isset($data['links'])) {
                 foreach ($data['links'] as $link) {
-                    $list[] = [
-                        'label' => __($link['label']),
-                        'href' => $this->backendUrl->getUrl(
-                            self::URL_DOWNLOAD,
-                            ['type' => $platform . $link['suffix']]
-                        ),
-                        'type' => $platform,
-                        'entity' => isset($link['entity']) ? $link['entity'] : ''
-                    ];
+                    if (isset($link['entity']) && $link['entity'] === 'github_link') {
+                        $list[] = [
+                            'label' => __($link['label']),
+                            'href' => self::GITHUB_LINK,
+                            'type' => $platform,
+                            'entity' => isset($link['entity']) ? $link['entity'] : ''
+                        ];
+                    } else {
+                        $list[] = [
+                            'label' => __($link['label']),
+                            'href' => $this->backendUrl->getUrl(
+                                self::URL_DOWNLOAD,
+                                ['type' => $platform . $link['suffix']]
+                            ),
+                            'type' => $platform,
+                            'entity' => isset($link['entity']) ? $link['entity'] : ''
+                        ];
+                    }
                 }
             }
         }
-    
         return $list;
     }
 
@@ -76,15 +91,7 @@ class Platforms extends \Magento\Framework\DataObject
      */
     public function toOptionArrayNames()
     {
-        $list = [];
-        foreach ($this->platforms as $platform => $data) {
-            $list[] = [
-                'label' => __($data['label']),
-                'value' => $platform
-            ];
-        }
-
-        return $list;
+        return [];
     }
 
     /**
@@ -123,5 +130,22 @@ class Platforms extends \Magento\Framework\DataObject
         }
 
         return $list;
+    }
+
+    /**
+     * @param $entityType
+     * @return array
+     */
+    public function getPlatformList($entityType)
+    {
+        $options = [];
+        $platforms = $this->platforms[$entityType] ?? [];
+        foreach ($platforms as $platform => $data) {
+            $options[] = [
+                'label' => __($data['label']),
+                'value' => $platform
+            ];
+        }
+        return ['options' => $options];
     }
 }

@@ -6,90 +6,76 @@
 
 namespace Firebear\ImportExport\Model\Import;
 
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
 use Magento\CustomerImportExport\Model\Import\Customer as MagentoCustomer;
-use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Magento\Framework\App\ObjectManager;
 use \Magento\ImportExport\Model\Import\AbstractEntity;
 use Firebear\ImportExport\Model\Import;
 
+/**
+ * Class Customer
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class Customer extends MagentoCustomer
 {
-    use \Firebear\ImportExport\Traits\General;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $_logger;
-
-    /**
-     * @var ConsoleOutput
-     */
-    protected $output;
+    use ImportTrait;
 
     protected $_debugMode;
 
-    protected $duplicateFields = [\Magento\CustomerImportExport\Model\Import\Customer::COLUMN_EMAIL];
-
     /**
-     * Customer constructor.
-     * @param \Magento\Framework\Stdlib\StringUtils $string
+     * @param Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\ImportExport\Model\ImportFactory $importFactory
-     * @param \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @param ProcessingErrorAggregatorInterface $errorAggregator
+     * @param ProcessingErrorAggregator $errorAggregator
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\ImportExport\Model\Export\Factory $collectionFactory
-     * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\CustomerImportExport\Model\ResourceModel\Import\Customer\StorageFactory $storageFactory
      * @param \Magento\Customer\Model\ResourceModel\Attribute\CollectionFactory $attrCollectionFactory
      * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param ConsoleOutput $output
      * @param \Firebear\ImportExport\Helper\Data $helper
-     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data
-     * @param LoggerInterface $logger
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Stdlib\StringUtils $string,
+        Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\ImportExport\Model\ImportFactory $importFactory,
-        \Magento\ImportExport\Model\ResourceModel\Helper $resourceHelper,
-        \Magento\Framework\App\ResourceConnection $resource,
-        ProcessingErrorAggregatorInterface $errorAggregator,
+        ProcessingErrorAggregator $errorAggregator,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\ImportExport\Model\Export\Factory $collectionFactory,
-        \Magento\Eav\Model\Config $eavConfig,
         \Magento\CustomerImportExport\Model\ResourceModel\Import\Customer\StorageFactory $storageFactory,
         \Magento\Customer\Model\ResourceModel\Attribute\CollectionFactory $attrCollectionFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Symfony\Component\Console\Output\ConsoleOutput $output,
+        ConsoleOutput $output,
         \Firebear\ImportExport\Helper\Data $helper,
-        LoggerInterface $logger,
-        \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData,
         array $data = []
     ) {
         parent::__construct(
-            $string,
+            $context->getStringUtils(),
             $scopeConfig,
             $importFactory,
-            $resourceHelper,
-            $resource,
+            $context->getResourceHelper(),
+            $context->getResource(),
             $errorAggregator,
             $storeManager,
             $collectionFactory,
-            $eavConfig,
+            $context->getConfig(),
             $storageFactory,
             $attrCollectionFactory,
             $customerFactory,
             $data
         );
+        $this->_availableBehaviors = [
+            \Magento\ImportExport\Model\Import::BEHAVIOR_APPEND,
+            \Magento\ImportExport\Model\Import::BEHAVIOR_DELETE,
+            \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE,
+        ];
         $this->output = $output;
-        $this->_logger = $logger;
+        $this->_logger = $context->getLogger();
         $this->_debugMode = $helper->getDebugMode();
-        $this->_dataSourceModel = $importFireData;
+        $this->_dataSourceModel = $context->getDataSourceModel();
+        $this->_helper = $helper;
     }
 
     /**
@@ -106,9 +92,9 @@ class Customer extends MagentoCustomer
     protected function _importData()
     {
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-            $entitiesToCreate = [];
-            $entitiesToUpdate = [];
-            $entitiesToDelete = [];
+            $entitiesCreate = [];
+            $entitiesUpdate = [];
+            $entitiesDelete = [];
             $attributesToSave = [];
 
             foreach ($bunch as $rowNumber => $rowData) {
@@ -130,22 +116,29 @@ class Customer extends MagentoCustomer
                     continue;
                 }
 
-                if ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_DELETE) {
-                    $entitiesToDelete[] = $this->_getCustomerId(
+                if (\Magento\ImportExport\Model\Import::BEHAVIOR_DELETE == $this->getBehavior($rowData)) {
+                    $entitiesDelete[] = $this->_getCustomerId(
                         $rowData[self::COLUMN_EMAIL],
                         $rowData[self::COLUMN_WEBSITE]
                     );
-                } elseif ($this->getBehavior($rowData) == \Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE) {
+                }
+                if (\Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE == $this->getBehavior($rowData)
+                    || \Magento\ImportExport\Model\Import::BEHAVIOR_REPLACE == $this->getBehavior($rowData)
+                ) {
                     $processedData = $this->_prepareDataForUpdate($rowData);
-                    $entitiesToCreate = array_merge($entitiesToCreate, $processedData[self::ENTITIES_TO_CREATE_KEY]);
-                    $entitiesToUpdate = array_merge($entitiesToUpdate, $processedData[self::ENTITIES_TO_UPDATE_KEY]);
+                    if (\Magento\ImportExport\Model\Import::BEHAVIOR_ADD_UPDATE == $this->getBehavior($rowData)) {
+                        $entitiesCreate = array_merge($entitiesCreate, $processedData[self::ENTITIES_TO_CREATE_KEY]);
+                    }
+                    $entitiesUpdate = array_merge($entitiesUpdate, $processedData[self::ENTITIES_TO_UPDATE_KEY]);
                     foreach ($processedData[self::ATTRIBUTES_TO_SAVE_KEY] as $tableName => $customerAttributes) {
                         if (!isset($attributesToSave[$tableName])) {
                             $attributesToSave[$tableName] = [];
                         }
                         $attributesToSave[$tableName] =
-                            array_diff_key($attributesToSave[$tableName], $customerAttributes)
-                            + $customerAttributes;
+                            array_diff_key(
+                                $attributesToSave[$tableName],
+                                $customerAttributes
+                            ) + $customerAttributes;
                     }
                 }
                 $time = explode(" ", microtime());
@@ -153,44 +146,28 @@ class Customer extends MagentoCustomer
                 $totalTime = $endTime - $startTime;
                 $totalTime = round($totalTime, 5);
 
-                $this->addLogWriteln(__('customer with email: %1 .... %2s', $email, $totalTime), $this->output, 'info');
+                $this->addLogWriteln(
+                    __('customer with email: %1 .... %2s', $email, $totalTime),
+                    $this->output,
+                    'info'
+                );
             }
-            $this->updateItemsCounterStats($entitiesToCreate, $entitiesToUpdate, $entitiesToDelete);
+            $this->updateItemsCounterStats($entitiesCreate, $entitiesUpdate, $entitiesDelete);
             /**
              * Save prepared data
              */
-            if ($entitiesToCreate || $entitiesToUpdate) {
-                $this->_saveCustomerEntities($entitiesToCreate, $entitiesToUpdate);
+            if ($entitiesCreate || $entitiesUpdate) {
+                $this->_saveCustomerEntities($entitiesCreate, $entitiesUpdate);
             }
             if ($attributesToSave) {
                 $this->_saveCustomerAttributes($attributesToSave);
             }
-            if ($entitiesToDelete) {
-                $this->_deleteCustomerEntities($entitiesToDelete);
+            if ($entitiesDelete) {
+                $this->_deleteCustomerEntities($entitiesDelete);
             }
         }
 
         return true;
-    }
-
-    public function _saveCustomerEntities(array $entitiesToCreate, array $entitiesToUpdate)
-    {
-        return parent::_saveCustomerEntities($entitiesToCreate, $entitiesToUpdate); // TODO: Change the autogenerated stub
-    }
-
-    public function _saveCustomerAttributes(array $attributesData)
-    {
-        return parent::_saveCustomerAttributes($attributesData); // TODO: Change the autogenerated stub
-    }
-
-    public function _deleteCustomerEntities(array $entitiesToDelete)
-    {
-        return parent::_deleteCustomerEntities($entitiesToDelete); // TODO: Change the autogenerated stub
-    }
-
-    public function _prepareDataForUpdate(array $rowData)
-    {
-        return parent::_prepareDataForUpdate($rowData); // TODO: Change the autogenerated stub
     }
 
     protected function _saveValidatedBunches()
@@ -286,37 +263,37 @@ class Customer extends MagentoCustomer
         return $this;
     }
 
-    protected function _validateRowForUpdate(array $rowData, $rowNumber)
+    protected function _validateRowForUpdate(array $rowData, $rowNum)
     {
-        if ($this->_checkUniqueKey($rowData, $rowNumber)) {
+        if ($this->_checkUniqueKey($rowData, $rowNum)) {
             $email = strtolower($rowData[self::COLUMN_EMAIL]);
             $website = $rowData[self::COLUMN_WEBSITE];
             $this->_newCustomers[$email][$website] = false;
 
             if (!empty($rowData[self::COLUMN_STORE]) && !isset($this->_storeCodeToId[$rowData[self::COLUMN_STORE]])) {
-                $this->addRowError(self::ERROR_INVALID_STORE, $rowNumber);
+                $this->addRowError(self::ERROR_INVALID_STORE, $rowNum);
             }
             if (isset($rowData['password']) && strlen($rowData['password'])
                 && $this->string->strlen($rowData['password']) < self::MIN_PASSWORD_LENGTH
             ) {
-                $this->addRowError(self::ERROR_PASSWORD_LENGTH, $rowNumber);
+                $this->addRowError(self::ERROR_PASSWORD_LENGTH, $rowNum);
             }
-            foreach ($this->_attributes as $attributeCode => $attributeParams) {
+            foreach ($this->_attributes as $attributeCode => $attributeData) {
                 if (in_array($attributeCode, $this->_ignoredAttributes)) {
                     continue;
                 }
                 if (isset($rowData[$attributeCode]) && strlen($rowData[$attributeCode])) {
                     $this->isAttributeValid(
                         $attributeCode,
-                        $attributeParams,
+                        $attributeData,
                         $rowData,
-                        $rowNumber,
+                        $rowNum,
                         isset($this->_parameters[Import::FIELD_FIELD_MULTIPLE_VALUE_SEPARATOR])
                             ? $this->_parameters[Import::FIELD_FIELD_MULTIPLE_VALUE_SEPARATOR]
                             : Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR
                     );
-                } elseif ($attributeParams['is_required'] && !$this->_getCustomerId($email, $website)) {
-                    $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNumber, $attributeCode);
+                } elseif ($attributeData['is_required'] && !$this->_getCustomerId($email, $website)) {
+                    $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNum, $attributeCode);
                 }
             }
         }

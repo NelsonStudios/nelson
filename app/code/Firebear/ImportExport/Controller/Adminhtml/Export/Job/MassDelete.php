@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Export\AbstractMass;
 
+/**
+ * Class MassDelete
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class MassDelete extends AbstractMass
 {
     /**
@@ -24,7 +29,7 @@ class MassDelete extends AbstractMass
         foreach ($collection as $job) {
             $this->repository->delete($job);
         }
-        
+
         return $this->getRedirect('A total of %1 record(s) have been deleted.', $size);
     }
 }

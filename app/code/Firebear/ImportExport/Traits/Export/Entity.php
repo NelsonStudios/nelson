@@ -6,26 +6,46 @@
 
 namespace Firebear\ImportExport\Traits\Export;
 
+use DateTime;
+use Exception;
+use Firebear\ImportExport\Traits\General as GeneralTrait;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\ImportExport\Model\Export;
+use Magento\Eav\Model\Entity\Attribute;
+
+/**
+ * Trait Entity
+ *
+ * @package Firebear\ImportExport\Traits\Export
+ */
 trait Entity
 {
+    use GeneralTrait;
+
     /**
      * @var int
      */
     protected $lastEntityId;
 
     /**
-     * @param $data
-     *
+     * @param array $data
+     * @param string|null $entityFieldID
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function changeData($data)
+    public function changeData($data, $entityFieldID = null)
     {
         $listCodes = $this->_parameters['list'];
+        if ($entityFieldID) {
+            $listCodes[] = $entityFieldID;
+        }
         $replaces = $this->_parameters['replace_code'];
         $replacesValues = $this->_parameters['replace_value'];
         $newData = [];
         $allFields = $this->_parameters['all_fields'];
-        foreach ($data as $key => $record) {
+        foreach ($data as $record) {
             $newRecord = [];
             foreach ($record as $code => $value) {
                 if (in_array($code, $listCodes)) {
@@ -35,7 +55,7 @@ trait Entity
                         $newCode = $replaces[$keyCode];
                     }
                     $newRecord[$newCode] = $value;
-                    if (isset($replacesValues[$keyCode]) && !empty($replacesValues[$keyCode])) {
+                    if (isset($replacesValues[$keyCode]) && $replacesValues[$keyCode] !== '') {
                         $newRecord[$newCode] = $replacesValues[$keyCode];
                     }
                 } else {
@@ -47,7 +67,17 @@ trait Entity
 
             $noFullList = array_diff($listCodes, array_keys($newRecord));
             if (!empty($noFullList)) {
+                $newCode = '';
                 foreach ($noFullList as $code => $value) {
+                    if (isset($replaces[$code])) {
+                        $newCode = $replaces[$code];
+                    }
+                    if (isset($replacesValues[$code])
+                        && $replacesValues[$code] !== ''
+                        && !isset($newRecord[$newCode])
+                    ) {
+                        $newRecord[$newCode] = $replacesValues[$code];
+                    }
                     $newRecord[$code] = $value;
                 }
             }
@@ -60,8 +90,17 @@ trait Entity
     }
 
     /**
-     * @param $row
-     *
+     * @param array $list
+     * @param string $search
+     * @return false|int|string
+     */
+    protected function getKeyFromList($list, $search)
+    {
+        return array_search($search, $list);
+    }
+
+    /**
+     * @param array $row
      * @return array
      */
     public function changeRow($row)
@@ -100,8 +139,7 @@ trait Entity
     }
 
     /**
-     * @param $headers
-     *
+     * @param array $headers
      * @return array
      */
     public function changeHeaders($headers)
@@ -133,17 +171,135 @@ trait Entity
     }
 
     /**
-     * @param $list
-     * @param $search
-     * @return false|int|string
+     * @return int
      */
-    protected function getKeyFromList($list, $search)
-    {
-        return array_search($search, $list);
-    }
-
     public function getCount()
     {
-        return $this->_getEntityCollection()->getSize();
+        /** @var AbstractDb $entityCollection */
+        $entityCollection = $this->_getEntityCollection();
+        return $entityCollection->getSize();
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->_parameters;
+    }
+
+    /**
+     * Apply filter to collection and add not skipped attributes to select.
+     *
+     * @param AbstractCollection $collection
+     * @return AbstractCollection
+     * @throws LocalizedException
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function _prepareEntityCollection(AbstractCollection $collection)
+    {
+        if (!isset($this->_parameters[Export::FILTER_ELEMENT_GROUP])
+            || !is_array($this->_parameters[Export::FILTER_ELEMENT_GROUP])
+        ) {
+            $filter = [];
+        } else {
+            $filter = $this->_parameters[Export::FILTER_ELEMENT_GROUP];
+        }
+
+        $exportCodes = $this->_getExportAttrCodes();
+
+        /** @var Attribute $attribute */
+        foreach ($this->filterAttributeCollection($this->getAttributeCollection()) as $attribute) {
+            $attrCode = $attribute->getAttributeCode();
+
+            // filter applying
+            if (isset($filter[$attrCode])) {
+                $attrFilterType = Export::getAttributeFilterType($attribute);
+
+                if (Export::FILTER_TYPE_SELECT == $attrFilterType) {
+                    if (is_scalar($filter[$attrCode])) {
+                        if ($filter[$attrCode] == 0) {
+                            $collection->addAttributeToFilter([
+                                ['attribute' => $attrCode, 'eq' => $filter[$attrCode]],
+                                ['attribute' => $attrCode, 'null' => 1],
+                            ]);
+                        } else {
+                            $collection->addAttributeToFilter($attrCode, ['eq' => $filter[$attrCode]]);
+                        }
+                    }
+                } elseif (Export::FILTER_TYPE_INPUT == $attrFilterType) {
+                    if (is_scalar($filter[$attrCode]) && trim($filter[$attrCode])) {
+                        $collection->addAttributeToFilter($attrCode, ['like' => "%{$filter[$attrCode]}%"]);
+                    }
+                } elseif (Export::FILTER_TYPE_DATE == $attrFilterType) {
+                    if (is_array($filter[$attrCode]) && count($filter[$attrCode]) == 2) {
+                        $from = array_shift($filter[$attrCode]);
+                        $to = array_shift($filter[$attrCode]);
+
+                        if (is_scalar($from) && !empty($from)) {
+                            $date = (new DateTime($from))->format('m/d/Y');
+                            $collection->addAttributeToFilter($attrCode, ['from' => $date, 'date' => true]);
+                        }
+                        if (is_scalar($to) && !empty($to)) {
+                            $date = (new DateTime($to))->format('m/d/Y');
+                            $collection->addAttributeToFilter($attrCode, ['to' => $date, 'date' => true]);
+                        }
+                    }
+                } elseif (Export::FILTER_TYPE_NUMBER == $attrFilterType) {
+                    if (is_array($filter[$attrCode]) && count($filter[$attrCode]) == 2) {
+                        $from = array_shift($filter[$attrCode]);
+                        $to = array_shift($filter[$attrCode]);
+
+                        if (is_numeric($from)) {
+                            $collection->addAttributeToFilter(
+                                $attrCode,
+                                ['from' => $from]
+                            );
+                        }
+                        if (is_numeric($to)) {
+                            $collection->addAttributeToFilter(
+                                $attrCode,
+                                ['to' => $to]
+                            );
+                        }
+                    }
+                }
+            }
+            if (in_array($attrCode, $exportCodes)) {
+                $collection->addAttributeToSelect($attrCode);
+            }
+        }
+        return $collection;
+    }
+
+    /**
+     * Retrieve entity field for export
+     *
+     * @return array
+     */
+    public function getFieldsForExport()
+    {
+        return [];
+    }
+
+    /**
+     * Retrieve entity field for filter
+     *
+     * @return array
+     */
+    public function getFieldsForFilter()
+    {
+        return [];
+    }
+
+    /**
+     * Retrieve entity field columns
+     *
+     * @return array
+     */
+    public function getFieldColumns()
+    {
+        return [];
     }
 }

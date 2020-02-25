@@ -6,17 +6,32 @@
 
 namespace Firebear\ImportExport\Model\Export;
 
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
+use Magento\CustomerImportExport\Model\Export\Address as MagentoAddress;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use Magento\Framework\Exception\LocalizedException;
 
-class Address extends \Magento\CustomerImportExport\Model\Export\Address
+/**
+ * Class Address
+ *
+ * @package Firebear\ImportExport\Model\Export
+ */
+class Address extends MagentoAddress implements EntityInterface
 {
-    use \Firebear\ImportExport\Traits\Export\Entity;
-
-    use \Firebear\ImportExport\Traits\General;
-
+    use ExportTrait;
 
     /**
-     * @return mixed
+     * @inheritdoc
+     */
+    protected function _initCustomers()
+    {
+        return $this;
+    }
+
+    /**
+     * Retrieve entity field for export
+     *
+     * @return array
      */
     public function getFieldsForExport()
     {
@@ -30,17 +45,40 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
     }
 
     /**
+     * Get additional customer attributes
+     *
+     * @return array
+     */
+    protected function _getExportAttributeCodes()
+    {
+        parent::_getExportAttributeCodes();
+
+        $customerAttributes = [
+            self::COLUMN_WEBSITE,
+            self::COLUMN_EMAIL,
+            self::COLUMN_NAME_DEFAULT_BILLING,
+            self::COLUMN_NAME_DEFAULT_SHIPPING
+        ];
+
+        foreach ($customerAttributes as $attribute) {
+            if (!in_array($attribute, $this->_attributeCodes)) {
+                $this->_attributeCodes[] = $attribute;
+            }
+        }
+
+        return $this->_attributeCodes;
+    }
+
+    /**
      * @param $item
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function exportItem($item)
     {
         $row = $this->_addAttributeValuesToRow($item);
 
-        $customer = $this->_customers[$item->getParentId()];
-
         foreach (self::$_defaultAddressAttributeMapping as $columnName => $attributeCode) {
-            if (!empty($customer[$attributeCode]) && $customer[$attributeCode] == $item->getId()) {
+            if (!empty($row[$columnName]) && $row[$columnName] == $item->getId()) {
                 $row[$columnName] = 1;
             }
         }
@@ -49,15 +87,21 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
         }
 
         $row[self::COLUMN_ADDRESS_ID] = $item['entity_id'];
-        $row[self::COLUMN_EMAIL] = $customer['email'];
-        $row[self::COLUMN_WEBSITE] = $this->_websiteIdToCode[$customer['website_id']];
+        if (isset($this->_websiteIdToCode[$item[self::COLUMN_WEBSITE]])) {
+            $row[self::COLUMN_WEBSITE] = $this->_websiteIdToCode[$item[self::COLUMN_WEBSITE]];
+        }
 
         $this->getWriter()->writeRow($this->changeRow($row));
     }
 
+    /**
+     * Export process
+     *
+     * @return array
+     * @throws LocalizedException
+     */
     public function export()
     {
-//        $this->lastEntityId = '';
         // skip and filter by customer address attributes
         $entityCollection = $this->_getEntityCollection();
         if (isset($this->_parameters['last_entity_id'])
@@ -65,11 +109,11 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
             && $this->_parameters['enable_last_entity_id'] > 0
         ) {
             $entityCollection->addFieldToFilter(
-                'entity_id', ['gt' => $this->_parameters['last_entity_id']]
+                'entity_id',
+                ['gt' => $this->_parameters['last_entity_id']]
             );
         }
         $this->_prepareEntityCollection($entityCollection);
-        $entityCollection->setCustomerFilter(array_keys($this->_customers));
 
         // prepare headers
         $this->getWriter()->setHeaderCols($this->_getHeaderColumns());
@@ -80,7 +124,9 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
     }
 
     /**
-     * @return mixed
+     * Retrieve header columns
+     *
+     * @return array
      */
     protected function _getHeaderColumns()
     {
@@ -92,7 +138,7 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
 
         return $this->changeHeaders($headers);
     }
-	
+
     /**
      * Apply filter to collection and add not skipped attributes to select
      *
@@ -103,6 +149,26 @@ class Address extends \Magento\CustomerImportExport\Model\Export\Address
     {
         $this->filterEntityCollection($collection);
         $this->_addAttributesToCollection($collection);
+        $collection->getSelect()
+            ->join(
+                ['ce' => $collection->getTable('customer_entity')],
+                'e.parent_id = ce.entity_id',
+                [
+                    self::COLUMN_WEBSITE => 'website_id',
+                    self::COLUMN_EMAIL => 'email',
+                    self::COLUMN_NAME_DEFAULT_BILLING => 'default_billing',
+                    self::COLUMN_NAME_DEFAULT_SHIPPING => 'default_shipping']
+            );
         return $collection;
-    }	
+    }
+
+    /**
+     * Retrieve attributes codes which are appropriate for export
+     *
+     * @return array
+     */
+    protected function _getExportAttrCodes()
+    {
+        return [];
+    }
 }

@@ -28,8 +28,7 @@ define(
                     var self = this;
                     if (localStorage.getItem('categories') == 'undefined') {
                         var options = null;
-                    }
-                    else {
+                    } else {
                         var options = $.parseJSON(localStorage.getItem('categories'));
                     }
                     var newOptions = [];
@@ -50,7 +49,7 @@ define(
                                 _.each(
                                     record.prevData,
                                     function (element) {
-                                    var currentElementData = object.data();
+                                        var currentElementData = object.data();
                                         if (currentElementData.record_id == element.record_id) {
                                             self.value(element.source_category_data_import);
                                         }

@@ -1,5 +1,5 @@
 /**
- * @copyright: Copyright В© 2017 Firebear Studio. All rights reserved.
+ * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
@@ -13,6 +13,9 @@ define([
     'use strict';
 
     return Parent.extend({
+
+        page: 0,
+
         ajaxSend: function (file) {
             this.end = 0;
             var lastEntityValue = '';
@@ -25,48 +28,62 @@ define([
             var object = reg.get(this.name + '.debugger.debug');
             var url = this.url + '?form_key=' + window.FORM_KEY;
             url += '&id=' + job + '&file=' + file + '&last_entity_value=' + lastEntityValue;
+
+            var page = this.page + 1;
+            this.page = page;
+            url = url + '&page=' + page;
+
             this.currentAjax = this.urlAjax + '?file=' + file;
             if (lastEntity.value()) {
                 lastEntityValue = lastEntity.value();
                 url = url + '&last_entity_id=' + lastEntityValue;
                 this.currentAjax = this.currentAjax + '&last_entity_id=' + lastEntityValue;
             }
+
             var urlAjax = this.currentAjax;
-            $('.run').attr("disabled", true);
+            $('.run').attr('disabled', true);
             var self = this;
+
+
             this.loading(true);
             storage.get(
                 url
             ).done(
                 function (response) {
-                    object.value(response.result);
-                    $(".run").attr("disabled", false);
-                    self.loading(false);
-                    self.isNotice(response.result);
-                    self.notice($t('The process is over'));
-                    self.isError(!response.result);
-                    if (response.file) {
-                        self.isHref(response.result);
-                        self.href(response.file);
-                        if (lastEntity.value() < response.last_entity_id) {
-                            lastEntity.value(response.last_entity_id);
+                    var entity = reg.get(self.ns + '.' + self.ns + '.settings.entity');
+
+                    if (entity.value() == 'catalog_product' && response.export_by_page) {
+                        self.ajaxSend(file);
+                    }else{
+                        object.value(response.result);
+                        $('.run').attr('disabled', false);
+                        self.loading(false);
+                        self.isNotice(response.result);
+                        self.notice($t('The process is over'));
+                        self.isError(!response.result);
+                        if (response.file) {
+                            self.isHref(response.result);
+                            self.href(response.file);
+                            if (lastEntity.value() < response.last_entity_id) {
+                                lastEntity.value(response.last_entity_id);
+                            }
                         }
+                        self.end = 1;
+                        self.page = 0;
                     }
-                    self.end = 1;
                 }
             ).fail(
                 function (response) {
-                    $(".run").attr("disabled", false);
+                    $('.run').attr('disabled', false);
                     self.loading(false);
                     self.isNotice(false);
                     self.isError(true);
                     self.end = 1;
+                    self.page = 0;
                 }
             );
-            if (self.end != 1) {
-                setTimeout(function () {
-                    self.getDebug(urlAjax)
-                }, 1500);
+            if ((self.page == 1) && (self.end != 1)) {
+                setTimeout(self.getDebug.bind(self, urlAjax), 1500);
             }
         },
         toggleModal: function () {
@@ -85,10 +102,10 @@ define([
                 urlAjax = self.currentAjax + '&number=0';
                 if (text.length > 0) {
                     $('#debug-run').html(text);
-                    $(".debug").scrollTop($(".debug")[0].scrollHeight);
+                    $('.debug').scrollTop($('.debug')[0].scrollHeight);
                 }
                 if (self.end != 1) {
-                    setTimeout(self.getDebug(urlAjax), 3500);
+                    setTimeout(self.getDebug.bind(self, urlAjax), 1500);
                 }
             }).fail(function (response) {
                 self.finish(false);

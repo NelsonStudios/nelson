@@ -30,7 +30,7 @@ interface ExportInterface extends AbstractInterface
      * @return string
      */
     public function getXslt();
-    
+
     /**
      * @param $source
      *

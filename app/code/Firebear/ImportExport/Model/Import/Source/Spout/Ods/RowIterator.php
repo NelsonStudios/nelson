@@ -57,7 +57,10 @@ class RowIterator
     /** @var int Row index to be processed next (one-based) */
     protected $nextRowIndexToBeProcessed = 1;
 
-    /** @var mixed|null Value of the last processed cell (because when reading cell at column N+1, cell N is processed) */
+    /**
+     * @var mixed|null Value of the last processed cell (because when reading cell at column N+1,
+     * cell N is processed)
+     */
     protected $lastProcessedCellValue = null;
 
     /** @var int Number of times the last processed row should be repeated */
@@ -68,7 +71,6 @@ class RowIterator
 
     /** @var bool Whether at least one cell has been read for the row currently being processed */
     protected $hasAlreadyReadOneCellInCurrentRow = false;
-
 
     /**
      * @param XMLReader $xmlReader XML Reader, positioned on the "<table:table>" element
@@ -82,10 +84,26 @@ class RowIterator
 
         // Register all callbacks to process different nodes when reading the XML file
         $this->xmlProcessor = new XMLProcessor($this->xmlReader);
-        $this->xmlProcessor->registerCallback(self::XML_NODE_ROW, XMLProcessor::NODE_TYPE_START, [$this, 'processRowStartingNode']);
-        $this->xmlProcessor->registerCallback(self::XML_NODE_CELL, XMLProcessor::NODE_TYPE_START, [$this, 'processCellStartingNode']);
-        $this->xmlProcessor->registerCallback(self::XML_NODE_ROW, XMLProcessor::NODE_TYPE_END, [$this, 'processRowEndingNode']);
-        $this->xmlProcessor->registerCallback(self::XML_NODE_TABLE, XMLProcessor::NODE_TYPE_END, [$this, 'processTableEndingNode']);
+        $this->xmlProcessor->registerCallback(
+            self::XML_NODE_ROW,
+            XMLProcessor::NODE_TYPE_START,
+            [$this, 'processRowStartingNode']
+        );
+        $this->xmlProcessor->registerCallback(
+            self::XML_NODE_CELL,
+            XMLProcessor::NODE_TYPE_START,
+            [$this, 'processCellStartingNode']
+        );
+        $this->xmlProcessor->registerCallback(
+            self::XML_NODE_ROW,
+            XMLProcessor::NODE_TYPE_END,
+            [$this, 'processRowEndingNode']
+        );
+        $this->xmlProcessor->registerCallback(
+            self::XML_NODE_TABLE,
+            XMLProcessor::NODE_TYPE_END,
+            [$this, 'processTableEndingNode']
+        );
     }
 
     /**
@@ -180,7 +198,8 @@ class RowIterator
     }
 
     /**
-     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object, positioned on a "<table:table-row>" starting node
+     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object,
+     * positioned on a "<table:table-row>" starting node
      * @return int A return code that indicates what action should the processor take next
      */
     protected function processRowStartingNode($xmlReader)
@@ -195,7 +214,8 @@ class RowIterator
     }
 
     /**
-     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object, positioned on a "<table:table-cell>" starting node
+     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object,
+     * positioned on a "<table:table-cell>" starting node
      * @return int A return code that indicates what action should the processor take next
      */
     protected function processCellStartingNode($xmlReader)
@@ -241,10 +261,10 @@ class RowIterator
         // with a number-columns-repeated value equals to the number of (supported columns - used columns).
         // In Excel, the number of supported columns is 16384, but we don't want to returns rows with
         // always 16384 cells.
-		$cellCount = count($this->currentlyProcessedRowData) + $actualNumColumnsRepeated;
+        $cellCount = count($this->currentlyProcessedRowData) + $actualNumColumnsRepeated;
         if ($cellCount !== self::MAX_COLUMNS_EXCEL && $cellCount !== 1024) {
             for ($i = 0; $i < $actualNumColumnsRepeated; $i++) {
-				$this->currentlyProcessedRowData[] = $this->lastProcessedCellValue;
+                $this->currentlyProcessedRowData[] = $this->lastProcessedCellValue;
             }
         }
 
@@ -269,30 +289,33 @@ class RowIterator
     }
 
     /**
-     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object, positioned on a "<table:table-row>" starting node
+     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object,
+     * positioned on a "<table:table-row>" starting node
      * @return int The value of "table:number-rows-repeated" attribute of the current node, or 1 if attribute missing
      */
     protected function getNumRowsRepeatedForCurrentNode($xmlReader)
     {
         $numRowsRepeated = $xmlReader->getAttribute(self::XML_ATTRIBUTE_NUM_ROWS_REPEATED);
-        return ($numRowsRepeated !== null) ? intval($numRowsRepeated) : 1;
+        return ($numRowsRepeated !== null) ? (int) ($numRowsRepeated) : 1;
     }
 
     /**
-     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object, positioned on a "<table:table-cell>" starting node
+     * @param \Box\Spout\Reader\Wrapper\XMLReader $xmlReader XMLReader object,
+     * positioned on a "<table:table-cell>" starting node
      * @return int The value of "table:number-columns-repeated" attribute of the current node, or 1 if attribute missing
      */
     protected function getNumColumnsRepeatedForCurrentNode($xmlReader)
     {
         $numColumnsRepeated = $xmlReader->getAttribute(self::XML_ATTRIBUTE_NUM_COLUMNS_REPEATED);
-        return ($numColumnsRepeated !== null) ? intval($numColumnsRepeated) : 1;
+        return ($numColumnsRepeated !== null) ? (int) ($numColumnsRepeated) : 1;
     }
 
     /**
      * Returns the (unescaped) correctly marshalled, cell value associated to the given XML node.
      *
      * @param \DOMNode $node
-     * @return string|int|float|bool|\DateTime|\DateInterval|null The value associated with the cell, empty string if cell's type is void/undefined, null on error
+     * @return string|int|float|bool|\DateTime|\DateInterval|null The value associated with the cell,
+     * empty string if cell's type is void/undefined, null on error
      */
     protected function getCellValue($node)
     {
@@ -338,7 +361,6 @@ class RowIterator
     {
         return $this->lastRowIndexProcessed;
     }
-
 
     /**
      * Cleans up what was created to iterate over the object.

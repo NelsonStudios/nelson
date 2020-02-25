@@ -10,10 +10,23 @@ use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
 use Magento\Framework\App\ObjectManager;
 use Magento\BundleImportExport\Model\Import\Product\Type\Bundle\RelationsDataSaver;
 
+/**
+ * Class Bundle
+ *
+ * @package Firebear\ImportExport\Model\Import\Product\Type
+ */
 class Bundle extends \Magento\BundleImportExport\Model\Import\Product\Type\Bundle
 {
+    use \Firebear\ImportExport\Traits\Import\Product\Type;
+
     private $relationsDataSaver;
     protected $resource;
+
+    public static $specialAttributes = [
+        'price_type',
+        'weight_type',
+        'sku_type',
+    ];
 
     /**
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Set\CollectionFactory $attrSetColFac
@@ -21,7 +34,9 @@ class Bundle extends \Magento\BundleImportExport\Model\Import\Product\Type\Bundl
      * @param \Magento\Framework\App\ResourceConnection $resource
      * @param array $params
      * @param \Magento\Framework\EntityManager\MetadataPool|null $metadataPool
-     * @param Bundle\RelationsDataSaver|null $relationsDataSaver
+     * @param \Magento\BundleImportExport\Model\Import\Product\Type\Bundle\RelationsDataSaver $relationsDataSaver
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\Set\CollectionFactory $attrSetColFac,
@@ -60,6 +75,11 @@ class Bundle extends \Magento\BundleImportExport\Model\Import\Product\Type\Bundl
                         $productId,
                         $index
                     )) {
+                        if (isset($tmpArray['selection_can_change_qty'], $selection['selection_can_change_qty'])
+                        && $tmpArray['selection_can_change_qty'] != $selection['selection_can_change_qty']
+                        ) {
+                            $tmpArray['selection_can_change_qty'] = $selection['selection_can_change_qty'] ?? 1;
+                        }
                         $selections[] = $tmpArray;
                         $index++;
                     }
@@ -67,7 +87,43 @@ class Bundle extends \Magento\BundleImportExport\Model\Import\Product\Type\Bundl
             }
         }
 
-        $this->relationsDataSaver->saveSelections($selections);
+        $selectedSelections = [];
+
+        foreach ($selections as $key => $selection) {
+            $productId = $selection['product_id'];
+            if (isset($selectedSelections[$selection['option_id']])) {
+                if (isset($selectedSelections[$selection['option_id']][$productId]) &&
+                    $selectedSelections[$selection['option_id']][$productId] == $productId ) {
+                    unset($selections[$key]);
+                } else {
+                    $selectedSelections[$selection['option_id']][$productId] = $productId;
+                }
+            } else {
+                $selectedSelections[$selection['option_id']][$productId] = $productId;
+            }
+        }
+
+        if (version_compare($this->_entityModel->getProductMetadata()->getVersion(), '2.2.0', '>=')) {
+            $this->relationsDataSaver->saveSelections($selections);
+        } else {
+            $selectionTable = $this->_resource->getTableName('catalog_product_bundle_selection');
+            if (!empty($selections)) {
+                $this->connection->insertOnDuplicate(
+                    $selectionTable,
+                    $selections,
+                    [
+                        'selection_id',
+                        'product_id',
+                        'position',
+                        'is_default',
+                        'selection_price_type',
+                        'selection_price_value',
+                        'selection_qty',
+                        'selection_can_change_qty'
+                    ]
+                );
+            }
+        }
         $this->saveCatalogProductRelation($selections);
 
         return $this;
@@ -96,5 +152,58 @@ class Bundle extends \Magento\BundleImportExport\Model\Import\Product\Type\Bundl
                 ]
             );
         }
+    }
+
+    /**
+     * Parse the option.
+     *
+     * @param array $values
+     *
+     * @return array
+     */
+    protected function parseOption($values)
+    {
+        $option = parent::parseOption($values);
+
+        $select = $this->connection->select()->from(
+            $this->_resource->getTableName('catalog_product_entity'),
+            ['sku', 'entity_id']
+        )->where(
+            'sku = (?)',
+            $option['sku']
+        );
+
+        $isSkuExists = $this->connection->fetchOne($select);
+        if (!$isSkuExists) {
+            unset($option['sku'], $option['name']);
+        }
+
+        return $option;
+    }
+
+    /**
+     * Parse selections.
+     *
+     * @param array $rowData
+     * @param int $entityId
+     *
+     * @return array
+     */
+    protected function parseSelections($rowData, $entityId)
+    {
+        $selections = parent::parseSelections($rowData, $entityId);
+        foreach ($this->_cachedOptions as $productId => $options) {
+            $childSkus = [];
+            foreach ($options as $key => $option) {
+                foreach ($option['selections'] as $selectionKey => $selection) {
+                    if (in_array($selection['sku'], $childSkus)) {
+                        unset($this->_cachedOptions[$productId][$key]['selections'][$selectionKey]);
+                    } else {
+                        $childSkus[] = $selection['sku'];
+                    }
+                }
+            }
+        }
+        return $selections;
     }
 }

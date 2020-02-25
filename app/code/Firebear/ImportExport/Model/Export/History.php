@@ -8,12 +8,18 @@ namespace Firebear\ImportExport\Model\Export;
 
 use Magento\Framework\Model\AbstractModel;
 use Firebear\ImportExport\Api\Data\ExportHistoryInterface;
+use Firebear\ImportExport\Model\ResourceModel\Export\History as ResourceModelHistory;
 
+/**
+ * Class History
+ *
+ * @package Firebear\ImportExport\Model\Export
+ */
 class History extends AbstractModel implements ExportHistoryInterface
 {
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\ResourceModel\Export\History');
+        $this->_init(ResourceModelHistory::class);
     }
 
     /**
@@ -33,7 +39,7 @@ class History extends AbstractModel implements ExportHistoryInterface
     }
 
     /**
-     * @return date
+     * @return string
      */
     public function getStartedAt()
     {
@@ -41,7 +47,7 @@ class History extends AbstractModel implements ExportHistoryInterface
     }
 
     /**
-     * @return date
+     * @return string
      */
     public function getFinishedAt()
     {
@@ -72,7 +78,6 @@ class History extends AbstractModel implements ExportHistoryInterface
         return $this->getData(self::TEMP_FILE);
     }
 
-
     /**
      * @param int $id
      *
@@ -98,7 +103,7 @@ class History extends AbstractModel implements ExportHistoryInterface
     }
 
     /**
-     * @param date $start
+     * @param string $start
      *
      * @return ExportHistoryInterface
      */
@@ -110,7 +115,7 @@ class History extends AbstractModel implements ExportHistoryInterface
     }
 
     /**
-     * @param date $finish
+     * @param string $finish
      *
      * @return ExportHistoryInterface
      */

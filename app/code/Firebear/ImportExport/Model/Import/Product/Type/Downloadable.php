@@ -6,21 +6,29 @@
 
 namespace Firebear\ImportExport\Model\Import\Product\Type;
 
+use Exception;
+use Firebear\ImportExport\Traits\Import\Product\Type as TypeTrait;
 use Magento\Framework\File\Uploader;
 use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
+use Magento\CatalogImportExport\Model\Import\Product\Type\AbstractType;
 
 /**
  * Class Downloadable
  */
 class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Product\Type\Downloadable
 {
+    use TypeTrait;
+
+    const ERROR_LINK_URL_NOT_IN_DOMAIN_WHITELIST = 'linkUrlNotInDomainWhitelist';
+    const ERROR_SAMPLE_URL_NOT_IN_DOMAIN_WHITELIST = 'sampleUrlNotInDomainWhitelist';
+
     /**
      * Array of cached import link
      *
      * @var array
      */
     protected $importLink = [];
-	
+
     /**
      * Validation links option
      *
@@ -29,29 +37,43 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
      */
     protected function isRowValidLink(array $rowData)
     {
-		$result = parent::isRowValidLink($rowData);
-		if (!$result && !empty($rowData[self::COL_DOWNLOADABLE_LINKS])) {
-			$rowSku = strtolower($rowData[ImportProduct::COL_SKU]);
-			$option = $this->prepareLinkData($rowData[self::COL_DOWNLOADABLE_LINKS]);
-			$option = $option[0];
-			$key = md5(
-				$option['link_url']. 
-				$option['link_file'] . 
-				$option['link_type'] . 
-				$option['sample_url'] . 
-				$option['sample_file'] . 
-				$option['sample_type'] . 
-				$rowSku
-			);
-			if (isset($this->importLink[$key])) {			
-				$this->_entityModel->addRowError(__('Duplicated downloadable_links attribute.'), $this->rowNum);
-				return true;
-			}
-			$this->importLink[$key] = true;
-		}		
+        $hasLinkData = (
+            isset($rowData[self::COL_DOWNLOADABLE_LINKS]) &&
+            $rowData[self::COL_DOWNLOADABLE_LINKS] != ''
+        );
+        if (!$hasLinkData) {
+            return false;
+        }
+        $linkData = $this->prepareLinkData($rowData[self::COL_DOWNLOADABLE_LINKS]);
+        if ($this->linksAdditionalAttributes($rowData, 'group_title', self::DEFAULT_GROUP_TITLE) == '') {
+            $this->_entityModel->addRowError(self::ERROR_GROUP_TITLE_NOT_FOUND, $this->rowNum);
+            $result = true;
+        }
+        $result = $result ?? $this->isTitle($linkData);
+
+        if (!$result && !empty($rowData[self::COL_DOWNLOADABLE_LINKS])) {
+            $rowSku = strtolower($rowData[ImportProduct::COL_SKU]);
+            $linkData = $linkData[0];
+            $key = hash(
+                'sha256',
+                $linkData['link_url'] .
+                $linkData['link_file'] .
+                $linkData['link_type'] .
+                $linkData['sample_url'] .
+                $linkData['sample_file'] .
+                $linkData['sample_type'] .
+                $rowSku,
+                false
+            );
+            if (isset($this->importLink[$key])) {
+                $this->_entityModel->addRowError(__('Duplicated downloadable_links attribute.'), $this->rowNum);
+                return true;
+            }
+            $this->importLink[$key] = true;
+        }
         return $result;
     }
-	
+
     /**
      * Get fill data options with key link
      *
@@ -130,7 +152,7 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
                     ['url', 'google']
                 )
             ) {
-                $dispersionPath = Uploader::getDispretionPath($fileName);
+                $dispersionPath = Uploader::getDispersionPath($fileName);
                 $imageSting = mb_strtolower(
                     $dispersionPath . '/'
                         . preg_replace('/[^a-z0-9\._-]+/i', '', $fileName)
@@ -147,9 +169,9 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
                     $this->_entityModel->getParameters()
                 )->move($fileName, $renameFileOff);
             }
-     
+
             return $res['file'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->_entityModel->addRowError(
                 $this->_messageTemplates[self::ERROR_MOVE_FILE] . '. '
                     . $e->getMessage(),
@@ -168,5 +190,45 @@ class Downloadable extends \Magento\DownloadableImportExport\Model\Import\Produc
             $error = true;
         }
         return !$error;
+    }
+
+    /**
+     * Save product type specific data.
+     *
+     * @return AbstractType
+     */
+    public function saveData()
+    {
+        $newSku = $this->_entityModel->getNewSku();
+        while ($bunch = $this->_entityModel->getNextBunch()) {
+            foreach ($bunch as $rowNum => $rowData) {
+                if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
+                    continue;
+                }
+
+                if (version_compare($this->_entityModel->getProductMetadata()->getVersion(), '2.2.0', '>=')) {
+                    $rowSku = strtolower($rowData[ImportProduct::COL_SKU]);
+                } else {
+                    $rowSku = $rowData[ImportProduct::COL_SKU];
+                }
+                $productData = $newSku[$rowSku];
+                $this->parseOptions($rowData, $productData[$this->getProductEntityLinkField()]);
+            }
+            if (!empty($this->cachedOptions['sample']) || !empty($this->cachedOptions['link'])) {
+                $this->saveOptions();
+                $this->clear();
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Clear current object
+     *
+     * @return void
+     */
+    public function clearObject()
+    {
+        $this->importLink = [];
     }
 }

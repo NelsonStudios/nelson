@@ -51,7 +51,6 @@ define(
                                 parent.showSpinner(false);
                             }
                         });
-                   
                     }
                 }
             }

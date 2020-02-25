@@ -7,45 +7,17 @@
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Magento\Framework\View\Result\PageFactory;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
 
+/**
+ * Class Index
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Index extends JobController
 {
-    /**
-     * @var PageFactory
-     */
-    protected $resultPageFactory;
-
-    /**
-     * Index constructor.
-     *
-     * @param Context                $context
-     * @param Registry               $coreRegistry
-     * @param JobFactory             $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param PageFactory            $resultPageFactory
-     */
-    public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        PageFactory $resultPageFactory
-    ) {
-        $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-    }
-
-    /**
-     * @return \Magento\Framework\View\Result\Page
-     */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
+        $resultPage = $this->resultFactory->create($this->resultFactory::TYPE_PAGE);
         $resultPage->setActiveMenu('Firebear_ImportExport::import_job')
             ->addBreadcrumb(__('Import Jobs'), __('Import Jobs'));
         $resultPage->getConfig()->getTitle()->prepend(__('Import Jobs'));

@@ -4,6 +4,11 @@ namespace Firebear\ImportExport\Plugin\Framework\View\Asset;
 
 use Magento\Framework\View\Asset\Minification;
 
+/**
+ * Class ExcludeFilesFromMinification
+ *
+ * @package Firebear\ImportExport\Plugin\Framework\View\Asset
+ */
 class ExcludeFilesFromMinification
 {
     public function aroundGetExcludes(Minification $subject, callable $proceed, $contentType)
@@ -36,7 +41,6 @@ class ExcludeFilesFromMinification
         $result[] = 'Firebear_ImportExport/js/lib/ace/snippets/csound_document';
         $result[] = 'Firebear_ImportExport/js/lib/ace/snippets/csound_orchestra';
         $result[] = 'Firebear_ImportExport/js/lib/ace/snippets/csound_score';
-
 
         $result[] = 'Firebear_ImportExport/js/lib/ace/ace';
         $result[] = 'Firebear_ImportExport/js/lib/ace/ext-beautify';
@@ -202,7 +206,6 @@ class ExcludeFilesFromMinification
         $result[] = 'Firebear_ImportExport/js/lib/ace/worker-html';
         $result[] = 'Firebear_ImportExport/js/lib/ace/worker-css';
         $result[] = 'Firebear_ImportExport/js/lib/ace/worker-coffee';
-
 
         return $result;
     }

@@ -1,14 +1,13 @@
 <?php
 /**
- * Copyright (c) 2018. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
-
 
 namespace Firebear\ImportExport\Model\Import;
 
 use Firebear\ImportExport\Helper\Additional;
-use Firebear\ImportExport\Traits\General;
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Cms\Api\Data\BlockInterface;
 use Magento\Cms\Model\BlockFactory as CmsBlockFactory;
@@ -30,19 +29,19 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Theme\Model\ResourceModel\Theme\Collection;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-
 /**
- * @property  $_logger
+ * Class CmsBlock
+ *
+ * @package Firebear\ImportExport\Model\Import
  */
 class CmsBlock extends AbstractEntity
 {
-    use General;
+    use ImportTrait;
 
     /**
      * Column category url key.
      */
     const COL_URL = 'identifier';
-
 
     /**
      * Column cms block_id.
@@ -53,7 +52,6 @@ class CmsBlock extends AbstractEntity
      * Column cms store_view_code.
      */
     const COL_STORE_VIEW_CODE = 'store_view_code';
-
 
     /**
      * Core event manager proxy
@@ -80,8 +78,6 @@ class CmsBlock extends AbstractEntity
     protected $resource;
     protected $blocksUrl;
 
-    protected $duplicateFields = [];
-
     /**
      * @var Registry
      */
@@ -94,15 +90,9 @@ class CmsBlock extends AbstractEntity
      */
     protected $blocks = [];
 
-    /**
-     * @var ConsoleOutput
-     */
-    protected $output;
-
     protected $sourceType;
     protected $blockResourceFactory;
     protected $additional;
-
 
     protected $blockFields = [
         BlockInterface::BLOCK_ID,
@@ -122,8 +112,6 @@ class CmsBlock extends AbstractEntity
      * @var Store
      */
     protected $store;
-    /** @var */
-    protected $_logger;
 
     /**
      * CmsBlock constructor.
@@ -212,13 +200,12 @@ class CmsBlock extends AbstractEntity
                 $collection = $this->collectionFactory->create();
                 $collection->addStoreFilter($store);
 
-                /* @var $collection \Magento\Cms\Model\ResourceModel\Block\Collection */
-                foreach ($collection as $page) {
-                    $this->blocks[$page->getIdentifier()] = $page->getBlockId();
+                /** @var \Magento\Cms\Model\Block $block */
+                foreach ($collection as $block) {
+                    $this->blocks[$block->getIdentifier()] = $block->getId();
                 }
             }
         }
-
     }
 
     public function getAllFields()
@@ -226,11 +213,6 @@ class CmsBlock extends AbstractEntity
         return array_unique(
             $this->blockFields
         );
-    }
-
-    public function setLogger($logger)
-    {
-        $this->_logger = $logger;
     }
 
     /**
@@ -298,7 +280,6 @@ class CmsBlock extends AbstractEntity
                         $rowNum
                     );
                 }
-
             }
         }
         return $this;
@@ -348,7 +329,11 @@ class CmsBlock extends AbstractEntity
                 $rowData = $this->joinIdenticalyData($rowData);
                 $rowData = $this->customChangeData($rowData);
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('block with name: %1 is not valided', $rowData['title']), $this->output, 'info');
+                    $this->addLogWriteln(
+                        __('block with name: %1 is not valided', $rowData['title']),
+                        $this->output,
+                        'info'
+                    );
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -469,7 +454,6 @@ class CmsBlock extends AbstractEntity
         }
         return $this->resource;
     }
-
 
     protected function getStore($rowData)
     {

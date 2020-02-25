@@ -6,7 +6,9 @@
 
 namespace Firebear\ImportExport\Model\ResourceModel\Job\Mapping;
 
-use \Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\Job\Mapping as ModelMapping;
+use Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\ResourceModel\Job\Mapping as ResourceModelMapping;
 
 /**
  * Class Collection
@@ -27,6 +29,9 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\Job\Mapping', 'Firebear\ImportExport\Model\ResourceModel\Job\Mapping');
+        $this->_init(
+            ModelMapping::class,
+            ResourceModelMapping::class
+        );
     }
 }

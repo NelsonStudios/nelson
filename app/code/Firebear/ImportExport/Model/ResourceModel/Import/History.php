@@ -1,21 +1,24 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\ResourceModel\Import;
 
 use Firebear\ImportExport\Api\Data\ImportHistoryInterface;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\DB\Select;
+use Magento\Framework\EntityManager\EntityManager;
+use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
-use Magento\Framework\EntityManager\MetadataPool;
-use Firebear\ImportExport\Api\Data\ImportInterface;
-use Magento\Framework\EntityManager\EntityManager;
-use Magento\Framework\Model\ResourceModel\Db\VersionControl\RelationComposite;
-use Magento\Framework\Model\ResourceModel\Db\VersionControl\Snapshot;
 
+/**
+ * Class History
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Import
+ */
 class History extends AbstractDb
 {
     /**

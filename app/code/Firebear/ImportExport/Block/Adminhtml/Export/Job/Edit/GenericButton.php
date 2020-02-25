@@ -38,7 +38,7 @@ class GenericButton
         $this->context = $context;
         $this->exportJobRepository = $exportJobRepository;
     }
-    
+
     public function getExportJobId()
     {
         try {

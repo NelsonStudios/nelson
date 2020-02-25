@@ -31,7 +31,7 @@ define([
             var self = this;
             $.async({
                 component: this,
-                selector: 'div'
+                selector: 'div.specialFire > div'
             }, function (element) {
                 var data = reg.get(self.provider).data;
                 var editor = ace.edit($(element).attr('id'));
@@ -47,7 +47,7 @@ define([
                 editor.setShowPrintMargin(true);
                 editor.renderer.setShowGutter(true);
                 editor.renderer.setOption('showLineNumbers', true);
-                self.on('fullValue', function(value) {
+                self.on('fullValue', function (value) {
                     editor.session.setValue(value);
                 })
 

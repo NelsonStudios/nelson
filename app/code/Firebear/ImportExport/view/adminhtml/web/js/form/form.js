@@ -21,7 +21,8 @@ define(
          * @param {Array} items
          * @returns {Object}
          */
-        function collectData(items) {
+        function collectData(items)
+        {
             var result = {};
 
             items = Array.prototype.slice.call(items);
@@ -48,7 +49,7 @@ define(
         return Form.extend(
             {
                 defaults: {
-                  nameModal:'',
+                    nameModal:'',
                 },
                 initialize: function () {
                     this._super();
@@ -133,13 +134,13 @@ define(
                     var postData = this.source.get('data');
                     var type = reg.get(self.ns + "." + self.ns + ".source.import_source");
                     if (typeof type != 'undefined') {
-                    if (type.value() == 'google') {
-                        var filePath = reg.get(self.ns + "." + self.ns + ".source.google_file_path");
-                        postData.file_path = filePath.value();
+                        if (type.value() == 'google') {
+                            var filePath = reg.get(self.ns + "." + self.ns + ".source.google_file_path");
+                            postData.file_path = filePath.value();
+                        }
                     }
-                }
-                   postData = this.recorrectData(postData);
-                   postData = this.recorrectMapData(postData);
+                    postData = this.recorrectData(postData);
+                    postData = this.recorrectMapData(postData);
                     $.ajax({
                         type: "POST",
                         url: this.source.submit_url,
@@ -155,7 +156,7 @@ define(
                     });
                 },
 
-                checkButton: function() {
+                checkButton: function () {
                     var data = reg.get(this.provider).data;
                     reg.get('import_job_form.import_job_form.general.title', function (name) {
                         if (name.value()) {
@@ -163,7 +164,7 @@ define(
                                 object.update = 1;
                                 object.validateGeneral();
                             });
-                           if (_.size(data['source_data_categories_map']) > 0) {
+                            if (_.size(data['source_data_categories_map']) > 0) {
                                 reg.get('import_job_form.import_job_form.source_data_map_container_category.load_categories_button', function (object) {
                                     object.loadForm();
                                 });
@@ -189,7 +190,7 @@ define(
                             data.source_filter_field.order = [];
                             data.source_filter_field.value = [];
                             data.source_filter_filter.value = [];
-                            _.each(list, function(elem, index) {
+                            _.each(list, function (elem, index) {
                                 data.source_filter_field.delete[index] = "";
                                 data.source_filter_field.entity[index] = elem["source_filter_field.entity"];
                                 data.source_filter_field.order[index] = "";
@@ -216,22 +217,22 @@ define(
                     
                         if (_.size(list) > 0) {
                             if (_.size(data.source_data_export)) {
-                            data.source_data_export.delete = [];
-                            data.source_data_export.order = [];
-                            data.source_data_export.value = [];
-                            data.source_data_replace.value = [];
-                            data.source_data_system.entity = [];
-                            data.source_data_system.value = [];
-                            _.each(list, function(elem, index) {
-                                data.source_data_export.delete[index] = "";
-                                data.source_data_export.order[index] = "";
-                                data.source_data_export.value[index] = elem["source_data_export.value"];
-                                data.source_data_replace.value[index] = elem["source_data_replace.value"];
-                                data.source_data_system.entity[index] = elem["source_data_system.entity"];;
-                                data.source_data_system.value[index] = elem["source_data_system.value"];;
-                            });
-                        }
-                    };
+                                data.source_data_export.delete = [];
+                                data.source_data_export.order = [];
+                                data.source_data_export.value = [];
+                                data.source_data_replace.value = [];
+                                data.source_data_system.entity = [];
+                                data.source_data_system.value = [];
+                                _.each(list, function (elem, index) {
+                                    data.source_data_export.delete[index] = "";
+                                    data.source_data_export.order[index] = "";
+                                    data.source_data_export.value[index] = elem["source_data_export.value"];
+                                    data.source_data_replace.value[index] = elem["source_data_replace.value"];
+                                    data.source_data_system.entity[index] = elem["source_data_system.entity"];;
+                                    data.source_data_system.value[index] = elem["source_data_system.value"];;
+                                });
+                            }
+                        };
                     }
                 
                     return data;
@@ -240,13 +241,13 @@ define(
                     var self = this;
                     
                     var type = reg.get(self.ns + "." + self.ns + ".source.import_source");
-                  if (typeof type != 'undefined') {
-                    if (type.value() == 'google') {
-                        var filePath = reg.get(self.ns + "." + self.ns + ".source.google_file_path");
-                        this.source.set('data.file_path',filePath.value());
+                    if (typeof type != 'undefined') {
+                        if (type.value() == 'google') {
+                            var filePath = reg.get(self.ns + "." + self.ns + ".source.google_file_path");
+                            this.source.set('data.file_path',filePath.value());
+                        }
                     }
-                }
-                this._super(redirect);
+                    this._super(redirect);
                 }
             }
         );

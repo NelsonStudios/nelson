@@ -4,16 +4,14 @@
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
-// @codingStandardsIgnoreFile
-
 /**@var \Magento\Backend\Block\Widget\Form\Renderer\Fieldset $block */
 ?>
 <?php $_element = $block->getElement() ?>
 <?php $_jsObjectName = $block->getFieldSetId() != null ? $block->getFieldSetId() : $_element->getHtmlId() ?>
 <?php $_jsObjectName .= '__recordId__' ?>
 <div class="price-rule-tree rule-tree">
-    <div id="<?= /* @escapeNotVerified */ $_jsObjectName ?>" <?= /* @escapeNotVerified */ $_element->serialize(['class']) ?>>
-        <?php if ($_element->getComment()): ?>
+    <div id="<?= /** @noEscape */ $_jsObjectName ?>" <?= /** @noEscape */ $_element->serialize(['class']) ?>>
+        <?php if ($_element->getComment()) : ?>
             <div class="messages">
                 <div class="message message-notice"><?= $block->escapeHtml($_element->getComment()) ?></div>
             </div>
@@ -30,9 +28,13 @@
         "prototype"
     ], function(VarienRulesForm){
 
-        window.<?= /* @escapeNotVerified */ $_jsObjectName ?> = new VarienRulesForm('<?= /* @escapeNotVerified */ $_jsObjectName ?>', '<?= /* @escapeNotVerified */ $block->getNewChildUrl() ?>', '__recordId__');
-        <?php if ($_element->getReadonly()): ?>
-        <?= $_element->getHtmlId() ?>.setReadonly(true);
+        window.<?= /** @noEscape */ $_jsObjectName ?> = new VarienRulesForm(
+            '<?= /** @noEscape */ $_jsObjectName ?>',
+            '<?= /** @noEscape */ $block->getNewChildUrl() ?>',
+            '__recordId__'
+        );
+        <?php if ($_element->getReadonly()) : ?>
+            <?= $_element->getHtmlId() ?>.setReadonly(true);
         <?php endif; ?>
 
     });

@@ -6,20 +6,30 @@
 
 namespace Firebear\ImportExport\Model\Import\CartPriceRule;
 
-use \Magento\Framework\Json\EncoderInterface;
+use Magento\Framework\Json\EncoderInterface;
+use Magento\SalesRule\Model\Rule\Condition\Address;
+use Magento\SalesRule\Model\Rule\Condition\Combine;
+use Magento\SalesRule\Model\Rule\Condition\Product;
+use Magento\SalesRule\Model\Rule\Condition\Product\Found;
+use Magento\SalesRule\Model\Rule\Condition\Product\Subselect;
 
+/**
+ * Class Condition
+ *
+ * @package Firebear\ImportExport\Model\Import\CartPriceRule
+ */
 class Condition
 {
 
     protected $attributes;
 
     /**
-     * @var \Magento\SalesRule\Model\Rule\Condition\Address
+     * @var Address
      */
     protected $address;
 
     /**
-     * @var \Magento\SalesRule\Model\Rule\Condition\Product
+     * @var Product
      */
     protected $product;
 
@@ -27,33 +37,36 @@ class Condition
 
     public $arrayAttr = [];
 
+    /**
+     * @var array
+     */
     protected $list = [
         'combine' => [
-            "type" => "Magento\SalesRule\Model\Rule\Condition\Combine",
-            "attribute" => null,
-            "operator" => null,
-            "value" => "1",
-            "is_value_processed" => null,
-            "aggregator" => "all",
-            "conditions" => []
+            'type' => Combine::class,
+            'attribute' => null,
+            'operator' => null,
+            'value' => '1',
+            'is_value_processed' => null,
+            'aggregator' => 'all',
+            'conditions' => []
         ],
         'product' => [
-            "type" => "Magento\SalesRule\Model\Rule\Condition\Product\Found",
-            "attribute" => null,
-            "operator" => null,
-            "value" => "1",
-            "is_value_processed" => null,
-            "aggregator" => "all",
-            "conditions" => []
+            'type' => Found::class,
+            'attribute' => null,
+            'operator' => null,
+            'value' => '1',
+            'is_value_processed' => null,
+            'aggregator' => 'all',
+            'conditions' => []
         ],
         'subs' => [
-            "type" => "Magento\SalesRule\Model\Rule\Condition\Product\Subselect",
-            "attribute" => null,
-            "operator" => null,
-            "value" => "1",
-            "is_value_processed" => null,
-            "aggregator" => "all",
-            "conditions" => []
+            'type' => Subselect::class,
+            'attribute' => null,
+            'operator' => null,
+            'value' => '1',
+            'is_value_processed' => null,
+            'aggregator' => 'all',
+            'conditions' => []
         ]
     ];
     protected $emptyBlock = [
@@ -63,9 +76,13 @@ class Condition
         "value" => "",
         "is_value_processed" => false
     ];
+
+    /**
+     * @var array
+     */
     protected $innerList = [
-        "address" => "Magento\SalesRule\Model\Rule\Condition\Address",
-        "product" => "Magento\SalesRule\Model\Rule\Condition\Product"
+        'address' => Address::class,
+        'product' => Product::class
     ];
 
     protected $jsonEncoder;
@@ -73,13 +90,13 @@ class Condition
     /**
      * Condition constructor.
      * @param EncoderInterface $jsonEncoder
-     * @param \Magento\SalesRule\Model\Rule\Condition\Address $address
-     * @param \Magento\SalesRule\Model\Rule\Condition\Product $product
+     * @param Address $address
+     * @param Product $product
      */
     public function __construct(
         EncoderInterface $jsonEncoder,
-        \Magento\SalesRule\Model\Rule\Condition\Address $address,
-        \Magento\SalesRule\Model\Rule\Condition\Product $product
+        Address $address,
+        Product $product
     ) {
         $this->jsonEncoder = $jsonEncoder;
         if ($this->attributes == null) {

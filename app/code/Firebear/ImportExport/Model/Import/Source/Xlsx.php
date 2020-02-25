@@ -3,13 +3,23 @@
  * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\Import\Source;
 
-use Magento\Framework\Filesystem\Directory\Read as Directory;
-use Magento\ImportExport\Model\Import\AbstractSource;
-use Firebear\ImportExport\Traits\Import\Map as ImportMap;
-use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
+use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\XLSX\Reader;
+use Box\Spout\Reader\XLSX\RowIterator;
+use Box\Spout\Common\Exception\IOException;
+use Box\Spout\Reader\Exception\SharedStringNotFoundException;
+use function count;
+use Exception;
+use Firebear\ImportExport\Model\Source\Platform\PlatformInterface;
+use Firebear\ImportExport\Traits\Import\Map as ImportMap;
+use InvalidArgumentException;
+use Magento\Framework\Filesystem\Directory\Read as Directory;
+use Magento\ImportExport\Model\Import\AbstractEntity;
+use Magento\ImportExport\Model\Import\AbstractSource;
 
 /**
  * Xlsx Import Adapter
@@ -17,95 +27,128 @@ use Box\Spout\Common\Type;
 class Xlsx extends AbstractSource
 {
     use ImportMap;
-	
+
     /**
      * Row Iterator
      *
-     * @var \Box\Spout\Reader\XLSX\RowIterator
-     */     
+     * @var RowIterator
+     */
     protected $rowIterator;
-    
+
     /**
      * Spreadsheet Reader
      *
-     * @var \Box\Spout\Reader\XLSX\Reader
-     */     
+     * @var Reader
+     */
     protected $reader;
-    
+
     /**
      * Column Map
      *
      * @var array
-     */     
+     */
     protected $maps = [];
-    
+
     /**
      * Office Document File Extension
      *
      * @var array
-     */       
+     */
     protected $extension = 'xlsx';
-    
+
     /**
      * Platform
      *
-     * @var mixed
-     */    
+     * @var PlatformInterface
+     */
     protected $platform;
-    
+
+    /**
+     * Object attributes
+     *
+     * @var array
+     */
+    protected $_data = [];
+
     /**
      * Initialize Adapter
-     * 
+     *
      * @param array $file
      * @param Directory $directory
+     * @param PlatformInterface $platform
+     * @param array $data
+     * @throws Exception
      */
     public function __construct(
         $file,
-        Directory $directory
+        Directory $directory,
+        PlatformInterface $platform = null,
+        $data = []
     ) {
-		$file = $directory->getAbsolutePath($file);
-		$this->reader = ReaderFactory::create(Type::XLSX);
-		$this->reader->setShouldFormatDates(true);
-		$this->reader->open($file);
-		
-		$sheetIterator = $this->reader->getSheetIterator();
-		$sheetIterator->rewind();
-		$sheet = $sheetIterator->current();
-		
-		$this->rowIterator = $sheet->getRowIterator();
-		
-		register_shutdown_function([$this, 'destruct']);
-		
-		$this->rewind();
-		parent::__construct(
-			$this->_getNextRow()
-		);
-    } 
-    
+        $this->_data = $data;
+        $this->platform = $platform;
+        $file = $directory->getAbsolutePath($file);
+        $this->reader = ReaderFactory::create(Type::XLSX);
+        $this->reader->setShouldFormatDates(true);
+        $this->reader->open($file);
+
+        $sheetIterator = $this->reader->getSheetIterator();
+        $sheetIterator->rewind();
+        $sheet = $sheetIterator->current();
+        if (isset($data['xlsx_sheet']) && $data['xlsx_sheet'] !== 'undefined') {
+            foreach ($sheetIterator as $sheetIt) {
+                if ($sheetIt->getIndex() == $data['xlsx_sheet'] - 1) {
+                    $sheet = $sheetIt;
+                    break;
+                }
+            }
+        }
+        $this->rowIterator = $sheet->getRowIterator();
+
+        register_shutdown_function([$this, 'destruct']);
+
+        $this->rewind();
+        try {
+            $originalData = $this->_getNextRow();
+            $parseData = $platform && method_exists($platform, 'prepareData')
+                ? $platform->prepareData($originalData)
+                : $originalData;
+        } catch (Exception $e) {
+            throw $e;
+        }
+        parent::__construct(
+            $parseData
+        );
+    }
+
     /**
      * Rewind the \Iterator to the first element (\Iterator interface)
      *
      * @return void
+     * @throws IOException
+     * @throws SharedStringNotFoundException
      */
     public function rewind()
     {
-		$this->_key = -1;
-        $this->_row = [];		
-		$this->rowIterator->rewind(); 
+        $this->_key = -1;
+        $this->_row = [];
+        $this->rowIterator->rewind();
         if ($this->_colQty) {
-			$this->next();
+            $this->next();
         }
     }
-    
+
     /**
      * Move forward to next element (\Iterator interface)
      *
      * @return void
+     * @throws IOException
+     * @throws SharedStringNotFoundException
      */
     public function next()
     {
         $this->_key++;
-		$this->rowIterator->next();
+        $this->rowIterator->next();
         $row = $this->_getNextRow();
         if (false === $row || [] === $row) {
             $this->_row = [];
@@ -114,27 +157,7 @@ class Xlsx extends AbstractSource
             $this->_row = $row;
         }
     }
-    
-    /**
-     * Return the key of the current element (\Iterator interface)
-     *
-     * @return int -1 if out of bounds, 0 or more otherwise
-     */
-    public function key()
-    {
-		return $this->_key;
-    }
-    
-    /**
-     * Checks if current position is valid (\Iterator interface)
-     *
-     * @return bool
-     */
-    public function valid()
-    {
-		return -1 !== $this->_key && $this->rowIterator->valid();
-    }
-    
+
     /**
      * Render next row
      *
@@ -142,9 +165,67 @@ class Xlsx extends AbstractSource
      */
     protected function _getNextRow()
     {
-		return $this->rowIterator->current();
+        return $this->rowIterator->current();
     }
-    
+
+    /**
+     * Return the key of the current element (\Iterator interface)
+     *
+     * @return int -1 if out of bounds, 0 or more otherwise
+     */
+    public function key()
+    {
+        return $this->_key;
+    }
+
+    /**
+     * @return array|false|mixed
+     */
+    public function current()
+    {
+        $row = $this->rowIterator->current();
+        $valid = true;
+        $emptyRow = 0;
+        foreach ($row as $item) {
+            if (empty($item)) {
+                $emptyRow++;
+            }
+        }
+        if ($emptyRow === count($row)) {
+            $valid = false;
+        }
+        if (!$valid || count($row) != $this->_colQty) {
+            if ($this->_foundWrongQuoteFlag) {
+                throw new InvalidArgumentException(AbstractEntity::ERROR_CODE_WRONG_QUOTES);
+            }
+
+            if (!$valid) {
+                throw new InvalidArgumentException(__('Empty Rows Detected'));
+            }
+
+            if ($this->_colQty > count($row)) {
+                $row = $row + array_fill(count($row), $this->_colQty - count($row), '');
+            } else {
+                throw new InvalidArgumentException(AbstractEntity::ERROR_CODE_COLUMNS_NUMBER);
+            }
+        }
+        $array = array_combine($this->_colNames, $row);
+
+        $array = $this->replaceValue($this->changeFields($array));
+
+        return $array;
+    }
+
+    /**
+     * Checks if current position is valid (\Iterator interface)
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return -1 !== $this->_key && $this->rowIterator->valid();
+    }
+
     /**
      * Column names getter
      *
@@ -152,9 +233,19 @@ class Xlsx extends AbstractSource
      */
     public function getColNames()
     {
-		return $this->replaceColumns($this->_colNames);
+        return $this->replaceColumns($this->_colNames);
     }
-    
+
+    /**
+     * Return Platform
+     *
+     * @return mixed
+     */
+    public function getPlatform()
+    {
+        return $this->platform;
+    }
+
     /**
      * Set Platform
      *
@@ -168,16 +259,6 @@ class Xlsx extends AbstractSource
     }
 
     /**
-     * Return Platform
-     *
-     * @return mixed
-     */
-    public function getPlatform()
-    {
-        return $this->platform;
-    }
-	
-    /**
      * Close file handle
      *
      * @return void
@@ -189,4 +270,3 @@ class Xlsx extends AbstractSource
         }
     }
 }
- 

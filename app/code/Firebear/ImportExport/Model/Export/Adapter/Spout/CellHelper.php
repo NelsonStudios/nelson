@@ -6,7 +6,7 @@
 namespace Firebear\ImportExport\Model\Export\Adapter\Spout;
 
 /**
- * 
+ *
  */
 class CellHelper
 {
@@ -36,8 +36,7 @@ class CellHelper
                 $cellIndex = chr($capitalAAsciiValue + $modulus) . $cellIndex;
 
                 // substracting 1 because it's zero-based
-                $columnIndex = intval($columnIndex / 26) - 1;
-
+                $columnIndex = (int) ($columnIndex / 26) - 1;
             } while ($columnIndex >= 0);
 
             self::$columnIndexToCellIndexCache[$originalColumnIndex] = $cellIndex;

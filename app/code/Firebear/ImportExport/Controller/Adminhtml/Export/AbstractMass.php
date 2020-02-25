@@ -6,12 +6,16 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export;
 
-use Magento\Framework\Controller\ResultFactory;
-use Magento\Backend\App\Action\Context;
-use Magento\Ui\Component\MassAction\Filter;
 use Firebear\ImportExport\Model\ResourceModel\ExportJob\CollectionFactory;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Ui\Component\MassAction\Filter;
 
-class AbstractMass extends \Magento\Backend\App\Action
+/**
+ * Class AbstractMass
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export
+ */
+class AbstractMass extends Job
 {
     /**
      * @var Filter
@@ -24,28 +28,21 @@ class AbstractMass extends \Magento\Backend\App\Action
     protected $collectionFactory;
 
     /**
-     * @var \Firebear\ImportExport\Api\ExportJobRepositoryInterface
-     */
-    protected $repository;
-
-    /**
-     * MassDelete constructor.
+     * AbstractMass constructor.
      *
-     * @param Context                                                 $context
-     * @param Filter                                                  $filter
-     * @param CollectionFactory                                       $collectionFactory
-     * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $repository
+     * @param Context $context
+     * @param Filter $filter
+     * @param CollectionFactory $collectionFactory
      */
     public function __construct(
         Context $context,
         Filter $filter,
-        CollectionFactory $collectionFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $repository
+        CollectionFactory $collectionFactory
     ) {
         parent::__construct($context);
-        $this->filter            = $filter;
+
+        $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
-        $this->repository        = $repository;
     }
 
     /**

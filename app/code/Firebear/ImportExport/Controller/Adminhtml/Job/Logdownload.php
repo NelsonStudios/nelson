@@ -7,16 +7,11 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Component\ComponentRegistrarInterface;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Filesystem\Directory\ReadFactory;
-use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Filesystem;
 
 /**
@@ -36,30 +31,26 @@ class Logdownload extends Job
 
     /**
      * Logdownload constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
      * @param Filesystem $filesystem
      * @param FileFactory $fileFactory
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
         Filesystem $filesystem,
         FileFactory $fileFactory
     ) {
+        parent::__construct($context);
+
         $this->fileFactory = $fileFactory;
         $this->directory = $filesystem->getDirectoryRead(DirectoryList::LOG);
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
     }
 
     /**
      * Execute action
      *
-     * @return void
+     * @return ResponseInterface
      */
     public function execute()
     {

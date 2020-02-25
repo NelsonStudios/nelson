@@ -5,14 +5,19 @@
  */
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Firebear\ImportExport\Model\JobFactory;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Registry;
-use Magento\Store\Model\StoreManagerInterface;
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\MediaStorage\Model\File\UploaderFactory;
+use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * Class Fileload
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Fileload extends JobController
 {
 
@@ -21,62 +26,45 @@ class Fileload extends JobController
     const MIME_CSV = 'text/csv';
 
     /**
-     *
-     * @var \Magento\Framework\Filesystem
+     * @var Filesystem
      */
     private $fileSystem;
 
     /**
-     *
-     * @var \Magento\Framework\Json\EncoderInterface
+     * @var SerializerInterface
      */
-    private $jsonEncoder;
+    protected $serializer;
 
     /**
-     *
-     * @var \Magento\Framework\Controller\Result\RawFactory
-     */
-    private $resultRawFactory;
-
-    /**
-     *
-     * @var \Magento\MediaStorage\Model\File\UploaderFactory
+     * @var UploaderFactory
      */
     private $uploaderFactory;
 
     /**
-     *
      * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
      * Fileload constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param \Magento\Framework\Filesystem $filesystem
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\Framework\Controller\Result\RawFactory $resultRawFactory
-     * @param \Magento\MediaStorage\Model\File\UploaderFactory $uploaderFactory
+     * @param Filesystem $filesystem
+     * @param SerializerInterface $serializer
+     * @param UploaderFactory $uploaderFactory
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        \Magento\Framework\Filesystem $filesystem,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\Framework\Controller\Result\RawFactory $resultRawFactory,
-        \Magento\MediaStorage\Model\File\UploaderFactory $uploaderFactory,
+        Filesystem $filesystem,
+        SerializerInterface $serializer,
+        UploaderFactory $uploaderFactory,
         StoreManagerInterface $storeManager
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
+        parent::__construct($context);
+
         $this->fileSystem = $filesystem;
-        $this->jsonEncoder = $jsonEncoder;
-        $this->resultRawFactory = $resultRawFactory;
+        $this->serializer = $serializer;
         $this->uploaderFactory = $uploaderFactory;
         $this->storeManager = $storeManager;
     }
@@ -94,7 +82,6 @@ class Fileload extends JobController
             $root = $this->fileSystem->getDirectoryRead(DirectoryList::ROOT);
             $uploader->setAllowRenameFiles(true);
             $uploader->setFilesDispersion(true);
-            // $uploader->setAllowedExtensions(['csv', 'xml']);
             if (in_array($uploader->getFileExtension(), [
                 'tar',
                 'gz'
@@ -112,7 +99,7 @@ class Fileload extends JobController
                 $archiveData = $uploader->save($mediaDirectory->getAbsolutePath('importexport/'));
                 $file = $archiveData['path'] . $archiveData['file'];
                 $zip = new \Magento\Framework\Archive\Zip();
-                
+
                 $zip->unpack($file, preg_replace('/\.zip$/i', '.csv', $file));
                 $result['type'] = 'csv';
                 $result['file'] = preg_replace('/\.zip$/i', '.csv', $archiveData['file']);
@@ -126,18 +113,17 @@ class Fileload extends JobController
                 $result['type'] = self::MIME_CSV;
             }
             $result['url'] = $this->getTmpMediaUrl($result['file']);
-            $this->getResponse()->setBody($this->jsonEncoder->encode($result));
+            $this->getResponse()->setBody($this->serializer->serialize($result));
         } catch (\Exception $e) {
             $result = [
                 'error' => $e->getMessage(),
                 'errorcode' => $e->getCode()
             ];
-            $this->getResponse()->setBody($this->jsonEncoder->encode($result));
+            $this->getResponse()->setBody($this->serializer->serialize($result));
         }
     }
 
     /**
-     *
      * @return string
      */
     private function getBaseTmpMediaUrl()
@@ -146,7 +132,6 @@ class Fileload extends JobController
     }
 
     /**
-     *
      * @param
      *            $file
      * @return string
@@ -157,7 +142,6 @@ class Fileload extends JobController
     }
 
     /**
-     *
      * @param
      *            $file
      * @return string

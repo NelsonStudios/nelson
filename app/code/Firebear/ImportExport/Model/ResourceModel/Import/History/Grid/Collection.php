@@ -6,17 +6,18 @@
 
 namespace Firebear\ImportExport\Model\ResourceModel\Import\History\Grid;
 
-use Magento\Framework\Api\Search\SearchResultInterface;
+use Firebear\ImportExport\Model\ResourceModel\Import\History\Collection as JobCollection;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\Search\AggregationInterface;
+use Magento\Framework\Api\Search\SearchResultInterface;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use Magento\Framework\Search\AggregationInterface;
-use Firebear\ImportExport\Model\ResourceModel\Import\History\Collection as JobCollection;
+use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 
 /**
  * Collection for displaying grid of cms blocks
@@ -39,8 +40,8 @@ class Collection extends JobCollection implements SearchResultInterface
      * @param string $eventObject
      * @param string $resourceModel
      * @param string $model
-     * @param string|null $connection
-     * @param AbstractDb $resource
+     * @param AdapterInterface|null $connection
+     * @param AbstractDb|null $resource
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -54,7 +55,7 @@ class Collection extends JobCollection implements SearchResultInterface
         $eventPrefix,
         $eventObject,
         $resourceModel,
-        $model = 'Magento\Framework\View\Element\UiComponent\DataProvider\Document',
+        $model = Document::class,
         AdapterInterface $connection = null,
         AbstractDb $resource = null
     ) {

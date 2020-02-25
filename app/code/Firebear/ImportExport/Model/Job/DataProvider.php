@@ -39,6 +39,11 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
     protected $jsonDecoder;
 
     /**
+     * @var PoolInterface
+     */
+    protected $pool;
+
+    /**
      * DataProvider constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -89,14 +94,15 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
                 $map = $this->scopeMaps($maps);
                 $data = array_merge($data, $map);
                 $data = array_merge($data, ['special_map' => $map]);
-                //    $data = array_merge($data, $conf);
             }
 
             if (!empty($job->getMapping()) && $maps = \Zend\Serializer\Serializer::unserialize($job->getMapping())) {
                 $map = $this->scopeCategoriesMapping($maps);
                 $data = array_merge($data, $map);
                 $data = array_merge($data, ['special_map_category' => $map]);
-                //    $data = array_merge($data, $conf);
+
+                $attributeValuesMap = $this->scopeAttributeValuesMapping($maps);
+                $data = array_merge($data, $attributeValuesMap);
             }
 
             if (!empty($job->getPriceRules())
@@ -161,6 +167,29 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
                 'record_id' => $count++,
                 'custom' => $field->getCustom()
             ];
+        }
+
+        return $map;
+    }
+
+    /**
+     * Highlight attribute values data inside common maps
+     *
+     * @param array $maps
+     * @return array
+     */
+    protected function scopeAttributeValuesMapping(array $maps)
+    {
+        $map['source_data_attribute_values_map'] = [];
+        $count = 0;
+
+        foreach ($maps as $field) {
+            if (isset($field['source_data_attribute_value_system']) &&
+                isset($field['source_data_attribute_value_import'])
+            ) {
+                $field['count'] = $count++;
+                $map['source_data_attribute_values_map'][] = $field;
+            }
         }
 
         return $map;

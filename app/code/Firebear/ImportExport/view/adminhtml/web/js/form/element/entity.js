@@ -19,9 +19,6 @@ define(
             {
                 defaults: {
                     code: '',
-                    imports: {
-                        changeOptions: '${$.parentName}.use_api:value'
-                    },
                     apiOptions: null
                 },
                 initialize: function () {
@@ -48,16 +45,18 @@ define(
                         $('.admin__field').each(function () {
                             var dataIndex = $(this).data('index');
                             if (dataIndex == 'category_levels_separator') {
-                                if (entityValue == 'cart_price_rule_behavior' || entityValue == 'order_behavior')
+                                if (entityValue == 'cart_price_rule_behavior' || entityValue == 'order_behavior') {
                                     $(this).css('display', 'none');
-                                else
+                                } else {
                                     $(this).css('display', 'block');
+                                }
                             }
                             if (dataIndex == 'categories_separator') {
-                                if (entityValue == 'cart_price_rule_behavior' || entityValue == 'order_behavior')
+                                if (entityValue == 'cart_price_rule_behavior' || entityValue == 'order_behavior') {
                                     $(this).css('display', 'none');
-                                else
+                                } else {
                                     $(this).css('display', 'block');
+                                }
                             }
                         });
                     }, 3000);
@@ -67,7 +66,10 @@ define(
                     this._super();
                     var map = registry.get(this.ns + '.' + this.ns + '.source_data_map_container.source_data_map');
                     var mapCategory = registry.get(this.ns + '.' + this.ns + '.source_data_map_container_category.source_data_categories_map');
-                    map.deleteRecords();
+                    var removeMapping = registry.get(this.ns + '.' + this.ns + '.source.remove_current_mappings');
+                    if (removeMapping !== undefined && removeMapping.value() == 1) {
+                        map.deleteRecords();
+                    }
                     map._updateCollection();
                     mapCategory.deleteRecords();
                     mapCategory._updateCollection();
@@ -78,47 +80,39 @@ define(
                         var elements = this.getOption(this.value());
                         this.setCode(elements.code);
                     }
-                    /* Hidding extra fields when entity CART PRICE RULE is selected*/
+                    /* Update platform dropdown */
+                    var platform = registry.get(this.ns + '.' + this.ns + '.settings.platforms');
+                    if (this.value()) {
+                        $.ajax({
+                            url: this.loadPlatformUrl,
+                            type: 'post',
+                            dataType: 'json',
+                            cache: false,
+                            showLoader: true,
+                            data: {entity: this.value()}
+                        }).done(function (response) {
+                            platform.options(response.options);
+                        });
+                    }
+                    /* Hidding extra fields when entity CART PRICE RULE is selected */
                     var entityValue = this.value();
                     $('.admin__field').each(function () {
                         var dataIndex = $(this).data('index');
                         if (dataIndex == 'category_levels_separator') {
-                            if (entityValue == 'cart_price_rule' || entityValue == 'order')
+                            if (entityValue == 'cart_price_rule' || entityValue == 'order') {
                                 $(this).css('display', 'none');
-                            else
+                            } else {
                                 $(this).css('display', 'block');
+                            }
                         }
                         if (dataIndex == 'categories_separator') {
-                            if (entityValue == 'cart_price_rule' || entityValue == 'order')
+                            if (entityValue == 'cart_price_rule' || entityValue == 'order') {
                                 $(this).css('display', 'none');
-                            else
+                            } else {
                                 $(this).css('display', 'block');
-                        }
-                        if (dataIndex == 'clear_attribute_value') {
-                            if (entityValue == 'catalog_product')
-                                $(this).css('display', 'block');
-                            else
-                                $(this).css('display', 'none');
-                        }
-                        if (dataIndex == 'remove_product_association') {
-                            if (entityValue == 'catalog_product')
-                                $(this).css('display', 'block');
-                            else
-                                $(this).css('display', 'none');
+                            }
                         }
                     });
-                },
-                changeOptions : function (value) {
-                    if (this.apiOptions == null) {
-                        this.apiOptions = [];
-                        this.apiOptions.push(this.getOption('catalog_product'));
-                    }
-                    if (value === "1") {
-                        this.setOptions(this.apiOptions);
-                        this.value('catalog_product');
-                    } else {
-                        this.setOptions(this.initialOptions);
-                    }
                 }
             }
         );

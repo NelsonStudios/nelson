@@ -6,7 +6,6 @@
 
 namespace Firebear\ImportExport\Model\Source\Import\Behavior;
 
-
 use Magento\ImportExport\Model\Import;
 use Magento\ImportExport\Model\Source\Import\AbstractBehavior;
 use Magento\Sales\Model\Order as OrderModel;
@@ -30,7 +29,7 @@ class Order extends AbstractBehavior
             Import::BEHAVIOR_DELETE => __('Delete')
         ];
     }
-    
+
     /**
      * Get Current Behaviour Group Code
      *

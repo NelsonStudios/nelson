@@ -84,6 +84,10 @@ class Options implements OptionSourceInterface
      */
     protected $cartPrice;
 
+    protected $coreRegistry;
+
+    protected $importConfig;
+
     /**
      * Options constructor.
      *
@@ -93,19 +97,21 @@ class Options implements OptionSourceInterface
     public function __construct(
         CollectionFactory $attributeFactory,
         \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCategoryFactory,
-        Product $productImportModel,
         Config $config,
         Factory $entityFactory,
         CartPrice $cartPrice,
-        \Firebear\ImportExport\Helper\Data $helper
+        \Firebear\ImportExport\Helper\Data $helper,
+        \Magento\Framework\Registry $coreRegistry,
+        \Firebear\ImportExport\Model\Source\Import\Config $importConfig
     ) {
         $this->attributeFactory = $attributeFactory;
         $this->attributeCategoryFactory = $attributeCategoryFactory;
-        $this->productImportModel = $productImportModel;
         $this->config = $config;
         $this->entityFactory = $entityFactory;
         $this->cartPrice = $cartPrice;
         $this->helper = $helper;
+        $this->coreRegistry = $coreRegistry;
+        $this->importConfig = $importConfig;
     }
 
     /**
@@ -113,14 +119,25 @@ class Options implements OptionSourceInterface
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function toOptionArray($withoutGroup = 0)
+    public function toOptionArray($withoutGroup = 0, $entity = false)
     {
-        //$options = $this->getAttributeCatalog($withoutGroup);
+        $newOptions = [];
+
+        if (!$entity) {
+            $job = $this->coreRegistry->registry('import_job');
+            if ($job->getId()) {
+                $entity = $job->getEntity();
+            } else {
+                return [];
+            }
+        }
 
         foreach ($this->config->getEntities() as $key => $items) {
+            if ($entity && $entity != $key) {
+                continue;
+            }
             if (in_array($key, [
-                self::CATALOG_PRODUCT,
-                self::ADVANCED_PRICING
+                self::CATALOG_PRODUCT
             ])) {
                 $newOptions[$key] = $this->getAttributeCatalog($withoutGroup);
             } elseif (in_array($key, [
@@ -131,7 +148,7 @@ class Options implements OptionSourceInterface
                 if (in_array($key, [
                     self::CART_PRICE_RULE
                 ])) {
-                    $newOptions[$key] = '';
+                    $newOptions[$key] = [];
                 } else {
                     try {
                         $object = $this->entityFactory->create($items['model']);
@@ -159,8 +176,10 @@ class Options implements OptionSourceInterface
         $options = [];
         $subOptions = [];
 
-        foreach ($this->helper->partCollection($attributeCollection) as $attribute) {
-            $label = (!$withoutGroup) ? $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' : $attribute->getAttributeCode();
+        foreach ($attributeCollection as $attribute) {
+            $label = (!$withoutGroup) ?
+                $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' :
+                $attribute->getAttributeCode();
             $subOptions[] =
                 [
                     'label' => $label,
@@ -177,19 +196,24 @@ class Options implements OptionSourceInterface
         } else {
             $options += $subOptions;
         }
-        $specialAttributes = $this->productImportModel->getSpecialAttributes();
+        $specialAttributes = \Firebear\ImportExport\Model\Import\Product::$specialAttributes;
+        $productTypes = $this->importConfig->getEntityTypes('catalog_product');
+        foreach ($productTypes as $productTypeConfig) {
+            $model = $productTypeConfig['model'];
+            if (property_exists($model, 'specialAttributes')) {
+                $specialAttributes = array_merge($specialAttributes, $model::$specialAttributes);
+            }
+        }
         $subOptions = [];
-        foreach ($this->helper->partCollection($specialAttributes) as $attribute) {
+        foreach ($specialAttributes as $attribute) {
             $subOptions[] = ['label' => $attribute, 'value' => $attribute];
         }
-
         unset($specialAttributes);
-        $AddFields = $this->productImportModel->getAddFields();
-        foreach ($this->helper->partCollection($AddFields) as $attribute) {
+        $AddFields = \Firebear\ImportExport\Model\Import\Product::$addFields;
+        foreach ($AddFields as $attribute) {
             $subOptions[] = ['label' => $attribute, 'value' => $attribute];
         }
         unset($AddFields);
-
         if (!$withoutGroup) {
             $options[] = [
                 'label' => __('Special Fields'),
@@ -233,9 +257,11 @@ class Options implements OptionSourceInterface
         $attributeCollection = $this->getAttributeCategoryCollection();
         $options = [];
         $subOptions = [];
-        foreach ($this->helper->partCollection($attributeCollection) as $attribute) {
+        foreach ($attributeCollection as $attribute) {
             if ($attribute->getFrontendLabel()) {
-                $label = (!$withoutGroup) ? $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' : $attribute->getAttributeCode();
+                $label = (!$withoutGroup) ?
+                    $attribute->getAttributeCode() . ' (' . $attribute->getFrontendLabel() . ')' :
+                    $attribute->getAttributeCode();
                 $subOptions[] =
                     [
                         'label' => $label,
@@ -283,7 +309,7 @@ class Options implements OptionSourceInterface
     {
         $options = [];
         foreach ($object->getAllFields() as $field) {
-            $options[] = ['label' => $field, 'value' => $field];
+            $options[] = is_array($field) ? $field : ['label' => $field, 'value' => $field];
         }
 
         return $options;
@@ -293,8 +319,7 @@ class Options implements OptionSourceInterface
     {
         if (in_array($entity, [
             self::CATALOG_PRODUCT,
-            self::CATALOG_CATEGORY,
-            self::ADVANCED_PRICING
+            self::CATALOG_CATEGORY
         ])) {
             $options = $this->getAttributeCatalog();
             $newOptions[$entity] = $options;

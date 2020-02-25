@@ -28,20 +28,12 @@ class Url extends AbstractType
      * Download remote source file to temporary directory
      *
      * @return bool|string
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function uploadSource()
     {
         if ($read = $this->_getSourceClient()) {
-            $fileName = '';
-            /* preg_match('/(\w+\.(csv|xml|txt))/i',$this->fileName, $matches);
-             if ($matches) {
-                 $fileName = $matches[0];
-             }*/
-            $fileName = $this->fileName;
-            if ($this->getFormatFile()) {
-                $fileName .= "." . strtolower($this->getFormatFile());
-            }
-            $fileName = str_replace("%", "_", $fileName);
+            $fileName = $this->convertUrlToFilename($this->getData($this->code . '_file_path'));
             $this->directory->writeFile(
                 $this->directory->getRelativePath($this->getImportPath() . '/' . $fileName),
                 $read->readAll()
@@ -87,7 +79,6 @@ class Url extends AbstractType
                     $read->readAll()
                 );
             } catch (\Exception $e) {
-
             }
         }
 
@@ -120,7 +111,6 @@ class Url extends AbstractType
                     $read->readAll()
                 );
             } catch (\Exception $e) {
-
             }
         }
 
@@ -190,5 +180,4 @@ class Url extends AbstractType
             return DriverPool::HTTP;
         }
     }
-
 }

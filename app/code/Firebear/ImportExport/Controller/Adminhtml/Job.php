@@ -6,27 +6,22 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml;
 
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
 use Firebear\ImportExport\Api\JobRepositoryInterface;
+use Firebear\ImportExport\Model\JobFactory;
+use Firebear\ImportExport\Helper\Data as Helper;
+use Magento\Backend\App\Action;
 
+/**
+ * Class Job
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml
+ */
 abstract class Job extends Action
 {
     const ADMIN_RESOURCE = 'Firebear_ImportExport::job';
 
     /**
-     * Core registry
-     *
-     * @var Registry
-     */
-    protected $coreRegistry = null;
-
-    protected $resourceModel;
-
-    /**
-     * @var \Firebear\ImportExport\Model\JobFactory
+     * @var JobFactory
      */
     protected $jobFactory;
 
@@ -36,18 +31,24 @@ abstract class Job extends Action
     protected $repository;
 
     /**
+     * @var Helper
+     */
+    protected $helper;
+
+    /**
+     * Job constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
      */
     public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository
+        Context $context
     ) {
-        $this->coreRegistry = $coreRegistry;
-        $this->jobFactory = $jobFactory;
-        $this->repository = $repository;
-        parent::__construct($context);
+        parent::__construct(
+            $context->getContext()
+        );
+
+        $this->jobFactory = $context->getJobFactory();
+        $this->repository = $context->getRepository();
+        $this->helper = $context->getHelper();
     }
 }

@@ -21,6 +21,11 @@ use Magento\Framework\Filesystem\File\ReadFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\ClassModelFactory;
 
+/**
+ * Class Bol
+ *
+ * @package Firebear\ImportExport\Model\Source\Platform
+ */
 class Bol extends AbstractPlatform
 {
     /**
@@ -32,8 +37,8 @@ class Bol extends AbstractPlatform
      */
     public function prepareRow($rowData)
     {
-       $rowData['product_type'] = 'simple';
-       $rowData['_attribute_set'] = $this->getAttributeSetName();
+        $rowData['product_type'] = 'simple';
+        $rowData['_attribute_set'] = $this->getAttributeSetName();
         return $rowData;
     }
 

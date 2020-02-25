@@ -46,7 +46,8 @@ class Txt extends \Firebear\ImportExport\Model\Import\Source\Csv
                     continue;
                 }
                 if ((strpos($item, $this->enclosure) === 0 || strrpos($item, $this->enclosure) === strlen($item) - 1)
-                    && !(strpos($item, $this->enclosure) === 0 && strrpos($item, $this->enclosure) === strlen($item) - 1)) {
+                    && !(strpos($item, $this->enclosure) === 0 &&
+                        strrpos($item, $this->enclosure) === strlen($item) - 1)) {
                     if ($checkerEnclosure === false) {
                         if (!$partOneKey) {
                             $partOneKey = $i;

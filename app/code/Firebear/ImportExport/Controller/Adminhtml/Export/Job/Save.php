@@ -6,12 +6,17 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Firebear\ImportExport\Model\Job;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Firebear\ImportExport\Model\ExportJob;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Serialize\SerializerInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Class Save
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
 
@@ -25,44 +30,47 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     private $dataPersistor;
 
     /**
-     * @var \Magento\Framework\Json\EncoderInterface
+     * @var SerializerInterface
      */
-    private $jsonEncoder;
+    protected $serializer;
 
     /**
-     * @var JsonFactory
+     * @var LoggerInterface
      */
-    protected $jsonFactory;
+    protected $logger;
 
+    /**
+     * @var array
+     */
     protected $additionalFields = [
         'enable_last_entity_id',
         'last_entity_id',
         'language',
-        'divided_additional'
+        'divided_additional',
+        'use_api',
+        'only_admin',
+        'cron_groups'
     ];
 
     /**
      * Save constructor.
-     * @param \Magento\Backend\App\Action\Context $context
+     *
+     * @param Context $context
      * @param DataPersistorInterface $dataPersistor
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory
-     * @param \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository
+     * @param SerializerInterface $serializer
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
+        Context $context,
         DataPersistorInterface $dataPersistor,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Firebear\ImportExport\Model\ExportJobFactory $exportJobFactory,
-        \Firebear\ImportExport\Api\ExportJobRepositoryInterface $exportRepository,
-        JsonFactory $jsonFactory
+        SerializerInterface $serializer,
+        LoggerInterface $logger
     ) {
+        parent::__construct($context);
+
         $this->dataPersistor = $dataPersistor;
-        $this->jsonEncoder = $jsonEncoder;
-        $this->jsonFactory = $jsonFactory;
-        parent::__construct($context, $coreRegistry, $exportJobFactory, $exportRepository);
+        $this->serializer = $serializer;
+        $this->logger = $logger;
     }
 
     /**
@@ -73,7 +81,7 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultJson = $this->jsonFactory->create();
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $data = $this->getRequest()->getPostValue();
         $behavior = $this->searchFields($data, 'behavior_');
         $exportSource = $this->searchFields($data, 'export_source_');
@@ -91,9 +99,9 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
                 unset($data[$adField]);
             }
         }
-        $data['source_data'] = $this->jsonEncoder->encode($sourceData + $sourceFilter);
-        $data['behavior_data'] = $this->jsonEncoder->encode($behavior);
-        $data['export_source'] = $this->jsonEncoder->encode($exportSource);
+        $data['source_data'] = $this->serializer->serialize($sourceData + $sourceFilter);
+        $data['behavior_data'] = $this->serializer->serialize($behavior);
+        $data['export_source'] = $this->serializer->serialize($exportSource);
 
         if ($data) {
             $id = $this->getRequest()->getParam('entity_id');
@@ -101,12 +109,12 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
                 $data['entity_id'] = null;
             }
             if (!$id) {
-                $model = $this->exportJobFactory->create();
+                $model = $this->jobFactory->create();
             } else {
                 if (empty($data['entity_id'])) {
                     $data['entity_id'] = $id;
                 }
-                $model = $this->exportRepository->getById($id);
+                $model = $this->repository->getById($id);
                 if (!$model->getId() && $id) {
                     if ($this->getRequest()->isAjax()) {
                         return $resultJson->setData(false);
@@ -117,7 +125,7 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
             }
             $model->setData($data);
             try {
-                $newModel = $this->exportRepository->save($model);
+                $newModel = $this->repository->save($model);
                 if (!$this->getRequest()->isAjax()) {
                     $this->messageManager->addSuccessMessage(__('You saved the export.'));
                 }
@@ -195,13 +203,10 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     public function validSourceData($data)
     {
         $del = 0;
-        if (isset($data[self::SOURCE_DATA . '_map'])) {
-            foreach ($data[self::SOURCE_DATA . '_map'] as $item) {
-                $id = $item['record_id'];
-                if (isset($data[self::SOURCE_DATA . '_export']['delete'][$id])
-                    && $data[self::SOURCE_DATA . '_export']['delete'][$id] == 1) {
+        if (isset($data[self::SOURCE_DATA . '_export']['delete'])) {
+            foreach ($data[self::SOURCE_DATA . '_export']['delete'] as $id => $value) {
+                if ($value) {
                     $del = 1;
-                    unset($data[self::SOURCE_DATA . '_map'][$id]);
                     unset($data[self::SOURCE_DATA . '_system']['value'][$id]);
                     unset($data[self::SOURCE_DATA . '_system']['entity'][$id]);
                     unset($data[self::SOURCE_DATA . '_export']['value'][$id]);
@@ -229,30 +234,39 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
                     $item['record_id'] = $key;
                 }
             }
-            $data[self::SOURCE_DATA . '_system']['value'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_system']['value']
-            );
-            $data[self::SOURCE_DATA . '_system']['entity'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_system']['entity']
-            );
-            $data[self::SOURCE_DATA . '_export']['value'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_export']['value']
-            );
-            $data[self::SOURCE_DATA . '_export']['order'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_export']['order']
-            );
-            $data[self::SOURCE_DATA . '_export']['delete'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_export']['delete']
-            );
-            $data[self::SOURCE_DATA . '_replace']['value'] = array_merge(
-                [],
-                $data[self::SOURCE_DATA . '_replace']['value']
-            );
+
+            if (isset($data[self::SOURCE_DATA . '_system'])) {
+                $data[self::SOURCE_DATA . '_system']['value'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_system']['value']
+                );
+                $data[self::SOURCE_DATA . '_system']['entity'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_system']['entity']
+                );
+            }
+
+            if (isset($data[self::SOURCE_DATA . '_export'])) {
+                $data[self::SOURCE_DATA . '_export']['value'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_export']['value']
+                );
+                $data[self::SOURCE_DATA . '_export']['order'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_export']['order']
+                );
+                $data[self::SOURCE_DATA . '_export']['delete'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_export']['delete']
+                );
+            }
+
+            if (isset($data[self::SOURCE_DATA . '_replace'])) {
+                $data[self::SOURCE_DATA . '_replace']['value'] = array_merge(
+                    [],
+                    $data[self::SOURCE_DATA . '_replace']['value']
+                );
+            }
         }
 
         return $data;
@@ -265,8 +279,7 @@ class Save extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
     public function validSourceFilter($data)
     {
         $del = 0;
-        \Magento\Framework\App\ObjectManager::getInstance()->get('Psr\Log\LoggerInterface')
-            ->debug(json_encode($data));
+        $this->logger->debug(json_encode($data));
         if (isset($data[self::SOURCE_FILTER . '_field']['delete'])) {
             foreach ($data[self::SOURCE_FILTER . '_field']['delete'] as $id => $item) {
                 if (isset($data[self::SOURCE_FILTER . '_field']['delete'][$id])

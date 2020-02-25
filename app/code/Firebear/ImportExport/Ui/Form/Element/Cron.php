@@ -1,15 +1,11 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
-
-// @codingStandardsIgnoreFile
 
 /**
  * Form time element
- *
- * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Firebear\ImportExport\Ui\Form\Element;
 
@@ -17,6 +13,11 @@ use Magento\Framework\Data\Form\Element\CollectionFactory;
 use Magento\Framework\Data\Form\Element\Factory;
 use Magento\Framework\Escaper;
 
+/**
+ * Class Cron
+ *
+ * @package Firebear\ImportExport\Ui\Form\Element
+ */
 class Cron extends \Magento\Framework\Data\Form\Element\AbstractElement
 {
     /**
@@ -140,7 +141,9 @@ class Cron extends \Magento\Framework\Data\Form\Element\AbstractElement
         $html .= '<div class="note admin__field-note"><span>Days of Week</span></div>';
         $html .= '</div>';
 
-        $html .= '<div class="col-m-12"><div class="note admin__field-note"><span>↑ Use this field if you have good cron knowledge.</span></div></div>';
+        $html .= '<div class="col-m-12"><div class="note admin__field-note">'
+            .'<span>↑ Use this field if you have good cron knowledge.</span>'
+            .'</div></div>';
 
         $html .= $this->getAfterElementHtml();
         return $html;

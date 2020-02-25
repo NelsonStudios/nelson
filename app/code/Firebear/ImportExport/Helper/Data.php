@@ -6,20 +6,21 @@
 
 namespace Firebear\ImportExport\Helper;
 
-use Firebear\ImportExport\Model\Source\Factory;
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Exception\LocalizedException;
-use Firebear\ImportExport\Model\Source\Config;
-use Firebear\ImportExport\Api\HistoryRepositoryInterface\Proxy as History;
-use Firebear\ImportExport\Api\ExHistoryRepositoryInterface\Proxy as ExHistory;
-use Firebear\ImportExport\Model\Job\Processor;
+use Firebear\ImportExport\Api\ExHistoryRepositoryInterface;
+use Firebear\ImportExport\Api\HistoryRepositoryInterface;
+use Firebear\ImportExport\Model\Export\HistoryFactory as ExportFactory;
 use Firebear\ImportExport\Model\ExportJob\Processor as ExportProcessor;
 use Firebear\ImportExport\Model\Import\HistoryFactory;
-use Firebear\ImportExport\Model\Export\HistoryFactory as ExportFactory;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface\Proxy as Timezone;
-use Magento\Framework\Filesystem;
+use Firebear\ImportExport\Model\Job\Processor;
+use Firebear\ImportExport\Model\Source\Config;
+use Firebear\ImportExport\Model\Source\Factory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Firebear\ImportExport\Model\ResourceModel\Import\DataFactory;
 
 /**
  * Class Data
@@ -128,7 +129,7 @@ class Data extends AbstractHelper
     protected $resultProcess;
 
     /**
-     * @var \Firebear\ImportExport\Model\ResourceModel\Import\DataFactory
+     * @var DataFactory
      */
     protected $dataFactory;
 
@@ -148,19 +149,20 @@ class Data extends AbstractHelper
 
     /**
      * Data constructor.
+     *
      * @param Context $context
      * @param Factory $sourceFactory
      * @param Config $configSource
      * @param \Firebear\ImportExport\Logger\Logger $logger
-     * @param History $historyRepository
-     * @param ExHistory $historyExRepository
+     * @param HistoryRepositoryInterface $historyRepository
+     * @param ExHistoryRepositoryInterface $historyExRepository
      * @param HistoryFactory $historyFactory
      * @param ExportFactory $exportFactory
      * @param Processor $processor
      * @param ExportProcessor $exProcessor
-     * @param Timezone $timezone
+     * @param TimezoneInterface $timezone
      * @param Filesystem $filesystem
-     * @param \Firebear\ImportExport\Model\ResourceModel\Import\DataFactory $dataFactory
+     * @param DataFactory $dataFactory
      * @param \Firebear\ImportExport\Model\Source\Platform\Config $configPlatforms
      * @param Factory $factory
      * @throws \Magento\Framework\Exception\FileSystemException
@@ -170,15 +172,15 @@ class Data extends AbstractHelper
         Factory $sourceFactory,
         Config $configSource,
         \Firebear\ImportExport\Logger\Logger $logger,
-        History $historyRepository,
-        ExHistory $historyExRepository,
+        HistoryRepositoryInterface $historyRepository,
+        ExHistoryRepositoryInterface $historyExRepository,
         HistoryFactory $historyFactory,
         ExportFactory $exportFactory,
         Processor $processor,
         ExportProcessor $exProcessor,
-        Timezone $timezone,
+        TimezoneInterface $timezone,
         Filesystem $filesystem,
-        \Firebear\ImportExport\Model\ResourceModel\Import\DataFactory $dataFactory,
+        DataFactory $dataFactory,
         \Firebear\ImportExport\Model\Source\Platform\Config $configPlatforms,
         \Firebear\ImportExport\Model\Source\Factory $factory,
         \Magento\Framework\Json\DecoderInterface $jsonDecoder
@@ -211,14 +213,22 @@ class Data extends AbstractHelper
     {
         $list = [];
         $types = $this->configSource->get();
-        foreach ($types as $typeName => $type) {
+        foreach ($types as $type) {
             foreach ($type['fields'] as $name => $values) {
                 if (!isset($list[$name])) {
                     $list[] = $name;
                 }
             }
         }
-
+        foreach ($this->platforms as $platforms) {
+            foreach ($platforms as $data) {
+                if (isset($data['source_fields']) && is_array($data['source_fields'])) {
+                    foreach ($data['source_fields'] as $field) {
+                        $list[] = $field['name'];
+                    }
+                }
+            }
+        }
         return array_unique($list);
     }
 
@@ -274,7 +284,7 @@ class Data extends AbstractHelper
     /**
      * @param $id
      * @param $file
-     * @return array
+     * @return bool
      */
     public function runImport($id, $file)
     {
@@ -285,8 +295,8 @@ class Data extends AbstractHelper
             $result = $this->processor->processScope($id, $file);
             $date = $this->timeZone->date();
             $timeStamp = $date->getTimestamp();
-            $history->setFinishedAt($timeStamp);
             $this->setResultProcessor($result);
+            $history->setFinishedAt($timeStamp);
             $this->historyRepository->save($history);
         } catch (\Exception $e) {
             $this->addLogComment(
@@ -300,7 +310,7 @@ class Data extends AbstractHelper
             return false;
         }
 
-        return true;
+        return $result;
     }
 
     /**
@@ -321,8 +331,8 @@ class Data extends AbstractHelper
             $res = [$result, $sourceData['last_entity_id']];
             $date = $this->timeZone->date();
             $timeStamp = $date->getTimestamp();
-            $history->setFinishedAt($timeStamp);
             $this->setResultProcessor($res);
+            $history->setFinishedAt($timeStamp);
             $this->historyExRepository->save($history);
         } catch (\Exception $e) {
             $this->addLogComment(
@@ -352,7 +362,10 @@ class Data extends AbstractHelper
 
     /**
      * @param $id
-     * @return $this
+     * @param $file
+     * @param $type
+     * @return \Firebear\ImportExport\Api\Data\ImportHistoryInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function createHistory($id, $file, $type)
     {
@@ -368,7 +381,6 @@ class Data extends AbstractHelper
 
         return $history;
     }
-
 
     /**
      * @param $id
@@ -447,13 +459,6 @@ class Data extends AbstractHelper
                 $line = $line . '<span text="item"></span><br/>';
                 yield $key => $line;
             }
-        }
-    }
-
-    public function partCollection($collection)
-    {
-        foreach ($collection as $element) {
-            yield $element;
         }
     }
 
@@ -585,10 +590,16 @@ class Data extends AbstractHelper
         return $this->processor;
     }
 
-    public function getPlatformModel($model)
+    /**
+     * @param string $model
+     * @param string $entityCode
+     *
+     * @return \Magento\ImportExport\Model\Source\Import\AbstractBehavior|null
+     */
+    public function getPlatformModel(string $model, string $entityCode = 'catalog_product')
     {
-        if (isset($this->platforms[$model]['model'])) {
-            return $this->factory->create($this->platforms[$model]['model']);
+        if (isset($this->platforms[$entityCode][$model]['model'])) {
+            return $this->factory->create($this->platforms[$entityCode][$model]['model']);
         }
 
         return null;

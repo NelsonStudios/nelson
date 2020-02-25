@@ -46,13 +46,24 @@ class Logger
     protected $isInline = false;
 
     /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    private $_timezone;
+
+    /**
      * Constructor
      *
      * @param Filesystem $filesystem
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param string $logFile
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
-    public function __construct(Filesystem $filesystem, $logFile = null)
-    {
+    public function __construct(
+        Filesystem $filesystem,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+        $logFile = null
+    ) {
+        $this->_timezone = $timezone;
         $this->directory = $filesystem->getDirectoryWrite(DirectoryList::LOG);
         if ($logFile) {
             $this->logFile = $logFile;
@@ -164,8 +175,10 @@ class Logger
      */
     protected function writeToFile($message, $type = 'info')
     {
+        $date = $this->_timezone->date();
+        $formattedDate = $date->format('Y-m-d H:i:s');
         if ($type) {
-            $message = '<span class="console-' . $type . '">' . $message . '</span>';
+            $message = '<span class="console-' . $type . '">' . $formattedDate ." : ". $message . '</span>';
         }
         $this->directory->writeFile($this->logFile, $message . "\r\n", 'a+');
     }

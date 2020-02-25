@@ -11,6 +11,11 @@
 
 namespace Firebear\ImportExport\Plugin\Model\Export;
 
+/**
+ * Class RowCustomizer
+ *
+ * @package Firebear\ImportExport\Plugin\Model\Export
+ */
 class RowCustomizer
 {
     /**

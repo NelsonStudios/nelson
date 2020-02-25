@@ -1,13 +1,19 @@
 <?php
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
 use Magento\Framework\Controller\ResultFactory;
 use Magento\ImportExport\Block\Adminhtml\Import\Frame\Result;
 
+/**
+ * Class Start
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Start extends \Magento\ImportExport\Controller\Adminhtml\Import\Start
 {
     /**

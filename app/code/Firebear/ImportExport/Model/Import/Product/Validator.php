@@ -1,8 +1,9 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\Import\Product;
 
 use Magento\CatalogImportExport\Model\Import\Product;
@@ -17,7 +18,7 @@ use Magento\Framework\Validator\AbstractValidator;
 class Validator extends \Magento\CatalogImportExport\Model\Import\Product\Validator
 {
     /**
-     * @var RowValidatorInterface[]|AbstractValidator[]
+     * @var array
      */
     protected $parameters = [];
 

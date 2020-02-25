@@ -6,10 +6,16 @@
 
 namespace Firebear\ImportExport\Model\Export\Dependencies\Config;
 
+use Magento\Framework\Config\Dom;
 use Magento\Framework\Config\FileResolverInterface;
 use Magento\Framework\Config\Reader\Filesystem;
 use Magento\Framework\Config\ValidationStateInterface;
 
+/**
+ * Class Reader
+ *
+ * @package Firebear\ImportExport\Model\Export\Dependencies\Config
+ */
 class Reader extends Filesystem
 {
     /**
@@ -22,14 +28,16 @@ class Reader extends Filesystem
     /**
      * Reader constructor.
      *
-     * @param FileResolverInterface    $fileResolver
-     * @param Converter                                          $converter
-     * @param SchemaLocator                                      $schemaLocator
+     * @param FileResolverInterface $fileResolver
+     * @param Converter $converter
+     * @param SchemaLocator $schemaLocator
      * @param ValidationStateInterface $validationState
-     * @param string                                             $fileName
-     * @param array                                              $idAttributes
-     * @param string                                             $domDocumentClass
-     * @param string                                             $defaultScope
+     * @param string $fileName
+     * @param array $idAttributes
+     * @param string $domDocumentClass
+     * @param string $defaultScope
+     *
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
      */
     public function __construct(
         FileResolverInterface $fileResolver,
@@ -38,18 +46,18 @@ class Reader extends Filesystem
         ValidationStateInterface $validationState,
         $fileName = 'di_export.xml',
         $idAttributes = [],
-        $domDocumentClass = 'Magento\Framework\Config\Dom',
+        $domDocumentClass = Dom::class,
         $defaultScope = 'global'
     ) {
-        $this->_fileResolver = $fileResolver;
-        $this->_converter = $converter;
-        $this->_fileName = $fileName;
-        $this->_idAttributes = array_replace($this->_idAttributes, $idAttributes);
-        $this->_schemaFile = $schemaLocator->getSchema();
-        $this->validationState = $validationState;
-        $this->_perFileSchema = $schemaLocator->getPerFileSchema() && $validationState->isValidationRequired()
-            ? $schemaLocator->getPerFileSchema() : null;
-        $this->_domDocumentClass = $domDocumentClass;
-        $this->_defaultScope = $defaultScope;
+        parent::__construct(
+            $fileResolver,
+            $converter,
+            $schemaLocator,
+            $validationState,
+            $fileName,
+            $idAttributes,
+            $domDocumentClass,
+            $defaultScope
+        );
     }
 }

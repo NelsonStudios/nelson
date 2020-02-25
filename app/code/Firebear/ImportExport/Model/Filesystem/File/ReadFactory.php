@@ -8,6 +8,11 @@ namespace Firebear\ImportExport\Model\Filesystem\File;
 
 use Firebear\ImportExport\Model\Filesystem\DriverPool;
 
+/**
+ * Class ReadFactory
+ *
+ * @package Firebear\ImportExport\Model\Filesystem\File
+ */
 class ReadFactory
 {
     /**

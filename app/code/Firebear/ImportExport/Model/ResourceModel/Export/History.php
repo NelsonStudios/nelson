@@ -1,8 +1,9 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\ResourceModel\Export;
 
 use Firebear\ImportExport\Api\Data\ExportHistoryInterface;
@@ -16,6 +17,11 @@ use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\RelationComposite;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\Snapshot;
 
+/**
+ * Class History
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Export
+ */
 class History extends AbstractDb
 {
     /**
@@ -81,7 +87,7 @@ class History extends AbstractDb
         $entityId = $value;
         if ($field != $entityMetadata->getIdentifierField() || $object->getStoreId()) {
             $select = $this->_getLoadSelect($field, $value, $object);
-            $select->reset(Select::COLUMNS)
+            $select->reset(\Magento\Framework\DB\Select::COLUMNS)
                 ->columns($this->getMainTable() . '.' . $entityMetadata->getIdentifierField())
                 ->limit(1);
             $result = $this->getConnection()->fetchCol($select);

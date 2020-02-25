@@ -22,7 +22,13 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\ClassModelFactory;
 use Magento\Bundle\Model\Product\Price as BundlePrice;
 use Magento\BundleImportExport\Model\Import\Product\Type\Bundle;
+use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
 
+/**
+ * Class Magento
+ *
+ * @package Firebear\ImportExport\Model\Source\Platform
+ */
 class Magento extends AbstractPlatform
 {
 
@@ -133,7 +139,7 @@ class Magento extends AbstractPlatform
                 $superSku = explode($this->separator, $rowData['_super_products_sku']);
                 $superAttr = explode($this->separator, $rowData['_super_attribute_code']);
                 $superOption = explode($this->separator, $rowData['_super_attribute_option']);
-                if (sizeof($superSku) > 0) {
+                if (count($superSku) > 0) {
                     foreach ($superSku as $key => $skuSuper) {
                         $newArray[$skuSuper][] = $superAttr[$key] . "=" . $superOption[$key];
                     }
@@ -248,19 +254,20 @@ class Magento extends AbstractPlatform
         }
 
         if (in_array('_root_category', $rowData) || in_array('_category', $rowData)) {
-            $key = null;
-            if ($key = array_search('_root_category', $rowData)) {
+            $key = array_search('_root_category', $rowData);
+            if ($key !== false) {
                 $rowData[$key] = 'categories';
             }
             $keySecond = array_search('_category', $rowData);
 
-            if ($key && $keySecond) {
-                unset($rowData[$keySecond]);
-            } elseif (!$key && $keySecond) {
-                $rowData[$keySecond] = 'categories';
+            if ($keySecond !== false) {
+                if ($key !== false) {
+                    unset($rowData[$keySecond]);
+                } else {
+                    $rowData[$keySecond] = 'categories';
+                }
             }
         }
-
 
         return $rowData;
     }
@@ -479,6 +486,20 @@ class Magento extends AbstractPlatform
         return $str;
     }
 
+    /**
+     * @param $source
+     * @param $maxDataSize
+     * @param $bunchSize
+     * @param $dataSourceModel
+     * @param $parameters
+     * @param $entityTypeCode
+     * @param $behavior
+     * @param $processedRowsCount
+     * @param $separator
+     * @param Product $model
+     *
+     * @return $this
+     */
     public function saveValidatedBunches(
         $source,
         $maxDataSize,
@@ -489,7 +510,7 @@ class Magento extends AbstractPlatform
         $behavior,
         $processedRowsCount,
         $separator,
-        $model
+        Product $model
     ) {
         $currentDataSize = 0;
         $bunchRows = [];
@@ -499,7 +520,6 @@ class Magento extends AbstractPlatform
         $repeatStore = 0;
         $source->rewind();
         $dataSourceModel->cleanBunches();
-        // $this->_dataSourceModel->cleanBunches();
         $file = null;
         $jobId = null;
 
@@ -521,13 +541,27 @@ class Magento extends AbstractPlatform
                     $bunchRows
                 );
                 $bunchRows = $nextRowBackup;
-                $currentDataSize = strlen(serialize($bunchRows));
+                $currentDataSize = strlen($model->getJsonHelper()->jsonEncode($bunchRows));
                 $startNewBunch = false;
                 $nextRowBackup = [];
             }
             if ($source->valid()) {
                 try {
                     $rowData = $source->current();
+                    $invalidAttr = [];
+                    foreach ($rowData as $attrName => $element) {
+                        if (!mb_check_encoding($element, 'UTF-8')) {
+                            unset($rowData[$attrName]);
+                            $invalidAttr[] = $attrName;
+                        }
+                    }
+                    if (!empty($invalidAttr)) {
+                        $model->addRowError(
+                            AbstractEntity::ERROR_CODE_ILLEGAL_CHARACTERS,
+                            $processedRowsCount,
+                            \implode(',', $invalidAttr)
+                        );
+                    }
                 } catch (\InvalidArgumentException $e) {
                     $model->addRowError($e->getMessage(), $processedRowsCount);
                     $processedRowsCount++;
@@ -644,16 +678,18 @@ class Magento extends AbstractPlatform
     protected function changeTierPrices($rowData)
     {
         if (!empty($rowData['_tier_price_price'])) {
-            $website = explode($this->separator,$rowData["_tier_price_website"]);
-            $group = explode($this->separator,$rowData["_tier_price_customer_group"]);
-            $qty = explode($this->separator,$rowData["_tier_price_qty"]);
-            $price = explode($this->separator,$rowData["_tier_price_price"]);
+            $website = explode($this->separator, $rowData["_tier_price_website"]);
+            $group = explode($this->separator, $rowData["_tier_price_customer_group"]);
+            $qty = explode($this->separator, $rowData["_tier_price_qty"]);
+            $price = explode($this->separator, $rowData["_tier_price_price"]);
             $txt = '';
             foreach ($price as $key => $tier) {
                 if (strpos($this->importProduct->productMetadata->getVersion(), '2.2') !== false) {
-                    $txt .= $group[$key] . $this->separator . $qty[$key] . $this->separator . $tier . $this->separator . "" . $this->separator . $website[$key];
+                    $txt .= $group[$key] . $this->separator . $qty[$key] . $this->separator . $tier .
+                        $this->separator . '' . $this->separator . $website[$key];
                 } else {
-                    $txt .= $group[$key] . $this->separator . $qty[$key] . $this->separator . $tier . $this->separator . $website[$key];
+                    $txt .= $group[$key] . $this->separator . $qty[$key] . $this->separator . $tier .
+                        $this->separator . $website[$key];
                 }
                 if (next($price)) {
                     $txt .= "|";

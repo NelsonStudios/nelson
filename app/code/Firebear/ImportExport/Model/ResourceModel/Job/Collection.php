@@ -6,8 +6,15 @@
 
 namespace Firebear\ImportExport\Model\ResourceModel\Job;
 
-use \Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\Job as ModelJob;
+use Firebear\ImportExport\Model\ResourceModel\AbstractCollection;
+use Firebear\ImportExport\Model\ResourceModel\Job as ResourceModelJob;
 
+/**
+ * Class Collection
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Job
+ */
 class Collection extends AbstractCollection
 {
     /**
@@ -22,6 +29,9 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\Job', 'Firebear\ImportExport\Model\ResourceModel\Job');
+        $this->_init(
+            ModelJob::class,
+            ResourceModelJob::class
+        );
     }
 }

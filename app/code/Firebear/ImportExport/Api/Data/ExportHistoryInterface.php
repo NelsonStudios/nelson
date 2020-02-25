@@ -37,12 +37,12 @@ interface ExportHistoryInterface
     public function getJobId();
 
     /**
-     * @return date
+     * @return string
      */
     public function getStartedAt();
 
     /**
-     * @return date
+     * @return string
      */
     public function getFinishedAt();
 
@@ -76,14 +76,14 @@ interface ExportHistoryInterface
     public function setJobId($jobId);
 
     /**
-     * @param date $start
+     * @param string $start
      *
      * @return ExportHistoryInterface
      */
     public function setStartedAt($start);
 
     /**
-     * @param date $finish
+     * @param string $finish
      *
      * @return ExportHistoryInterface
      */

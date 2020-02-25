@@ -1,6 +1,6 @@
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 /**
@@ -25,10 +25,11 @@ define([
                 'configurable_create',
                 'configurable_type',
                 'configurable_field',
-                'configurable_variations'
+                'configurable_variations',
+                'copy_simple_value'
             ];
 
-            _.each(fieldset.elems(), function(elem) {
+            _.each(fieldset.elems(), function (elem) {
                 if (formElements.indexOf(elem.index) >= 0) {
                     elem.visible(self.checked());
                 }

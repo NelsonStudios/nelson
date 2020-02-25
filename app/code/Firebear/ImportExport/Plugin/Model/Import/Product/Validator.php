@@ -87,15 +87,13 @@ class Validator extends BaseValidator
         );
         if ($createValuesAllowed) {
             if (in_array($attrParams['type'], $this->types)) {
-                $attribute = $this->prodAttrFac->create();
-                $attribute->load($attrParams['id']);
                 $separator = $subject->getContext()->getMultipleValueSeparator() ?
                     $subject->getContext()->getMultipleValueSeparator() :
                     MagentoProduct::PSEUDO_MULTI_LINE_SEPARATOR;
                 $values = explode($separator, $rowData[$attrCode]);
+                $values = array_map('trim', $values);
                 foreach ($values as $value) {
-                    if ($createValuesAllowed && $attribute->getIsUserDefined()) {
-                        $value = trim($value);
+                    if ($createValuesAllowed && !empty($attrParams['is_user_defined'])) {
                         $attrParams['options'][strtolower($value)] = $value;
                     }
                 }
@@ -112,7 +110,6 @@ class Validator extends BaseValidator
                     $this->registry->register('firebear_create_attr', $newData);
                 }
             }
-
         }
 
         return $proceed($attrCode, $attrParams, $rowData);

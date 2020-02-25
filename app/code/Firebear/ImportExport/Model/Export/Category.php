@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
@@ -7,37 +6,59 @@
 
 namespace Firebear\ImportExport\Model\Export;
 
-use Magento\Catalog\Api\Data\CategoryInterface;
+use Exception;
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
+use Magento\Catalog\Model\Category as CategoryModel;
+use Magento\Catalog\Model\ResourceModel\CategoryFactory;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Eav\Model\Config;
+use Magento\Eav\Model\Entity\Type as EntityType;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\ImportExport\Model\Export\ConfigInterface;
+use Magento\ImportExport\Model\Export\Entity\AbstractEntity;
 use Magento\ImportExport\Model\Import;
-use \Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use \Magento\Store\Model\Store;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\Website;
 
-class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
+/**
+ * Class Category
+ *
+ * @package Firebear\ImportExport\Model\Export
+ */
+class Category extends AbstractEntity implements EntityInterface
 {
+    use ExportTrait;
 
-    use \Firebear\ImportExport\Traits\Export\Entity;
-
-    use \Firebear\ImportExport\Traits\General;
+    const COL_STORE = 'store_view';
+    const COL_STORE_NAME = 'store_name';
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var string|null
      */
-    protected $logger;
+    protected $currentStoreCode = null;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
+     * @var Collection
+     */
+    protected $entityCollection;
+
+    /**
+     * @var CollectionFactory
      */
     protected $entityCollectionFactory;
 
     /**
-     * @var \Magento\ImportExport\Model\Export\ConfigInterface
+     * @var ConfigInterface
      */
     protected $exportConfig;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\CategoryFactory
+     * @var CategoryFactory
      */
     protected $categoryFactory;
 
@@ -70,7 +91,6 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
      */
     protected $collectionAttr;
 
-
     private $userDefinedAttributes = [];
 
     protected $headerColumns = [];
@@ -83,7 +103,7 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         'news_from_date',
         'news_to_date',
         'custom_design_from',
-        'custom_design_to'
+        'custom_design_to',
     ];
 
     protected $customAttr = [
@@ -93,14 +113,14 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         'custom_design_to',
         'custom_layout_update',
         'custom_use_parent_settings',
-        'description'
+        'description',
     ];
 
     protected $closedAttr = [
         'all_children',
         'children',
         'children_count',
-        'level'
+        'level',
     ];
 
     /**
@@ -110,20 +130,32 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
      */
     protected $itemsPerPage = null;
 
+    /**
+     * Category constructor.
+     *
+     * @param TimezoneInterface $localeDate
+     * @param Config $config
+     * @param ResourceConnection $resource
+     * @param StoreManagerInterface $storeManager
+     * @param CollectionFactory $collectionFactory
+     * @param ConfigInterface $exportConfig
+     * @param CategoryFactory $categoryFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeColFactory
+     * @param \Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory $typeCollection
+     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory $collectionAttrFactory
+     */
     public function __construct(
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Eav\Model\Config $config,
+        TimezoneInterface $localeDate,
+        Config $config,
         ResourceConnection $resource,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $collectionFactory,
-        \Magento\ImportExport\Model\Export\ConfigInterface $exportConfig,
-        \Magento\Catalog\Model\ResourceModel\CategoryFactory $categoryFactory,
+        StoreManagerInterface $storeManager,
+        CollectionFactory $collectionFactory,
+        ConfigInterface $exportConfig,
+        CategoryFactory $categoryFactory,
         \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeColFactory,
         \Magento\Eav\Model\ResourceModel\Entity\Type\CollectionFactory $typeCollection,
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory $collectionAttrFactory
     ) {
-        $this->logger = $logger;
         $this->entityCollectionFactory = $collectionFactory;
         $this->exportConfig = $exportConfig;
         $this->categoryFactory = $categoryFactory;
@@ -132,16 +164,24 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         $this->collectionAttr = $collectionAttrFactory;
         parent::__construct($localeDate, $config, $resource, $storeManager);
 
-        $this->initAttributes()
-            ->initWebsites();
+        $this->initAttributes()->initWebsites();
         $this->getFieldsForExport();
     }
 
+    /**
+     * Retrieve header columns
+     *
+     * @return array|string[]
+     */
     public function _getHeaderColumns()
     {
         return $this->customHeadersMapping($this->headerColumns);
     }
 
+    /**
+     * @param array $rowData
+     * @return array
+     */
     protected function customHeadersMapping($rowData)
     {
         foreach ($rowData as $key => $fieldName) {
@@ -153,23 +193,31 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return ($this->_parameters['all_fields']) ? $this->headerColumns : array_unique($rowData);
     }
 
+    /**
+     * @param array $data
+     */
     protected function setHeaderColumns($data)
     {
         if (!$this->headerColumns) {
             $this->headerColumns = array_merge(
                 [
                     'name',
+                    self::COL_STORE,
+                    self::COL_STORE_NAME,
                     'image',
-                    'url_path'
+                    'url_path',
                 ],
                 $data
             );
         }
     }
 
+    /**
+     * @param bool $resetCollection
+     * @return Collection
+     */
     protected function _getEntityCollection($resetCollection = false)
     {
-
         if ($resetCollection || empty($this->entityCollection)) {
             $this->entityCollection = $this->entityCollectionFactory->create();
         }
@@ -177,6 +225,33 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $this->entityCollection;
     }
 
+    /**
+     * @return array|Collection[]
+     */
+    protected function getArrEntityCollection()
+    {
+        $entityCollections = [];
+        $stores = $this->_storeManager->getStores();
+        $store_ids = $this->_parameters['behavior_data']['store_ids'];
+        if (in_array('0', $store_ids)) {
+            foreach ($stores as $store) {
+                $entity = $this->_getEntityCollection(true)->setStore($store);
+                $entityCollections[$store->getCode()] = $entity;
+            }
+        } else {
+            foreach ($store_ids as $storeId) {
+                $store = $stores[$storeId];
+                $entity = $this->_getEntityCollection(true)->setStore($store);
+                $entityCollections[$store->getCode()] = $entity;
+            }
+        }
+
+        return $entityCollections;
+    }
+
+    /**
+     * @return int|null
+     */
     protected function getItemsPerPage()
     {
         if ($this->itemsPerPage === null) {
@@ -202,7 +277,7 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
             $minProductsLimit = 500;
             $maxProductsLimit = 5000;
 
-            $this->itemsPerPage = intval(
+            $this->itemsPerPage = (int) (
                 ($memoryLimit * $memoryUsagePercent - memory_get_usage(true)) / $memoryPerProduct
             );
             if ($this->itemsPerPage < $minProductsLimit) {
@@ -216,11 +291,12 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $this->itemsPerPage;
     }
 
-    protected function paginateCollection($page, $pageSize)
-    {
-        $this->_getEntityCollection()->setPage($page, $pageSize);
-    }
-
+    /**
+     * Export process
+     *
+     * @return array
+     * @throws LocalizedException
+     */
     public function export()
     {
         //Execution time may be very long
@@ -229,24 +305,28 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         $writer = $this->getWriter();
         $page = 0;
         $counts = 0;
-        while (true) {
+        $storesRows = [];
+
+        $storiesEntityCollection = $this->getArrEntityCollection();
+
+        foreach ($storiesEntityCollection as $storeViewCode => $entityCollection) {
+            $this->currentStoreCode=$storeViewCode;
             ++$page;
-            $entityCollection = $this->_getEntityCollection(true);
             $entityCollection->setOrder('entity_id', 'asc');
             $this->_prepareEntityCollection($entityCollection);
             if (isset($this->_parameters['last_entity_id'])
                 && $this->_parameters['last_entity_id'] > 0
                 && $this->_parameters['enable_last_entity_id'] > 0
             ) {
-                $entityCollection->addFieldToFilter(
-                    'entity_id', ['gt' => $this->_parameters['last_entity_id']]
-                );
+                $entityCollection->addFieldToFilter('entity_id', ['gt' => $this->_parameters['last_entity_id']]);
             }
-            $this->paginateCollection($page, $this->getItemsPerPage());
+            $entityCollection->setPage($page, $this->getItemsPerPage());
+
             if ($entityCollection->count() == 0) {
                 break;
             }
-            $exportData = $this->getExportData();
+
+            $exportData = $this->getExportData($entityCollection);
             if ($page == 1) {
                 $writer->setHeaderCols($this->_getHeaderColumns());
             }
@@ -255,47 +335,79 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                     $this->lastEntityId = $dataRow['entity_id'];
                 }
                 $dd = $this->_customFieldsMapping($dataRow);
-                $writer->writeRow($dd);
+                $dd[self::COL_STORE] = $storeViewCode;
+                $storesRows[$storeViewCode][] = $dd;
                 $counts++;
             }
+        }
 
-            if ($entityCollection->getCurPage() >= $entityCollection->getLastPageNumber()) {
-                break;
-            }
+        $newRows = $this->prepareRows($storesRows);
+        foreach ($newRows as $line) {
+            $writer->writeRow($line);
         }
 
         return [$writer->getContents(), $counts, $this->lastEntityId];
     }
 
-    protected function getExportData()
+    /**
+     * @param array $storesRows
+     * @return array
+     */
+    protected function prepareRows($storesRows)
+    {
+        $newRows = [];
+        $firstStoreRows = array_shift($storesRows);
+        foreach ($firstStoreRows as $numRow => $row) {
+            $newRows[] = $row;
+            if (!empty($storesRows)) {
+                foreach ($storesRows as $storeCode => $rows) {
+                    $newRows[] = $storesRows[$storeCode][$numRow];
+                }
+            }
+        }
+
+        return $newRows;
+    }
+
+    /**
+     * @param Collection $entityCollection
+     * @return array
+     */
+    protected function getExportData($entityCollection)
     {
         $exportData = [];
         try {
-            $rawData = $this->collectRawData();
+            $rawData = $this->collectRawData($entityCollection);
 
             foreach ($rawData as $productId => $dataRow) {
                 $exportData[] = $dataRow;
             }
-        } catch (\Exception $e) {
-            $this->logger->critical($e);
+        } catch (Exception $e) {
+            $this->_logger->critical($e);
         }
-        $newData = $this->changeData($exportData);
+        $newData = $this->changeData($exportData, 'entity_id');
 
         $this->headerColumns = $this->changeHeaders($this->headerColumns);
-
 
         return $newData;
     }
 
-    protected function collectRawData()
+    /**
+     * @param Collection $collection
+     * @return array
+     * @throws Exception
+     */
+    protected function collectRawData($collection)
     {
         $data = [];
-        $collection = $this->_getEntityCollection();
-
+        /**
+         * @var int $itemId
+         * @var CategoryModel $item
+         */
         foreach ($collection as $itemId => $item) {
             $path = [];
             foreach ($this->getParentCategories($item) as $cat) {
-                if ($cat->getId() == \Magento\Catalog\Model\Category::TREE_ROOT_ID) {
+                if ($cat->getId() == CategoryModel::TREE_ROOT_ID) {
                     continue;
                 }
                 $path[] = $cat->getName();
@@ -303,8 +415,12 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
             if (empty($path)) {
                 $path[] = $item->getName();
             }
-            $data[$itemId]['name'] = implode("/", $path);
+            $catName = implode("/", $path);
+            $data[$itemId]['name'] = $catName;
             foreach ($this->_getExportAttrCodes() as $code) {
+                if (strpos($catName, $item->getName()) === false) {
+                    $data[$itemId][self::COL_STORE_NAME] = $item->getName();
+                }
                 if ($code == 'name' || in_array($code, $this->closedAttr)) {
                     continue;
                 }
@@ -315,12 +431,9 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 if (isset($this->_attributeValues[$code][$attrValue]) && !empty($this->_attributeValues[$code])) {
                     $attrValue = $this->_attributeValues[$code][$attrValue];
                 }
-
                 $fieldName = isset($this->fieldsMap[$code]) ? $this->fieldsMap[$code] : $code;
                 if ($this->attributeTypes[$code] == 'datetime') {
-                    if (in_array($code, $this->dateAttrCodes)
-                        || in_array($code, $this->userDefinedAttributes)
-                    ) {
+                    if (in_array($code, $this->dateAttrCodes) || in_array($code, $this->userDefinedAttributes)) {
                         $attrValue = $this->_localeDate->formatDateTime(
                             new \DateTime($attrValue),
                             \IntlDateFormatter::SHORT,
@@ -345,7 +458,6 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                         $data[$itemId][$fieldName] = htmlspecialchars_decode($attrValue);
                     }
                 } else {
-                    // $data[$itemId][$fieldName] = $this->collectMultiselectValues($item, $code);
                     $data[$itemId][$fieldName] = $attrValue;
                 }
             }
@@ -356,17 +468,29 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $data;
     }
 
+    /**
+     * Retrieve entity type code
+     *
+     * @return string
+     */
     public function getEntityTypeCode()
     {
         return 'catalog_category';
     }
 
+    /**
+     * @return $this
+     */
     protected function initAttributes()
     {
         foreach ($this->getAttributeCollection() as $attribute) {
-            $this->_attributeValues[$attribute->getAttributeCode()] = $this->getAttributeOptions($attribute);
-            $this->attributeTypes[$attribute->getAttributeCode()] =
-                \Magento\ImportExport\Model\Import::getAttributeType($attribute);
+            try {
+                $this->_attributeValues[$attribute->getAttributeCode()] = $this->getAttributeOptions($attribute);
+            } catch (\TypeError $exception) {
+                // ignore exceptions connected with source models
+                $this->_attributeValues[$attribute->getAttributeCode()] = [];
+            }
+            $this->attributeTypes[$attribute->getAttributeCode()] = Import::getAttributeType($attribute);
             if ($attribute->getIsUserDefined()) {
                 $this->userDefinedAttributes[] = $attribute->getAttributeCode();
             }
@@ -375,9 +499,12 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function initWebsites()
     {
-        /** @var $website \Magento\Store\Model\Website */
+        /** @var Website $website */
         foreach ($this->_storeManager->getWebsites() as $website) {
             $this->websiteIdToCode[$website->getId()] = $website->getCode();
         }
@@ -385,6 +512,11 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $this;
     }
 
+    /**
+     * Retrieve entity field for export
+     *
+     * @return array
+     */
     public function getFieldsForExport()
     {
         $list = [];
@@ -398,19 +530,29 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return array_unique($this->headerColumns);
     }
 
+    /**
+     * Retrieve entity field for filter
+     *
+     * @return array
+     */
     public function getFieldsForFilter()
     {
         $options = [];
         $types = $this->typeCollection->create()->addFieldToFilter('entity_type_code', $this->getEntityTypeCode());
         if ($types->getSize()) {
+            /** @var EntityType $type */
+            $type = $types->getFirstItem();
             $collection = $this->collectionAttr->create()->addFieldToFilter(
                 'entity_type_id',
-                $types->getFirstItem()->getId()
+                $type->getId()
             );
+            /** @var \Magento\Catalog\Model\Category\Attribute $item */
             foreach ($collection as $item) {
                 $options[] = [
                     'value' => $item->getAttributeCode(),
-                    'label' => $item->getFrontendLabel() ? $item->getFrontendLabel() : $item->getAttributeCode()
+                    'label' => $item->getDefaultFrontendLabel()
+                        ? $item->getDefaultFrontendLabel()
+                        : $item->getAttributeCode(),
                 ];
             }
         }
@@ -418,18 +560,18 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return [$this->getEntityTypeCode() => $options];
     }
 
+    /**
+     * Entity attributes collection getter.
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection
+     */
     public function getAttributeCollection()
     {
         return $this->attributeColFactory->create();
     }
 
-    public function getFieldColumns()
-    {
-        return [];
-    }
-
     /**
-     * @param $rowData
+     * @param array $rowData
      * @return array
      */
     protected function _customFieldsMapping($rowData)
@@ -442,7 +584,7 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 unset($rowData[$systemFieldName]);
             }
         }
-        if (count($headerColumns != count(array_keys($rowData)))) {
+        if (count($headerColumns) != count(array_keys($rowData))) {
             $newData = [];
             foreach ($headerColumns as $code) {
                 if (!isset($rowData[$code])) {
@@ -457,32 +599,41 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return $rowData;
     }
 
+    /**
+     * @param string $code
+     * @param mixed $value
+     * @return bool
+     */
     protected function isValidAttributeValue($code, $value)
     {
         $isValid = true;
-        if (!is_numeric($value) && empty($value)) {
-            $isValid = false;
-        }
-
-        if (!isset($this->_attributeValues[$code])) {
+        if ((!is_numeric($value) && empty($value)) || !isset($this->_attributeValues[$code])) {
             $isValid = false;
         }
 
         return $isValid;
     }
 
+    /**
+     * @param CategoryModel $category
+     * @return array|DataObject[]
+     * @throws LocalizedException
+     */
     public function getParentCategories($category)
     {
-        if ($category->getId() > $this->_storeManager->getStore()->getRootCategoryId()) {
+        /** @var Store $store */
+        $store = $this->_storeManager->getStore($this->currentStoreCode);
+        if ($category->getId() > $store->getRootCategoryId()) {
             $path = implode(',', array_reverse($category->getPathIds()));
             $list = $path;
             $categories = array_reverse(explode(',', $list));
-            /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $categories */
+            /** @var Collection $categories */
             $collection = $this->entityCollectionFactory->create();
             /*Sort parent categories by level to get correct category path*/
             return $collection
+                ->setStoreId($store->getId())
                 ->addAttributeToSelect(
-                    array('name', 'level')
+                    ['name', 'level']
                 )->addFieldToFilter(
                     'entity_id',
                     ['in' => $categories]
@@ -492,6 +643,11 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         return [];
     }
 
+    /**
+     * @param CategoryModel $item
+     * @param string $attrCode
+     * @return string
+     */
     protected function collectMultiselectValues($item, $attrCode)
     {
         $attrValue = $item->getData($attrCode);
@@ -508,7 +664,6 @@ class Category extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
 
             $str .= $key . "=" . $val;
         }
-
 
         return $str;
     }

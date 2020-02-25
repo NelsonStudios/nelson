@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Model\Output;
 
 use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Class Xslt
+ *
+ * @package Firebear\ImportExport\Model\Output
+ */
 class Xslt
 {
     /**
@@ -19,8 +24,10 @@ class Xslt
      */
     public function convert($file, $xsl)
     {
-        if (!@class_exists('\XSLTProcessor')) {
-            throw new LocalizedException(__('The XSLTProcessor class could not be found. This means your PHP installation is missing XSL features.'));
+        if (!class_exists('\XSLTProcessor')) {
+            throw new LocalizedException(__(
+                'The XSLTProcessor class could not be found. This means your PHP installation is missing XSL features.'
+            ));
         }
         $xmlDoc = new \DOMDocument();
 

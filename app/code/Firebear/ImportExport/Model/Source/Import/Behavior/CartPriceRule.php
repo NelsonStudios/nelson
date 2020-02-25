@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Model\Source\Import\Behavior;
 
+/**
+ * Class CartPriceRule
+ *
+ * @package Firebear\ImportExport\Model\Source\Import\Behavior
+ */
 class CartPriceRule extends \Magento\ImportExport\Model\Source\Import\AbstractBehavior
 {
     const  ONLY_UPDATE = 'update';

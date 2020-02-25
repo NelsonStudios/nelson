@@ -10,11 +10,13 @@
 
 namespace Firebear\ImportExport\Plugin\Config;
 
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Model\ExportJobFactory;
-use Psr\Log\LoggerInterface;
-use Firebear\ImportExport\Cron\RunImportJobs;
 use Firebear\ImportExport\Cron\RunExportJobs;
+use Firebear\ImportExport\Cron\RunImportJobs;
+use Firebear\ImportExport\Model\ExportJob;
+use Firebear\ImportExport\Model\ExportJobFactory;
+use Firebear\ImportExport\Model\JobFactory;
+use Magento\Framework\Serialize\SerializerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Data
@@ -45,6 +47,10 @@ class Data
     protected $jobCodePattern = 'importexport_jobs_run_id_%u';
 
     protected $jobCodeExportPattern = 'importexport_export_jobs_run_id_%u';
+    /**
+     * @var SerializerInterface
+     */
+    protected $serializer;
 
     /**
      * Data constructor.
@@ -52,15 +58,18 @@ class Data
      * @param ExportJobFactory $exportJobFactory
      * @param JobFactory $jobFactory
      * @param LoggerInterface $logger
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         ExportJobFactory $exportJobFactory,
         JobFactory $jobFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SerializerInterface $serializer
     ) {
         $this->exportJobFactory = $exportJobFactory;
         $this->jobFactory = $jobFactory;
         $this->logger = $logger;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -73,7 +82,6 @@ class Data
      */
     public function afterGetJobs(\Magento\Cron\Model\Config\Data $subject, $result)
     {
-
         $result = $this->scopeCrons($result, $this->jobFactory, RunImportJobs::class, $this->jobCodePattern);
         $result = $this->scopeCrons(
             $result,
@@ -81,7 +89,6 @@ class Data
             RunExportJobs::class,
             $this->jobCodeExportPattern
         );
-
         return $result;
     }
 
@@ -101,7 +108,12 @@ class Data
         $jobCollection->load();
         foreach ($jobCollection as $job) {
             $jobName = sprintf($pattern, $job->getId());
-            $result['default'][$jobName] = [
+            $jobSourceData = $this->serializer->unserialize($job->getData('source_data'));
+            if ($job instanceof ExportJob) {
+                $jobSourceData = $this->serializer->unserialize($job->getData('export_source'));
+            }
+            $cronGroupName = $jobSourceData['cron_groups'] ?? 'firebear_importexport';
+            $result[$cronGroupName][$jobName] = [
                 'name' => $jobName,
                 'instance' => $instance,
                 'method' => 'execute',

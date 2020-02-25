@@ -6,13 +6,19 @@
 
 namespace Firebear\ImportExport\Model\Export;
 
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
+use Magento\CustomerImportExport\Model\Export\Customer as MagentoCustomer;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
+use Magento\Framework\Exception\LocalizedException;
 
-class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
+/**
+ * Class Customer
+ *
+ * @package Firebear\ImportExport\Model\Export
+ */
+class Customer extends MagentoCustomer implements EntityInterface
 {
-    use \Firebear\ImportExport\Traits\Export\Entity;
-
-    use \Firebear\ImportExport\Traits\General;
+    use ExportTrait;
 
     /**
      * @return mixed
@@ -26,7 +32,7 @@ class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
 
     /**
      * @param $item
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function exportItem($item)
     {
@@ -44,6 +50,10 @@ class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
         $this->getWriter()->writeRow($this->changeRow($row));
     }
 
+    /**
+     * @return array
+     * @throws LocalizedException
+     */
     public function export()
     {
         $entityCollection = $this->_getEntityCollection();
@@ -52,7 +62,8 @@ class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
             && $this->_parameters['enable_last_entity_id'] > 0
         ) {
             $entityCollection->addFieldToFilter(
-                'entity_id', ['gt' => $this->_parameters['last_entity_id']]
+                'entity_id',
+                ['gt' => $this->_parameters['last_entity_id']]
             );
         }
         $this->_prepareEntityCollection($entityCollection);
@@ -75,7 +86,7 @@ class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
 
         return $this->changeHeaders($headers);
     }
-	
+
     /**
      * Apply filter to collection and add not skipped attributes to select
      *
@@ -87,5 +98,15 @@ class Customer extends \Magento\CustomerImportExport\Model\Export\Customer
         $this->filterEntityCollection($collection);
         $this->_addAttributesToCollection($collection);
         return $collection;
-    }		
+    }
+
+    /**
+     * Retrieve attributes codes which are appropriate for export
+     *
+     * @return array
+     */
+    protected function _getExportAttrCodes()
+    {
+        return [];
+    }
 }

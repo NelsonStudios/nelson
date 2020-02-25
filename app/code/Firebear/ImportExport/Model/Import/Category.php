@@ -6,28 +6,35 @@
 
 namespace Firebear\ImportExport\Model\Import;
 
+use Firebear\ImportExport\Traits\Import\Entity as ImportTrait;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Category as MagentoCategoryModel;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\CatalogImportExport\Model\Import\Product\CategoryProcessor;
+use Magento\Cms\Model\Page\DomValidationState;
 use Magento\Eav\Model\Config;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Json\Helper\Data;
+use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\StringUtils;
 use Magento\ImportExport\Model\Import;
 use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
+use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
 use Magento\ImportExport\Model\ResourceModel\Helper;
-use Magento\Framework\Registry;
-use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Magento\CatalogImportExport\Model\Import\Product\RowValidatorInterface as ValidatorInterface;
 
+/**
+ * Class Category
+ *
+ * @package Firebear\ImportExport\Model\Import
+ */
 class Category extends AbstractEntity
 {
-
-    use \Firebear\ImportExport\Traits\General;
+    use ImportTrait;
 
     /**
      * Delimiter in category path.
@@ -46,6 +53,8 @@ class Category extends AbstractEntity
     const COL_STORE = 'store_view';
 
     const COL_STORE_NAME = 'store_name';
+
+    const COL_URL_PATH = 'url_path';
 
     /**
      * Column category name.
@@ -73,12 +82,19 @@ class Category extends AbstractEntity
     const COL_INCLUDE_IN_MENU = 'include_in_menu';
 
     /**
+     * Column Custom layout update.
+     */
+    const COL_CUSTOM_LAYOUT_UPDATE = 'custom_layout_update';
+
+    /**
      * Error codes
      */
     const ERROR_CODE_NAME_REQUIRED = 'columnNameIsRequired';
+    const ERROR_CODE_LAYOUT_UPDATE_IS_NOT_VALID = 'CustomLayoutIsNotValid';
 
     protected $errorTemplates = [
-        self::ERROR_CODE_NAME_REQUIRED => "Column 'name' is not set"
+        self::ERROR_CODE_NAME_REQUIRED => "Column 'name' is not set",
+        self::ERROR_CODE_LAYOUT_UPDATE_IS_NOT_VALID => "Column 'custom_layout_update' is not valid"
     ];
 
     /**
@@ -141,9 +157,14 @@ class Category extends AbstractEntity
     protected $categoriesUrl;
 
     /**
-     * @var ConsoleOutput
+     * @var \Magento\Framework\Filter\FilterManager
      */
-    protected $output;
+    protected $filterManager;
+
+    /**
+     * @var DomValidationState
+     */
+    private $validationState;
 
     private $multiLineSeparatorForRegexp;
 
@@ -158,9 +179,21 @@ class Category extends AbstractEntity
     protected $nameToId;
 
     /**
+     * @var \Magento\Framework\App\ProductMetadata
+     */
+    public $productMetadata;
+
+    /**
      * @var \Firebear\ImportExport\Helper\Additional
      */
     protected $additional;
+
+    /**
+     * @var \Magento\Framework\View\Model\Layout\Update\ValidatorFactory
+     */
+    protected $validatorFactory;
+    /** @var array  */
+    protected $notAllowedUpdateWhenEmpty = [self::COL_URL];
 
     /**
      * @var array
@@ -176,6 +209,26 @@ class Category extends AbstractEntity
     ];
 
     /**
+     * @var array
+     */
+    protected $categoriesDeleted = [];
+
+    /**
+     * @var array
+     */
+    protected $urlComparableList = [];
+
+    /**
+     * @var array
+     */
+    protected $urlRequestPathStoreId = [];
+
+    /**
+     * @var array
+     */
+    protected $foundDuplicate = [];
+
+    /**
      * @param Data $jsonHelper
      * @param \Magento\ImportExport\Helper\Data $importExportData
      * @param \Magento\ImportExport\Model\ResourceModel\Import\Data $importData
@@ -188,8 +241,20 @@ class Category extends AbstractEntity
      * @param CategoryProcessor $categoryProcessor
      * @param CategoryFactory $categoryFactory
      * @param ManagerInterface $eventManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param CategoryRepositoryInterface $categoryRepository
-     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data
+     * @param ConsoleOutput $output
+     * @param \Magento\Framework\Registry $registry
+     * @param \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData
+     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeColFactory
+     * @param \Magento\Catalog\Model\ResourceModel\CategoryFactory $categoryResourceFactory
+     * @param \Firebear\ImportExport\Helper\Additional $additional
+     * @param \Magento\Framework\App\ProductMetadata $productMetadata
+     * @param \Magento\Framework\View\Model\Layout\Update\ValidatorFactory $validatorFactory
+     * @param \Magento\Framework\Filter\FilterManager $filterManager
+     * @param DomValidationState $validationState
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         Data $jsonHelper,
@@ -206,12 +271,16 @@ class Category extends AbstractEntity
         ManagerInterface $eventManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         CategoryRepositoryInterface $categoryRepository,
-        \Symfony\Component\Console\Output\ConsoleOutput $output,
+        ConsoleOutput $output,
         Registry $registry,
         \Firebear\ImportExport\Model\ResourceModel\Import\Data $importFireData,
         \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeColFactory,
         \Magento\Catalog\Model\ResourceModel\CategoryFactory $categoryResourceFactory,
-        \Firebear\ImportExport\Helper\Additional $additional
+        \Firebear\ImportExport\Helper\Additional $additional,
+        \Magento\Framework\App\ProductMetadata $productMetadata,
+        \Magento\Framework\View\Model\Layout\Update\ValidatorFactory $validatorFactory,
+        \Magento\Framework\Filter\FilterManager $filterManager,
+        $validationState = null
     ) {
         $this->categoryColFactory = $categoryColFactory;
         $this->categoryProcessor = $categoryProcessor;
@@ -224,6 +293,15 @@ class Category extends AbstractEntity
         $this->attributeCol = $attributeColFactory;
         $this->resourceFactory = $categoryResourceFactory;
         $this->additional = $additional;
+        $this->productMetadata = $productMetadata;
+        $this->validatorFactory = $validatorFactory;
+        $this->validationState = $validationState;
+
+        if (version_compare($this->productMetadata->getVersion(), '2.2.2', '>=') && !$validationState) {
+            $this->validationState = ObjectManager::getInstance()->get(
+                DomValidationState::class
+            );
+        }
         parent::__construct(
             $jsonHelper,
             $importExportData,
@@ -236,11 +314,14 @@ class Category extends AbstractEntity
         );
         $this->_dataSourceModel = $importFireData;
         $this->initCategories()->initAttributes();
+        $this->initRequestPathStoreId();
+        $this->filterManager = $filterManager;
     }
 
     /**
      * Prepare all existing categories in array
      * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function initCategories()
     {
@@ -256,7 +337,7 @@ class Category extends AbstractEntity
                 $collection->setStoreId($store)
                     ->addAttributeToSelect(self::COL_NAME)
                     ->addAttributeToSelect(self::COL_URL);
-                /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
+                /** @var \Magento\Catalog\Model\Category $category */
                 foreach ($collection as $category) {
                     $structure = explode(self::DELIMITER_CATEGORY, $category->getPath());
                     $pathSize = count($structure);
@@ -320,11 +401,9 @@ class Category extends AbstractEntity
         $this->_validatedRows = null;
         if (Import::BEHAVIOR_DELETE == $this->getBehavior()) {
             $this->deleteCategories();
+        } elseif (Import::BEHAVIOR_REPLACE == $this->getBehavior()) {
+            $this->replaceProcess();
         } else {
-            /**
-             * If user select replace behavior all categories will be deleted first,
-             * then new categories will be saved
-             */
             $this->saveCategoriesData();
         }
         $this->eventManager->dispatch('catalog_category_import_finish_before', ['adapter' => $this]);
@@ -335,6 +414,8 @@ class Category extends AbstractEntity
     /**
      * Delete categories is delete behavior is selected
      * @return $this
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function deleteCategories()
     {
@@ -368,6 +449,11 @@ class Category extends AbstractEntity
                                 );
                             } else {
                                 $this->categoryRepository->delete($category);
+                                if (Import::BEHAVIOR_REPLACE == $this->getBehavior()) {
+                                    if (isset($rowData['name'])) {
+                                        $this->categoriesDeleted[] = $rowData['name'];
+                                    }
+                                }
                             }
                         } catch (\Magento\Framework\Exception\StateException $e) {
                             $this->addRowError(
@@ -391,6 +477,9 @@ class Category extends AbstractEntity
     /**
      * Delete all categories when replace behavior is selected
      * @return $this
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function deleteAllCategories()
     {
@@ -411,6 +500,20 @@ class Category extends AbstractEntity
     }
 
     /**
+     * @return $this
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function replaceProcess()
+    {
+        $this->deleteAllCategories();
+        $this->saveCategoriesData();
+
+        return $this;
+    }
+
+    /**
      * Gather and save information about product entities.
      *
      * @return $this
@@ -421,12 +524,6 @@ class Category extends AbstractEntity
      */
     protected function saveCategoriesData()
     {
-        /**
-         * Delete all categories if replace behavior is selected
-         */
-        if (Import::BEHAVIOR_REPLACE == $this->getBehavior()) {
-            $this->deleteAllCategories();
-        }
         $this->_initSourceType('url');
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
@@ -435,12 +532,19 @@ class Category extends AbstractEntity
             $this->categoriesCache = [];
             $bunch = $this->prepareImagesFromSource($bunch);
             foreach ($bunch as $rowNum => $rowData) {
+                if ($rowData['name'] == 'Root Catalog') {
+                    continue;
+                }
                 $this->_processedRowsCount++;
                 $rowData = $this->joinIdenticalyData($rowData);
                 $rowData = $this->customChangeData($rowData);
+                $rowData = $this->clearEmptyData($rowData, $rowNum);
+
+                if (!$rowData) {
+                    continue;
+                }
 
                 if (!isset($rowData[self::COL_NAME])) {
-
                     $this->getErrorAggregator()->addError(
                         self::ERROR_CODE_NAME_REQUIRED,
                         ProcessingError::ERROR_LEVEL_CRITICAL,
@@ -449,8 +553,25 @@ class Category extends AbstractEntity
                     continue;
                 }
 
+                if (isset($rowData[self::COL_CUSTOM_LAYOUT_UPDATE])
+                    && !empty($rowData[self::COL_CUSTOM_LAYOUT_UPDATE])) {
+                    $rowData[self::COL_CUSTOM_LAYOUT_UPDATE] = stripslashes($rowData[self::COL_CUSTOM_LAYOUT_UPDATE]);
+                    if (!$this->validateLayoutUpdateRow($rowData[self::COL_CUSTOM_LAYOUT_UPDATE])) {
+                        $this->getErrorAggregator()->addError(
+                            self::ERROR_CODE_LAYOUT_UPDATE_IS_NOT_VALID,
+                            ProcessingError::ERROR_LEVEL_WARNING,
+                            $this->_processedRowsCount
+                        );
+                        continue;
+                    }
+                }
+
                 if (!$this->validateRow($rowData, $rowNum)) {
-                    $this->addLogWriteln(__('Category with name: %1 is not valided', $rowData[self::COL_NAME]), $this->output, 'info');
+                    $this->addLogWriteln(
+                        __('Category with name: %1 is not valided', $rowData[self::COL_NAME]),
+                        $this->output,
+                        'info'
+                    );
                     continue;
                 }
                 $time = explode(" ", microtime());
@@ -469,9 +590,15 @@ class Category extends AbstractEntity
                     if (isset($rowData['entity_id'])) {
                         unset($rowData['entity_id']);
                     }
+                    if (!empty($this->categoriesDeleted)) {
+                        if (in_array($rowData[self::COL_NAME], $this->categoriesDeleted)) {
+                            $rowData[self::COL_NAME];
+                        } else {
+                            continue;
+                        }
+                    }
                 }
 
-                $rowData = $this->checkUrl($rowData);
                 $rowData = $this->changeData($rowData);
                 $rowData['store_id'] = 0;
                 if (!empty($rowData[self::COL_STORE])) {
@@ -480,21 +607,13 @@ class Category extends AbstractEntity
                         unset($rowData[self::COL_STORE]);
                     }
                 }
-                $rowPath = null;
-                $rowPath = str_replace(
-                    $this->_parameters['category_levels_separator'], self::DELIMITER_CATEGORY, $rowData[self::COL_NAME]
-                );
-                /*     if (strpos($rowData[self::COL_NAME], self::DELIMITER_CATEGORY) !== false) {
-                         $rowPath = $rowData[self::COL_NAME];
-                     } elseif (isset($rowData[self::COL_PARENT])) {
-                         $rowPath = (int)$rowData[self::COL_PARENT];
-                     } elseif (isset($rowData[self::COL_PATH])) {
-                         $rowPath = $rowData[self::COL_PATH] . self::DELIMITER_CATEGORY . $rowData[self::COL_NAME];
-                     }*/
+
+                $rowPath = $rowData[self::COL_NAME];
 
                 if (!empty($rowPath)) {
                     if (is_int($rowPath)) {
                         try {
+                            /** @var \Magento\Catalog\Model\Category $category */
                             $category = $this->categoryFactory->create();
                             if (!($parentCategory = isset($this->categoriesCache[$rowPath])
                                 ? $this->categoriesCache[$rowPath] : null)
@@ -502,14 +621,18 @@ class Category extends AbstractEntity
                                 $parentCategory = $this->categoryFactory->create()->load($rowPath);
                             }
                             $category->setParentId($rowPath);
-                            $category->setIsActive(isset($rowData[self::COL_IS_ACTIVE]) ? $rowData[self::COL_IS_ACTIVE] : true);
-                            $category->setIncludeInMenu(isset($rowData[self::COL_INCLUDE_IN_MENU]) ? $rowData[self::COL_INCLUDE_IN_MENU] : true);
+                            $category->setIsActive(
+                                isset($rowData[self::COL_IS_ACTIVE]) ? $rowData[self::COL_IS_ACTIVE] : true
+                            );
+                            $category->setIncludeInMenu(
+                                isset($rowData[self::COL_INCLUDE_IN_MENU]) ? $rowData[self::COL_INCLUDE_IN_MENU] : true
+                            );
                             $category->setAttributeSetId($category->getDefaultAttributeSetId());
                             $category->setStoreId($rowData['store_id']);
                             $category->addData($rowData);
+
                             $category->setPath($parentCategory->getPath());
                             $category->save();
-                           // $this->categoryRepository->save($category);
                             $this->categoriesCache[$category->getId()] = $category;
                             $in++;
                         } catch (\Exception $e) {
@@ -520,15 +643,19 @@ class Category extends AbstractEntity
                                 null,
                                 $e->getMessage()
                             );
-                            //$this->_processedRowsCount++;
                         }
                     } else {
-                        if (!isset($this->categories[$rowPath])) {
+                        $rowPathWithDefaultDelimiter = str_replace(
+                            $this->_parameters['category_levels_separator'],
+                            self::DELIMITER_CATEGORY,
+                            $rowPath
+                        );
+                        if (!isset($this->categories[$rowPathWithDefaultDelimiter])) {
                             ++$in;
                             $result = $this->prepareCategoriesByPath($rowPath, $rowData);
                         } else {
                             ++$up;
-                            $result = $this->updateCategoriesByPath($rowPath, $rowData);
+                            $result = $this->updateCategoriesByPath($rowPathWithDefaultDelimiter, $rowData);
                         }
                         if ($result === false) {
                             continue;
@@ -548,9 +675,37 @@ class Category extends AbstractEntity
                 'catalog_category_import_bunch_save_after',
                 ['adapter' => $this, 'bunch' => $bunch]
             );
-
         }
         return $this;
+    }
+
+    /**
+     * @param $rowData
+     * @param $rownum
+     * @return array
+     */
+    protected function clearEmptyData($rowData, $rownum)
+    {
+        foreach ($this->attrData as $attrDatum) {
+            if (isset($rowData[$attrDatum['attribute_code']]) && $rowData[$attrDatum['attribute_code']] == '') {
+                if ($attrDatum['is_required'] &&
+                    !in_array($attrDatum['attribute_code'], ['available_sort_by','default_sort_by'])) {
+                    $message = __('A required attribute missing %1', $attrDatum['attribute_code']);
+                    $this->getErrorAggregator()->addError(
+                        self::ERROR_CODE_NAME_REQUIRED,
+                        ProcessingError::ERROR_LEVEL_CRITICAL,
+                        $rownum,
+                        $attrDatum['attribute_code'],
+                        $message,
+                        $message
+                    );
+                    return [];
+                } else {
+                    unset($rowData[$attrDatum['attribute_code']]);
+                }
+            }
+        }
+        return $rowData;
     }
 
     /**
@@ -559,13 +714,13 @@ class Category extends AbstractEntity
      * @param $rowPath
      * @param $rowData
      *
-     * @return $this
+     * @return bool
      */
     protected function prepareCategoriesByPath($rowPath, $rowData)
     {
         $result = true;
-        $parentId = \Magento\Catalog\Model\Category::TREE_ROOT_ID;
-        $pathParts = explode(self::DELIMITER_CATEGORY, $rowPath);
+        $parentId = MagentoCategoryModel::TREE_ROOT_ID;
+        $pathParts = explode($this->_parameters['category_levels_separator'], $rowPath);
         $path = '';
         foreach ($pathParts as $pathPart) {
             if ($pathPart == '') {
@@ -584,12 +739,22 @@ class Category extends AbstractEntity
                     $category->setStoreId(0);
                     $category->setParentId($parentId);
                     $category->setIsActive(isset($rowData[self::COL_IS_ACTIVE]) ? $rowData[self::COL_IS_ACTIVE] : true);
-                    $category->setIncludeInMenu(isset($rowData[self::COL_INCLUDE_IN_MENU]) ? $rowData[self::COL_INCLUDE_IN_MENU] : true);
+                    $category->setIncludeInMenu(
+                        isset($rowData[self::COL_INCLUDE_IN_MENU]) ? $rowData[self::COL_INCLUDE_IN_MENU] : true
+                    );
                     $category->setAttributeSetId($category->getDefaultAttributeSetId());
                     $category->setName($pathPart);
+                    if (isset($rowData[MagentoCategoryModel::KEY_AVAILABLE_SORT_BY])
+                        && !empty($rowData[MagentoCategoryModel::KEY_AVAILABLE_SORT_BY])
+                    ) {
+                        $attrValue = \explode(
+                            $this->getMultipleValueSeparator(),
+                            $rowData[MagentoCategoryModel::KEY_AVAILABLE_SORT_BY]
+                        );
+                        $category->setAvailableSortBy($attrValue);
+                    }
                     $category->setPath($parentCategory->getPath());
                     $category->save();
-                   // $category = $this->categoryRepository->save($category);
                     if ($category->getId()) {
                         $category->setPath($parentCategory->getPath() . self::DELIMITER_CATEGORY . $category->getId());
                         $category->save();
@@ -608,7 +773,6 @@ class Category extends AbstractEntity
                         $e->getMessage()
                     );
                     $result = false;
-                    //$this->_processedRowsCount++;
                 }
             }
             if (isset($this->categories[$path])) {
@@ -627,32 +791,61 @@ class Category extends AbstractEntity
      * @param $rowPath
      * @param $rowData
      *
-     * @return $this
+     * @return bool
      */
     protected function updateCategoriesByPath($rowPath, $rowData)
     {
         $result = true;
         $categoryId = $this->categories[$rowPath];
-        $category = $this->categoryFactory->create()->load($categoryId);
+        $category = $this->categoryFactory->create()->setStoreId($rowData['store_id'])->load($categoryId);
         /**
          * Avoid changing category name and path
          */
-
-        if (!empty($rowData[self::COL_STORE_NAME])) {
-            $rowData['name'] = $rowData[self::COL_STORE_NAME];
+        if (isset($rowData[self::COL_STORE_NAME]) && !empty($rowData[self::COL_STORE_NAME])) {
+            $rowData[self::COL_NAME] = $rowData[self::COL_STORE_NAME];
             unset($rowData[self::COL_STORE_NAME]);
-        } else {
-            if (isset($rowData[self::COL_NAME])) {
-                unset($rowData[self::COL_NAME]);
-            }
+        } elseif (isset($rowData[self::COL_NAME])) {
+            unset($rowData[self::COL_NAME]);
         }
 
         if (isset($rowData[self::COL_PATH])) {
             unset($rowData[self::COL_PATH]);
         }
         try {
-            $category->addData($rowData);
+            foreach (\array_keys($this->attrData) as $attrCode) {
+                if (!isset($rowData[$attrCode])
+                    || \in_array($attrCode, $this->notAllowedUpdateWhenEmpty, false)
+                ) {
+                    continue;
+                }
+                if (!empty($rowData[$attrCode])
+                    && $category->getData($attrCode) !== $rowData[$attrCode]
+                ) {
+                    if ($attrCode === MagentoCategoryModel::KEY_AVAILABLE_SORT_BY) {
+                        $attrValue = \explode(
+                            $this->getMultipleValueSeparator(),
+                            $rowData[$attrCode]
+                        );
+                        $category->setData($attrCode, $attrValue);
+                    } else {
+                        $category->setData($attrCode, $rowData[$attrCode]);
+                    }
+                }
+            }
+
             $category->setStoreId($rowData['store_id']);
+            /**
+             * set url_key in OrigData for method \Magento\Framework\Model\AbstractModel::dataHasChangedFor
+             * cause url_path was change
+             */
+            if (Import::BEHAVIOR_APPEND == $this->getBehavior()
+                && $this->_parameters['generate_url'] == 1
+                && isset($rowData['is_url_path_generated'])
+                && $rowData['is_url_path_generated'] == 1
+            ) {
+                $urlCheck = $rowData['url_key'] . '1';
+                $category->setOrigData('url_key', $urlCheck);
+            }
             $category->save();
         } catch (\Exception $e) {
             $this->getErrorAggregator()->addError(
@@ -663,7 +856,6 @@ class Category extends AbstractEntity
                 $e->getMessage()
             );
             $result = false;
-         //   $this->_processedRowsCount++;
         }
 
         return $result;
@@ -692,6 +884,26 @@ class Category extends AbstractEntity
     }
 
     /**
+     * Validate custom update row.
+     *
+     * @param string $validateString
+     * @return boolean
+     */
+    protected function validateLayoutUpdateRow($validateString)
+    {
+        $layoutXmlValidator = $this->validatorFactory->create(
+            [
+                'validationState' => $this->validationState,
+            ]
+        );
+        try {
+            return $layoutXmlValidator->isValid($validateString);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * EAV entity type code getter.
      *
      * @abstract
@@ -710,47 +922,6 @@ class Category extends AbstractEntity
         foreach ($collection as $category) {
             $this->categoriesUrl[] = $category[self::COL_URL];
         }
-    }
-
-    /**
-     * @param $rowData
-     * @return mixed
-     */
-    protected function checkUrl($rowData)
-    {
-        if (isset($rowData[self::COL_URL])) {
-            $url = $this->searchUrl($rowData[self::COL_URL]);
-            $rowData[self::COL_URL] = $url;
-            $this->categoriesUrl[] = $url;
-        }
-
-        return $rowData;
-    }
-
-    /**
-     * @param $url
-     * @return mixed
-     */
-    protected function searchUrl($url)
-    {
-        if (in_array($url, $this->categoriesUrl)) {
-            preg_match_all("/\d+$/i", $url, $out);
-            if (isset($out[0][0])) {
-                $counter = (int)$out[0][0];
-                $url = $this->searchUrl(str_replace($counter, ++$counter, $url));
-            } else {
-                $url = $url;
-            }
-        }
-
-        if ($this->checkUrlKeyDuplicates($url)) {
-            preg_match_all("/\d+$/i", $url, $out);
-            if (isset($out[0][0])) {
-                $counter = (int)$out[0][0];
-                $url = $this->searchUrl(str_replace($counter, ++$counter, $url));
-            }
-        }
-        return $url;
     }
 
     /**
@@ -838,16 +1009,20 @@ class Category extends AbstractEntity
 
                 $this->_processedRowsCount++;
                 $rowData = $this->customBunchesData($rowData);
-                $rowSize = strlen($this->jsonHelper->jsonEncode($rowData));
+                $rowData = $this->customFieldsMapping($rowData, $source->key());
 
-                $isBunchSizeExceeded = $bunchSize > 0 && count($bunchRows) >= $bunchSize;
+                if ($this->validateRow($rowData, $source->key())) {
+                    $rowSize = strlen($this->jsonHelper->jsonEncode($rowData));
 
-                if ($currentDataSize + $rowSize >= $maxDataSize || $isBunchSizeExceeded) {
-                    $startNewBunch = true;
-                    $nextRowBackup = [$source->key() => $rowData];
-                } else {
-                    $bunchRows[$source->key()] = $rowData;
-                    $currentDataSize += $rowSize;
+                    $isBunchSizeExceeded = $bunchSize > 0 && count($bunchRows) >= $bunchSize;
+
+                    if ($currentDataSize + $rowSize >= $maxDataSize || $isBunchSizeExceeded) {
+                        $startNewBunch = true;
+                        $nextRowBackup = [$source->key() => $rowData];
+                    } else {
+                        $bunchRows[$source->key()] = $rowData;
+                        $currentDataSize += $rowSize;
+                    }
                 }
 
                 $source->next();
@@ -857,17 +1032,326 @@ class Category extends AbstractEntity
         return $this;
     }
 
-    private function parseAdditionalAttributes($additionalAttributes)
+    /**
+     * @param $rowData
+     * @param $rowNum
+     * @return mixed
+     */
+    protected function findUrlKeyDuplicates($rowData, $rowNum)
     {
-        return empty($this->_parameters[Import::FIELDS_ENCLOSURE])
-            ? $this->parseAttributesWithoutWrappedValues($additionalAttributes)
-            : $this->parseAttributesWithWrappedValues($additionalAttributes);
+        $storeCode = isset($rowData[self::COL_STORE]) ? $rowData[self::COL_STORE] : 'default';
+        $rowData = $this->urlPathSlashTrim($rowData);
+        if (!isset($this->urlComparableList['url_path'][$storeCode])) {
+            $this->urlComparableList['url_path'][$storeCode] = [];
+        }
+        if (!isset($this->urlComparableList['url_key'][$storeCode])) {
+            $this->urlComparableList['url_key'][$storeCode] = [];
+        }
+
+        $rowData = $this->checkCategoryIfParentIsDuplicate($storeCode, $rowData, $rowNum);
+
+        if (!empty($rowData[self::COL_URL_PATH])
+            && count(explode('/', $rowData[self::COL_URL_PATH])) == 1
+            && !empty($rowData[self::COL_URL])
+        ) {
+            if ($rowData[self::COL_URL] != $rowData[self::COL_URL_PATH]) {
+                 $rowData[self::COL_URL_PATH] = $rowData[self::COL_URL];
+            }
+        }
+
+        if (isset($rowData[self::COL_URL_PATH]) && empty($rowData[self::COL_URL_PATH])) {
+            if (($this->isRootCategory($rowData) && isset($rowData[self::COL_URL]) && !empty($rowData[self::COL_URL])
+                && in_array($rowData[self::COL_URL], $this->urlComparableList['url_key'][$storeCode]))
+                || ($this->isUrlRequestPathDuplicateMage($rowData[self::COL_URL_PATH], $rowData))
+            ) {
+                $this->foundDuplicate[$storeCode][] = $rowData[self::COL_NAME];
+                if ($this->_parameters['generate_url'] == 1) {
+                    $rowData = $this->generateUrlKeyProcess($rowData, $storeCode);
+                } else {
+                    $message = 'category with name: %1 not imported because its url is not unique.';
+                    $this->addLogWriteln(__($message, $rowData[self::COL_NAME]), $this->output, 'error');
+                    $this->addRowError(__($message, $rowData[self::COL_NAME]), $rowNum);
+                }
+            } else {
+                $this->urlComparableList['url_key'][$storeCode][] = $rowData[self::COL_URL] ?? '';
+            }
+        } else {
+            if ((isset($rowData[self::COL_URL_PATH]) && !empty($rowData[self::COL_URL_PATH])
+                && in_array($rowData[self::COL_URL_PATH], $this->urlComparableList['url_path'][$storeCode]))
+                || ($this->isUrlRequestPathDuplicateMage($rowData[self::COL_URL_PATH], $rowData))
+            ) {
+                $this->foundDuplicate[$storeCode][] = $rowData[self::COL_NAME];
+                if ($this->_parameters['generate_url'] == 1) {
+                    $rowData = $this->generateUrlKeyProcess($rowData, $storeCode);
+                } else {
+                    $message = 'category with name: %1 not imported because its url is not unique.';
+                    $this->addLogWriteln(__($message, $rowData[self::COL_NAME]), $this->output, 'error');
+                    $this->addRowError(__($message, $rowData[self::COL_NAME]), $rowNum);
+                }
+            } else {
+                $this->urlComparableList['url_path'][$storeCode][] = $rowData[self::COL_URL_PATH] ?? '';
+            }
+        }
+
+        return $rowData;
     }
 
-    private function parseAttributesWithoutWrappedValues($attributesData)
+    /**
+     * @param $rowData
+     * @return mixed
+     */
+    protected function urlPathSlashTrim($rowData)
     {
-        $attributeNameValuePairs = explode($this->getMultipleValueSeparator(), $attributesData);
-        $preparedAttributes = [];
+        if (isset($rowData[self::COL_URL_PATH]) && !empty($rowData[self::COL_URL_PATH])) {
+            if (substr($rowData[self::COL_URL_PATH], -1) == '/') {
+                $rowData[self::COL_URL_PATH] = substr($rowData[self::COL_URL_PATH], 0, -1);
+            }
+        }
+        return $rowData;
+    }
+
+    /**
+     * @param $rowData
+     * @return bool
+     */
+    protected function isRootCategory($rowData)
+    {
+        $result = false;
+        if (isset($rowData[self::COL_PATH]) && !empty($rowData[self::COL_PATH])) {
+            $countSlash = substr_count($rowData[self::COL_PATH], '/');
+            if ($countSlash == 1) {
+                $result = true;
+            }
+        } else {
+            $name = isset($rowData[self::COL_NAME]) ? $rowData[self::COL_NAME] : '';
+            if ($name == 'Root Catalog') {
+                $result = false;
+            } else {
+                $countSlash = substr_count($name, '/');
+                if ($countSlash == 0) {
+                    $result = true;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $storeCode
+     * @param $rowData
+     * @param $rowNum
+     * @return mixed
+     */
+    protected function checkCategoryIfParentIsDuplicate($storeCode, $rowData, $rowNum)
+    {
+        if (isset($this->foundDuplicate[$storeCode])) {
+            foreach ($this->foundDuplicate[$storeCode] as $key => $categoryDuplicate) {
+                $position = strpos($rowData[self::COL_NAME], $categoryDuplicate);
+                if ($position == 0) {
+                    if ($this->_parameters['generate_url'] == 1) {
+                        $rowData['is_url_path_generated'] = 1;
+                    } else {
+                        $message = 'category with name: %1 not imported because its url is not unique.';
+                        $this->addLogWriteln(__($message, $rowData[self::COL_NAME]), $this->output, 'error');
+                        $this->addRowError(__($message, $rowData[self::COL_NAME]), $rowNum);
+                    }
+                    break;
+                }
+            }
+        }
+        return $rowData;
+    }
+
+    /**
+     * @param $rowData
+     * @param $storeCode
+     * @return mixed
+     */
+    private function generateUrlKeyProcess($rowData, $storeCode)
+    {
+        if ($rowData[self::COL_NAME] != 'Root Catalog') {
+            if (!empty($rowData[self::COL_URL_PATH])) {
+                $oldUrl = $rowData[self::COL_URL_PATH];
+            } else {
+                $oldUrl = $rowData[self::COL_URL];
+            }
+
+            $i = 1;
+            $newUrl = $this->generateUrl($oldUrl, $i);
+            $generation = true;
+            while ($generation) {
+                if ($this->isUrlRequestPathDuplicateMage($newUrl, $rowData)) {
+                    $i++;
+                    $newUrl = $this->generateUrl($oldUrl, $i);
+                } else {
+                    if ($this->isUrlDuplicateComparableList($newUrl, $storeCode)) {
+                        $i++;
+                        $newUrl = $this->generateUrl($oldUrl, $i);
+                    } else {
+                        $this->addKeyInComparableList($newUrl, $storeCode, $rowData);
+                        $rowData['is_url_path_generated'] = 1;
+                        $generation = false;
+                    }
+                }
+            }
+
+            $rowData[self::COL_URL_PATH] = $newUrl;
+            $newUrl=explode('/', $newUrl);
+            $newUrlKey = $newUrl[count($newUrl)-1];
+            $rowData[self::COL_URL] = $this->formatUrlKey($newUrlKey);
+        }
+
+        return $rowData;
+    }
+
+    /**
+     * @param $url
+     * @param $i
+     * @return string
+     */
+    protected function generateUrl($url, $i)
+    {
+        return $url.$i;
+    }
+
+    /**
+     * @param $url
+     * @param $rowData
+     * @return bool
+     */
+    protected function isUrlRequestPathDuplicateMage($url, $rowData)
+    {
+        $result = false;
+        $storeId = $this->getStoreIdByCode($rowData);
+        if (!empty($this->urlRequestPathStoreId)) {
+            if (isset($this->urlRequestPathStoreId[$url][$storeId])
+                || isset($this->urlRequestPathStoreId[$url.'.html'][$storeId])
+            ) {
+                $result = true;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $newUrl
+     * @param $storeCode
+     * @return bool
+     */
+    protected function isUrlDuplicateComparableList($newUrl, $storeCode)
+    {
+        $result = false;
+        if (!empty($this->urlComparableList)) {
+            if (in_array($newUrl, $this->urlComparableList['url_path'][$storeCode])
+                || isset($this->urlComparableList['new_generated']['url_path'][$storeCode][$newUrl])
+            ) {
+                $result = true;
+            } else {
+                if (in_array($newUrl, $this->urlComparableList['url_key'][$storeCode])
+                    || isset($this->urlComparableList['new_generated']['url_key'][$storeCode][$newUrl])
+                ) {
+                    $result = true;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $rowData
+     * @return int
+     */
+    protected function getStoreIdByCode($rowData)
+    {
+        $storeId = 1;
+        if (!empty($rowData[self::COL_STORE])) {
+            if (isset($this->nameToId[$rowData[self::COL_STORE]])) {
+                $storeId = $this->nameToId[$rowData[self::COL_STORE]];
+            }
+        }
+        return $storeId;
+    }
+
+    /**
+     * @return array
+     */
+    protected function initRequestPathStoreId()
+    {
+        $resource = $this->getResource();
+        $select = $this->_connection->select()->from(
+            ['url_rewrite' => $resource->getTable('url_rewrite')],
+            ['request_path', 'store_id']
+        );
+        $requestPaths = $this->_connection->fetchAll(
+            $select
+        );
+        if (!empty($requestPaths)) {
+            foreach ($requestPaths as $key => $data) {
+                $this->urlRequestPathStoreId[$data['request_path']][$data['store_id']] = 1;
+            }
+        }
+        return $this->urlRequestPathStoreId;
+    }
+
+    /**
+     * @param $newUrl
+     * @param $storeCode
+     * @param $rowData
+     */
+    protected function addKeyInComparableList($newUrl, $storeCode, $rowData)
+    {
+        if (!empty($rowData[self::COL_URL_PATH])) {
+            $this->urlComparableList['new_generated']['url_path'][$storeCode][$newUrl] = 1;
+        } else {
+            if (!empty($rowData[self::COL_URL])) {
+                $this->urlComparableList['new_generated']['url_key'][$storeCode][$newUrl] = 1;
+            }
+        }
+    }
+
+    /**
+     * @param $url
+     * @param $rowData
+     * @return bool
+     */
+    public function checkUrlKeyDuplicates($url, $rowData)
+    {
+        $result = false;
+        $storeId = $this->getStoreIdByCode($rowData);
+
+        $resource = $this->getResource();
+        $select = $this->_connection->select()->from(
+            ['url_rewrite' => $resource->getTable('url_rewrite')],
+            ['request_path', 'store_id']
+        )->joinLeft(
+            ['cpe' => $resource->getTable('catalog_product_entity')],
+            'cpe.entity_id = url_rewrite.entity_id'
+        )->where('request_path LIKE "%' . $url . '"')
+            ->orWhere('request_path LIKE "%' . $url . '.html"')
+            ->where('store_id IN (?)', $storeId);
+        $urlKeyDuplicates = $this->_connection->fetchAssoc(
+            $select
+        );
+        if (!empty($urlKeyDuplicates)) {
+            $result = true;
+        }
+        return $result;
+    }
+
+    protected function parseAdditionalAttributes($attributes)
+    {
+        return empty($this->_parameters[Import::FIELDS_ENCLOSURE])
+            ? $this->parseAttributesWithoutWrappedValues($attributes)
+            : $this->parseAttributesWithWrappedValues($attributes);
+    }
+
+    private function parseAttributesWithoutWrappedValues($data)
+    {
+        $attributeNameValuePairs = explode(
+            $this->getMultipleValueSeparator(),
+            $data
+        );
+        $result = [];
         $code = '';
         foreach ($attributeNameValuePairs as $attributeData) {
             //process case when attribute has ImportModel::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR inside its value
@@ -875,31 +1359,39 @@ class Category extends AbstractEntity
                 if (!$code) {
                     continue;
                 }
-                $preparedAttributes[$code] .= $this->getMultipleValueSeparator() . $attributeData;
+                $result[$code] .= $this->getMultipleValueSeparator() . $attributeData;
                 continue;
             }
-            list($code, $value) = explode(self::PAIR_NAME_VALUE_SEPARATOR, $attributeData, 2);
+            list($code, $value) = explode(
+                self::PAIR_NAME_VALUE_SEPARATOR,
+                $attributeData,
+                2
+            );
             $code = mb_strtolower($code);
-            $preparedAttributes[$code] = $value;
+            $result[$code] = $value;
         }
-        return $preparedAttributes;
+        return $result;
     }
 
-    private function parseAttributesWithWrappedValues($attributesData)
+    private function parseAttributesWithWrappedValues($data)
     {
-        $attributes = [];
-        preg_match_all('~((?:[a-zA-Z0-9_])+)="((?:[^"]|""|"' . $this->getMultiLineSeparatorForRegexp() . '")+)"+~',
-            $attributesData,
+        $attributesArray = [];
+        preg_match_all(
+            '~((?:[a-zA-Z0-9_])+)="((?:[^"]|""|"'
+            . $this->getMultiLineSeparatorForRegexp()
+            . '")+)"+~',
+            $data,
             $matches
         );
         foreach ($matches[1] as $i => $attributeCode) {
-            $attribute = $this->retrieveAttributeByCode($attributeCode);
+            $attribute = $this
+                ->retrieveAttributeByCode($attributeCode);
             $value = 'multiselect' != $attribute->getFrontendInput()
                 ? str_replace('""', '"', $matches[2][$i])
                 : '"' . $matches[2][$i] . '"';
-            $attributes[mb_strtolower($attributeCode)] = $value;
+            $attributesArray[mb_strtolower($attributeCode)] = $value;
         }
-        return $attributes;
+        return $attributesArray;
     }
 
     public function getMultipleValueSeparator()
@@ -918,6 +1410,25 @@ class Category extends AbstractEntity
                 : self::PSEUDO_MULTI_LINE_SEPARATOR;
         }
         return $this->multiLineSeparatorForRegexp;
+    }
+
+    /**
+     * @param $rowData
+     * @param $rowNum
+     * @return mixed
+     */
+    public function customFieldsMapping($rowData, $rowNum)
+    {
+        if (isset($rowData[self::COL_NAME])) {
+            $actualName = \explode(self::DELIMITER_CATEGORY, $rowData[self::COL_NAME]);
+            $rowData['_actual_name'] = \end($actualName);
+        }
+
+        if (Import::BEHAVIOR_APPEND == $this->getBehavior()) {
+            $rowData = $this->findUrlKeyDuplicates($rowData, $rowNum);
+        }
+
+        return $rowData;
     }
 
     public function retrieveAttributeByCode($attrCode)
@@ -969,23 +1480,6 @@ class Category extends AbstractEntity
         return $this->resource;
     }
 
-    protected function checkUrlKeyDuplicates($urlKeys)
-    {
-        $resource = $this->getResource();
-        $select = $this->_connection->select()->from(
-            ['url_rewrite' => $resource->getTable('url_rewrite')],
-            ['request_path', 'store_id']
-        )->joinLeft(
-            ['cpe' => $resource->getTable('catalog_product_entity')],
-            "cpe.entity_id = url_rewrite.entity_id"
-        )->where('request_path LIKE "%' . $urlKeys . '%"');
-        $urlKeyDuplicates = $this->_connection->fetchAssoc(
-            $select
-        );
-
-        return count($urlKeyDuplicates);
-    }
-
     protected function prepareImagesFromSource($bunch)
     {
         $image = 'image';
@@ -1023,5 +1517,25 @@ class Category extends AbstractEntity
     public function getInitialCategories()
     {
         return $this->categories;
+    }
+
+    /**
+     * Format URL key from name or defined key
+     *
+     * @param string $str
+     * @return string
+     */
+    public function formatUrlKey($str)
+    {
+        return $this->filterManager->translitUrl($str);
+    }
+
+    /**
+     * @param $categoryId
+     * @return mixed|null
+     */
+    public function getCategoryById($categoryId)
+    {
+        return $this->categoriesCache[$categoryId] ?? null;
     }
 }

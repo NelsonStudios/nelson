@@ -24,6 +24,10 @@ define(
                     }
                 },
                 initConfig  : function (config) {
+                    var options = $.parseJSON(localStorage.getItem('options'));
+                    if (options) {
+                        config.options = options;
+                    }
                     this._super();
                     this.sourceOptions = $.parseJSON(this.sourceOptions);
                     return this;

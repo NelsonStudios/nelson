@@ -50,7 +50,7 @@ define(
                     this._super();
                     this.updateCron(false);
                 },
-                onChange: function(value) {
+                onChange: function (value) {
                     var self = this;
                     var find  = 0;
                     var thisValue = this.value();
@@ -58,17 +58,17 @@ define(
                         find = 1;
                         this.value('NONE');
                     }
-                  _.each(this.expr, function(item, key) {
-                     if (item == value) {
-                         if (thisValue != key) {
-                             self.value(key);
-                         }
-                         find = 1;
-                     }
-                  });
-                  if (find == 0 && thisValue != 'C') {
-                      this.value('C');
-                  }
+                    _.each(this.expr, function (item, key) {
+                        if (item == value) {
+                            if (thisValue != key) {
+                                self.value(key);
+                            }
+                            find = 1;
+                        }
+                    });
+                    if (find == 0 && thisValue != 'C') {
+                        this.value('C');
+                    }
                 },
                 updateCron: function (check) {
                     var self = this;

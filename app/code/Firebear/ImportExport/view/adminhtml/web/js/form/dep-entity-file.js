@@ -64,7 +64,7 @@ define(
                         var lastValue = _.last(value);
                         var obj = this.seacrhEl(lastValue);
                         if (obj !== undefined) {
-                            if (_.indexOf(value, obj['parent']) == -1
+                            if (obj['parent'].length && _.indexOf(value, obj['parent']) == -1
                                 && !this.searchParent(lastValue, value)
                             ) {
                                 value.pop();
@@ -99,7 +99,9 @@ define(
                         function (item) {
                             if (item != value) {
                                 var obj = self.seacrhEl(item);
-                                parents.push(obj['parent']);
+                                if (obj !== undefined) {
+                                    parents.push(obj['parent']);
+                                }
                             }
                         }
                     );

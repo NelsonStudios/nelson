@@ -6,14 +6,21 @@
 
 namespace Firebear\ImportExport\Model\Import\Source;
 
+use Magento\Framework\Filesystem\Directory\Read as Directory;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\ImportExport\Model\Import\AbstractEntity;
+use Magento\ImportExport\Model\Import\AbstractSource;
+use Magento\ImportExport\Model\Import;
+use Firebear\ImportExport\Model\Source\Platform\PlatformInterface;
+use Firebear\ImportExport\Traits\Import\Map as ImportMap;
 
 /**
  * CSV import adapter
  */
-class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
+class Csv extends AbstractSource
 {
-    use \Firebear\ImportExport\Traits\Import\Map;
+    use ImportMap;
 
     /**
      * @var \Magento\Framework\Filesystem\File\Write
@@ -21,7 +28,7 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
     protected $file;
 
     /**
-     * Delimiter.
+     * Delimiter
      *
      * @var string
      */
@@ -30,53 +37,69 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
     /**
      * @var string
      */
-    protected $enclosure = '';
+    protected $enclosure = '"';
 
     protected $maps;
 
     protected $extension = 'csv';
 
     protected $mimeTypes = [
-      /*  'text/csv',
-        'text/plain',
-        'application/csv',
-        'text/comma-separated-values',
-        'text/anytext',
-        'application/octet-stream' */
     ];
 
+    /**
+     * Platform
+     *
+     * @var \Firebear\ImportExport\Model\Source\Platform\PlatformInterface
+     */
     protected $platform;
 
     /**
-     * Csv constructor.
+     * Initialize Adapter
+     *
      * @param array $file
-     * @param \Magento\Framework\Filesystem\Directory\Read $directory
-     * @param string $delimiter
-     * @param string $enclosure
+     * @param Directory $directory
+     * @param PlatformInterface $platform
+     * @param array $data
+     *
+     * @throws LocalizedException
+     * @throws \LogicException
      * @throws \Exception
      */
     public function __construct(
         $file,
-        \Magento\Framework\Filesystem\Directory\Read $directory,
-        $delimiter = ',',
-        $enclosure = '"'
+        Directory $directory,
+        PlatformInterface $platform = null,
+        $data = []
     ) {
         register_shutdown_function([$this, 'destruct']);
         try {
-            $result = $this->checkMimeType($directory->getRelativePath($file));
-
+            $result = $this->checkMimeType(
+                $directory->getRelativePath($file)
+            );
             if ($result !== true) {
-                throw new \Exception($result);
+                throw new LocalizedException($result);
             }
-            $this->file = $directory->openFile($directory->getRelativePath($file), 'r');
-        } catch (\Magento\Framework\Exception\FileSystemException $e) {
+            $this->file = $directory->openFile(
+                $directory->getRelativePath($file),
+                'r'
+            );
+        } catch (FileSystemException $e) {
             throw new \LogicException("Unable to open file: '{$file}'");
         }
-        if ($delimiter) {
-            $this->delimiter = $delimiter;
+
+        $this->platform = $platform;
+        $this->delimiter = $data[Import::FIELD_FIELD_SEPARATOR] ?? $$this->delimiter;
+        try {
+            $originalData = $this->_getNextRow();
+            $parseData = $platform && method_exists($platform, 'prepareData')
+                ? $platform->prepareData($originalData)
+                : $originalData;
+        } catch (\Exception $e) {
+            throw $e;
         }
-        $this->enclosure = $enclosure;
-        parent::__construct($this->_getNextRow());
+        parent::__construct(
+            $parseData
+        );
     }
 
     /**
@@ -89,6 +112,16 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
         if (is_object($this->file)) {
             $this->file->close();
         }
+    }
+
+    /**
+     * Checks if current position is valid (\Iterator interface)
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return -1 !== $this->_key;
     }
 
     /**
@@ -136,17 +169,16 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
     {
         $row = $this->_row;
         if (count($row) != $this->_colQty) {
-            if ($this->_foundWrongQuoteFlag) {
-                throw new \InvalidArgumentException(AbstractEntity::ERROR_CODE_WRONG_QUOTES);
-            } else {
-                throw new \InvalidArgumentException(AbstractEntity::ERROR_CODE_COLUMNS_NUMBER);
-            }
+            $error = $this->_foundWrongQuoteFlag
+                ? AbstractEntity::ERROR_CODE_WRONG_QUOTES
+                : AbstractEntity::ERROR_CODE_COLUMNS_NUMBER;
+            throw new \InvalidArgumentException($error);
         }
+
         $array = array_combine($this->_colNames, $row);
-
-        $array = $this->replaceValue($this->changeFields($array));
-
-        return $array;
+        return $this->replaceValue(
+            $this->changeFields($array)
+        );
     }
 
     /**
@@ -158,7 +190,9 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
     }
 
     /**
-     * @param $platform
+     * Set Platform
+     *
+     * @param PlatformInterface $platform
      * @return $this
      */
     public function setPlatform($platform)
@@ -169,7 +203,9 @@ class Csv extends \Magento\ImportExport\Model\Import\AbstractSource
     }
 
     /**
-     * @return mixed
+     * Return Platform
+     *
+     * @return null|\Firebear\ImportExport\Model\Source\Platform\PlatformInterface
      */
     public function getPlatform()
     {

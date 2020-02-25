@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
+/**
+ * Class Delete
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Delete extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
 {
     /**
@@ -17,8 +22,8 @@ class Delete extends \Firebear\ImportExport\Controller\Adminhtml\Export\Job
         $jobId = $this->getRequest()->getParam('entity_id');
         if ($jobId) {
             try {
-                $model = $this->exportRepository->getById($jobId);
-                $this->exportRepository->delete($model);
+                $model = $this->repository->getById($jobId);
+                $this->repository->delete($model);
                 $this->messageManager->addSuccessMessage(__('You deleted the job.'));
 
                 return $resultRedirect->setPath('*/*/');

@@ -32,11 +32,6 @@ class Curl extends AbstractType
     public function uploadSource()
     {
         if ($read = $this->_getSourceClient()) {
-            $fileName = '';
-           /* preg_match('/(\w+\.(csv|xml|txt))/i',$this->fileName, $matches);
-            if ($matches) {
-                $fileName = $matches[0];
-            }*/
             $fileName = $this->fileName;
             if ($this->getFormatFile()) {
                 $fileName .= "." . strtolower($this->getFormatFile());
@@ -84,7 +79,6 @@ class Curl extends AbstractType
                     $read->readAll()
                 );
             } catch (\Exception $e) {
-
             }
         }
 
@@ -116,7 +110,6 @@ class Curl extends AbstractType
                     $read->readAll()
                 );
             } catch (\Exception $e) {
-
             }
         }
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright: Copyright © 2018 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
@@ -7,79 +6,77 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Job;
 
+use Firebear\ImportExport\Controller\Adminhtml\Context;
 use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Registry;
-use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
+use Firebear\ImportExport\Model\ExportFactory;
+use Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export\Options as EntityOptions;
+use Magento\Framework\App\HttpRequestInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Controller\Result\Json as ResultJson;
+use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Class Downfields
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Job
+ */
 class Downfields extends JobController
 {
     /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
-
-    /**
-     * @var \Firebear\ImportExport\Model\ExportFactory
+     * @var ExportFactory
      */
     protected $export;
 
     /**
-     * @var \Magento\ImportExport\Model\Source\Export\Entity
+     * @var EntityOptions
      */
     protected $entity;
 
     /**
      * Downfields constructor.
+     *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param \Firebear\ImportExport\Model\ExportFactory $export
-     * @param \Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export\Options $entity
+     * @param ExportFactory $export
+     * @param EntityOptions $entity
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Firebear\ImportExport\Model\ExportFactory $export,
-        \Firebear\ImportExport\Ui\Component\Listing\Column\Entity\Export\Options $entity
+        ExportFactory $export,
+        EntityOptions $entity
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
+        parent::__construct($context);
+
         $this->export = $export;
         $this->entity = $entity;
     }
 
     /**
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
+     * @throws LocalizedException
      */
     public function execute()
     {
-        /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
+        /** @var ResultJson $resultJson */
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
         $options  = [];
-        $entities = $this->entity->toOptionArray();
-        if ($this->getRequest()->isAjax()) {
+        /** @var HttpRequestInterface $request */
+        $request = $this->getRequest();
+        if ($request->isAjax()) {
             $entity = $this->getRequest()->getParam('entity');
 
             if ($entity) {
                 $list = $this->loadList($entity);
-                $options = $list[$entity] ?? '';
+                $options = $list[$entity] ?? [];
             }
-
-            return $resultJson->setData($options);
         }
+
+        return $resultJson->setData($options);
     }
 
     /**
+     * @param string $entity
      * @return array
+     * @throws LocalizedException
      */
     protected function loadList($entity)
     {
@@ -104,8 +101,8 @@ class Downfields extends JobController
 
     /**
      * @param string $entity
-     *
      * @return array
+     * @throws LocalizedException
      */
     protected function prepareFields($entity)
     {

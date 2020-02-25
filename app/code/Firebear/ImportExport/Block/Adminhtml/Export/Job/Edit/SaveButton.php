@@ -7,6 +7,11 @@ namespace Firebear\ImportExport\Block\Adminhtml\Export\Job\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
+/**
+ * Class SaveButton
+ *
+ * @package Firebear\ImportExport\Block\Adminhtml\Export\Job\Edit
+ */
 class SaveButton extends GenericButton implements ButtonProviderInterface
 {
     /**

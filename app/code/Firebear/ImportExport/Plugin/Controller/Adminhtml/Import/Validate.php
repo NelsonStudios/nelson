@@ -16,6 +16,11 @@ use Magento\ImportExport\Block\Adminhtml\Import\Frame\Result;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
 use Magento\ImportExport\Model\Import\Entity\AbstractEntity;
 
+/**
+ * Class Validate
+ *
+ * @package Firebear\ImportExport\Plugin\Controller\Adminhtml\Import
+ */
 class Validate
 {
     /**
@@ -96,7 +101,7 @@ class Validate
                 $resultBlock->addError(__('Sorry, but the data is invalid or the file is not uploaded.'));
             }
             return $resultLayout;
-        } elseif ($this->getRequest()->isPost() && !$this->getRequest()->getFiles()->count()) {
+        } elseif ($subject->getRequest()->isPost() && !$subject->getRequest()->getFiles()->count()) {
             $resultBlock->addError(__('The file was not uploaded.'));
 
             return $resultLayout;
@@ -171,7 +176,7 @@ class Validate
             $message = '';
             $counter = 0;
             foreach ($this->getErrorMessages($errorAggregator) as $error) {
-                $message .= ++$counter . '. ' . $error . '<br>';
+                $message .= (++$counter) . '. ' . $error . '<br>';
                 if ($counter >= \Magento\ImportExport\Controller\Adminhtml\ImportResult::LIMIT_ERRORS_MESSAGE) {
                     break;
                 }
@@ -189,7 +194,6 @@ class Validate
                     '<strong>' . __('Following Error(s) has been occurred during importing process:') . '</strong><br>'
                     . '<div class="import-error-wrapper">' . __('Only the first 100 errors are shown. ')
                     . '<a href="'
-                    // . $this->createDownloadUrlImportHistoryFile($this->createErrorReport($errorAggregator))
                     . '">' . __('Download full report') . '</a><br>'
                     . '<div class="import-error-list">' . $message . '</div></div>'
                 );

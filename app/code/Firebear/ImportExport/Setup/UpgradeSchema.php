@@ -9,6 +9,7 @@ use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
+use Magento\Framework\Module\Manager;
 
 /**
  * Upgrade the extension
@@ -18,14 +19,24 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
     protected $eavSetup;
 
+    protected $installSchema;
+
+    protected $module;
+
     /**
      * UpgradeSchema constructor.
      * @param EavSetup $eavSetup
+     * @param InstallSchema $installSchema
+     * @param Manager $module
      */
     public function __construct(
-        EavSetup $eavSetup
+        EavSetup $eavSetup,
+        InstallSchema $installSchema,
+        Manager $module
     ) {
         $this->eavSetup = $eavSetup;
+        $this->installSchema = $installSchema;
+        $this->module = $module;
     }
 
     /**
@@ -33,6 +44,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
+        if (version_compare($context->getVersion(), '1.2.0', '<')) {
+            if ($this->module->isEnabled('Firebear_ImportExport')) {
+                $this->installSchema->install($setup, $context);
+            }
+        }
         if (version_compare($context->getVersion(), '1.4.0', '<')) {
             $this->addMappingTable($setup);
         }
@@ -56,10 +72,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
         if (version_compare($context->getVersion(), '2.1.2', '<')) {
             $this->addPriceMapping($setup);
-            $this->updateEntityData($setup);
-        }
-        if (version_compare($context->getVersion(), '2.1.4', '<')) {
-            $this->updateBlockEntityData($setup);
         }
         if (version_compare($context->getVersion(), '2.1.6', '<')) {
             $this->addFieldXslt($setup);
@@ -70,6 +82,65 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.1.8', '<')) {
             $this->addFieldToMapping($setup);
         }
+        if (version_compare($context->getVersion(), '3.0.1', '<')) {
+            $this->addExportJobEventTable($setup);
+        }
+        if (version_compare($context->getVersion(), '3.1.7', '<')) {
+            $this->changeXsltField($setup);
+        }
+        if (version_compare($context->getVersion(), '3.1.8-alpha.1', '<')) {
+            $this->addFieldTranslateFrom($setup);
+            $this->addFieldTranslateTo($setup);
+        }
+    }
+
+    /**
+     * Add export job event table
+     *
+     * @param SchemaSetupInterface $setup
+     *
+     * @return $this
+     */
+    protected function addExportJobEventTable(SchemaSetupInterface $setup)
+    {
+        $installer = $setup;
+
+        $installer->startSetup();
+
+        /**
+         * Create table 'firebear_export_jobs_event'
+         */
+        $table = $installer->getConnection()->newTable(
+            $installer->getTable('firebear_export_jobs_event')
+        )->addColumn(
+            'job_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            null,
+            ['nullable' => false, 'primary' => true],
+            'Job Id'
+        )->addColumn(
+            'event',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            255,
+            ['nullable' => false, 'primary' => true],
+            'Event name'
+        )->addIndex(
+            $installer->getIdxName('firebear_export_jobs_event', ['event']),
+            ['event']
+        )->addForeignKey(
+            $installer->getFkName('firebear_export_jobs_event', 'job_id', 'firebear_export_jobs', 'entity_id'),
+            'job_id',
+            $installer->getTable('firebear_export_jobs'),
+            'entity_id',
+            \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+        )->setComment(
+            'Export job event'
+        );
+        $installer->getConnection()->createTable($table);
+
+        $installer->endSetup();
+
+        return $this;
     }
 
     /**
@@ -500,42 +571,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
 
     /**
-     * Update EAV Entity type model data
-     * @param SchemaSetupInterface $setup
-     */
-    public function updateEntityData(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        $this->eavSetup->addEntityType(
-            'cms_page',
-            [
-                'entity_model' => 'Magento\Cms\Model\ResourceModel\Page',
-                'attribute_model' => null,
-                'entity_table' => 'cms_page',
-            ]
-        );
-        $setup->endSetup();
-    }
-
-    /**
-     * Update EAV entity type model for cms block
-     * @param SchemaSetupInterface $setup
-     */
-    public function updateBlockEntityData(SchemaSetupInterface $setup)
-    {
-        $setup->startSetup();
-        $this->eavSetup->addEntityType(
-            'cms_block',
-            [
-                'entity_model' => 'Magento\Cms\Model\ResourceModel\Block',
-                'attribute_model' => null,
-                'entity_table' => 'cms_block',
-            ]
-        );
-        $setup->endSetup();
-    }
-
-    /**
      * @param SchemaSetupInterface $setup
      */
     public function addFieldXslt(SchemaSetupInterface $setup)
@@ -585,5 +620,70 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ]
         );
         $setup->endSetup();
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    public function addFieldTranslateFrom(SchemaSetupInterface $setup)
+    {
+        $setup->startSetup();
+        $setup->getConnection()->addColumn(
+            $setup->getTable('firebear_import_jobs'),
+            'translate_from',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'nullable' => true,
+                'length' => 255,
+                'comment' => 'Translate from'
+            ]
+        );
+        $setup->endSetup();
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    public function addFieldTranslateTo(SchemaSetupInterface $setup)
+    {
+        $setup->startSetup();
+        $setup->getConnection()->addColumn(
+            $setup->getTable('firebear_import_jobs'),
+            'translate_to',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'nullable' => true,
+                'length' => 255,
+                'comment' => 'Translate to'
+            ]
+        );
+        $setup->endSetup();
+    }
+
+    /**
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     */
+    public function changeXsltField(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->changeColumn(
+            $setup->getTable('firebear_import_jobs'),
+            'xslt',
+            'xslt',
+            [
+                'type' => 'longblob',
+                'nullable' => true,
+                'comment' => 'Xslt'
+            ]
+        );
+        $setup->getConnection()->changeColumn(
+            $setup->getTable('firebear_export_jobs'),
+            'xslt',
+            'xslt',
+            [
+                'type' => 'longblob',
+                'nullable' => true,
+                'comment' => 'Xslt'
+            ]
+        );
     }
 }

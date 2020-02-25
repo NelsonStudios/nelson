@@ -12,6 +12,7 @@ use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Json\DecoderInterface;
 use Magento\ImportExport\Controller\Adminhtml\ImportResult;
 use Magento\ImportExport\Model\History;
@@ -74,7 +75,7 @@ class Processor
      */
     protected $state;
     /**
-     * @var Import
+     * @var \Firebear\ImportExport\Model\Import
      */
     protected $importModel;
     /**
@@ -154,6 +155,26 @@ class Processor
     protected $fileWrite;
 
     /**
+     * @var \Firebear\ImportExport\Model\Source\Factory
+     */
+    protected $sourceFactory;
+
+    /**
+     * @var \Firebear\ImportExport\Model\Source\Platform\Config
+     */
+    protected $configPlatform;
+
+    /**
+     * @var ConsoleOutput
+     */
+    protected $output;
+
+    /**
+     * @var \Magento\Framework\TranslateInterface
+     */
+    protected $translator;
+
+    /**
      * Processor constructor.
      * @param \Firebear\ImportExport\Model\JobFactory $jobFactory
      * @param \Firebear\ImportExport\Model\ImportFactory $importFactory
@@ -197,7 +218,9 @@ class Processor
         \Firebear\ImportExport\Model\Output\Xslt $modelOutput,
         \Magento\Framework\Filesystem\Io\File $file,
         \Magento\Framework\Filesystem\File\WriteFactory $fileWrite,
-        \Magento\Framework\Registry $registry
+        \Magento\Framework\Registry $registry,
+        \Firebear\ImportExport\Model\Source\Factory $sourceFactory,
+        \Firebear\ImportExport\Model\Source\Platform\Config $configPlatform
     ) {
         $this->jobFactory = $jobFactory;
         $this->importFactory = $importFactory;
@@ -224,15 +247,21 @@ class Processor
         $this->outputModel = $modelOutput;
         $this->file = $file;
         $this->fileWrite = $fileWrite;
+        $this->sourceFactory = $sourceFactory;
+        $this->configPlatform = $configPlatform;
+
         $registry->unregister('isSecureArea');
         $registry->register('isSecureArea', true);
     }
 
     /**
      * @param $jobId
-     * @return mixed
+     * @param $file
+     * @param int $offset
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function processScope($jobId, $file)
+    public function processScope($jobId, $file, $offset = 1)
     {
         $totalTime = 0;
         $result = false;
@@ -241,11 +270,14 @@ class Processor
         }
         try {
             $data = $this->prepareJob($jobId);
+            $importModel = $this->getImportModel();
+
             if (!$this->inConsole) {
                 $data['output'] = null;
             }
 
             $data['file'] = $file;
+            $data['offset'] = $offset;
             $this->strategy = $data['validation_strategy'];
             $this->errorsCount = $data['allowed_error_count'];
             $this->reindex = $data['reindex'];
@@ -253,34 +285,43 @@ class Processor
                 $this->setTypeSource($data['type_file']);
             }
 
+            $importModel->setLogger($this->logger)->setData($data)->setJobId($jobId);
+
             if (!$this->inConsole) {
-                $this->getImportModel()->setOutput(null);
+                $importModel->setOutput(null);
             }
+
+            $importModel->setErrorAggregator($this->errorAggregator);
+            $importModel->getErrorAggregator()->initValidationStrategy($this->strategy, $this->errorsCount);
 
             $validationResult = $this->dataValidate($data, $jobId);
             $area = $this->areaList->getArea($this->state->getAreaCode());
 
             $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
+
+            if ($this->strategy == 'validation-skip-errors') {
+                $result = true;
+            } else {
+                $result = !$importModel->getErrorAggregator()->hasToBeTerminated();
+            }
+
         } catch (\Exception $e) {
             $this->addLogComment(
                 'Job #' . $jobId . ' can\'t be imported. Check if job exist',
                 $this->output,
                 'error'
             );
+
             $this->addLogComment(
                 $e->getMessage(),
                 $this->output,
                 'error'
             );
-            $this->revertLocale();
-
-            return false;
         }
 
         $this->revertLocale();
 
-        return ($this->strategy == 'validation-skip-errors') ? true
-            : !$this->getImportModel()->getErrorAggregator()->hasToBeTerminated();
+        return $result;
     }
 
     /**
@@ -338,7 +379,9 @@ class Processor
                 ['map' => $mapAttributesData],
                 ['price_rules' => $priceRules],
                 ['identicaly' => $identicaly],
-                ['xslt' => $this->job->getXslt()]
+                ['xslt' => $this->job->getXslt()],
+                ['translate_from' => $this->job->getTranslateFrom()],
+                ['translate_to' => $this->job->getTranslateTo()]
             );
         }
 
@@ -352,7 +395,7 @@ class Processor
     /**
      * Get import model
      *
-     * @return Import|mixed
+     * @return \Firebear\ImportExport\Model\Import
      */
     public function getImportModel()
     {
@@ -435,13 +478,6 @@ class Processor
         try {
             $validationResult = $this->validate($data);
         } catch (\Exception $e) {
-            $this->getImportModel()->getErrorAggregator()->addError(
-                $e->getCode(),
-                ProcessingError::ERROR_LEVEL_CRITICAL,
-                null,
-                null,
-                $e->getMessage()
-            );
             $this->getImportModel()->addLogComment($e->getMessage());
             $summary = '<b>' . $e->getMessage() . '</b><br />';
             $importHistoryModel = $this->getImportHistoryModel();
@@ -467,68 +503,78 @@ class Processor
     /**
      * @param array $data
      * @return bool
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function validate(array $data)
     {
-        /* @var $import Import */
-        $this->getImportModel()->setData($data);
-        $this->getImportModel()->setJobId($this->job->getId());
+        $importModel = $this->getImportModel();
+
+        $importModel->setData($data);
+        $importModel->setJobId($this->job->getId());
         if (!$this->inConsole) {
-            $this->getImportModel()->setOutput(null);
+            $importModel->setOutput(null);
         }
 
-        if ($data['import_source'] != 'file') {
-            $destFile = $this->getImportModel()->uploadSource();
-            //   $another = 1;
-        } else {
-            $destFile = $data['file_path'];
-        }
-
-        if (isset($data['type_file']) && $data['type_file'] == 'xml' && $data['xml_switch']) {
-            $destFile = $this->applyXsltTemplate($destFile, $data);
-        }
-
-        $source = Adapter::findAdapterFor(
-            $this->getTypeClass(),
-            $destFile,
-            $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
-            $data[Import::FIELD_FIELD_SEPARATOR]
+        $platform = $importModel->getPlatform(
+            $data['platforms'] ?? null,
+            $data['entity'] ?? null
         );
 
-        $validationResult = $this->getImportModel()->validateSource($source);
-        if (!$this->getImportModel()->getProcessedRowsCount()) {
-            if (!$this->getImportModel()->getErrorAggregator()->getErrorsCount()) {
-                throw new \Magento\Framework\Exception\LocalizedException(
+        $isGateway = $platform && $platform->isGateway();
+        if ($isGateway) {
+            $source = $platform->getSource($data);
+        } else {
+            if ($data['import_source'] != 'file') {
+                $destFile = $importModel->uploadSource();
+                //   $another = 1;
+            } else {
+                $destFile = $data['file_path'];
+            }
+
+            if (isset($data['type_file']) && $data['type_file'] == 'xml' && $data['xml_switch']) {
+                $destFile = $this->applyXsltTemplate($destFile, $data);
+            }
+
+            $source = Adapter::findAdapterFor(
+                $this->getTypeClass(),
+                $destFile,
+                $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
+                $platform,
+                $data
+            );
+        }
+
+        $validationResult = $importModel->validateSource($source);
+
+        if (!$importModel->getProcessedRowsCount()) {
+            if (!$importModel->getErrorAggregator()->getErrorsCount()) {
+                throw new LocalizedException(
                     __('This file is empty. Please try another one.')
                 );
             } else {
                 $errors = '';
-                foreach ($this->getImportModel()->getErrorAggregator()->getAllErrors() as $error) {
+                foreach ($importModel->getErrorAggregator()->getAllErrors() as $error) {
                     $errors .= $error->getErrorMessage() . ' ';
                 }
-                throw new \Exception(
-                    $errors
+                throw new LocalizedException(
+                    __($errors)
                 );
             }
         } else {
             if (!$validationResult) {
-                throw new \Exception(
+                throw new LocalizedException(
                     __('Data validation is failed. Please fix errors and re-upload the file..')
                 );
             } else {
-                if ($this->getImportModel()->isImportAllowed()) {
+                if ($importModel->isImportAllowed()) {
                     return true;
                 } else {
-                    throw new \Exception(
+                    throw new LocalizedException(
                         __('The file is valid, but we can\'t import it for some reason.')
                     );
                 }
             }
         }
-
-        return true;
     }
 
     /**
@@ -538,7 +584,7 @@ class Processor
      * @param $data
      *
      * @return string
-     * @throws \Exception
+     * @throws LocalizedException
      */
     public function applyXsltTemplate($destFile, $data)
     {
@@ -551,18 +597,18 @@ class Processor
         try {
             $result = $this->outputModel->convert($dest, $data['xslt']);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new LocalizedException(__($e->getMessage()));
         }
 
         $pathInfo = pathinfo($destFile);
 
         if (strpos($destFile, $directory->getAbsolutePath()) === false) {
-            $destFile = $directory->getAbsolutePath() . "/" . $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
+            $destFile = $directory->getAbsolutePath() . '/' . $pathInfo['dirname'] . '/' .
+                $pathInfo['filename'] . '_xslt.' . $pathInfo['extension'];
         } else {
             $destFile = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "_xslt." . $pathInfo['extension'];
         }
 
-        // $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
         $file = $this->fileWrite->create(
             $destFile,
             \Magento\Framework\Filesystem\DriverPool::FILE,
@@ -682,7 +728,7 @@ class Processor
      * @param $error
      * @param int $show
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function processImport($file, $job, $offset, $error, $show = 1)
     {
@@ -700,33 +746,36 @@ class Processor
             $this->setTypeSource($data['type_file']);
         }
 
-        $this->importModel = $this->importFactory->create();
-        $this->getImportModel()->setLogger($this->logger);
-        $this->getImportModel()->setData($data);
-        $this->getImportModel()->setJobId($job);
-        if (!$this->inConsole) {
-            $this->getImportModel()->setOutput(null);
+        /**
+         * @todo Check another entities for fetching data from db in constructor.
+         * Avoid new entity object initialization if possible.
+         */
+        if ($data['entity'] != 'catalog_product') {
+            $this->importModel = $this->importFactory->create();
         }
-        $this->getImportModel()->setErrorAggregator($this->errorAggregator);
-        $this->getImportModel()->getErrorAggregator()->initValidationStrategy(
-            $this->strategy,
-            $this->errorsCount
-        );
-        $this->getImportModel()->setProcessErrorStatistics(ProcessingError::ERROR_LEVEL_CRITICAL, $error);
-        $this->getImportModel()->importSourcePart($file, $offset, $job, $show);
+        $this->importModel->setLogger($this->logger);
+        $this->importModel->setData($data);
+        $this->importModel->setJobId($job);
+        if (!$this->inConsole) {
+            $this->importModel->setOutput(null);
+        }
+        $this->importModel->setErrorAggregator($this->errorAggregator);
+        $this->importModel->getErrorAggregator()->initValidationStrategy($this->strategy, $this->errorsCount);
+        $this->importModel->setProcessErrorStatistics(ProcessingError::ERROR_LEVEL_CRITICAL, $error);
+        $this->importModel->importSourcePart($file, $offset, $job, $show);
         $this->scopeMessages(1);
         $this->revertLocale();
 
         return [
-            (int)$this->getImportModel()->getErrorsCount([ProcessingError::ERROR_LEVEL_CRITICAL]),
-            !$this->getImportModel()->getErrorAggregator()->hasToBeTerminated()
+            (int) $this->importModel->getErrorsCount([ProcessingError::ERROR_LEVEL_CRITICAL]),
+            !$this->importModel->getErrorAggregator()->hasToBeTerminated()
         ];
     }
 
     /**
      * @param int $skip
      *
-     * @throws \Exception
+     * @throws LocalizedException
      */
     protected function scopeMessages($skip = 0)
     {
@@ -742,8 +791,8 @@ class Processor
                 }
             }
             if (!$skip) {
-                throw new \Exception(
-                    implode(PHP_EOL, $messages)
+                throw new LocalizedException(
+                    __(implode(PHP_EOL, $messages))
                 );
             }
         }
@@ -811,8 +860,6 @@ class Processor
                 if (is_int($modified)) {
                     $this->job->setFileUpdatedAt($modified)->save();
                 }
-
-                //  $this->scopeMessages();
 
                 $this->getImportModel()->invalidateIndex();
             }
@@ -887,18 +934,19 @@ class Processor
     }
 
     /**
-     * Get columns names from first row.
+     * Get columns names from first row
      *
      * @param \Firebear\ImportExport\Model\Job $job
      *
      * @return array
      */
-    public function getCsvColumns($job)
+    public function getColumns($job)
     {
         $errorMessage = [];
         if (is_object($job) && (!$job->getId() || $job->getEntity() != 'catalog_product')) {
             return [];
         }
+
         $data = is_object($job) ? $this->prepareJob($job->getId()) : $job;
         if (isset($data['job_id'])) {
             $jobId = (int)$data['job_id'];
@@ -910,15 +958,51 @@ class Processor
                 $data['xslt'] = $jobModel->getXslt();
             }
         }
+
         $directory = $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT);
         if (!$this->inConsole) {
             $this->getImportModel()->setOutput(null);
         }
-        if ($data['import_source'] != 'file') {
-            $this->getImportModel()->setImportSource($data['import_source']);
+
+        $platform = $this->getImportModel()->getPlatform(
+            $data['platforms'] ?? null,
+            $data['entity'] ?? null
+        );
+
+        if ($data['import_source'] == 'file') {
+            $destFile = $data['file_path'];
+
+            if (isset($data['type_file']) && $data['type_file'] == 'xml'
+                && isset($data['xml_switch']) && $data['xml_switch']
+            ) {
+                $destFile = $this->applyXsltTemplate($destFile, $data);
+            }
+
+            $source = Adapter::findAdapterFor(
+                $this->getTypeClass(),
+                $destFile,
+                $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
+                $platform,
+                $data
+            );
+        } else {
+            $isGateway = $platform && $platform->isGateway();
+            if ($isGateway) {
+                $data['get_only_first_page'] = true;
+                $this->source = $platform->getSource($data);
+                $this->getImportModel()->setSource($this->source);
+            } else {
+                $this->getImportModel()->setImportSource($data['import_source']);
+            }
+
             $this->getImportModel()->setData($data);
             $this->getImportModel()->getSource()->setData($data);
             $this->getImportModel()->setLogger($this->logger);
+
+            if ($isGateway) {
+                return $this->source->getColNames();
+            }
+
             $result = null;
             $source = $this->getImportModel()->getSource();
             $source->setFormatFile($data['type_file']);
@@ -931,8 +1015,7 @@ class Processor
                 }
             }
             $destFile = $this->getImportModel()->uploadSource();
-            if (
-                isset($data['type_file']) && $data['type_file'] == 'xml'
+            if (isset($data['type_file']) && $data['type_file'] == 'xml'
                 && isset($data['xml_switch']) && $data['xml_switch']
             ) {
                 $destFile = $this->applyXsltTemplate($destFile, $data);
@@ -943,33 +1026,15 @@ class Processor
                     $this->getTypeClass(),
                     $destFile,
                     $directory,
-                    $data[Import::FIELD_FIELD_SEPARATOR]
+                    $platform,
+                    $data
                 );
             } else {
                 $this->source = $source;
 
                 return is_array($job) ? $errorMessage : [];
             }
-        } else {
-
-            $destFile = $data['file_path'];
-
-            if (
-                isset($data['type_file']) && $data['type_file'] == 'xml'
-                && isset($data['xml_switch']) && $data['xml_switch']
-            ) {
-                $destFile = $this->applyXsltTemplate($destFile, $data);
-            }
-
-            $source = Adapter::findAdapterFor(
-                $this->getTypeClass(),
-                $destFile,
-                $this->filesystemFactory->create()
-                    ->getDirectoryWrite(DirectoryList::ROOT),
-                $data[Import::FIELD_FIELD_SEPARATOR]
-            );
         }
-
         $this->source = $source;
 
         return $source->getColNames();
@@ -980,13 +1045,57 @@ class Processor
         $errorMessage = [];
 
         $data = $this->prepareDataFromAjax($data);
+        if (isset($data['job_id'])) {
+            $jobId = (int)$data['job_id'];
+            $jobModel = $this->jobFactory->create();
+            $jobModel->load($jobId);
+            $sourceData = $this->jsonDecoder->decode($jobModel->getSourceData());
+            if (isset($sourceData['xml_switch']) && $sourceData['xml_switch'] && $jobModel->getXslt()) {
+                $data['xml_switch'] = 1;
+                $data['xslt'] = $jobModel->getXslt();
+            } else {
+                $data['xml_switch'] = 0;
+            }
+        }
         if (!$this->inConsole) {
             $this->getImportModel()->setOutput(null);
         }
-        if ($data['import_source'] != 'file') {
-            $this->getImportModel()->setImportSource($data['import_source']);
+
+        $platform = $this->getImportModel()->getPlatform(
+            $data['platforms'] ?? null,
+            $data['entity'] ?? null
+        );
+
+        if ($data['import_source'] == 'file') {
+            $destFile = $data['file_path'];
+            if (isset($data['type_file']) && $data['type_file'] == 'xml' && $data['xml_switch']) {
+                $destFile = $this->applyXsltTemplate($destFile, $data);
+            }
+            $source = Adapter::findAdapterFor(
+                $this->getTypeClass(),
+                $destFile,
+                $this->filesystemFactory->create()
+                    ->getDirectoryWrite(DirectoryList::ROOT),
+                $platform,
+                $data
+            );
+        } else {
+            $isGateway = $platform && $platform->isGateway();
+            if ($isGateway) {
+                $data['get_only_first_page'] = true;
+                $this->source = $platform->getSource($data);
+                $this->getImportModel()->setSource($this->source);
+            } else {
+                $this->getImportModel()->setImportSource($data['import_source']);
+            }
             $this->getImportModel()->setData($data);
             $this->getImportModel()->getSource()->setData($data);
+
+            if ($isGateway) {
+                $this->source->setMap($data['records']);
+                return true;
+            }
+
             $result = null;
             $source = $this->getImportModel()->getSource();
             try {
@@ -999,25 +1108,21 @@ class Processor
             }
 
             if ($result) {
+                $destFile = $this->getImportModel()->uploadSource();
+                if (isset($data['type_file']) && $data['type_file'] == 'xml' && $data['xml_switch']) {
+                    $destFile = $this->applyXsltTemplate($destFile, $data);
+                }
                 $source = Adapter::findAdapterFor(
                     $this->getTypeClass(),
-                    $this->getImportModel()->uploadSource(),
+                    $destFile,
                     $this->filesystemFactory->create()->getDirectoryWrite(DirectoryList::ROOT),
-                    $data[Import::FIELD_FIELD_SEPARATOR]
+                    $platform,
+                    $data
                 );
             } else {
                 $this->source = $source;
             }
-        } else {
-            $source = Adapter::findAdapterFor(
-                $this->getTypeClass(),
-                $data['file_path'],
-                $this->filesystemFactory->create()
-                    ->getDirectoryWrite(DirectoryList::ROOT),
-                $data[Import::FIELD_FIELD_SEPARATOR]
-            );
         }
-
         $this->source = $source;
         $this->source->setMap($data['records']);
         return true;
@@ -1029,7 +1134,6 @@ class Processor
      */
     public function prepareDataFromAjax($data)
     {
-
         $mapAttributesData = [];
         foreach ($data['records'] as $map) {
             $mapAttributesData[] = [
@@ -1039,7 +1143,6 @@ class Processor
             ];
         }
         $data['records'] = $mapAttributesData;
-
         return $data;
     }
 
@@ -1051,8 +1154,8 @@ class Processor
     /**
      * @param $data
      *
-     * @return array|string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return array
+     * @throws LocalizedException
      */
     public function processValidate($data)
     {
@@ -1073,7 +1176,7 @@ class Processor
             }
         }
 
-        return empty($messages) ? '' : $messages;
+        return empty($messages) ? [] : $messages;
     }
 
     /**

@@ -6,13 +6,12 @@
 
 namespace Firebear\ImportExport\Console\Command;
 
-use Firebear\ImportExport\Model\Job\Processor;
+use Firebear\ImportExport\Api\JobRepositoryInterface;
 use Firebear\ImportExport\Model\JobFactory;
-use Firebear\ImportExport\Api\JobRepositoryInterface\Proxy as JobRepository;
+use Firebear\ImportExport\Model\Job\Processor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\Json\DecoderInterface;
 
 /**
  * Command prints list of available currencies
@@ -27,7 +26,7 @@ class ImportJobAbstractCommand extends Command
     protected $factory;
 
     /**
-     * @var JobRepository
+     * @var JobRepositoryInterface
      */
     protected $repository;
 
@@ -57,8 +56,9 @@ class ImportJobAbstractCommand extends Command
 
     /**
      * ImportJobAbstractCommand constructor.
+     *
      * @param JobFactory $factory
-     * @param JobRepository $repository
+     * @param JobRepositoryInterface $repository
      * @param \Firebear\ImportExport\Logger\Logger $logger
      * @param Processor $importProcessor
      * @param \Firebear\ImportExport\Helper\Data $helper
@@ -66,7 +66,7 @@ class ImportJobAbstractCommand extends Command
      */
     public function __construct(
         JobFactory $factory,
-        JobRepository $repository,
+        JobRepositoryInterface $repository,
         \Firebear\ImportExport\Logger\Logger $logger,
         Processor $importProcessor,
         \Firebear\ImportExport\Helper\Data $helper,

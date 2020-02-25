@@ -6,10 +6,17 @@
 
 namespace Firebear\ImportExport\Model\Export\RowCustomizer;
 
+use Firebear\ImportExport\Model\Import;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\CatalogImportExport\Model\Export\RowCustomizerInterface;
 use Magento\CatalogImportExport\Model\Import\Product as ImportProduct;
-use Firebear\ImportExport\Model\Import;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 
+/**
+ * Class Tax
+ *
+ * @package Firebear\ImportExport\Model\Export\RowCustomizer
+ */
 class Tax implements RowCustomizerInterface
 {
     const WEE_TAX_VARIATIONS_COLUMN = 'wee_tax_variations';
@@ -32,7 +39,7 @@ class Tax implements RowCustomizerInterface
     protected $tax;
 
     /**
-     * @var \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionnFactory
+     * @var AttributeCollectionFactory
      */
     protected $collectionFactory;
 
@@ -48,14 +55,15 @@ class Tax implements RowCustomizerInterface
 
     /**
      * Tax constructor.
+     *
      * @param \Magento\Weee\Model\ResourceModel\Attribute\Backend\Weee\Tax $tax
-     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory $collectionFactory
+     * @param AttributeCollectionFactory $collectionFactory
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         \Magento\Weee\Model\ResourceModel\Attribute\Backend\Weee\Tax $tax,
-        \Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory $collectionFactory,
+        AttributeCollectionFactory $collectionFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
@@ -93,8 +101,9 @@ class Tax implements RowCustomizerInterface
                                 'state=' . $element['state']
                                 . Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR .
                                 'value=' . $element['value'];
-                            if (next($tax)) {
-                                $str .= ImportProduct::PSEUDO_MULTI_LINE_SEPARATOR;
+                            if (isset($element['website_id'])) {
+                                $str .= Import::DEFAULT_GLOBAL_MULTI_VALUE_SEPARATOR .
+                                    'website_id=' . $element['website_id'];
                             }
                             $variations[] = $str;
                         }

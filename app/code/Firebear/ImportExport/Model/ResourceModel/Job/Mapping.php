@@ -10,6 +10,11 @@ use Magento\Framework\EntityManager\MetadataPool;
 use Firebear\ImportExport\Api\Data\ImportMappingInterface;
 use Magento\Framework\EntityManager\EntityManager;
 
+/**
+ * Class Mapping
+ *
+ * @package Firebear\ImportExport\Model\ResourceModel\Job
+ */
 class Mapping extends AbstractDb
 {
     /**

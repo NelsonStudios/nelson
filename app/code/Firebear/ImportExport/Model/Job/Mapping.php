@@ -8,16 +8,22 @@ namespace Firebear\ImportExport\Model\Job;
 
 use Magento\Framework\Model\AbstractModel;
 use Firebear\ImportExport\Api\Data\ImportMappingInterface;
+use Firebear\ImportExport\Model\ResourceModel\Job\Mapping as ResourceModelMapping;
 
+/**
+ * Class Mapping
+ *
+ * @package Firebear\ImportExport\Model\Job
+ */
 class Mapping extends AbstractModel implements ImportMappingInterface
 {
-    
+
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\ResourceModel\Job\Mapping');
+        $this->_init(ResourceModelMapping::class);
     }
     /**
      * @return int|null

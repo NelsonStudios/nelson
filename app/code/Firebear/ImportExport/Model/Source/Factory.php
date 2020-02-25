@@ -9,6 +9,11 @@
  */
 namespace Firebear\ImportExport\Model\Source;
 
+/**
+ * Class Factory
+ *
+ * @package Firebear\ImportExport\Model\Source
+ */
 class Factory
 {
     /**

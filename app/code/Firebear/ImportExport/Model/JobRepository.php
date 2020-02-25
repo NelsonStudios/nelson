@@ -44,7 +44,7 @@ class JobRepository implements JobRepositoryInterface
     protected $jobRegistry;
 
     /**
-     * @var Helper
+     * @var \Firebear\ImportExport\Helper\Data
      */
     protected $helper;
 

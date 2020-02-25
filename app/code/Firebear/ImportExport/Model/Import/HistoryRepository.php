@@ -8,6 +8,7 @@ namespace Firebear\ImportExport\Model\Import;
 
 use Firebear\ImportExport\Api\Data\ImportHistoryInterface;
 use Firebear\ImportExport\Api\HistoryRepositoryInterface;
+use Firebear\ImportExport\Logger\Logger;
 use Firebear\ImportExport\Model\ResourceModel\Import\History as ImportHistoryResource;
 use Firebear\ImportExport\Model\ResourceModel\Import\History\CollectionFactory as ImportCollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -38,24 +39,23 @@ class HistoryRepository implements HistoryRepositoryInterface
     protected $importCollectionFactory;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     protected $logger;
 
     /**
      * JobRepository constructor.
+     *
      * @param ImportHistoryResource $resource
-     * @param \Firebear\ImportExport\Model\JobRegistry $jobRegistry
      * @param HistoryFactory $importFactory
      * @param ImportCollectionFactory $importCollectionFactory
-     * @param \Firebear\ImportExport\Logger\Logger $logger
+     * @param Logger $logger
      */
     public function __construct(
         ImportHistoryResource $resource,
-        \Firebear\ImportExport\Model\JobRegistry $jobRegistry,
-        \Firebear\ImportExport\Model\Import\HistoryFactory $importFactory,
+        HistoryFactory $importFactory,
         ImportCollectionFactory $importCollectionFactory,
-        \Firebear\ImportExport\Logger\Logger $logger
+        Logger $logger
     ) {
         $this->resource = $resource;
         $this->importFactory = $importFactory;

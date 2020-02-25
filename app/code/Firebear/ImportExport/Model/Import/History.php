@@ -8,6 +8,7 @@ namespace Firebear\ImportExport\Model\Import;
 
 use Magento\Framework\Model\AbstractModel;
 use Firebear\ImportExport\Api\Data\ImportHistoryInterface;
+use Firebear\ImportExport\Model\ResourceModel\Import\History as ResourceModelHistory;
 
 /**
  * ImportExport job model
@@ -17,7 +18,7 @@ class History extends AbstractModel implements ImportHistoryInterface
 {
     protected function _construct()
     {
-        $this->_init('Firebear\ImportExport\Model\ResourceModel\Import\History');
+        $this->_init(ResourceModelHistory::class);
     }
 
     /**
@@ -37,7 +38,7 @@ class History extends AbstractModel implements ImportHistoryInterface
     }
 
     /**
-     * @return date
+     * @return string
      */
     public function getStartedAt()
     {
@@ -45,7 +46,7 @@ class History extends AbstractModel implements ImportHistoryInterface
     }
 
     /**
-     * @return date
+     * @return string
      */
     public function getFinishedAt()
     {
@@ -93,7 +94,7 @@ class History extends AbstractModel implements ImportHistoryInterface
     }
 
     /**
-     * @param date $start
+     * @param string $start
      *
      * @return ImportHistoryInterface
      */
@@ -105,7 +106,7 @@ class History extends AbstractModel implements ImportHistoryInterface
     }
 
     /**
-     * @param date $finish
+     * @param string $finish
      *
      * @return ImportHistoryInterface
      */

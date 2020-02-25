@@ -1,147 +1,146 @@
 <?php
+
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
 
 namespace Firebear\ImportExport\Ui\Component\Form\Categories;
 
-use Magento\Framework\Data\OptionSourceInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
-use Magento\Framework\App\RequestInterface;
 use Magento\Catalog\Model\Category as CategoryModel;
+use Magento\Catalog\Model\CategoryRepository;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\App\Cache\Type\Block as TypeBlock;
+use Magento\Framework\App\CacheInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
+use function is_object;
 
 /**
  * Options tree for "Categories" field
  */
-class Options implements OptionSourceInterface
+class Options extends \Magento\Catalog\Ui\Component\Product\Form\Categories\Options
 {
-    /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
-     */
-    protected $categoryCollectionFactory;
+
+    const CATEGORY_TREE_ID = 'CATALOG_PRODUCT_CATEGORY_TREE';
 
     /**
-     * @var RequestInterface
+     * @var \Magento\Framework\App\CacheInterface
      */
-    protected $request;
+    protected $cacheManager;
 
     /**
-     * @var array
+     * @var \Magento\Framework\Serialize\SerializerInterface
      */
-    protected $categoriesTree;
+    protected $serializerInterface;
+
+    /**
+     * @var \Magento\Catalog\Model\CategoryRepository;
+     */
+    protected $categoryRepository;
+
+    /**
+     * @var \Psr\Log\LoggerInterface;
+     */
+    protected $loggerInterface;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface;
+     */
+    protected $storeManager;
 
     /**
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param RequestInterface $request
+     * @param CategoryRepository $categoryRepository
+     * @param CacheInterface $cacheManager
+     * @param SerializerInterface $serializerInterface
+     * @param LoggerInterface $loggerInterface
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         CategoryCollectionFactory $categoryCollectionFactory,
-        RequestInterface $request
+        RequestInterface $request,
+        CategoryRepository $categoryRepository,
+        CacheInterface $cacheManager,
+        SerializerInterface $serializerInterface,
+        LoggerInterface $loggerInterface,
+        StoreManagerInterface $storeManager
     ) {
-        $this->categoryCollectionFactory = $categoryCollectionFactory;
-        $this->request = $request;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toOptionArray()
-    {
-        return $this->getCategoriesTree();
+        parent::__construct($categoryCollectionFactory, $request);
+        $this->categoryRepository = $categoryRepository;
+        $this->cacheManager = $cacheManager;
+        $this->serializerInterface = $serializerInterface;
+        $this->loggerInterface = $loggerInterface;
+        $this->storeManager = $storeManager;
     }
 
     /**
      * Retrieve categories tree
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getCategoriesTree()
     {
-        if ($this->categoriesTree === null) {
-            $storeId = $this->request->getParam('store');
-            /* @var $matchingNamesCollection \Magento\Catalog\Model\ResourceModel\Category\Collection */
-            $matchingNamesCollection = $this->categoryCollectionFactory->create();
+        $storeId = $this->request->getParam('store');
+        if (empty($storeId)) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
 
-            $matchingNamesCollection->addAttributeToSelect('path')
+        $filter = 'import_job_form_' . $storeId;
+        $categoryTree = $this->cacheManager->load(self::CATEGORY_TREE_ID . '_' . $filter);
+        if (!empty($categoryTree)) {
+            $this->categoriesTree = $this->serializerInterface->unserialize($categoryTree);
+        }
+
+        if ($this->categoriesTree === null) {
+            $this->categoriesTree = [];
+            $matchingCollection = $this->categoryCollectionFactory->create();
+
+            $matchingCollection
+                ->addAttributeToSelect('path')
                 ->addAttributeToFilter('entity_id', ['neq' => CategoryModel::TREE_ROOT_ID])
                 ->setStoreId($storeId);
 
-            $shownCategoriesIds = [];
-
             /** @var \Magento\Catalog\Model\Category $category */
-            foreach ($matchingNamesCollection as $category) {
-                foreach (explode('/', $category->getPath()) as $parentId) {
-                    $shownCategoriesIds[$parentId] = 1;
-                }
-            }
-
-            /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
-            $collection = $this->categoryCollectionFactory->create();
-
-            $collection->addAttributeToFilter('entity_id', ['in' => array_keys($shownCategoriesIds)])
-                ->addAttributeToSelect(['name', 'is_active', 'parent_id'])
-                ->setOrder('entity_id', 'ASC')
-                ->setStoreId($storeId);
-
-            $categoryPaths = [];
-            foreach ($collection as $category) {
-                if ($category->hasChildren()) {
-                    $this->recursiveCategory($category->getChildrenCategories(), $categoryPaths);
-                }
-            }
-        }
-
-        $this->categoriesTree = [];
-        foreach ($categoryPaths as $path) {
-            $this->categoriesTree[] = ['value' => $path, 'label' => $path];
-        }
-
-        \Magento\Framework\App\ObjectManager::getInstance()->get('Psr\Log\LoggerInterface')
-            ->debug(json_encode($this->categoriesTree));
-
-        return $this->categoriesTree;
-    }
-
-    private function recursiveCategory($categoryChildren, &$categoryPaths = [])
-    {
-        foreach ($categoryChildren as $categoryChild) {
-            $categoryPaths[] = $this->getCategoryPath($categoryChild);
-        }
-    }
-
-    private function getCategoryPath($categoryChild)
-    {
-        $storeId = $this->request->getParam('store');
-
-        /* @var $collection \Magento\Catalog\Model\ResourceModel\Category\Collection */
-        $collection = $this->categoryCollectionFactory->create();
-
-        $collection->addAttributeToFilter('entity_id', $categoryChild->getId())
-            ->addAttributeToSelect(['name', 'is_active', 'parent_id', 'path'])
-            ->setStoreId($storeId);
-        $categoryFullPath = '';
-        foreach ($collection as $category) {
-            $categoryPath = $category->getPath();
-            $explodeCategoryPath = explode('/', $categoryPath);
-            foreach ($explodeCategoryPath as $categoryId) {
-                if ($categoryId == 1) {
-                    continue;
-                }
-                $collectionPathCategory = $this->categoryCollectionFactory->create();
-                $collectionPathCategory->addAttributeToFilter('entity_id', $categoryId)
-                    ->addAttributeToSelect(['name', 'is_active', 'parent_id', 'path'])
-                    ->setStoreId($storeId);
-                foreach ($collectionPathCategory as $categoryPath) {
-                    if (empty($categoryFullPath)) {
-                        $categoryFullPath = $categoryPath->getName();
-                    } else {
-                        $categoryFullPath .= '/' . $categoryPath->getName();
+            foreach ($matchingCollection as $category) {
+                $pathIds = $category->getPathIds();
+                $path = [];
+                foreach ($pathIds as $categoryId) {
+                    if ($categoryId != 1 && !empty(trim($categoryId)) && !empty($storeId)) {
+                        try {
+                            $cat = $this->categoryRepository->get($categoryId, $storeId);
+                        } catch (NoSuchEntityException $noSuchEntityException) {
+                            //if exception found skip to avoid form break
+                            $this->loggerInterface->critical($noSuchEntityException->getMessage());
+                            continue;
+                        }
+                        if (is_object($cat)) {
+                            $path[] = $cat->getName();
+                        }
                     }
                 }
+                $categoryPath = implode('/', $path);
+
+                $this->categoriesTree[] = [
+                    'value' => $categoryPath,
+                    'label' => $categoryPath
+                ];
             }
         }
 
-        return $categoryFullPath;
+        $this->loggerInterface->debug($this->serializerInterface->serialize($this->categoriesTree));
+
+        $this->cacheManager->save(
+            $this->serializerInterface->serialize($this->categoriesTree),
+            self::CATEGORY_TREE_ID . '_' . $filter,
+            [CategoryModel::CACHE_TAG, TypeBlock::CACHE_TAG]
+        );
+
+        return $this->categoriesTree;
     }
 }

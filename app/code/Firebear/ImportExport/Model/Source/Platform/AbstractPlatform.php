@@ -25,10 +25,11 @@ use Magento\Tax\Model\ClassModelFactory;
 
 /**
  * Abstract class for import source types
+ * @method \Magento\ImportExport\Model\Import\AbstractSource getSource(array $data)
  *
  * @package Firebear\ImportExport\Model\Source\Platform
  */
-abstract class AbstractPlatform extends DataObject
+abstract class AbstractPlatform extends DataObject implements PlatformInterface
 {
 
     /**
@@ -116,7 +117,7 @@ abstract class AbstractPlatform extends DataObject
     protected $session;
 
     /**
-     * @var unset columns
+     * @var array
      */
     protected $unsetColumns;
 
@@ -134,7 +135,8 @@ abstract class AbstractPlatform extends DataObject
         StoreManagerInterface $storeManager,
         Attribute $attributeFactory,
         ResourceModelFactory $resourceFactory,
-        Session $session
+        Session $session,
+        array $data = []
     ) {
         $this->scopeConfig                   = $scopeConfig;
         $this->filesystem                    = $filesystem;
@@ -189,12 +191,16 @@ abstract class AbstractPlatform extends DataObject
             '_associated_position',
             'bundle_configurations'
         ];
+
+        parent::__construct(
+            $data
+        );
     }
 
     /**
      * Get special attributes
      *
-     * @return \string[]
+     * @return string[]
      */
     public function getSpecialAttributes()
     {
@@ -248,5 +254,15 @@ abstract class AbstractPlatform extends DataObject
         }
 
         return $prevData;
+    }
+
+    /**
+     * Check if platform is gateway
+     *
+     * @return bool
+     */
+    public function isGateway()
+    {
+        return false;
     }
 }

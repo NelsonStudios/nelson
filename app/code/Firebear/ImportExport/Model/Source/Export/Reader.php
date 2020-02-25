@@ -6,12 +6,17 @@
 
 namespace Firebear\ImportExport\Model\Source\Export;
 
+use Magento\Framework\Config\Dom;
 use Magento\Framework\Config\FileResolverInterface;
-use Magento\Framework\Config\Reader\Filesystem;
 use Magento\Framework\Config\ValidationStateInterface;
 use Firebear\ImportExport\Model\Source\Config\Converter;
 use Firebear\ImportExport\Model\Source\Config\SchemaLocator;
 
+/**
+ * Class Reader
+ *
+ * @package Firebear\ImportExport\Model\Source\Export
+ */
 class Reader extends \Firebear\ImportExport\Model\Source\Config\Reader
 {
     /**
@@ -24,14 +29,16 @@ class Reader extends \Firebear\ImportExport\Model\Source\Config\Reader
     /**
      * Reader constructor.
      *
-     * @param FileResolverInterface    $fileResolver
-     * @param Converter                                          $converter
-     * @param SchemaLocator                                      $schemaLocator
+     * @param FileResolverInterface $fileResolver
+     * @param Converter $converter
+     * @param SchemaLocator $schemaLocator
      * @param ValidationStateInterface $validationState
-     * @param string                                             $fileName
-     * @param array                                              $idAttributes
-     * @param string                                             $domDocumentClass
-     * @param string                                             $defaultScope
+     * @param string $fileName
+     * @param array $idAttributes
+     * @param string $domDocumentClass
+     * @param string $defaultScope
+     *
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
      */
     public function __construct(
         FileResolverInterface $fileResolver,
@@ -40,9 +47,10 @@ class Reader extends \Firebear\ImportExport\Model\Source\Config\Reader
         ValidationStateInterface $validationState,
         $fileName = 'source_types_export.xml',
         $idAttributes = [],
-        $domDocumentClass = 'Magento\Framework\Config\Dom',
+        $domDocumentClass = Dom::class,
         $defaultScope = 'global'
     ) {
+        // phpcs:enable
         parent::__construct(
             $fileResolver,
             $converter,

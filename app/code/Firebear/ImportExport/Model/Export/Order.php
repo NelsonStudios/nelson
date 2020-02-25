@@ -3,18 +3,25 @@
  * @copyright: Copyright © 2017 Firebear Studio. All rights reserved.
  * @author   : Firebear Studio <fbeardev@gmail.com>
  */
+
 namespace Firebear\ImportExport\Model\Export;
 
-use Firebear\ImportExport\Traits\Export\Entity as EntityTrait;
+use DateTime;
+use Exception;
+use Firebear\ImportExport\Traits\Export\Entity as ExportTrait;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Store\Model\Store;
 use Magento\ImportExport\Model\Export\AbstractEntity;
 use Magento\ImportExport\Model\Export\Factory as ExportFactory;
 use Magento\ImportExport\Model\ResourceModel\CollectionByPagesIteratorFactory;
+use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Status\Collection as OrderStatusCollection;
 use Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory as StatusCollectionFactory;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Psr\Log\LoggerInterface;
@@ -22,142 +29,137 @@ use Firebear\ImportExport\Model\Export\Dependencies\Config as ExportConfig;
 use Firebear\ImportExport\Model\Source\Factory as SourceFactory;
 use Firebear\ImportExport\Model\ExportJob\Processor;
 use Firebear\ImportExport\Helper\Data as Helper;
-use Firebear\ImportExport\Traits\General as GeneralTrait;
+use Zend_Db_Statement_Exception;
 
 /**
  * Order export adapter
+ *
+ * @package Firebear\ImportExport\Model\Export
  */
-class Order extends AbstractEntity
+class Order extends AbstractEntity implements EntityInterface
 {
-    use GeneralTrait;
-    use EntityTrait;
+    use ExportTrait;
 
-    /**
-     * Console Output
-     *
-     * @var \Symfony\Component\Console\Output\ConsoleOutput
-     */
-    protected $_output;
-    
-    /**
-     * Logger Interface
-     *
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $_logger;
-    
     /**
      * Orders whose data is exported
      *
-     * @var \Magento\Sales\Model\ResourceModel\Order\Collection
+     * @var OrderCollection
      */
     protected $_orderCollection;
-	
+
     /**
      * Resource Model
      *
-     * @var \Magento\Framework\App\ResourceConnection
+     * @var ResourceConnection
      */
     protected $_resourceModel;
-	
+
     /**
      * DB connection
      *
-     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     * @var AdapterInterface
      */
     protected $_connection;
-    
+
     /**
      * Header columns
      *
      * @var array
-     */    
+     */
     protected $_headerColumns = [];
-	
+
     /**
      * Item export data
      *
      * @var array
-     */      
+     */
     protected $_exportData = [];
-	
+
+    /**
+     * Validate filters result
+     *
+     * @var array
+     */
+    protected $filters = [];
+
+    /**
+     * @var array
+     */
+    protected $_fieldsMap = [];
+
     /**
      * Export config data
      *
      * @var array
-     */     
-	protected $_exportConfig;
-	
+     */
+    protected $_exportConfig;
+
     /**
-     * Source Factory
-     *
-     * @var \Firebear\ImportExport\Model\Source\Factory
+     * @var SourceFactory
      */
     protected $_sourceFactory;
-	
+
     /**
-     * Helper
-     *
-     * @var \Firebear\ImportExport\Helper\Data
+     * @var Helper
      */
     protected $_helper;
-    
+
     /**
      * Describe table
      *
      * @var array
-     */    
+     */
     protected $_describeTable = [];
-    
+
     /**
      * Prefix data
      *
      * @var array
-     */    
+     */
     protected $_prefixData = [
-		'sales_order_item' => 'item',
-		'sales_order_address' => 'address',
-		'sales_order_payment' => 'payment',
-		'sales_payment_transaction' => 'transaction',
-		'sales_shipment' => 'shipment',
-		'sales_shipment_item' => 'shipment_item',
-		'sales_shipment_comment' => 'shipment_comment',
-		'sales_shipment_track' => 'shipment_track',
-		'sales_invoice' => 'invoice',
-		'sales_invoice_item' => 'invoice_item',
-		'sales_invoice_comment' => 'invoice_comment',
-		'sales_creditmemo' => 'creditmemo',		
-		'sales_creditmemo_item' => 'creditmemo_item',
-		'sales_creditmemo_comment' => 'creditmemo_comment',
-		'sales_order_status_history' => 'status_history',
-		'sales_order_tax' => 'tax',
-		'sales_order_tax_item' => 'tax_item',			
+        'sales_order_item' => 'item',
+        'sales_order_address' => 'address',
+        'sales_order_payment' => 'payment',
+        'sales_payment_transaction' => 'transaction',
+        'sales_shipment' => 'shipment',
+        'sales_shipment_item' => 'shipment_item',
+        'sales_shipment_comment' => 'shipment_comment',
+        'sales_shipment_track' => 'shipment_track',
+        'sales_invoice' => 'invoice',
+        'sales_invoice_item' => 'invoice_item',
+        'sales_invoice_comment' => 'invoice_comment',
+        'sales_creditmemo' => 'creditmemo',
+        'sales_creditmemo_item' => 'creditmemo_item',
+        'sales_creditmemo_comment' => 'creditmemo_comment',
+        'sales_order_status_history' => 'status_history',
+        'sales_order_tax' => 'tax',
+        'sales_order_tax_item' => 'tax_item',
     ];
-    
+
     /**
      * Default values
      *
      * @var array
-     */    
+     */
     protected $_default = [];
-    
+
     /**
      * Order Status Collection
      *
-     * @var \Magento\Sales\Model\ResourceModel\Order\Status\Collection
+     * @var OrderStatusCollection
      */
     protected $_statusCollection;
-    
+
     /**
      * Order Statuses Label
      *
      * @var array
      */
     protected $_status;
-    
+
     /**
      * Initialize export
-	 *
+     *
      * @param LoggerInterface $logger
      * @param ConsoleOutput $output
      * @param ScopeConfigInterface $scopeConfig
@@ -169,7 +171,7 @@ class Order extends AbstractEntity
      * @param ExportConfig $exportConfig
      * @param SourceFactory $sourceFactory
      * @param Helper $helper
-     * @param StatusCollectionFactory $statusCollectionFactory     
+     * @param StatusCollectionFactory $statusCollectionFactory
      * @param array $data
      */
     public function __construct(
@@ -180,31 +182,31 @@ class Order extends AbstractEntity
         ExportFactory $collectionFactory,
         CollectionByPagesIteratorFactory $resourceColFactory,
         OrderCollectionFactory $orderColFactory,
-		ResourceConnection $resource,
-		ExportConfig $exportConfig,
-		SourceFactory $sourceFactory,
-		Helper $helper,
-		StatusCollectionFactory $statusCollectionFactory,
+        ResourceConnection $resource,
+        ExportConfig $exportConfig,
+        SourceFactory $sourceFactory,
+        Helper $helper,
+        StatusCollectionFactory $statusCollectionFactory,
         array $data = []
     ) {
         $this->_logger = $logger;
-        $this->_output = $output;
-		$this->_resourceModel = $resource;
-		$this->_exportConfig = $exportConfig->get();
-		$this->_sourceFactory = $sourceFactory;
-		$this->_helper = $helper;
-		$this->_statusCollection = $statusCollectionFactory->create();
+        $this->output = $output;
+        $this->_resourceModel = $resource;
+        $this->_exportConfig = $exportConfig->get();
+        $this->_sourceFactory = $sourceFactory;
+        $this->_helper = $helper;
+        $this->_statusCollection = $statusCollectionFactory->create();
         $this->_orderCollection = $data['order_collection'] ?? $orderColFactory->create();
-		$this->_connection = $resource->getConnection();
-        
+        $this->_connection = $resource->getConnection();
+
         parent::__construct(
             $scopeConfig,
             $storeManager,
             $collectionFactory,
             $resourceColFactory
         );
-		
-		$this->_initStores();
+
+        $this->_initStores();
     }
 
     /**
@@ -235,20 +237,20 @@ class Order extends AbstractEntity
     public function _getHeaderColumns()
     {
         return $this->_customHeadersMapping(
-			$this->_headerColumns
-		);
+            $this->_headerColumns
+        );
     }
 
     /**
      * Retrieve orders collection
      *
-     * @return \Magento\Sales\Model\ResourceModel\Order\Collection
+     * @return OrderCollection
      */
     protected function _getEntityCollection()
     {
         return $this->_orderCollection;
     }
-    
+
     /**
      * Retrieve order statuses
      *
@@ -272,164 +274,184 @@ class Order extends AbstractEntity
      * Export process
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function export()
     {
         //Execution time may be very long
         set_time_limit(0);
         if (!isset($this->_parameters['behavior_data']['deps'])) {
-            $this->addLogWriteln(__('You have not selected items'), $this->_output);
-            return false;
+            throw new LocalizedException(__('You have not selected items.'));
         }
-        $this->addLogWriteln(__('Begin Export'), $this->_output);
-        $this->addLogWriteln(__('Scope Data'), $this->_output);
-           
+        $this->addLogWriteln(__('Begin Export'), $this->output);
+        $this->addLogWriteln(__('Scope Data'), $this->output);
+
         $collection = $this->_getEntityCollection();
         $this->_prepareEntityCollection($collection);
         $this->_exportCollectionByPages($collection);
-        // create export file 
+        // create export file
         return [
-			$this->getWriter()->getContents(), 
-			$this->_processedEntitiesCount, 
-			$this->lastEntityId
-		];
+            $this->getWriter()->getContents(),
+            $this->_processedEntitiesCount,
+            $this->lastEntityId
+        ];
     }
 
     /**
      * Export one item
      *
-     * @param \Magento\Framework\Model\AbstractModel $item
+     * @param AbstractModel $item
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
+     * @throws Zend_Db_Statement_Exception
      */
     public function exportItem($item)
     {
-		foreach ($this->_getExportData($item) as $row) {
-			$this->getWriter()->writeRow($row);
-		}
-		$this->_processedEntitiesCount++;
+        $exportData = $this->_getExportData($item);
+        foreach ($this->filters as $table => $isValid) {
+            if (false === $isValid) {
+                return;
+            }
+        }
+        foreach ($exportData as $row) {
+            $this->getWriter()->writeRow($row);
+        }
+        $this->_processedEntitiesCount++;
     }
-	
+
     /**
      * Get export data for collection
      *
-     * @param \Magento\Framework\Model\AbstractModel $item	 
+     * @param AbstractModel $item
      * @return array
+     * @throws Zend_Db_Statement_Exception
+     * @throws Exception
      */
     protected function _getExportData($item)
     {
         $orderId = $item->getId();
-		$deps = $this->_parameters['behavior_data']['deps'];
-		$children = $this->_exportConfig['order']['fields'] ?? [];
-		$this->lastEntityId = $orderId;
-		
+        $deps = $this->_parameters['behavior_data']['deps'];
+        $children = $this->_exportConfig['order']['fields'] ?? [];
+        $this->lastEntityId = $orderId;
+        $this->filters = [];
+
         if (!count($this->_default) && !$this->_isNested()) {
-			$tables = array_keys($this->_prefixData);
-			foreach ($tables as $table) {
-				if (!in_array($table, $deps)) {
-					continue;
-				}
-				if (empty($this->_describeTable[$table])) {
-					$this->_describeTable[$table] = $this->_connection->describeTable(
-						$this->_resourceModel->getTableName($table)
-					);
-				}
-				$prefix = $this->_prefixData[$table] ?? $table;
-				$row = [];
-				foreach (array_keys($this->_describeTable[$table]) as $column) {
-					$row[$prefix . ':' . $column] = '';
-				}
-				$row = $this->_updateData($row, $table);
-				$this->_default = array_merge($this->_default, $row);
-			}
+            $tables = array_keys($this->_prefixData);
+            foreach ($tables as $table) {
+                if (!in_array($table, $deps)) {
+                    continue;
+                }
+                if (empty($this->_describeTable[$table])) {
+                    $this->_describeTable[$table] = $this->_connection->describeTable(
+                        $this->_resourceModel->getTableName($table)
+                    );
+                }
+                $prefix = $this->_prefixData[$table] ?? $table;
+                $row = [];
+                foreach (array_keys($this->_describeTable[$table]) as $column) {
+                    $row[$prefix . ':' . $column] = '';
+                }
+                $row = $this->_updateData($row, $table);
+                $this->_default = array_merge($this->_default, $row);
+            }
         }
-        
+
         $exportData = $item->toArray();
         unset($exportData['store_name']);
-        
-		$exportData['status_label'] = isset($exportData['status'])
-			? $this->_getStatusLabel($exportData['status'])
-			: '';        
-        
-		$exportData = $this->_updateData($exportData, 'sales_order');
-		$this->_exportData = [0 => array_merge($exportData, $this->_default)];
-		
 
-		foreach ($children as $table => $param) {
-			if ($param['parent'] == 'sales_order' && in_array($table, $deps)) {
-				$this->_prepareChildEntity([$orderId], $table, $param['parent_field'], $param['main_field']);
-			}
-		}
+        $exportData['status_label'] = isset($exportData['status'])
+            ? $this->_getStatusLabel($exportData['status'])
+            : '';
+
+        $exportData = $this->_updateData($exportData, 'sales_order');
+        $this->_exportData = [0 => array_merge($exportData, $this->_default)];
+
+        foreach ($children as $table => $param) {
+            if ($param['parent'] == 'sales_order' && in_array($table, $deps)) {
+                $this->_prepareChildEntity([$orderId], $table, $param['parent_field'], $param['main_field']);
+            }
+        }
         return $this->_exportData;
     }
-    
+
     protected function _isNested()
     {
-		return in_array(
-			$this->_parameters['behavior_data']['file_format'], 
-			['xml', 'json']
-		);
+        return in_array(
+            $this->_parameters['behavior_data']['file_format'],
+            ['xml', 'json']
+        );
     }
-    
+
     /**
      * Prepare child entity
      *
-     * @param int $entityIds
+     * @param array  $entityIds
      * @param string $table
      * @param int $parentIdField
-     * @param int $entityIdField	 
+     * @param int $entityIdField
      * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws Exception
      */
     protected function _prepareChildEntity($entityIds, $table, $parentIdField, $entityIdField)
     {
-		$rowId = 0;
+        $rowId = 0;
         $select = $this->_connection->select()->from(
             $this->_resourceModel->getTableName($table)
         )->where(
             $parentIdField . ' IN (?)',
             $entityIds
-        );       
+        );
         $stmt = $this->_connection->query($select);
-		
-		$prefix = $this->_prefixData[$table] ?? $table;
-		$entityIds = [];
-		
+        $prefix = $this->_prefixData[$table] ?? $table;
+        $entityIds = [];
+
         if ($this->_isNested()) {
-			$exportData = [];
-			while ($row = $stmt->fetch()) {
-				$entityIds[] = $row[$entityIdField];
-				$exportData[] = ['item' => $this->_updateData($row, $table)];
-			}
-			$this->_exportData[0][$prefix] = $exportData;
-        } 
-        else {
-			while ($row = $stmt->fetch()) {
-				$itemRow = [];
-				$entityIds[] = $row[$entityIdField];
-				$row = $this->_updateData($row, $table);
-				
-				foreach ($row as $column => $value) {
-					$itemRow[$prefix . ':' . $column] = $value;
-				}
-				
-				$exportData = $this->_exportData[$rowId] ?? [];
-				$this->_exportData[$rowId] = array_merge($exportData, $itemRow);
-				$rowId++;
-			}        
+            $exportData = [];
+            while ($row = $stmt->fetch()) {
+                $entityIds[] = $row[$entityIdField];
+                $exportData[] = ['item' => $this->_updateData($row, $table)];
+            }
+            $this->_exportData[0][$prefix] = $exportData;
+        } else {
+            while ($row = $stmt->fetch()) {
+                $itemRow = [];
+                $entityIds[] = $row[$entityIdField];
+                foreach ($row as $column => $value) {
+                    $row[$prefix . ':' . $column] = $value;
+                    unset($row[$column]);
+                }
+                $row = $this->_updateData($row, $table);
+                $exportData = $this->_exportData[$rowId] ?? [];
+                $this->_exportData[$rowId] = array_merge($exportData, $row);
+                $rowId++;
+            }
         }
+
         if (!count($entityIds)) {
-			return;
+            if (!isset($this->_parameters[Processor::EXPORT_FILTER_TABLE]) ||
+                !is_array($this->_parameters[Processor::EXPORT_FILTER_TABLE])) {
+                $exportFilter = [];
+            } else {
+                $exportFilter = $this->_parameters[Processor::EXPORT_FILTER_TABLE];
+            }
+            foreach ($exportFilter as $filter) {
+                if ($filter['entity'] == $table) {
+                    $this->filters[$table] = false;
+                }
+            }
+            return;
         }
-		$deps = $this->_parameters['behavior_data']['deps'];
-		$children = $this->_exportConfig['order']['fields'] ?? [];
-		foreach ($children as $childTable => $param) {
-			if ($param['parent'] == $table && in_array($table, $deps)) {
-				$this->_prepareChildEntity($entityIds, $childTable, $param['parent_field'], $param['main_field']);
-			}
-		}		
+        $deps = $this->_parameters['behavior_data']['deps'];
+        $children = $this->_exportConfig['order']['fields'] ?? [];
+        foreach ($children as $childTable => $param) {
+            if ($param['parent'] == $table && in_array($table, $deps)) {
+                $this->_prepareChildEntity($entityIds, $childTable, $param['parent_field'], $param['main_field']);
+            }
+        }
     }
-    
+
     /**
      * Retrieve headers mapping
      *
@@ -444,46 +466,47 @@ class Order extends AbstractEntity
             }
         }
         return $rowData;
-    }    
-    
+    }
+
     /**
      * Apply filter to collection
      *
      * @param AbstractCollection $collection
      * @return AbstractCollection
+     * @throws Exception
      */
     protected function _prepareEntityCollection(AbstractCollection $collection)
     {
-		if (isset($this->_parameters['last_entity_id']) && 
-			$this->_parameters['last_entity_id'] > 0 && 
-			$this->_parameters['enable_last_entity_id'] > 0
-		) {
-			$collection->addFieldToFilter(
-				'entity_id', ['gt' => $this->_parameters['last_entity_id']]
-			);
-		}
+        if (isset($this->_parameters['last_entity_id']) &&
+            $this->_parameters['last_entity_id'] > 0 &&
+            $this->_parameters['enable_last_entity_id'] > 0
+        ) {
+            $collection->addFieldToFilter(
+                'entity_id',
+                ['gt' => $this->_parameters['last_entity_id']]
+            );
+        }
 
-        if (!isset($this->_parameters[Processor::EXPORT_FILTER_TABLE]) || 
-			!is_array($this->_parameters[Processor::EXPORT_FILTER_TABLE])) {
+        if (!isset($this->_parameters[Processor::EXPORT_FILTER_TABLE]) ||
+            !is_array($this->_parameters[Processor::EXPORT_FILTER_TABLE])) {
             $exportFilter = [];
         } else {
             $exportFilter = $this->_parameters[Processor::EXPORT_FILTER_TABLE];
         }
-		
+
         $filters = [];
-		$entity = 'sales_order';
+        $entity = 'sales_order';
         foreach ($exportFilter as $data) {
             if ($data['entity'] == $entity) {
                 $filters[$data['field']] = $data['value'];
             }
         }
-		
-		$fields = $this->getTableColumns();
+
+        $fields = $this->getTableColumns();
         foreach ($filters as $key => $value) {
             if (isset($fields[$entity][$key])) {
                 $type = $fields[$entity][$key]['type'];
                 if ('text' == $type) {
-                    $value = $value;
                     if (is_scalar($value)) {
                         trim($value);
                     }
@@ -492,36 +515,39 @@ class Order extends AbstractEntity
                     if (is_array($value) && count($value) == 2) {
                         $from = array_shift($value);
                         $to = array_shift($value);
-
                         if (is_numeric($from)) {
                             $collection->addFieldToFilter($key, ['from' => $from]);
                         }
                         if (is_numeric($to)) {
                             $collection->addFieldToFilter($key, ['to' => $to]);
                         }
+                    } else {
+                        $collection->addFieldToFilter($key, $value);
                     }
                 } elseif ('date' == $type) {
                     if (is_array($value) && count($value) == 2) {
-                        $from = array_shift($exportFilter[$value]);
-                        $to = array_shift($exportFilter[$value]);
-
+                        $from = array_shift($value);
+                        $to = array_shift($value);
                         if (is_scalar($from) && !empty($from)) {
-                            $date = (new \DateTime($from))->format('m/d/Y');
+                            $date = (new DateTime($from))->format('m/d/Y');
                             $collection->addFieldToFilter($key, ['from' => $date, 'date' => true]);
                         }
                         if (is_scalar($to) && !empty($to)) {
-                            $date = (new \DateTime($to))->format('m/d/Y');
+                            $date = (new DateTime($to))->format('m/d/Y');
                             $collection->addFieldToFilter($key, ['to' => $date, 'date' => true]);
                         }
                     }
                 }
             }
-        }		
+        }
         return $collection;
-    } 
-	
+    }
+
     /**
+     * Retrieve entity field for export
+     *
      * @return array
+     * @throws LocalizedException
      */
     public function getFieldsForExport()
     {
@@ -529,6 +555,10 @@ class Order extends AbstractEntity
         foreach ($this->_exportConfig as $typeName => $type) {
             if ($typeName == 'order') {
                 foreach ($type['fields'] as $name => $values) {
+                    $prefix = $this->_prefixData[$name] ?? '';
+                    if ($prefix) {
+                        $prefix .= ':';
+                    }
                     $model = $this->_sourceFactory->create($values['model']);
                     $options[$name] = [
                         'label' => __($values['label']),
@@ -539,7 +569,7 @@ class Order extends AbstractEntity
                     foreach ($fields as $field) {
                         $options[$name]['value'][] = [
                             'label' => $field,
-                            'value' => $field
+                            'value' => $prefix . $field
                         ];
                     }
                 }
@@ -547,16 +577,19 @@ class Order extends AbstractEntity
         }
         return $options;
     }
-	
+
     /**
+     * Retrieve entity field for filter
+     *
      * @return array
+     * @throws LocalizedException
      */
     public function getFieldsForFilter()
     {
         $options = [];
         foreach ($this->_exportConfig as $typeName => $type) {
             if ($typeName == 'order') {
-				foreach ($type['fields'] as $name => $values) {
+                foreach ($type['fields'] as $name => $values) {
                     $model = $this->_sourceFactory->create($values['model']);
                     $fields = $this->getChildHeaders($model);
                     $mergeFields = [];
@@ -576,8 +609,12 @@ class Order extends AbstractEntity
             }
         }
         return $options;
-    } 
-	
+    }
+
+    /**
+     * @return array
+     * @throws LocalizedException
+     */
     protected function getTableColumns()
     {
         $options = [];
@@ -596,9 +633,10 @@ class Order extends AbstractEntity
         }
         return $options;
     }
-	
+
     /**
      * @return array
+     * @throws LocalizedException
      */
     public function getFieldColumns()
     {
@@ -628,62 +666,110 @@ class Order extends AbstractEntity
         }
         return $options;
     }
-	
+
     /**
      * @param $model
      * @return array
+     * @throws LocalizedException
      */
     public function getChildHeaders($model)
     {
         return array_keys($this->describeTable($model));
     }
-    
+
     /**
-     * @param null $model
+     * @param null|AbstractModel $model
      * @return array
+     * @throws LocalizedException
      */
     protected function describeTable($model = null)
     {
-        if ($model) {
+        $fields = [];
+        if ($model && is_a($model, AbstractModel::class)) {
             $resource = $model->getResource();
-        } else {
-            $resource = $this->factory->create()->getResource();
+            $table = $resource->getMainTable();
+            $fields = $resource->getConnection()->describeTable($table);
         }
-        $table = $resource->getMainTable();
-        $fields = $resource->getConnection()->describeTable($table);
-
         return $fields;
     }
-	
+
     /**
+     * @param array $data
+     * @param string $table
      * @return array
+     * @throws Exception
      */
     protected function _updateData($data, $table)
     {
-		if (empty($this->_describeTable[$table])) {
-			$this->_describeTable[$table] = $this->_connection->describeTable(
-				$this->_resourceModel->getTableName($table)
-			);
-		}
-		
-		$info = $this->_describeTable[$table];
-		foreach ($data as $field => $value) {
-			$dataType = $info[$field]['DATA_TYPE'] ?? null;
-			if (in_array($dataType, ['blob', 'mediumblob', 'tinyblob', 'longblob'])) {
-				$data[$field] = base64_encode($value);
-			}
-		}
-        
+        if (!isset($this->_parameters[Processor::EXPORT_FILTER_TABLE]) ||
+            !is_array($this->_parameters[Processor::EXPORT_FILTER_TABLE])) {
+            $exportFilter = [];
+        } else {
+            $exportFilter = $this->_parameters[Processor::EXPORT_FILTER_TABLE];
+        }
+        $filters = [];
+        foreach ($exportFilter as $filter) {
+            if ($filter['entity'] == $table) {
+                $filters[$filter['field']] = $filter['value'];
+            }
+        }
+
+        if (empty($this->_describeTable[$table])) {
+            $this->_describeTable[$table] = $this->_connection->describeTable(
+                $this->_resourceModel->getTableName($table)
+            );
+        }
+
+        $info = $this->_describeTable[$table];
+        foreach ($data as $field => $value) {
+            $dataType = $info[$field]['DATA_TYPE'] ?? null;
+            $type = $dataType ? $this->_helper->convertTypesTables($dataType) : null;
+            if (isset($filters[$field]) && !isset($this->filters[$table])) {
+                $isValid = false;
+                $filterValue = $filters[$field];
+                if ('text' == $type) {
+                    if (is_scalar($filterValue)) {
+                        trim($filterValue);
+                    }
+                    $isValid = mb_stripos($value, $filterValue) !== false;
+                } elseif ('int' == $type) {
+                    if (is_array($filterValue) && count($filterValue) == 2) {
+                        $from = array_shift($filterValue);
+                        $to = array_shift($filterValue);
+                        $isValid = $from <= $value && ($to === '' || $to >= $value);
+                    } else {
+                        $isValid = mb_stripos($value, $filterValue) !== false;
+                    }
+                } elseif ('date' == $type) {
+                    if (is_array($filterValue) && count($filterValue) == 2) {
+                        $from = array_shift($filterValue);
+                        $to = array_shift($filterValue);
+                        if ($value && $from && $to) {
+                            $value = (new DateTime($value))->format('m/d/Y');
+                            $from = (new DateTime($from))->format('m/d/Y');
+                            $to = (new DateTime($to))->format('m/d/Y');
+                            $isValid = ($to >= $value) && ($from <= $value);
+                        }
+                    }
+                }
+                $this->filters[$table] = $isValid;
+            }
+
+            if (in_array($dataType, ['blob', 'mediumblob', 'tinyblob', 'longblob'])) {
+                $data[$field] = base64_encode($value);
+            }
+        }
+
         $instr = $this->_scopeFields($table);
         $allFields = $this->_parameters['all_fields'];
-		if (!$allFields) {
-			return $this->_changedColumns($data, $instr);
-		}
-		return $this->_addPartColumns($data, $instr, $table);
+        if (!$allFields) {
+            return $this->_changedColumns($data, $instr);
+        }
+        return $this->_addPartColumns($data, $instr, $table);
     }
-	
+
     /**
-     * @param $key
+     * @param string $table
      * @return array
      */
     protected function _scopeFields($table)
@@ -705,7 +791,7 @@ class Order extends AbstractEntity
         ];
         return $instr;
     }
-	
+
     /**
      * @param $numbers
      * @param $list
@@ -721,9 +807,10 @@ class Order extends AbstractEntity
         }
         return $array;
     }
-	
+
     /**
-     * @param $data
+     * @param array $data
+     * @param array $instr
      * @return array
      */
     protected function _changedColumns($data, $instr)
@@ -738,7 +825,7 @@ class Order extends AbstractEntity
                 }
                 $newData[$newCode] = $value;
                 if ($ki !== false && isset($instr['replacesValues'][$ki])
-                    && !empty($instr['replacesValues'][$ki])) {
+                    && $instr['replacesValues'][$ki] !== '') {
                     $newData[$newCode] = $instr['replacesValues'][$ki];
                 }
             } else {
@@ -747,7 +834,7 @@ class Order extends AbstractEntity
         }
         return $newData;
     }
-	
+
     /**
      * @param $list
      * @param $search
@@ -757,9 +844,12 @@ class Order extends AbstractEntity
     {
         return array_search($search, $list);
     }
-	
+
     /**
-     * @param $item
+     * @param $data
+     * @param $instr
+     * @param $table
+     *
      * @return array
      */
     protected function _addPartColumns($data, $instr, $table)
@@ -776,17 +866,29 @@ class Order extends AbstractEntity
                 }
             }
         }
-        if (!in_array($reqCode, $instr['list'])) {
+        if (!in_array($reqCode, $instr['list'])
+            && isset($data[$reqCode])
+        ) {
             $newData[$reqCode] = $data[$reqCode];
         }
+
+        $prefix = $this->_prefixData[$table] ?? '';
 
         foreach ($instr['list'] as $k => $code) {
             $newCode = $code;
             if (isset($instr['replaces'][$k])) {
                 $newCode = $instr['replaces'][$k];
             }
-            $newData[$newCode] = $data[$code];
-
+            $newData[$newCode] = $data[$code] ?? '';
+            try {
+                if ($table !== 'sales_order' && strpos($code, $prefix) !== false) {
+                    $newData[$newCode] = $data[$code] ?? '';
+                } elseif ($prefix) {
+                    $newData[$newCode] = $data[$prefix . ':' . $code] ?? '';
+                }
+            } catch (Exception $exception) {
+                $this->addLogWriteln($code, $this->getOutput(), 'error');
+            }
             if (isset($instr['replacesValues'][$k])
                 && !empty($instr['replacesValues'][$k])) {
                 $newData[$newCode] = $instr['replacesValues'][$k];
@@ -794,5 +896,15 @@ class Order extends AbstractEntity
         }
 
         return $newData;
-    }   
+    }
+
+    /**
+     * Retrieve attributes codes which are appropriate for export
+     *
+     * @return array
+     */
+    protected function _getExportAttrCodes()
+    {
+        return [];
+    }
 }

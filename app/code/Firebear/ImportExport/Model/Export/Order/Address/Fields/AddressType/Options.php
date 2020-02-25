@@ -21,13 +21,9 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $options = [
+        return [
             ['label' => 'shipping', 'value' => 'Shipping'],
             ['label' => 'billing', 'value' => 'Billing'],
         ];
-
-        $this->options = $options;
-
-        return $this->options;
     }
 }

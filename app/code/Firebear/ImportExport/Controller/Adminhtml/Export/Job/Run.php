@@ -6,72 +6,44 @@
 
 namespace Firebear\ImportExport\Controller\Adminhtml\Export\Job;
 
-use Firebear\ImportExport\Api\ExportJobRepositoryInterface;
-use Firebear\ImportExport\Api\JobRepositoryInterface;
-use Firebear\ImportExport\Controller\Adminhtml\Job as JobController;
-use Firebear\ImportExport\Helper\Data;
-use Firebear\ImportExport\Model\JobFactory;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Registry;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Context;
+use Firebear\ImportExport\Controller\Adminhtml\Export\Job as JobController;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\App\CacheInterface;
 
+/**
+ * Class Run
+ *
+ * @package Firebear\ImportExport\Controller\Adminhtml\Export\Job
+ */
 class Run extends JobController
 {
-    /**
-     * @var JsonFactory
-     */
-    protected $jsonFactory;
+    const CACHE_TAG = 'config_scopes';
 
     /**
-     * @var Data
+     * @var SerializerInterface
      */
-    protected $helper;
+    protected $serializer;
 
     /**
-     * @var \Magento\Framework\Json\DecoderInterface
+     * @var \Magento\Framework\App\CacheInterface
      */
-    protected $jsonDecoder;
-
-    /**
-     * @var \Magento\Backend\Model\UrlInterface
-     */
-    protected $url;
-    /** @var ExportJobRepositoryInterface */
-    protected $exportJobRepository;
-    /** @var \Magento\Framework\Json\EncoderInterface */
-    protected $jsonEncoder;
+    protected $cache;
 
     /**
      * Run constructor.
      *
      * @param Context $context
-     * @param Registry $coreRegistry
-     * @param JobFactory $jobFactory
-     * @param JobRepositoryInterface $repository
-     * @param JsonFactory $jsonFactory
-     * @param \Magento\Framework\Json\DecoderInterface $jsonDecoder
-     * @param \Magento\Framework\Json\EncoderInterface $jsonoEncoder
-     * @param ExportJobRepositoryInterface $exportJobRepository
-     * @param Data $helper
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         Context $context,
-        Registry $coreRegistry,
-        JobFactory $jobFactory,
-        JobRepositoryInterface $repository,
-        JsonFactory $jsonFactory,
-        \Magento\Framework\Json\DecoderInterface $jsonDecoder,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        ExportJobRepositoryInterface $exportJobRepository,
-        Data $helper
+        SerializerInterface $serializer,
+        CacheInterface $cache
     ) {
-        parent::__construct($context, $coreRegistry, $jobFactory, $repository);
-        $this->jsonFactory = $jsonFactory;
-        $this->helper = $helper;
-        $this->jsonDecoder = $jsonDecoder;
-        $this->jsonEncoder = $jsonEncoder;
-        $this->exportJobRepository = $exportJobRepository;
-        $this->url = $context->getBackendUrl();
+        parent::__construct($context);
+        $this->serializer = $serializer;
+        $this->cache = $cache;
     }
 
     /**
@@ -80,8 +52,8 @@ class Run extends JobController
     public function execute()
     {
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */
-        $resultJson = $this->jsonFactory->create();
-        $result = true;
+        $resultJson = $this->resultFactory->create($this->resultFactory::TYPE_JSON);
+        $result[0] = true;
         $exportFile = '';
         $lastEntityId = '';
         if ($this->getRequest()->isAjax()
@@ -95,11 +67,29 @@ class Run extends JobController
                 ob_implicit_flush();
                 $id = $this->getRequest()->getParam('id');
                 $file = $this->getRequest()->getParam('file');
+
+                $page = $this->getRequest()->getParam('page');
+                $this->cache->save($page, 'current_page', [self::CACHE_TAG]);
+                $exportByPage = $this->cache->load('export_by_page');
+
+                if (($page > 1) && ($exportByPage == 0)) {
+                    return $resultJson->setData([
+                        'export_by_page' => false,
+                        'result' => true,
+                        'file' => $this->_backendUrl->getUrl(
+                            'import/export_job/download',
+                            ['file' => str_replace("/", "|", $file)]
+                        ),
+                        'last_entity_id' => $lastEntityId,
+                    ]);
+                }
+
                 $lastEntityId = $this->getRequest()->getParam('last_entity_value');
 
                 if ($lastEntityId) {
                     $this->updateLastEntityId($id, $lastEntityId);
                 }
+
                 $exportFile = $this->helper->runExport($id, $file);
                 $result = $this->helper->getResultProcessor();
 
@@ -108,13 +98,16 @@ class Run extends JobController
                 ) {
                     $lastEntityId = $result[1];
                 }
+
             } catch (\Exception $e) {
-                $result = false;
+                $result[0] = false;
             }
 
+            $exportByPage = $this->cache->load('export_by_page');
             return $resultJson->setData([
+                'export_by_page' => ($exportByPage == 1) ?  true : false,
                 'result' => $result[0],
-                'file' => $this->url->getUrl(
+                'file' => $this->_backendUrl->getUrl(
                     'import/export_job/download',
                     ['file' => str_replace("/", "|", $exportFile)]
                 ),
@@ -131,16 +124,16 @@ class Run extends JobController
      */
     protected function updateLastEntityId($jobId, $lastEntityId)
     {
-        $exportJob = $this->exportJobRepository->getById($jobId);
-        $sourceData = $this->jsonDecoder->decode($exportJob->getExportSource());
+        $exportJob = $this->repository->getById($jobId);
+        $sourceData = $this->serializer->unserialize($exportJob->getExportSource());
         $sourceData = array_merge(
             $sourceData,
             [
                 'last_entity_id' => $lastEntityId,
             ]
         );
-        $sourceData = $this->jsonEncoder->encode($sourceData);
+        $sourceData = $this->serializer->serialize($sourceData);
         $exportJob->setExportSource($sourceData);
-        $this->exportJobRepository->save($exportJob);
+        $this->repository->save($exportJob);
     }
 }

@@ -1,15 +1,11 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * @copyright: Copyright © 2019 Firebear Studio. All rights reserved.
+ * @author   : Firebear Studio <fbeardev@gmail.com>
  */
-
-// @codingStandardsIgnoreFile
 
 /**
  * Form time element
- *
- * @author      Magento Core Team <core@magentocommerce.com>
  */
 namespace Firebear\ImportExport\Ui\Form\Element;
 
@@ -17,6 +13,11 @@ use Magento\Framework\Data\Form\Element\CollectionFactory;
 use Magento\Framework\Data\Form\Element\Factory;
 use Magento\Framework\Escaper;
 
+/**
+ * Class Frequency
+ *
+ * @package Firebear\ImportExport\Ui\Form\Element
+ */
 class Frequency extends \Magento\Framework\Data\Form\Element\Select
 {
     /**
@@ -42,7 +43,6 @@ class Frequency extends \Magento\Framework\Data\Form\Element\Select
      */
     public function getElementHtml()
     {
-        // $layout = $this->getForm()->getParent()->getLayout();
         $this->addClass('select admin__control-select');
         $html = '';
         if ($this->getBeforeElementHtml()) {
@@ -54,14 +54,13 @@ class Frequency extends \Magento\Framework\Data\Form\Element\Select
         }
 
         $onchange = '';
-        if($this->getDepend()) {
+        if ($this->getDepend()) {
             $fieldId = $this->getDepend();
             $onchange .= ' data-depend="' . $fieldId . '"';
         }
 
-        $html .= '<select' . $onchange . ' id="' . $this->getHtmlId() . '" name="' . $this->getName() . '" ' . $this->serialize(
-            $this->getHtmlAttributes()
-        ) . $this->_getUiId() . '>' . "\n";
+        $html .= '<select' . $onchange . ' id="' . $this->getHtmlId() . '" name="' . $this->getName() . '" ' .
+            $this->serialize($this->getHtmlAttributes()) . $this->_getUiId() . '>' . "\n";
 
         $value = $this->getValue();
         if (!is_array($value)) {
@@ -98,7 +97,7 @@ class Frequency extends \Magento\Framework\Data\Form\Element\Select
                 "\n";
         }
 
-        if($this->getDepend()) {
+        if ($this->getDepend()) {
             $html .= $this->getScript();
         }
 

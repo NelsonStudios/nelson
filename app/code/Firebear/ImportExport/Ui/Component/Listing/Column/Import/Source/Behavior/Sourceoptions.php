@@ -9,6 +9,11 @@ namespace Firebear\ImportExport\Ui\Component\Listing\Column\Import\Source\Behavi
 use Magento\Framework\Data\OptionSourceInterface;
 use Firebear\ImportExport\Model\Import;
 
+/**
+ * Class Sourceoptions
+ *
+ * @package Firebear\ImportExport\Ui\Component\Listing\Column\Import\Source\Behavior
+ */
 class Sourceoptions implements OptionSourceInterface
 {
     /**

@@ -23,7 +23,36 @@ class Ftp extends \Magento\Framework\Filesystem\Io\Ftp
      */
     public function mdtm($filename)
     {
-        return @ftp_mdtm($this->_conn, $filename);
+        return ftp_mdtm($this->_conn, $filename);
+    }
+
+    /**
+     * Creates a directory.
+     *
+     * @param string $dir
+     * @param int $mode
+     * @param bool $recursive
+     * @return bool|void
+     */
+    public function mkdir($dir, $mode = 0777, $recursive = false)
+    {
+        if (!$this->cd($dir)) {
+            if ($recursive) {
+                $parts = explode(DIRECTORY_SEPARATOR, $dir);
+                foreach ($parts as $part) {
+                    if (!$this->cd($part)) {
+                        parent::mkdir($part);
+                        $this->cd($part);
+                        $this->chmod($mode, $part);
+                    }
+                }
+            } else {
+                parent::mkdir($dir);
+                $this->chmod($mode, $dir);
+            }
+        } else {
+            $this->chmod($mode, $dir);
+        }
     }
 
     public function checkIsPath($filename, $dest)

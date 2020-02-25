@@ -21,12 +21,6 @@ class JobActions extends Column
      */
     const URL_PATH_EDIT = 'import/job/edit';
 
-    const URL_PATH_DELETE = 'import/job/delete';
-
-    const URL_PATH_ENABLE = 'import/job/enable';
-
-    const URL_PATH_DISABLE = 'import/job/disable';
-
     /**
      * @var UrlInterface
      */
@@ -71,52 +65,13 @@ class JobActions extends Column
                                     'entity_id' => $item['entity_id']
                                 ]
                             ),
-                            'label' => __('Edit & Run')
-                        ],
-                        'delete' => [
-                            'href' => $this->urlBuilder->getUrl(
-                                static::URL_PATH_DELETE,
-                                [
-                                    'entity_id' => $item['entity_id']
-                                ]
-                            ),
-                            'label' => __('Delete'),
-                            'confirm' => [
-                                'title' => __('Delete "${ $.$data.title }"'),
-                                'message' => __('Are you sure you want to delete a "${ $.$data.title }" record?')
-                            ]
+                            'label' => __('Edit')
                         ]
                     ];
-                    if (!$item['is_active']) {
-                        $item[$this->getData('name')]['enable'] = [
-                            'href' => $this->urlBuilder->getUrl(
-                                static::URL_PATH_ENABLE,
-                                [
-                                    'entity_id' => $item['entity_id']
-                                ]
-                            ),
-                            'label' => __('Enable')
-                        ];
-                    } else {
-                        $item[$this->getData('name')]['disable'] = [
-                            'href' => $this->urlBuilder->getUrl(
-                                static::URL_PATH_DISABLE,
-                                [
-                                    'entity_id' => $item['entity_id']
-                                ]
-                            ),
-                            'label' => __('Disable')
-                        ];
-                    }
                 }
             }
         }
 
         return $dataSource;
-    }
-
-    public function getBuilder()
-    {
-        return $this->urlBuilder;
     }
 }

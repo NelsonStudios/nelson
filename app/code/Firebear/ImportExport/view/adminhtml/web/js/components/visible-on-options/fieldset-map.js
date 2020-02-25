@@ -32,7 +32,9 @@ define(
                     this.visible(this.inverseVisibility ? !this.isShown : this.isShown);
                     if (this.isShown) {
                         var map = reg.get(this.ns + '.' + this.ns + '.source_data_map_container.source_data_map');
-                        map.showSpinner(false);
+                        if (map !== undefined) {
+                            map.showSpinner(false);
+                        }
                     }
                     if (this.openOnShow) {
                         this.opened(this.inverseVisibility ? !this.isShown : this.isShown);

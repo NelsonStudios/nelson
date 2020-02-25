@@ -11,12 +11,10 @@
         <field name="file_path" id="file_path" label="File Path" type="text" required="true" notice="The file must match the format. Use relative path to Magento installation, e.g. var/import/products.csv (Make sure folder have correct write permissions - 775 , for more details please see Magento 2 Permissions guide)" validation="no-whitespace" component="Firebear_ImportExport/js/form/import-path-file"/>
         <field name="import_images_file_dir" id="file_import_images_file_dir" label="Images File Directory" type="text" required="false" notice="Use relative path to Magento installation, e.g. var/import/images/"/>
     </type>
-    <type name="dropbox" label="Dropbox" modelInstance="Firebear\ImportExport\Model\Source\Type\Dropbox" exists="\Kunnu\Dropbox\Dropbox" sortOrder="20">
-        <field name="file_path" id="file_path" label="File Path" type="text" required="true" notice="The file must match the format." validation="no-whitespace" component="Firebear_ImportExport/js/form/import-path-file"/>
-        <field name="app_key" id="app_key" label="App Key" type="text" required="true" />
-        <field name="app_secret" id="app_secret" label="App Secret" type="text" required="true" />
+    <type name="dropbox" label="Dropbox" modelInstance="Firebear\ImportExport\Model\Source\Type\Dropbox" sortOrder="20">
+        <field name="file_path" id="file_path" label="File Path" type="text" required="true" notice="The file must match the format." validation="validate-no-empty" component="Firebear_ImportExport/js/form/import-path-file"/>
         <field name="access_token" id="access_token" label="Access Token" type="text" required="true" />
-        <field name="import_images_file_dir" id="file_import_images_file_dir" label="Images File Directory" type="text" notice="Use relative path to Magento installation, e.g. var/import/images/"/>
+        <field name="remote_images_file_dir" id="remote_images_file_dir" label="Remote Images Directory" type="text" notice="Use absolute path, e.g. /import/images/"/>
     </type>
     <type name="ftp" label="Ftp" modelInstance="Firebear\ImportExport\Model\Source\Type\Ftp" sortOrder="30">
         <field name="file_path" id="file_path" label="File Path" type="text" required="true" notice="The file must match the format." validation="no-whitespace" component="Firebear_ImportExport/js/form/import-path-file"/>
@@ -45,7 +43,7 @@
         <field name="request_options" id="request_options" label="JSON Options" type="text" required="true" notice="JSON Options" validation="validate-no-empty required-entry" component="Firebear_ImportExport/js/form/import-rest-textarea"/>
         <field name="request_body" id="request_body" label="JSON Body Request" type="text" required="false" notice="JSON Body Request"  component="Firebear_ImportExport/js/form/import-rest-textarea"/>
     </type>
-    <type name="soap" label="SOAP API" modelInstance="Firebear\ImportExport\Model\Source\Type\SOAP" sortOrder="80" depends="xml" api="1">
+    <type name="soap" label="SOAP API" modelInstance="Firebear\ImportExport\Model\Source\Type\Soap" sortOrder="80" depends="xml" api="1">
         <field name="soap_version" id="soap_version" label="SOAP Version" type="text" required="true" formElement="select" component="Firebear_ImportExport/js/form/import-soap-select" options="Firebear\ImportExport\Model\Job\Source\SoapVersion" source_options="Firebear\ImportExport\Model\Job\Source\SoapVersion"/>
         <field name="request_url" id="request_url" label="Web Service Url" type="text" required="true" notice="Web Service Url" validation="no-whitespace url2"/>
         <field name="soap_call" id="soap_call" label="Call Function" type="text" required="true" notice="End point of Request" validation="no-whitespace"/>

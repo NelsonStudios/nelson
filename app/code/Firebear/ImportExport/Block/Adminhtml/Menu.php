@@ -6,6 +6,11 @@
 
 namespace Firebear\ImportExport\Block\Adminhtml;
 
+/**
+ * Class Menu
+ *
+ * @package Firebear\ImportExport\Block\Adminhtml
+ */
 class Menu extends \Magento\Backend\Block\Template
 {
     /**
