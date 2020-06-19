@@ -1021,12 +1021,17 @@ define(['iwdOpcSelectize', 'jquery', 'underscore', 'uiRegistry'], function (sele
                     var value = this.$input.val(),
                     changed = this.$input.html(),
                     elements = $("select[name='" + this.$input.attr('name') +"']");
-                    this.$input.val('');
-                    this.$input.val(value);
+                    if(value){
+                        this.$input.val('');
+                        this.$input.val(value); 
+                    }
                     /*value upadte fix for mobile*/
                     if(!value){
                         var newVal=this.$input.parent().find('.selectize-input.items.has-items .item').attr('data-value');
-                        this.$input.val('').trigger('change').val(newVal).trigger('change');
+                        if(newVal){
+                            this.$input.val('').trigger('change').val(newVal).trigger('change');
+                        }
+                        return;
                     }
                     /*end*/
                     this.$input.get(0).indeterminate = true;
