@@ -23,12 +23,11 @@ class PaymentInformationManagement
     }
 
     public function afterSavePaymentInformation(
-        \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject,
+        \Magento\Checkout\Api\PaymentInformationManagementInterface $subject,
         $result,
-        $cartId,
-        $billingAddress = null,
         $paymentMethod,
-        $email
+        $cartId,
+        $billingAddress = null
     ) {
         $this->checkoutHelper->updateQuoteExtraField($cartId);
         return $result;

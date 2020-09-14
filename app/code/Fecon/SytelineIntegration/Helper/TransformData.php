@@ -287,8 +287,10 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function getSytelineExtraField($order, $key)
     {
-        $data = $this->serializer->unserialize($order->getSytelineCheckoutExtraFields());
         $value = '';
+        try {
+            $data = $this->serializer->unserialize($order->getSytelineCheckoutExtraFields());
+        } catch (\Exception $ex) { }
         if (isset($data[$key])) {
             $value = $data[$key];
         }

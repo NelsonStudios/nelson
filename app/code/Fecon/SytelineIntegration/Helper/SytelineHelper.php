@@ -251,7 +251,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $order->setData('real_order_id', $apiResponse->SubmitCartResponse->ExternalOrderID);
             $order->setData('syteline_id', $apiResponse->SubmitCartResponse->ExternalOrderID);
             $this->orderRepository->save($order);
-        } else {
+        } elseif (isset($orderData)) {
             $successfullRequest = false;
             $this->logDataErrors($errors, $orderId);
             $this->submissionHelper->createSubmission($orderId, $orderData, null, $successfullRequest, $errors);
