@@ -87,6 +87,7 @@ class DataHandler
         $ErpSendShoppingCartRequest->Comments                     = $data["request"]["Comments"];
         $ErpSendShoppingCartRequest->EmailAddress                 = $data["request"]["EmailAddress"];
         $ErpSendShoppingCartRequest->AccountNumber                = $data["request"]["AccountNumber"];
+        $ErpSendShoppingCartRequest->SerialNumber                = $data["request"]["SerialNumber"];
         $ErpSendShoppingCartRequest->ShipVia                      = $data["request"]["ShipVia"];
         $ErpSendShoppingCartRequest->OrderCustomerName            = $data["request"]["OrderCustomerName"];
         $ErpSendShoppingCartRequest->CollectAccountNumber         = $data["request"]["CollectAccountNumber"];

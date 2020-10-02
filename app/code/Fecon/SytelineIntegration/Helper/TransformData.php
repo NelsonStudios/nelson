@@ -110,6 +110,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "Comments" => (string) $order->getCustomerNote(),
                 "EmailAddress" => (string) $order->getCustomerEmail(),
                 "AccountNumber" => $this->getAccountNumber($order),
+                "SerialNumber" => $this->getSerialNumber($order),
                 "ShipVia" => "BEST",
                 "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
@@ -305,6 +306,15 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getAccountNumber($order)
     {
         return $this->getSytelineExtraField($order, 'purchaseOrderNumber');
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     * @return string
+     */
+    protected function getSerialNumber($order)
+    {
+        return $this->getSytelineExtraField($order, 'serialNumber');
     }
 
     /**
