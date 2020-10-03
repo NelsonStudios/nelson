@@ -32,7 +32,7 @@ class GuestPaymentInformationManagement
     }
 
     /**
-     * @param \Magento\Checkout\Api\PaymentInformationManagementInterface $subject
+     * @param \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject
      * @param $result
      * @param $cartId
      * @param $email
@@ -41,7 +41,7 @@ class GuestPaymentInformationManagement
      * @return mixed
      */
     public function afterSavePaymentInformation(
-        \Magento\Checkout\Api\PaymentInformationManagementInterface $subject,
+        \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject,
         $result,
         $cartId,
         $email,
