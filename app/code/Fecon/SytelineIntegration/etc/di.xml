@@ -54,9 +54,9 @@
     <preference for="Magento\Checkout\Block\Cart\Item\Renderer" type="Fecon\SytelineIntegration\Block\Cart\Item\Renderer"/>
     <preference for="Magento\Checkout\Block\Cart\Grid" type="Fecon\SytelineIntegration\Block\Cart\Grid"/>
     <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
-        <plugin disabled="true" name="Fecon_SytelineIntegration_Plugin_Magento_Checkout_Api_GuestPaymentInformationManagementInterface" type="Fecon\SytelineIntegration\Plugin\Magento\Checkout\Api\PaymentInformationManagement"/>
+        <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Checkout_Api_GuestPaymentInformationManagementInterface" type="Fecon\SytelineIntegration\Plugin\Magento\Checkout\Api\GuestPaymentInformationManagement"/>
     </type>
     <type name="Magento\Checkout\Api\PaymentInformationManagementInterface">
-        <plugin disabled="true" name="Fecon_SytelineIntegration_Plugin_Magento_Checkout_Api_PaymentInformationManagementInterface" type="Fecon\SytelineIntegration\Plugin\Magento\Checkout\Api\PaymentInformationManagement"/>
+        <plugin name="Fecon_SytelineIntegration_Plugin_Magento_Checkout_Api_PaymentInformationManagementInterface" type="Fecon\SytelineIntegration\Plugin\Magento\Checkout\Api\PaymentInformationManagement"/>
     </type>
 </config>

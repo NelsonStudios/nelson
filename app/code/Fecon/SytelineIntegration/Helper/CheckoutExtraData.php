@@ -17,11 +17,6 @@ class CheckoutExtraData
     protected $cartRepository;
 
     /**
-     * @var \Magento\Quote\Model\QuoteIdMaskFactory
-     */
-    protected $quoteIdMaskFactory;
-
-    /**
      * @var \Magento\Framework\App\RequestInterface
      */
     protected $request;
@@ -37,26 +32,26 @@ class CheckoutExtraData
    private $serializer;
 
     public function __construct(
-        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Framework\App\RequestInterface $request,
         CartRepositoryInterface $cartRepository,
         \Psr\Log\LoggerInterface $logger,
         SerializerInterface $serializer
     ) {
-        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->cartRepository = $cartRepository;
         $this->request = $request;
         $this->logger = $logger;
         $this->serializer = $serializer;
     }
 
-    public function updateQuoteExtraField($cartId)
+    /**
+     * @param $quoteId
+     */
+    public function updateQuoteExtraField($quoteId)
     {
-        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
-        $quoteId = $quoteIdMask->getQuoteId();
         /** @var Quote $quote */
         $quote = $this->cartRepository->getActive($quoteId);
         $requestContent = $this->request->getContent();
+
         try {
             $data = $this->serializer->unserialize($requestContent);
             $extraFields = $this->serializer->serialize($data['sytelineExtraFields']);
