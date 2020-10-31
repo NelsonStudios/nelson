@@ -18,7 +18,8 @@
         "mageworx/module-shippingrulesmeta": "^2.3",
         "mageplaza/module-banner-slider": "2.0.0",
         "extait/admin-notify": "^1.4",
-        "cweagans/composer-patches": "^1.6"
+        "cweagans/composer-patches": "^1.6",
+        "avalara/avatax-magento": "^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",
