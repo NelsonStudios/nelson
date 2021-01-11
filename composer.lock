@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3139d97e056a23be6fd5a1656797d06f",
+    "content-hash": "c80766b22cacce28803c755f843ee191",
     "packages": [
         {
             "name": "amzn/amazon-pay-and-login-with-amazon-core-module",
@@ -6869,23 +6869,70 @@
             "time": "2017-06-21T14:56:23+00:00"
         },
         {
-            "name": "magepal/magento2-gmailsmtpapp",
-            "version": "2.6.3",
+            "name": "magepal/magento2-core",
+            "version": "1.1.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/magepal/magento2-gmail-smtp-app.git",
-                "reference": "3bc895673d0339d89d228799b768a715309540f8"
+                "url": "https://github.com/magepal/magento2-core.git",
+                "reference": "231c17bb48781eae3b917a365702316f16c397c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/magepal/magento2-gmail-smtp-app/zipball/3bc895673d0339d89d228799b768a715309540f8",
-                "reference": "3bc895673d0339d89d228799b768a715309540f8",
+                "url": "https://api.github.com/repos/magepal/magento2-core/zipball/231c17bb48781eae3b917a365702316f16c397c1",
+                "reference": "231c17bb48781eae3b917a365702316f16c397c1",
                 "shasum": ""
             },
             "require": {
-                "magento/framework": "100.0.*|100.1.*|101.0.*|102.0.*",
-                "magento/module-backend": "100.0.*|100.1.*|100.2.*|101.0.*",
-                "php": "~5.6.0|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.1.3|~7.2.0"
+                "magento/framework": "100.0.*|100.1.*|101.0.*|102.0.*|103.0.*"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "MagePal\\Core\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Renon Stewart",
+                    "email": "renon@magepal.com",
+                    "homepage": "https://www.magepal.com/",
+                    "role": "Leader"
+                }
+            ],
+            "description": "MagePal core extension",
+            "homepage": "https://www.magepal.com/",
+            "keywords": [
+                "magento 2",
+                "magepal core extension"
+            ],
+            "time": "2020-08-19T20:44:24+00:00"
+        },
+        {
+            "name": "magepal/magento2-gmailsmtpapp",
+            "version": "2.8.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/magepal/magento2-gmail-smtp-app.git",
+                "reference": "79498339578d759134f0c0d7e96c74fe24c7291f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/magepal/magento2-gmail-smtp-app/zipball/79498339578d759134f0c0d7e96c74fe24c7291f",
+                "reference": "79498339578d759134f0c0d7e96c74fe24c7291f",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": "100.0.*|100.1.*|101.0.*|102.0.*|103.0.*",
+                "magento/module-backend": "100.0.*|100.1.*|100.2.*|101.0.*|102.0.*",
+                "magepal/magento2-core": ">1.1.0",
+                "php": "~5.6.0|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.1.3|~7.2.0|~7.3.0|~7.4.0"
             },
             "type": "magento2-module",
             "autoload": {
@@ -6924,7 +6971,7 @@
                 "magento2 smtp",
                 "send email magento2"
             ],
-            "time": "2019-05-18T12:56:24+00:00"
+            "time": "2020-07-29T16:10:16+00:00"
         },
         {
             "name": "mageplaza/module-banner-slider",
@@ -6969,16 +7016,16 @@
         },
         {
             "name": "mageplaza/module-core",
-            "version": "1.4.4",
+            "version": "1.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mageplaza/module-core.git",
-                "reference": "8d50d27c1b06718c7c9e7bfb38848126e3e43ac0"
+                "reference": "d050c9f35b04197e97b6747d7dbf1f164b1f26fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mageplaza/module-core/zipball/8d50d27c1b06718c7c9e7bfb38848126e3e43ac0",
-                "reference": "8d50d27c1b06718c7c9e7bfb38848126e3e43ac0",
+                "url": "https://api.github.com/repos/mageplaza/module-core/zipball/d050c9f35b04197e97b6747d7dbf1f164b1f26fe",
+                "reference": "d050c9f35b04197e97b6747d7dbf1f164b1f26fe",
                 "shasum": ""
             },
             "type": "magento2-module",
@@ -7003,7 +7050,57 @@
                 }
             ],
             "description": "Mageplaza Core for Magento 2",
-            "time": "2019-05-24T11:15:09+00:00"
+            "time": "2020-12-07T08:10:17+00:00"
+        },
+        {
+            "name": "mageplaza/module-smtp",
+            "version": "4.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mageplaza/magento-2-smtp.git",
+                "reference": "8517e1777084b75c7a7c4fd70737ae9de8ad1dbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mageplaza/magento-2-smtp/zipball/8517e1777084b75c7a7c4fd70737ae9de8ad1dbf",
+                "reference": "8517e1777084b75c7a7c4fd70737ae9de8ad1dbf",
+                "shasum": ""
+            },
+            "require": {
+                "mageplaza/module-core": "^1.4.5"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Mageplaza\\Smtp\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Mageplaza",
+                    "email": "support@mageplaza.com",
+                    "homepage": "https://www.mageplaza.com",
+                    "role": "Technical Support"
+                }
+            ],
+            "description": "SMTP Extension for Magento 2 helps the owner of store simply install SMTP (Simple Mail Transfer Protocol) server which transmits the messages into codes or numbers",
+            "keywords": [
+                "email settings",
+                "gmail smtp",
+                "magento 2",
+                "magento 2 smtp",
+                "magento smtp",
+                "mageplaza",
+                "smtp"
+            ],
+            "time": "2020-11-19T08:07:43+00:00"
         },
         {
             "name": "mageworx/module-geoip",
@@ -11785,6 +11882,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2017-11-27T05:48:46+00:00"
         },
         {
@@ -12246,6 +12344,7 @@
             ],
             "description": "FinderFacade is a convenience wrapper for Symfony's Finder component.",
             "homepage": "https://github.com/sebastianbergmann/finder-facade",
+            "abandoned": true,
             "time": "2017-11-18T17:31:49+00:00"
         },
         {
