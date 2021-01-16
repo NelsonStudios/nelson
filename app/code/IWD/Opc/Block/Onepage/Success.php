@@ -66,6 +66,35 @@ class Success extends CheckoutSuccess
         $this->opcHelper = $opcHelper;
     }
 
+
+    /**
+     * Prepares block data
+     *
+     * @return void
+     */
+    protected function prepareBlockData()
+    {
+        $orderId = $this->_checkoutSession->getLastOrderId();
+        $order = $this->orderRepository->get($orderId);
+
+        $this->addData(
+            [
+                'is_order_visible' => $this->isVisible($order),
+                'view_order_url' => $this->getUrl(
+                    'sales/order/view/',
+                    ['order_id' => $order->getEntityId()]
+                ),
+                'print_url' => $this->getUrl(
+                    'sales/order/print',
+                    ['order_id' => $order->getEntityId()]
+                ),
+                'can_print_order' => $this->isVisible($order),
+                'can_view_order'  => $this->canViewOrder($order),
+                'order_id'  => $order->getIncrementId()
+            ]
+        );
+    }
+
     protected function _toHtml()
     {
         if ($this->opcHelper->isShowSuccessPage() &&
