@@ -107,15 +107,17 @@ class Cart implements CartInterface {
      */
     protected $opts;
 
+    protected $apiRequest;
+
     /**
      * Constructor
-     * 
-     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession       
-     * @param \Magento\Customer\Model\Session                    $customerSession   
-     * @param \Magento\Checkout\Model\Session                    $checkoutSession   
-     * @param \Magento\Quote\Model\QuoteFactory                  $quoteFactory      
-     * @param \Magento\Framework\App\Request\Http                $request           
-     * @param \Fecon\ExternalCart\Model\Customer                 $customerModel     
+     *
+     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession
+     * @param \Magento\Customer\Model\Session                    $customerSession
+     * @param \Magento\Checkout\Model\Session                    $checkoutSession
+     * @param \Magento\Quote\Model\QuoteFactory                  $quoteFactory
+     * @param \Magento\Framework\App\Request\Http                $request
+     * @param \Fecon\ExternalCart\Model\Customer                 $customerModel
      * @param \Fecon\ExternalCart\Helper\Data                    $externalCartHelper
      */
     public function __construct(
@@ -126,7 +128,8 @@ class Cart implements CartInterface {
         \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Model\Customer $customerModel,
-        \Fecon\ExternalCart\Helper\Data $externalCartHelper
+        \Fecon\ExternalCart\Helper\Data $externalCartHelper,
+        \Magento\Framework\Webapi\Rest\Request $apiRequest
     ) {
         $this->cartHelper = $externalCartHelper;
         /**
@@ -141,7 +144,7 @@ class Cart implements CartInterface {
         $this->tokenModelFactory = $tokenModelFactory;
         $this->customerModel = $customerModel;
         $this->request = $request;
-
+        $this->apiRequest = $apiRequest;
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
@@ -376,14 +379,16 @@ class Cart implements CartInterface {
      */
     public function submitCart() {
         /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
-        $postData = $this->request->getPost();
-        if(!empty($postData)) {
+        $postData = $this->apiRequest->getBodyParams();
+        
+	if(!empty($postData)) {
             /* Request array structure to send to Magento 2 Rest API */
             $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
             /* Array with result of products added or error */
             $productsAdded = [];
             /* Transform post data from body into an array to easily handle the data. */
-            $cartData = $this->cartHelper->jsonDecode($postData['body']);
+//            $cartData = $this->cartHelper->jsonDecode($postData);
+            $cartData =$postData;
             /* Validation for shopping cart, check if there're products to add into the Magento cart, if not throw an exception */
             if(empty($cartData['GetCart']['ErpSendShoppingCartRequest']['ShoppingCartLines']['ShoppingCartLine'])) {
                 $errMsg = 'Error, empty ShoppingCartLine no products to add.';
