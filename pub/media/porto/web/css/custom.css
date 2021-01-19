@@ -100,6 +100,9 @@ body > p {
 .cms-index-index #banner-slider-carousel {
     height: 780px;
 }
+.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container img{
+    display: none;
+}
 .page-header.type16.header-newskin .header.content .minicart-wrapper {
     background-color: transparent !important;
     position: relative !important;
@@ -211,6 +214,11 @@ body > p {
     position: unset;
     float: left !important;
     transform: translateY(0%) !important;
+}
+.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content {
+    position: unset !important;
+    transform: translateY(0%);
+    padding-top: 18%;
 }
 }
 .swatch-input {display: none;}
