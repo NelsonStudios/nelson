@@ -1,3 +1,39 @@
+@font-face {
+    font-family: 'SubstanceW00';
+    src: url('../fonts/SubstanceW00-Black.woff2') format('woff2'),
+        url('../fonts/SubstanceW00-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SubstanceW00';
+    src: url('../fonts/SubstanceW00-Thin.woff2') format('woff2'),
+        url('../fonts/SubstanceW00-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SubstanceW00';
+    src: url('../fonts/SubstanceW00-Bold.woff2') format('woff2'),
+        url('../fonts/SubstanceW00-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SubstanceW00';
+    src: url('../fonts/SubstanceW00-Light.woff2') format('woff2'),
+        url('../fonts/SubstanceW00-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
 .action.compare.no-display {
     display: none !important;
 }
@@ -16,6 +52,20 @@ body > p {
     background-image: url(../images/cart.png) !important;
     background-repeat: no-repeat;
 }
+.page-header.type16.header-newskin .catalog-nav {
+    background-color: transparent;
+    float: left;
+}
+.page-header.type16.header-newskin .header.content .minicart-wrapper .counter.qty {
+    left: 64% !important;
+    width: 20px !important;
+    margin: -2px 0 0 5px;
+    background: #ffc21f !important;
+}
+.page-header.type16.header-newskin .catalog-nav .nav-sections nav.navigation.sw-megamenu ul li a:hover {
+    background-color: transparent !important;
+    color: #fff !important;
+}
 .page-header.type16.header-newskin .header.content .minicart-wrapper {
     background-color: transparent !important;
 }
@@ -32,7 +82,11 @@ body > p {
     padding: 0;
     background: rgba(0,0,0,0.9);
 }
-
+.page-header.type16.header-newskin .header.content .minicart-wrapper .cart-img {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0px 0 0 0px !important;
+}
 @media (min-width: 1200px) {
     .col-xl-2-4 {
         width: 20%;
@@ -107,6 +161,14 @@ body > p {
     padding-right: 0px;
     border-right: 0;
     color: rgba(255,255,255,0.8) !important;
+}
+.page-header.type16.header-newskin .header.content .logo {
+    position: inherit;
+    float: left !important;
+    top: 50%;
+    left: 100px;
+    margin: 0;
+    transform: translateY(-50%);
 }
 }
 .swatch-input {display: none;}
