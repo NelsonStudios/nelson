@@ -416,8 +416,9 @@
     <div class="catalog-nav">
         <?php echo $this->getChildHtml("navigation.sections"); ?>
     </div>
-        <?php echo $this->getChildHtml("top.search"); ?>
         <?php echo $this->getChildHtml("minicart"); ?>
+        <?php echo $this->getChildHtml("top.search"); ?>
+        
         
         <?php if($header_type > 13):?>
         <div class="burger" onclick="this.classList.toggle('burger_active'); document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
