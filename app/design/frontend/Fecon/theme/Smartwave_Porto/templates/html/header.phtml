@@ -412,6 +412,9 @@
     </div>
     <div class="header content">
         <?php echo $this->getChildHtml("logo"); ?>
+    <div class="catalog-nav">
+        <?php echo $this->getChildHtml("navigation.sections"); ?>
+    </div>
         <?php echo $this->getChildHtml("top.search"); ?>
         <?php echo $this->getChildHtml("minicart"); ?>
         
@@ -420,9 +423,7 @@
 <!--         <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span> -->
         <?php endif;?>
     </div>
-    <div class="catalog-nav">
-        <?php echo $this->getChildHtml("navigation.sections"); ?>
-    </div>
+    
     <div id="mobile-nav" class="mobile-nav">
 	    <?php echo $this->getChildHtml("navigation.sections"); ?>
         <?php 
