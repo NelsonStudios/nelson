@@ -398,14 +398,14 @@
             <?php 
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
-                  ->setBlockId('porto_custom_block_for_header')
+                  ->setBlockId('store_language')
                   ->toHtml();
             ?>
             <?php echo $this->getChildHtml("header.links"); ?>
             <?php 
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
-                  ->setBlockId('store_language')
+                  ->setBlockId('porto_custom_block_for_header')
                   ->toHtml();
             ?>
         </div>

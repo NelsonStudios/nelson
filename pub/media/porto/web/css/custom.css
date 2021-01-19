@@ -15,7 +15,7 @@ body > p {
 .cms-index-index .shop-products-section .container-fluid {
     padding-right: 15px;
     padding-left: 15px;
-    max-width: 1140px;
+    max-width: 1170px;
     position: relative;
 }
 .page-header.type16.header-newskin .header.content {
@@ -61,9 +61,9 @@ body > p {
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header {
     position: relative;
-    max-width: 1140px;
+    max-width: 1170px;
     height: 40px;
-    padding: 0;
+    padding: 0 15px;
     background: transparent;
 }
 
