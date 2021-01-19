@@ -104,7 +104,8 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isProductAvailable(\Magento\Catalog\Model\Product $product, $qty = '1')
     {
-        $productData = $this->dataTransformHelper->productToArray($product, $qty);
+        $productLoaded = $this->getLoadedProduct($product);
+        $productData = $this->dataTransformHelper->productToArray($productLoaded, $qty);
         $apiResponse = $this->apiHelper->getPartInfo($productData);
         $available = $this->getAvailability($apiResponse, $product->getId());
 
@@ -120,17 +121,17 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getAvailability($response, $productId)
     {
-//        $available = false;
-//        if (is_array($response)) {
-//            $errors = $response;
-//        } else {
-//            if (!$this->responseHasErrors($response, $errors)) {
-//                $available = ($response->ErpGetPartInfoResponse->Availability == $this::SYTELINE_AVAIALABLE_STATUS);
-//            }
-//        }
-//        if (isset($errors) && !empty($errors)) {
-//            $this->logDataErrors($errors, null, $productId);
-//        }
+        $available = false;
+        if (is_array($response)) {
+            $errors = $response;
+        } else {
+            if (!$this->responseHasErrors($response, $errors)) {
+                $available = ($response->ErpGetPartInfoResponse->Availability == $this::SYTELINE_AVAIALABLE_STATUS);
+            }
+        }
+        if (isset($errors) && !empty($errors)) {
+            $this->logDataErrors($errors, null, $productId);
+        }
         $available = true;
 
         return $available;
@@ -147,10 +148,10 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $hasErrors = false;
         if (isset($response->ErpGetPartInfoResponse)) {
-//            if (!isset($response->ErpGetPartInfoResponse->Availability)) {
-//                $hasErrors = true;
-//                $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetPartInfo';
-//            }
+            if (!isset($response->ErpGetPartInfoResponse->Availability)) {
+                $hasErrors = true;
+                $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetPartInfo';
+            }
             if (!isset($response->ErpGetPartInfoResponse->RetailPrice) || $response->ErpGetPartInfoResponse->RetailPrice == 0) {
                 $hasErrors = true;
                 $errors['errors'][] = 'It has been an error in the data retrieved by the Web Service GetPartInfo';
@@ -260,6 +261,11 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         return $successfullRequest;
     }
 
+    protected function getLoadedProduct($product)
+    {
+        return $this->productRepository->getById($product->getId());
+    }
+
     /**
      * Check if $product exists in Syteline
      *
@@ -269,7 +275,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function existsInSyteline($product)
     {
         try {
-            $loadedProduct = $this->productRepository->getById($product->getId());
+            $loadedProduct = $this->getLoadedProduct($product);
             $exists = (bool) $loadedProduct->getExistsInSyteline();
         } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
             $exists = false;
