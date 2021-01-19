@@ -108,7 +108,6 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $productData = $this->dataTransformHelper->productToArray($productLoaded, $qty);
         $apiResponse = $this->apiHelper->getPartInfo($productData);
         $available = $this->getAvailability($apiResponse, $product->getId());
-
         return $available;
     }
 
@@ -132,7 +131,6 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if (isset($errors) && !empty($errors)) {
             $this->logDataErrors($errors, null, $productId);
         }
-        $available = true;
 
         return $available;
     }
