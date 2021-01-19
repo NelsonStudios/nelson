@@ -411,6 +411,7 @@
         </div>
     </div>
     <div class="header content">
+        <div class="header-inner">
         <?php echo $this->getChildHtml("logo"); ?>
     <div class="catalog-nav">
         <?php echo $this->getChildHtml("navigation.sections"); ?>
@@ -422,6 +423,7 @@
         <div class="burger" onclick="this.classList.toggle('burger_active'); document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
 <!--         <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span> -->
         <?php endif;?>
+    </div>
     </div>
     
     <div id="mobile-nav" class="mobile-nav">

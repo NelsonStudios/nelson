@@ -50,6 +50,9 @@ body > p {
 .clearer {
     clear:both;
 }
+.page-header.type16 .block-search input {
+    border-radius: 5px !important;
+}
 .page-header.type16.header-newskin .header.content .block-search {
     position: unset;
     width: 300px;
@@ -104,6 +107,12 @@ body > p {
     height: 100px;
     padding: 0;
     background: rgba(0,0,0,0.9);
+}
+.page-header.type16.header-newskin .header.content .header-inner {
+    max-width: 1170px;
+    padding: 0 15px;
+    width: 100%;
+    margin: 0 auto;
 }
 .page-header.type16.header-newskin .header.content .minicart-wrapper .cart-img {
     width: 20px !important;
