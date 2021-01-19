@@ -11,6 +11,21 @@ body > p {
 .clearer {
     clear:both;
 }
+
+.cms-index-index .shop-products-section .container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    max-width: 1140px;
+    position: relative;
+}
+.page-header.type16.header-newskin .header.content {
+    position: relative;
+    max-width: 100%;
+    height: 100px;
+    padding: 0;
+    background: rgba(0,0,0,0.9);
+}
+
 @media (min-width: 1200px) {
     .col-xl-2-4 {
         width: 20%;
@@ -41,16 +56,25 @@ body > p {
     background: transparent;
 }
 .page-header.type16 > .panel.wrapper {
-    background-color: transparent !important;
+    background: rgba(70,70,69,0.8);
     color: #000;
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header {
     position: relative;
-    max-width: 100%;
+    max-width: 1140px;
     height: 40px;
     padding: 0;
-    background: rgba(70,70,69,0.8);
+    background: transparent;
 }
+
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li:first-child {
+    font-size: 18px;
+    left: auto;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li a {
+    color: #fff;
+}
+
 
 }
 .swatch-input {display: none;}
