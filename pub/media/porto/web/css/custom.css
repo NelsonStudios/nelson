@@ -426,7 +426,8 @@ fieldset[disabled] .block-search .action.search {
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li:last-child a {
     color: #fff !important;
-    font-weight: bold !important; 
+    font-weight: bold !important;
+    font-size: 16px !important;
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header {
     position: relative;
@@ -1518,6 +1519,9 @@ fieldset[disabled] .block-search .action.search {
         font-weight: 700;
         text-transform: uppercase;
     }
+.page-header.type16.header-newskin .header.content .block-search .control input:focus{
+    width: 100% !important;
+}
 }
 
 .grid-images {
