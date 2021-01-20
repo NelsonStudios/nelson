@@ -108,10 +108,38 @@ body > p {
 .shop-products-section .container-fluid .products .product-item-photo a {
     border: 0 !important;
 }
+.cms-index-index .shop-products-section .container-fluid .products .product-item:hover .product-item-photo {
+    box-shadow: none !important;
+}
 .cms-index-index .shop-products-section .container-fluid .products .product-item .product-item-info {
     border: solid 1px #d0d2d3;
     border-radius: 5px;
     background: #fff;
+    padding: 0 0 20px;
+}
+.product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary {
+    font-weight:bold;
+
+}
+.shop-products-section {
+    margin-bottom: 50px;
+}
+.shop-products-section.featured-products{
+    margin-bottom: 0px;
+}
+.product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:hover, .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:active, .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:focus {
+    color: #ffffff;
+    background-color: #056233 !important;
+    border-color: #056233 !important;
+     font-family: 'SubstanceW00' !important;
+     font-weight: bold !important;
+}
+.price-box .price {
+    font-family: 'SubstanceW00' !important;
+    font-size: 16px !important;
+    letter-spacing: normal;
+    color: #e4002b;
+    font-weight: bold;
 }
 
 button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more {
@@ -126,6 +154,9 @@ button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more
     height: auto !important;
     transition-duration: 0.25s;
     border-radius: 5px;
+}
+.cms-index-index .filterproduct-title .content {
+    background-color: transparent !important;
 }
 .cms-index-index .shop-products-section .container-fluid .owl-item .product-item-details .product-item-name a {
     padding: 15px 15px 0;
@@ -145,6 +176,24 @@ button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more
 
 .cms-index-index .filterproduct-title::before {
     border-bottom: 0 !important;
+}
+.shop-products-section.fecon-products .container-fluid .products .product-item-details .product-item-name {
+    position: relative;
+    margin: 0;
+    background-color: transparent;
+}
+.shop-products-section.fecon-products .container-fluid .products .product-item .product-item-info {
+    border: 0 !important;
+    border-radius: 5px;
+    background:transparent !important;
+}
+.shop-products-section.fecon-products .product.name a {
+    font-size: 14px !important;
+    font-family: 'SubstanceW00' !important;
+}
+.shop-products-section.fecon-products{
+    background: #000;
+    padding-bottom: 50px;
 }
 .toolbar .modes > a {
     text-decoration: none;
@@ -333,7 +382,7 @@ button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more
     position: unset !important;
     transform: translateY(0%);
     padding-top: 22%;
-    padding-bottom: 12%;
+    padding-bottom: 5%;
 }
 .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .btn-red-slider{
     font-size: 18px;
