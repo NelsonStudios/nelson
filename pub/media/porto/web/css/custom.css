@@ -424,6 +424,10 @@ fieldset[disabled] .block-search .action.search {
     padding-right: 10px;
     margin-right: 5px !important;
 }
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li:last-child a {
+    color: #fff !important;
+    font-weight: bold !important; 
+}
 .page-header.type16.header-newskin .panel.wrapper .panel.header {
     position: relative;
     max-width: 1170px;
