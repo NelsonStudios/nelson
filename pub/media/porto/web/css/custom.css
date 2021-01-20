@@ -290,9 +290,11 @@ fieldset[disabled] .block-search .action.search {
 }
 .page-header.type16.header-newskin .header.content .minicart-wrapper .counter.qty {
     left: 85% !important;
-    width: 20px !important;
+    width: 21px !important;
+    height: 21px !important
     margin: -2px 0 0 5px;
     background: #ffc21f !important;
+    line-height: 22px !important;
 }
 .page-header.type16.header-newskin .catalog-nav .nav-sections nav.navigation.sw-megamenu ul li a {
     padding: 1px 0px 0 0px !important;
