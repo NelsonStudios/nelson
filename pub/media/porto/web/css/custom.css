@@ -357,7 +357,8 @@ fieldset[disabled] .block-search .action.search {
     max-width: 1170px;
     position: relative;
 }
-body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product-info-main .page-title-wrapper .page-title span{
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product-info-main 
+.page-title-wrapper .page-title span{
     color: #e4002b;
     font-family: 'D-DIN Condensed';
     font-weight: bold;
@@ -366,6 +367,12 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     font-size: 36px;
     line-height: 1.25;
     font-weight: 600;
+}
+.page-layout-1column .product.media, .page-layout-2columns-left .product.media, .page-layout-2columns-right .product.media, .page-layout-3columns .product.media{
+    width: 40.83%;
+    padding: 0px 38px 10px;
+    border: solid 1px #000;
+    border-radius: 5px;
 }
 body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product.info.detailed{
         width: 100% !important;
