@@ -367,6 +367,13 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     line-height: 1.25;
     font-weight: 600;
 }
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product.info.detailed{
+        width: 100% !important;
+    margin-left: 0% !important;
+}
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product.info.detailed .gray-line{
+    border: 0 !important;
+}
 body.catalog-product-view .page-wrapper main#maincontent .columns .column.main 
 .product-info-main .product-info-price .price-final_price{
     padding-top: 0 !important;
