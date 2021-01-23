@@ -369,10 +369,15 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     font-weight: 600;
 }
 .page-layout-1column .product.media, .page-layout-2columns-left .product.media, .page-layout-2columns-right .product.media, .page-layout-3columns .product.media{
-    width: 40.83%;
-    padding: 0px 38px 10px;
+    width: 35% !important;
+    padding: 0px 1% 10px;
     border: solid 1px #000;
     border-radius: 5px;
+    text-align: center;
+}
+.page-layout-1column .product-info-main, .page-layout-2columns-left .product-info-main, 
+.page-layout-2columns-right .product-info-main, .page-layout-3columns .product-info-main{
+    width: 62% !important;
 }
 body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product.info.detailed{
         width: 100% !important;
@@ -4950,4 +4955,7 @@ table .col {
     font-size: 36px;
     line-height: 1.25;
     font-weight: 600;
+}
+.page-layout-2columns-right .column.main {
+    width: 100% !important;
 }
