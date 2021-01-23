@@ -357,7 +357,7 @@ fieldset[disabled] .block-search .action.search {
     max-width: 1170px;
     position: relative;
 }
-body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product-info-main .page-title-wrapper .page-title{
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product-info-main .page-title-wrapper .page-title span{
     color: #e4002b;
     font-family: 'D-DIN Condensed';
     font-weight: bold;
