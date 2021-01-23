@@ -420,12 +420,16 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main
 }
 
 body .page-wrapper main#maincontent {
-    padding: 130px 15px 0 !important;
+    padding: 120px 15px 0 !important;
     max-width: 1170px;
     margin: 0 auto;
 }
 .related-products-section{
     padding: 30px 0 0;
+}
+.related-products-section .container-fluid {
+    padding-right: 0px;
+    padding-left: 0px;
 }
 .owl-carousel .owl-item {
     min-height: 1px;
