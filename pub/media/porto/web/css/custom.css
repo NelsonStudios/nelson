@@ -4911,11 +4911,43 @@ table .col {
     display: none;
 }
 .rating-summary .rating-result > span:before, .review-control-vote label:before {
-    color: #575f68;
+    color: #ffc107;
+}
+.review-control-vote label:before, .review-control-vote:before {
+    font-size: 20px !important;
+    line-height: 20px !important;
+    height: 20px !important;
+    letter-spacing: 10px;
+}
+.fieldset .review-field-ratings > .label {
+    margin-bottom: 0px !important;
+}
+.fieldset > .field, .fieldset > .fields > .field {
+    margin: 0 0 10px !important;
+}
+.fieldset > .field > .label, .fieldset > .fields > .field > .label {
+    font-weight: 400;
+    font-size: 14px !important;
+    line-height: 14px !important;
+    margin-bottom: 5px !important;
 }
 .product-reviews-summary .reviews-actions a:not(:last-child) {
     border-right: 0;
 }
+.fieldset {
+    border: 0;
+    margin: 0 0 15px !important;
+}
 .product-reviews-summary .reviews-actions a.view {
     padding-right: 3px;
+}
+.filterproduct-title-related{
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+    font-weight: bold;
+    position: relative;
+    margin-top: 0;
+    font-size: 36px;
+    line-height: 1.25;
+    font-weight: 600;
 }
