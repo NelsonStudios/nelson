@@ -338,6 +338,63 @@ fieldset[disabled] .block-search .action.search {
     max-width: 1170px;
     position: relative;
 }
+body .page-wrapper main#maincontent {
+    padding: 0 15px !important;
+    max-width: 1170px;
+    margin: 0 auto;
+}
+body .page-wrapper main#maincontent .columns .column.main 
+#layer-product-list .products.wrapper .product-items li.product-item {
+    padding: 0;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    margin: 0 1% 20px;
+    width: 31%;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper 
+.product-items li.product-item .product-item-info {
+    border: 1px solid #d0d2d3 !important;
+}
+.sidebar.sidebar-main:before {
+    border: 0 !important;
+}
+.block-category-list .block-title {
+    padding: 30px 0px 0 0px;
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+    font-weight: bold;
+    position: relative;
+    margin-top: 0;
+    font-size: 36px;
+    line-height: 1.25;
+    font-weight: 600;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list 
+.toolbar-products .toolbar-sorter label.sorter-label {
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+    font-weight: bold;
+    position: relative;
+    margin-top: 0;
+    font-size: 18px !important;
+    line-height: 1.25;
+    font-weight: 600;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .toolbar-products 
+select.sorter-options, body .page-wrapper main#maincontent .columns .column.main #layer-product-list 
+.toolbar-products select.limiter-options {
+    font-size: 16px;
+    cursor: pointer;
+    background: transparent url(../images/down-chevron-green.png) no-repeat 98% 48%;
+    border: none;
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+}
+#layer-product-list{
+    padding-top: 38px;
+}
 .page-header.type16.header-newskin .header.content {
     position: relative;
     max-width: 100%;
@@ -1521,6 +1578,30 @@ fieldset[disabled] .block-search .action.search {
     }
 .page-header.type16.header-newskin .header.content .block-search .control input:focus{
     width: 100% !important;
+}
+.page-header.type16.header-newskin .header.content .block-search {
+    display: none;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header {
+    background-color: #000;
+}
+.page-header.type16.header-newskin .header.content {
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    padding: 8px 0;
+    background: rgba(0,0,0,0.9);
+}
+.page-header.type16.header-newskin .header.content .burger, .page-header.type16.header-newskin .header.content .nav-toggle {
+    right: 61px;
+    width: 56px !important;
+    height: 56px !important;
+}
+.page-header.type16.header-newskin .header.content .minicart-wrapper .cart-img {
+    left: 30% !important;
+}
+.page-header.type16.header-newskin .header.content .minicart-wrapper .counter.qty {
+    left: 70% !important;
 }
 }
 
