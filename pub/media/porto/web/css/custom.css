@@ -340,6 +340,10 @@ fieldset[disabled] .block-search .action.search {
     height: 40px !important;
     float: right;
 }
+#layered-filter-block-container .filter.block{
+    border: solid 1px #000;
+    border-radius: 5px;
+}
 .cms-index-index .shop-products-section .container-fluid {
     padding-right: 15px;
     padding-left: 15px;
@@ -504,11 +508,11 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
 }
 
 .page-header.type16 > .panel.wrapper {
-    background: rgba(70,70,69,0.8);
+    background: rgba(70,70,69,1);
     color: #000;
 }
 .cms-home .page-header.type16 > .panel.wrapper {
-    background: rgba(70,70,69,1);
+    background: rgba(70,70,69,0.8);
     color: #000;
 }
 #google_translate_element {
@@ -1646,10 +1650,10 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
     max-width: 100%;
     height: auto;
     padding: 8px 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,1);
 }
 .cms-home .page-header.type16.header-newskin .header.content {
-    background: rgba(0,0,0,1);
+    background: rgba(0,0,0,0.9);
 }
 .page-header.type16.header-newskin .header.content .burger, .page-header.type16.header-newskin .header.content .nav-toggle {
     right: 61px;
