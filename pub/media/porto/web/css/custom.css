@@ -344,14 +344,39 @@ fieldset[disabled] .block-search .action.search {
     border: solid 1px #000;
     border-radius: 5px;
 }
+
+.filter-options-item {
+    margin-bottom: 0px !important;
+}
+.block-category-list .block-content, .filter-options-content {
+    border-bottom: 0 !important;
+}
 .cms-index-index .shop-products-section .container-fluid {
     padding-right: 15px;
     padding-left: 15px;
     max-width: 1170px;
     position: relative;
 }
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .product-info-main .page-title-wrapper .page-title{
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+    font-weight: bold;
+    position: relative;
+    margin-top: 0;
+    font-size: 36px;
+    line-height: 1.25;
+    font-weight: 600;
+}
+body.catalog-product-view .page-wrapper main#maincontent .columns .column.main 
+.product-info-main .product-info-price .price-final_price{
+    padding-top: 0 !important;
+}
+.product-options-bottom .price-box .price-container .price, .product-info-price .price-box .price-container .price {
+    font-size: 24px !important;
+}
+
 body .page-wrapper main#maincontent {
-    padding: 0 15px !important;
+    padding: 100px 15px 0 !important;
     max-width: 1170px;
     margin: 0 auto;
 }
