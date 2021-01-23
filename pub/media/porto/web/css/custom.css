@@ -359,18 +359,30 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .p
     border: 0 !important;
 }
 .block-category-list .block-title {
-    padding: 30px 0px 0 0px;
-    color: #e4002b;
+    padding: 30px 0px 0 0px !important;
+    color: #e4002b !important;
     font-family: 'D-DIN Condensed';
     font-weight: bold;
     position: relative;
     margin-top: 0;
-    font-size: 36px;
+    font-size: 36px !important;
     line-height: 1.25;
     font-weight: 600;
 }
 body .page-wrapper main#maincontent .columns .column.main #layer-product-list 
 .toolbar-products .toolbar-sorter label.sorter-label {
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #e4002b;
+    font-family: 'D-DIN Condensed';
+    font-weight: bold;
+    position: relative;
+    margin-top: 0;
+    font-size: 18px !important;
+    line-height: 1.25;
+    font-weight: 600;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .toolbar-products .field.limiter label {
     font-weight: 500;
     text-transform: uppercase;
     color: #e4002b;
@@ -393,7 +405,7 @@ select.sorter-options, body .page-wrapper main#maincontent .columns .column.main
     font-family: 'D-DIN Condensed';
 }
 #layer-product-list{
-    padding-top: 38px;
+    padding-top: 40px;
 }
 .page-header.type16.header-newskin .header.content {
     position: relative;
@@ -401,6 +413,22 @@ select.sorter-options, body .page-wrapper main#maincontent .columns .column.main
     height: auto;
     padding: 25px 0;
     background: rgba(0,0,0,0.9);
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper 
+.product-items li.product-item .product-item-info .product-item-photo {
+    min-height: 305px !important;
+    width: 75%;
+    margin: 0 auto;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list 
+.toolbar-products .pages .items.pages-items .item {
+    border: 1px solid #176336;
+    width: 35px !important;
+    height: 35px !important;
+    padding-top: 5px !important;
+    display: inline-block;
+    margin-left: 10px;
+    background: #ffffff;
 }
 .page-header.type16.header-newskin .header.content .header-inner {
     max-width: 1170px;
