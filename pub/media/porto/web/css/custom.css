@@ -109,7 +109,16 @@ body > p {
     font-family: 'D-DIN Condensed';
     font-weight: bold;
 }
-
+.message.global.demo{
+    display: none !important;
+}
+.fieldset > .field > .label, .fieldset > .fields > .field > .label {
+    font-weight: 600;
+    color: #000;
+    font-size: 14px !important;
+    line-height: 14px !important;
+    margin-bottom: 5px !important;
+}
 .shop-products-section .container-fluid .products .product-item-photo a {
     border: 0 !important;
 }
@@ -470,7 +479,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main
 }
 
 body .page-wrapper main#maincontent {
-    padding: 120px 15px 0 !important;
+    padding: 90px 15px 0 !important;
     max-width: 1170px;
     margin: 0 auto;
 }
@@ -554,7 +563,7 @@ select.sorter-options, body .page-wrapper main#maincontent .columns .column.main
     font-size: 16px;
     cursor: pointer;
     background: transparent url(../images/down-chevron-green.png) no-repeat 98% 48%;
-    border: none;
+    border: solid 1px #d0d2d3;
     color: #e4002b;
     font-family: 'D-DIN Condensed';
 }
