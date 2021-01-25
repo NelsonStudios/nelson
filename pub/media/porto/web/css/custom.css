@@ -617,6 +617,10 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
     }
 }
 @media (min-width: 768px) {
+
+
+
+
     .layout-1280 .navigation, .layout-1280 .page-wrapper > .breadcrumbs .items, 
     .layout-1280 .page-header .header.panel, .layout-1280 .header.content, .layout-1280 
     .footer.content, .layout-1280 .page-wrapper > .widget, .layout-1280 .page-wrapper > .page-bottom, 
@@ -5094,22 +5098,29 @@ input#coupon_code{
     font-weight: 600 !important;
 }
 #block-shipping{
-    background: #58595b;
-    color: #fff;
 }
 #block-shipping .title strong {
-    font-size: 1.4rem;
     font-weight: 600;
-    color: #fff;
+    color: #000;
 }
 .cart-summary .block > .title:after {
-    right: 3px;
-    color: #fff;
+    color: #000;
 }
 .cart-summary > .title {
     font-size: 2.4rem;
-    display: none;
     font-weight: 600 !important;
     margin: 12px 0;
     color: #000 !important;
+}
+.cart-totals .grand strong, .opc-block-summary .table-totals .grand strong {
+    color: #000 !important;
+}
+.cart-totals tbody .mark, .cart-totals tfoot .mark {
+    text-align: left;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+.cart-totals tbody .amount, .cart-totals tfoot .amount, .opc-block-summary .table-totals tbody 
+.amount, .opc-block-summary .table-totals tfoot .amount {
+    font-weight: 600 !important;
 }
