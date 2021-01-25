@@ -116,7 +116,7 @@ body > p {
 .cms-index-index .shop-products-section .container-fluid .products .product-item:hover .product-item-photo {
     box-shadow: none !important;
 }
-.cms-index-index .shop-products-section .container-fluid .products .product-item .product-item-info {
+.shop-products-section .container-fluid .products .product-item .product-item-info {
     border: solid 1px #d0d2d3;
     border-radius: 5px;
     background: #fff;
@@ -442,12 +442,7 @@ body.cms-home #banner-slider-carousel .owl-carousel .owl-item {
     padding-right: 0px;
     padding-left: 0px;
 }
-.owl-carousel .owl-item {
-    min-height: 1px;
-    border: solid 1px #d0d2d3;
-    border-radius: 5px;
-    float: left;
-}
+
 body .page-wrapper main#maincontent .columns .column.main 
 #layer-product-list .products.wrapper .product-items li.product-item {
     padding: 0;
