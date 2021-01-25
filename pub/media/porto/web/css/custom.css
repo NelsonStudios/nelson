@@ -5078,5 +5078,38 @@ body .page-wrapper main#maincontent .columns .column.main .cart-container {
     line-height: 14px;
 }
 .checkout-cart-index .product-image-container{
-    width: 100px !important
+    width: 70px !important
+}
+.cart.table-wrapper .product-item-name {
+    margin-top: 4px !important;
+}
+input#coupon_code{
+    height: 30px !important;
+}
+.cart-summary .action.primary.checkout{
+    padding: 10px 10px !important;
+    background: #e4002b !important;
+    border: 0 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+#block-shipping{
+    background: #58595b;
+    color: #fff;
+}
+#block-shipping .title strong {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+}
+.cart-summary .block > .title:after {
+    right: 3px;
+    color: #fff;
+}
+.cart-summary > .title {
+    font-size: 2.4rem;
+    display: none;
+    font-weight: 600 !important;
+    margin: 12px 0;
+    color: #000 !important;
 }
