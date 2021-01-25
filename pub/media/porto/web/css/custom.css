@@ -424,6 +424,17 @@ body .page-wrapper main#maincontent {
     max-width: 1170px;
     margin: 0 auto;
 }
+body.cms-home .page-wrapper main#maincontent {
+    padding: 0px 0px 0 !important;
+    max-width: none;
+    margin: 0 auto;
+}
+body.cms-home #banner-slider-carousel .owl-carousel .owl-item {
+    min-height: 1px;
+    border:0;
+    border-radius:0;
+    float: left;
+}
 .related-products-section{
     padding: 30px 0 0;
 }
