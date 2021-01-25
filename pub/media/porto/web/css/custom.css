@@ -122,6 +122,12 @@ body > p {
     background: #fff;
     padding: 0 0 20px;
 }
+.container-fluid .products .product-item .product-item-info {
+    border: solid 1px #d0d2d3;
+    border-radius: 5px;
+    background: #fff;
+    padding: 0 0 20px;
+}
 .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary {
     font-weight:bold;
 
