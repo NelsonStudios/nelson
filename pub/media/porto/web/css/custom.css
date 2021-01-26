@@ -101,6 +101,15 @@
 html, body{
     font-family: 'SubstanceW00' !important;
 }
+
+.page-layout-1column .block.widget .products-grid .product-item {
+    width: 22.66% !important;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin: 15px 1.1% !important;
+}
+
+
 body > p {
     display: none;
 }
@@ -538,6 +547,9 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .p
     line-height: 1.25;
     font-weight: 600;
 }
+.product-item-name {
+    min-height: 40px;
+}
 body .page-wrapper main#maincontent .columns .column.main #layer-product-list 
 .toolbar-products .toolbar-sorter label.sorter-label {
     font-weight: 500;
@@ -631,11 +643,7 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
 
 
 
-@media (min-width: 991px) {
-.page-layout-1column .block.widget .products-grid .product-item {
-    width: 21.666667% !important;
-}
-}
+
 
 @media (min-width: 768px) {
 
