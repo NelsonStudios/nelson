@@ -209,6 +209,35 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     text-decoration: none;
     color: #fff !important;
 }
+.iwd_main_wrapper .iwd_opc_column_name {
+    text-align: left !important;
+    color: #000 !important;
+    margin-bottom: 24px;
+    margin-bottom: 8px !important;
+}
+
+.iwd_opc_wrapper .iwd_opc_alternative_wrapper button.iwd_opc_button.iwd_opc_place_order_button.active {
+    color: #ffffff !important;
+    background: #e4002b !important;
+    font-weight: 600;
+    height: auto;
+    border: 1px solid #e4002b;
+}
+
+#checkout.iwd_opc_wrapper {
+    padding: 40px;
+    background-color: transparent;
+    margin-top: 80px !important;
+}
+.product-info-main {
+    float: right;
+    padding-top: 30px;
+}
+
+.product.media{
+    margin-top: 40px;
+}
+
 .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav{
     right: 100px !important;
     left: 160px !important;
@@ -469,6 +498,18 @@ body.catalog-product-view .page-wrapper main#maincontent .columns
 .value ul {
     margin: 0 !important;
     padding: 0 !important;
+}
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    text-align: left !important;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  text-align: left !important;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  text-align: left !important;
 }
 .value ul li {
     list-style: none;
@@ -5135,7 +5176,7 @@ body .page-wrapper main#maincontent .columns .column.main .cart-container {
     margin-top: 4px !important;
 }
 input#coupon_code{
-    height: 30px !important;
+    height: 40px !important;
 }
 .cart-summary .action.primary.checkout{
     padding: 10px 10px !important;
