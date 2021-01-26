@@ -5391,3 +5391,8 @@ input#coupon_code{
 .amount, .opc-block-summary .table-totals tfoot .amount {
     font-weight: 600 !important;
 }
+
+.message.success a {
+    color: #e4002b !important;
+    font-weight: bold;
+}
