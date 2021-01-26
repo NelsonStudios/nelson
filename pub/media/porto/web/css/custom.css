@@ -1998,7 +1998,7 @@ body .page-wrapper main#maincontent {
 .page-header.type16.header-newskin .header.content .burger, .page-header.type16.header-newskin .header.content .nav-toggle {
     right: 61px;
     width: 56px !important;
-    height: 56px !important;
+    height: auto !important;
 }
 .page-header.type16.header-newskin .header.content .minicart-wrapper .cart-img {
     left: 30% !important;
