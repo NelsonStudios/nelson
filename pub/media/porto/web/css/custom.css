@@ -748,7 +748,7 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
 
 
 
-@media (max-width: 810px) {
+@media (max-width: 880px) {
 .page-header.type16.header-newskin .header.content .block-search {
     display: none;
 }
