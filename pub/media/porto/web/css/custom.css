@@ -515,7 +515,7 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .p
     border: 1px solid #d0d2d3 !important;
     border-radius: 5px;
 }
-.product-items li.product-item .product-item-info .product-image-photo {
+.product-items li.product-item .product-item-info .product-item-photo {
     min-height: 305px !important;
     width: 75%;
     margin: 0 auto;
@@ -628,6 +628,15 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
         width: 100%;
     }
 }
+
+
+
+@media (min-width: 991px) {
+.page-layout-1column .block.widget .products-grid .product-item {
+    width: 21.666667% !important;
+}
+}
+
 @media (min-width: 768px) {
 
 
