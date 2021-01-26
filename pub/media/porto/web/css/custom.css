@@ -1964,6 +1964,12 @@ body .page-wrapper main#maincontent {
     width: 100% !important;
 }
 
+.page-header.type16.header-newskin .header.content .burger, .page-header.type16.header-newskin .header.content .nav-toggle {
+    right: 61px;
+    width: 56px !important;
+    height: auto !important;
+}
+
 
 .page-layout-1column .block.widget .products-grid .product-item {
     width: 46.66% !important;
@@ -5149,6 +5155,12 @@ table .col {
     .nav-open a.right-side-open, .nav-open .sidebar.sidebar-additional.open + .side-overlay, .nav-open .sidebar.sidebar-additional {
         display: none !important;
     }
+.page-header.type16.header-newskin .header.content .burger, .page-header.type16.header-newskin .header.content .nav-toggle {
+    right: 61px;
+    width: 56px !important;
+    height: 56px !important;
+}
+
 }
 .sidebar .product-items .product-item .product-reviews-summary, .small-list.products-grid .product-item .product-reviews-summary {
     margin-top: 0;
