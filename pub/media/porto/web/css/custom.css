@@ -89,12 +89,18 @@
     font-display: swap;
 }
 
-
+html, body {
+    color: #222 !important;
+}
 .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay {
     margin: 0 100px;
     background: transparent !important;
 }
 
+.goog-te-gadget-simple .goog-te-menu-value span {
+    background: url(../images/arrow.png) no-repeat right top;
+    padding-right: 10px;
+}
 .page-header.type16.header-newskin .panel.wrapper .panel.header .header.links li a{
     color: rgba(255,255,255,0.8) !important;
 }
