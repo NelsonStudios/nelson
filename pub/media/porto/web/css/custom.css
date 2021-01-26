@@ -190,7 +190,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
 .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:hover, 
 .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:active, 
 .product-item-inner .product-item-actions .actions-primary form button.action.tocart.primary:focus {
-    color: #ffffff;
+    color: #ffffff !important;
     background-color: #056233 !important;
     border-color: #056233 !important;
     font-family: 'SubstanceW00' !important;
@@ -224,7 +224,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     font-weight: bold !important;
 }
 
-button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more {
+.actions-primary button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more {
     color: #000 !important;
     background-color: #fff !important;
     border-color: #056233 !important;
