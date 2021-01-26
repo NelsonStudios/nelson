@@ -519,9 +519,6 @@ body.catalog-product-view .page-wrapper main#maincontent .columns
 .iwd_main_wrapper div.iwd_opc_small_button.active, .iwd_main_wrapper a.iwd_opc_button.active, 
 .iwd_main_wrapper div.iwd_opc_button.active, .iwd_main_wrapper button.iwd_opc_button.active {
     color: #343434;
-    border-color: #056233 !important;
-    background: #056233;
-    color: #fff;
     font-weight: bold;
 }
 
@@ -5395,4 +5392,11 @@ input#coupon_code{
 .message.success a {
     color: #e4002b !important;
     font-weight: bold;
+}
+.iwd_opc_wrapper .selectize-input, .iwd_opc_wrapper .iwd_opc_select_container, .iwd_opc_wrapper 
+.iwd_opc_field.iwd_opc_input, .iwd_opc_wrapper .field.iwd_opc_input, .iwd_opc_wrapper .iwd_opc_field .input-text, 
+.iwd_opc_wrapper .field .input-text, .iwd_opc_wrapper .iwd_opc_field textarea, .iwd_opc_wrapper .field textarea, 
+.iwd_opc_wrapper .iwd_opc_field .iwd_opc_hosted_field, .iwd_opc_wrapper .field .iwd_opc_hosted_field, .iwd_opc_wrapper 
+.iwd_opc_field.iwd_opc_textarea, .iwd_opc_wrapper .field.iwd_opc_textarea, .iwd_opc_wrapper .field select{
+    border-radius: 5px !important;
 }
