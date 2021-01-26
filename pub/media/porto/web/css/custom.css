@@ -520,6 +520,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns
 .iwd_main_wrapper div.iwd_opc_button.active, .iwd_main_wrapper button.iwd_opc_button.active {
     color: #343434;
     font-weight: bold;
+    border-radius: 5px !important;
 }
 
 
