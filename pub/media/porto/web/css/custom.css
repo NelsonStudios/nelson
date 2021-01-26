@@ -2843,6 +2843,13 @@ body.boxed .page-wrapper {
     .owl-banner-carousel .content-17.type1 h2{font-size:28px}
     .owl-banner-carousel .content-17.type1 p{display:none}
     .owl-banner-carousel .content-17.type1 a{display:none}
+
+.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .big-gray-underline {
+    margin-bottom: 0px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 0 !important;
+}
+
 }
 
 #banner-slider-demo-18 .content-1{position:absolute;left:50%;top:50%;padding:30px 20px 15px;text-align:left;margin-left:-163px;margin-top:-95px}
@@ -5191,6 +5198,17 @@ table .col {
         padding-left: 20px;
         padding-right: 20px;
     }
+
+
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav {
+    display: block !important;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li {
+    display: none !important;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li:last-child {
+    display: block !important;
+}
 }
 @media (max-width: 480px) {
     .onepage-category .category-detail .products-area .category-link {
