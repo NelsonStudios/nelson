@@ -497,7 +497,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns
 .iwd_main_wrapper div.iwd_opc_small_button.active, .iwd_main_wrapper a.iwd_opc_button.active, 
 .iwd_main_wrapper div.iwd_opc_button.active, .iwd_main_wrapper button.iwd_opc_button.active {
     color: #343434;
-    border-color: #343434;
+    border-color: #056233 !important;
     background: #056233;
     color: #fff;
     font-weight: bold;
