@@ -196,6 +196,15 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
     font-family: 'SubstanceW00' !important;
     font-weight: bold !important;
 }
+.product-item-inner .product-item-actions .actions-primary button.action.tocart.primary:hover, 
+.product-item-inner .product-item-actions .actions-primary button.action.tocart.primary:active, 
+.product-item-inner .product-item-actions .actions-primary button.action.tocart.primary:focus {
+    color: #ffffff;
+    background-color: #056233 !important;
+    border-color: #056233 !important;
+    font-family: 'SubstanceW00' !important;
+    font-weight: bold !important;
+}
 .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li a:hover {
     text-decoration: none;
     color: #fff !important;
@@ -232,6 +241,13 @@ button.action.primary, button.captcha-reload, a.action.primary, a.post-read-more
     background-color: transparent !important;
 }
 .cms-index-index .shop-products-section .container-fluid .owl-item .product-item-details .product-item-name a {
+    padding: 15px 15px 0;
+    font-size: 14px !important;
+    color: #333333;
+    font-weight: bold;
+    font-family: 'SubstanceW00' !important;
+}
+.cms-index-index .product-item-details .product-item-name a {
     padding: 15px 15px 0;
     font-size: 14px !important;
     color: #333333;
