@@ -98,8 +98,8 @@ html, body {
 }
 
 .goog-te-gadget-simple .goog-te-menu-value span {
-    background: url(../images/arrow.png) no-repeat right top;
-    padding-right: 10px;
+    background: url(../images/arrow.png) no-repeat right 3px;
+    padding-right: 25px;
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header .header.links li a{
     color: rgba(255,255,255,0.8) !important;
