@@ -1187,12 +1187,7 @@ body .page-wrapper main#maincontent {
     .owl-banner-carousel .content.type1 p{display:none}
     .owl-banner-carousel .content.type1 a{font-size:8px}
 }
-.cms-index-index .shop-products-section .container-fluid .products .product-item {
-    width: 98% !important;
-    max-width: 330px !important;
-    margin: 0 auto !important;
-    float: none !important;
-}
+
 /*=============== Demo 3 Homepage Slider ===============*/
 #banner-slider-demo-3 .slide1-content em{font-size:26.26px;margin:0 10px}
 #banner-slider-demo-3 .slide1-content h2{font-size:79.12px;margin:5px 0 10px}
@@ -5256,6 +5251,12 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .p
     min-height: inherit !important;
     width: 75%;
     margin: 0 auto;
+}
+.cms-index-index .shop-products-section .container-fluid .products .product-item {
+    width: 98% !important;
+    max-width: 330px !important;
+    margin: 0 auto !important;
+    float: none !important;
 }
 body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
     padding: 0;
