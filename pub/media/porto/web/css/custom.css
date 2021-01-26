@@ -259,7 +259,7 @@ body.catalog-product-view .page-wrapper main#maincontent .columns .column.main .
 
 .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav{
     right: 100px !important;
-    left: 160px !important;
+    left: inherit !important;
 }
 .page-header.type16 .minicart-wrapper .action.showcart .counter.qty {
     color: #000 !important;
@@ -5207,7 +5207,18 @@ table .col {
     display: none !important;
 }
 .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav li:last-child {
-    display: block !important;
+    display: inline-block !important;
+    text-align: right;
+    float: right;
+    margin-right: 25px;
+    border-right: solid 1px;
+    padding-right: 5px;
+    color: #fff !important;
+    font-weight: bold;
+}
+.page-wrapper .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav {
+    right: 100px !important;
+    left: 0px !important;
 }
 }
 @media (max-width: 480px) {
