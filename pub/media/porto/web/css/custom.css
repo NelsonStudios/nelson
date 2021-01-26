@@ -1165,45 +1165,7 @@ body .page-wrapper main#maincontent {
 
 
 
-@media (max-width: 650px) {
-body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
-    padding: 0;
-    margin-left: -1px;
-    margin-bottom: -1px;
-    margin: 16px 1% 5px;
-    width: 48%;
-}
-}
 
-
-@media (max-width: 550px) {
-.page-layout-1column .block.widget .products-grid .product-item {
-    width: 98% !important;
-    margin-bottom: 20px;
-    margin-left: 0;
-    margin: 0 auto 10px !important;
-    max-width: 280px;
-    float: none;
-}
-.product-items li.product-item .product-item-info .product-item-photo {
-    min-height: inherit !important;
-    width: 75%;
-    margin: 0 auto;
-}
-body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
-    padding: 0;
-    margin-left: -1px;
-    margin-bottom: -1px;
-    margin: 0 auto 10px;
-    width: 98%;
-    max-width: 280px;
-}
-.product-items li.product-item .product-item-info .product-item-photo {
-    min-height: inherit !important;
-    width: 75%;
-    margin: 0 auto;
-}
-}
 
 /*=============== Demo 1 Homepage Slider ===============*/
 .owl-banner-carousel .content.type1 h2{font-size:60px}
@@ -5238,6 +5200,50 @@ table .col {
         display: inline-block;
     }
 }
+
+
+
+@media (max-width: 650px) {
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
+    padding: 0;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    margin: 16px 1% 5px;
+    width: 48%;
+}
+}
+
+
+@media (max-width: 550px) {
+.page-layout-1column .block.widget .products-grid .product-item {
+    width: 98% !important;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin: 0 auto 10px !important;
+    max-width: 280px;
+    float: none;
+}
+.product-items li.product-item .product-item-info .product-item-photo {
+    min-height: inherit !important;
+    width: 75%;
+    margin: 0 auto;
+}
+body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
+    padding: 0;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    margin: 0 auto 10px;
+    width: 98%;
+    max-width: 280px;
+}
+.product-items li.product-item .product-item-info .product-item-photo {
+    min-height: inherit !important;
+    width: 75%;
+    margin: 0 auto;
+}
+}
+
+
 .block-search input {
     left: -9999px;
 }
