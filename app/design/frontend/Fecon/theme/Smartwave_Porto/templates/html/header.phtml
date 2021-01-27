@@ -414,7 +414,15 @@
         <div class="header-inner">
         <?php echo $this->getChildHtml("logo"); ?>
     <div class="catalog-nav">
-        <?php echo $this->getChildHtml("navigation.sections"); ?>
+        <?php //echo $this->getChildHtml("navigation.sections"); ?>
+
+        <?php 
+            echo $this->getLayout()
+              ->createBlock('Magento\Cms\Block\Block')
+              ->setBlockId('porto_custom_block_for_category')
+              ->toHtml();
+        ?>
+
     </div>
      <?php if($header_type > 13):?>
         <div class="burger" onclick="this.classList.toggle('burger_active'); document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
@@ -427,7 +435,7 @@
     </div>
     
     <div id="mobile-nav" class="mobile-nav">
-	    <?php echo $this->getChildHtml("navigation.sections"); ?>
+	    <?php //echo $this->getChildHtml("navigation.sections"); ?>
         <?php 
             echo $this->getLayout()
               ->createBlock('Magento\Cms\Block\Block')
