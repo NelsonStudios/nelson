@@ -755,11 +755,16 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list
 }
 
 .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
-    font-size: 48px;
-    line-height: 60px;
+    font-size: 60px;
+    line-height: 70px;
     font-weight: bold;
     font-family: 'D-DIN Condensed' !important;
     color: #fff;
+    text-transform: uppercase;
+}
+.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay 
+.container .content .green-header span {
+    color: #cf0b16;
 }
 .cms-index-index #banner-slider-carousel .owl-stage-outer 
 .owl-stage .owl-item .item .black-overlay .container .content .white-header {
