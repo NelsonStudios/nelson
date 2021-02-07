@@ -88,9 +88,10 @@ class ShippingMethod extends \Magento\Ui\Component\Listing\Columns\Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 $shippingMethod = $item[\Fecon\Shipping\Api\Data\PreorderInterface::SHIPPING_METHOD];
-//                $shippingCode = $this->getShippingCode($shippingMethod);
-//                $shippingTitle = $this->manualShipping->getCode('method', $shippingCode);
-                $item[$this->getData('name')] = $this->getShippingMethods($shippingMethod);
+                $shippingCode = $this->getShippingCode($shippingMethod);
+                //$shippingTitle = $this->manualShipping->getCode('method', $shippingCode);
+                //$item[$this->getData('name')] = $this->getShippingMethods($shippingMethod);
+                $item[$this->getData('name')] = $shippingMethod;
             }
         }
 
