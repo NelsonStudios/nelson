@@ -350,4 +350,14 @@ class CustomerHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->session->isLoggedIn();
     }
+
+    /**
+     * Checking customer login status
+     *
+     * @return bool
+     */
+    public function loggedCustomerEmail()
+    {
+        return $this->session->getCustomer()->getEmail();
+    }
 }
