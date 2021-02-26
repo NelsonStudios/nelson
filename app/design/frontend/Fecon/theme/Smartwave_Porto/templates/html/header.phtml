@@ -398,33 +398,44 @@
             <?php 
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
-                  ->setBlockId('porto_custom_block_for_header')
+                  ->setBlockId('store_language')
                   ->toHtml();
             ?>
             <?php echo $this->getChildHtml("header.links"); ?>
             <?php 
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
-                  ->setBlockId('store_language')
+                  ->setBlockId('porto_custom_block_for_header')
                   ->toHtml();
             ?>
         </div>
     </div>
     <div class="header content">
+        <div class="header-inner">
         <?php echo $this->getChildHtml("logo"); ?>
-        <?php echo $this->getChildHtml("top.search"); ?>
-        <?php echo $this->getChildHtml("minicart"); ?>
-        
-        <?php if($header_type > 13):?>
+    <div class="catalog-nav">
+        <?php //echo $this->getChildHtml("navigation.sections"); ?>
+
+        <?php 
+            echo $this->getLayout()
+              ->createBlock('Magento\Cms\Block\Block')
+              ->setBlockId('porto_custom_block_for_category')
+              ->toHtml();
+        ?>
+
+    </div>
+     <?php if($header_type > 13):?>
         <div class="burger" onclick="this.classList.toggle('burger_active'); document.getElementById('mobile-nav').classList.toggle('mobile-nav_visible')"></div>
 <!--         <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span> -->
         <?php endif;?>
+        <?php echo $this->getChildHtml("minicart"); ?>
+        <?php echo $this->getChildHtml("top.search"); ?>
+        
     </div>
-    <div class="catalog-nav">
-        <?php echo $this->getChildHtml("navigation.sections"); ?>
     </div>
+    
     <div id="mobile-nav" class="mobile-nav">
-	    <?php echo $this->getChildHtml("navigation.sections"); ?>
+	    <?php //echo $this->getChildHtml("navigation.sections"); ?>
         <?php 
             echo $this->getLayout()
               ->createBlock('Magento\Cms\Block\Block')
