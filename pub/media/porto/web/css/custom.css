@@ -143,10 +143,6 @@ body > p {
     font-family: 'D-DIN Condensed';
     font-weight: bold;
 }
-.message.global.demo{
-    display: none !important;
-}
-
 .shop-products-section .container-fluid .products .product-item-photo a {
     border: 0 !important;
 }
