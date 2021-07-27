@@ -5428,3 +5428,17 @@ input#coupon_code{
 .iwd_opc_field.iwd_opc_textarea, .iwd_opc_wrapper .field.iwd_opc_textarea, .iwd_opc_wrapper .field select{
     border-radius: 5px !important;
 }
+.page-header.type16.header-newskin .panel.wrapper .panel.header .header.links.customer-loggedin li a {
+    color: #000 !important;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav.customer-loggedin{
+    right:140px !important;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .header.links.customer-loggedin li a:hover {
+    background: #fff !important;
+    text-decoration: underline;
+    color: #000 !important;
+}
+.page-header.type16.header-newskin .panel.wrapper .panel.header .header.links.customer-loggedin li > span:hover{
+    color: #fff !important;;
+}
