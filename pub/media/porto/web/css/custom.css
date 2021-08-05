@@ -5475,3 +5475,13 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .p
     vertical-align: middle;
     width: auto;
 }
+.page-wrapper .iwd_opc_wrapper .iwd_opc_alternative_wrapper #iwd_opc_top{
+    margin-bottom: 24px;
+}
+.checkout-notice h2{
+    text-align: center;
+    margin-top: 0;
+}
+.label.grand_total{
+    margin-right: 5px;
+}

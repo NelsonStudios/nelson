@@ -5,7 +5,9 @@
 </div>
 <!-- /ko -->
 <!-- ko if: !isTaxDisplayedInGrandTotal -->
-<!-- ko text: getValue() --><!-- /ko -->
+<span class="label grand_total"><!-- ko text: 'Total: ' --><!-- /ko --></span>
+<span class="value"><!-- ko text: getValue() --><!-- /ko -->
+</span>
 <!-- /ko -->
 <!-- ko if: isBaseGrandTotalDisplayNeeded() -->
 <div class="iwd_opc_review_grand_total_base">
