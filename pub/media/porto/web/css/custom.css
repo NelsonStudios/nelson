@@ -37,8 +37,8 @@
 
 @font-face {
     font-family: 'D-DIN';
-    src: url('D-DIN.woff2') format('woff2'),
-        url('D-DIN.woff') format('woff');
+    src: url('../fonts/D-DIN.woff2') format('woff2'),
+        url('../fonts/D-DIN.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -944,6 +944,7 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
     position: unset;
     float: left !important;
     transform: translateY(0%) !important;
+    margin-top: -5px !important;
 }
 .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage
 .owl-item .item .black-overlay .container .content {
@@ -5693,6 +5694,7 @@ transition: all 300ms ease 0ms;
     color: #fff !important;
     font-family: 'D-DIN' !important;
     text-transform: uppercase;
+    font-weight: bold !important;
 }
 .home-teaser-red:hover {
 text-decoration: none !important;
