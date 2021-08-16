@@ -395,14 +395,14 @@
 <?php else: ?>
     <div class="panel wrapper">
         <div class="panel header">
-            <?php 
+            <?php
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
                   ->setBlockId('store_language')
                   ->toHtml();
             ?>
             <?php echo $this->getChildHtml("header.links"); ?>
-            <?php 
+            <?php
                 echo $this->getLayout()
                   ->createBlock('Magento\Cms\Block\Block')
                   ->setBlockId('porto_custom_block_for_header')
@@ -411,12 +411,13 @@
         </div>
     </div>
     <div class="header content">
+       <div id="homelink"></div>
         <div class="header-inner">
         <?php echo $this->getChildHtml("logo"); ?>
     <div class="catalog-nav">
         <?php //echo $this->getChildHtml("navigation.sections"); ?>
 
-        <?php 
+        <?php
             echo $this->getLayout()
               ->createBlock('Magento\Cms\Block\Block')
               ->setBlockId('porto_custom_block_for_category')
@@ -430,13 +431,13 @@
         <?php endif;?>
         <?php echo $this->getChildHtml("minicart"); ?>
         <?php echo $this->getChildHtml("top.search"); ?>
-        
+
     </div>
     </div>
-    
+
     <div id="mobile-nav" class="mobile-nav">
 	    <?php //echo $this->getChildHtml("navigation.sections"); ?>
-        <?php 
+        <?php
             echo $this->getLayout()
               ->createBlock('Magento\Cms\Block\Block')
               ->setBlockId('porto_custom_block_for_header')
