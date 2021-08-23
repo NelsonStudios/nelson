@@ -164,6 +164,8 @@ $lazy_owl = $this->getData("lazy_owl");
                                 <?php echo $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
                             </a>
                         </strong>
+                        <strong class="list-sku"> <?= sprintf("SKU#: %s",$_product->getSku());?></strong>
+
                         <?php endif;?>
                         <?php $_category_config['rating_star'] = "";  //disabled at the moment ?>
                         <?php if($_category_config['rating_star']): ?>
@@ -191,6 +193,7 @@ $lazy_owl = $this->getData("lazy_owl");
                                     <?php echo $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
                                 </a>
                             </strong>
+                            <strong class="list-sku"> <?= sprintf("SKU#: %s",$_product->getSku());?></strong>
                         <?php endif;?>
                         <?php if ($showDescription):?>
                             <div class="product description product-item-description">
