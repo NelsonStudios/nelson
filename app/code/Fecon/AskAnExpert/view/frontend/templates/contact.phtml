@@ -1,8 +1,7 @@
 <?php 
-$om  = \Magento\Framework\App\ObjectManager::getInstance();
-$obj = $om->get('Magento\Framework\HTTP\PhpEnvironment\RemoteAddress');
-$logger = $om->get('Psr\Log\LoggerInterface');
-$ip  =  $obj->getRemoteAddress();
+$logger = $block->getLogger();
+$ip  =  $block->getRemoteAddress();
+
 try {
   $xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
 } catch(\Exception $e) {

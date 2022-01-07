@@ -8,9 +8,7 @@
 /**
  * @var $checkoutSession \Magento\Checkout\Model\Session\Proxy
  */
-$checkoutSession = \Magento\Framework\App\ObjectManager::getInstance()
-    ->get(\Magento\Checkout\Model\Session\Proxy::class);
-$isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
+$isVirtual = $block->getQuote()->isVirtual() ?>
 <div class="iwd_opc_clear"></div>
 <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
     <div class="loader"></div>
@@ -65,17 +63,11 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
                 iwdBlockLoader();
                 return url.setBaseUrl('<?php /* @escapeNotVerified */ echo $block->getBaseUrl();?>');
             });
-		
-              
-        </script>
-	
-    </div>
-		
+		</script>
+	</div>
 		<?php  
-		$objectManager =  \Magento\Framework\App\ObjectManager::getInstance(); 
-          $moduleManager = $objectManager->get('\Magento\Framework\Module\Manager');
-		
-		if($moduleManager->isEnabled('Amazon_Login')){ ?>
+		$moduleManager = $block->getManager();
+        if($moduleManager->isEnabled('Amazon_Login')){ ?>
 		 <div class="amazon-button-container" id="minicart-amazon-pay-button" style="display:none;">
                    <div class="amazon-button-container centered-button" style="margin-left:45%;">
     <div class="amazon-button-container__cell">

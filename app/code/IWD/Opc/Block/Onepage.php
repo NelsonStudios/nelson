@@ -7,6 +7,7 @@ use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Checkout\Model\CompositeConfigProvider;
+use \Magento\Framework\Module\Manager;
 
 class Onepage extends CheckoutOnepage
 {
@@ -19,10 +20,12 @@ class Onepage extends CheckoutOnepage
         FormKey $formKey,
         CompositeConfigProvider $configProvider,
         CheckoutSession $checkoutSession,
+        Manager $manager,
         array $layoutProcessors = [],
         array $data = []
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->manager = $manager;
         parent::__construct($context, $formKey, $configProvider, $layoutProcessors, $data);
     }
 
@@ -31,7 +34,10 @@ class Onepage extends CheckoutOnepage
         if (null === $this->quote) {
             $this->quote = $this->checkoutSession->getQuote();
         }
-
         return $this->quote;
+    }
+    public function getManager()
+    {
+        return $this->manager;
     }
 }
