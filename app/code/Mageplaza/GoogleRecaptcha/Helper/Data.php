@@ -21,22 +21,31 @@
 
 namespace Mageplaza\GoogleRecaptcha\Helper;
 
+use Exception;
+use Magento\Checkout\Helper\Data as CheckoutData;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\HTTP\Adapter\CurlFactory;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Mageplaza\Core\Helper\AbstractData;
+use Mageplaza\Core\Helper\AbstractData as CoreHelper;
 use Mageplaza\GoogleRecaptcha\Model\System\Config\Source\Frontend\Forms as DefaultFormsPaths;
+use ReCaptcha\ReCaptcha;
 
 /**
  * Class Data
  * @package Mageplaza\GoogleRecaptcha\Helper
  */
-class Data extends AbstractData
+class Data extends CoreHelper
 {
     const CONFIG_MODULE_PATH     = 'googlerecaptcha';
     const BACKEND_CONFIGURATION  = '/backend';
     const FRONTEND_CONFIGURATION = '/frontend';
+
+    /**
+     * @var CurlFactory
+     */
+    protected $_curlFactory;
 
     /**
      * @var DefaultFormsPaths
@@ -44,55 +53,76 @@ class Data extends AbstractData
     protected $_formPaths;
 
     /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+
+    /**
      * Data constructor.
+     *
      * @param Context $context
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
      * @param CurlFactory $curlFactory
      * @param DefaultFormsPaths $formPaths
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
         CurlFactory $curlFactory,
-        DefaultFormsPaths $formPaths
-    )
-    {
-        $this->_formPaths = $formPaths;
+        DefaultFormsPaths $formPaths,
+        EncryptorInterface $encryptor
+    ) {
+        $this->_curlFactory = $curlFactory;
+        $this->_formPaths   = $formPaths;
+        $this->encryptor    = $encryptor;
 
         parent::__construct($context, $objectManager, $storeManager);
     }
 
     /**
+     * Backend
+     */
+
+    /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getVisibleKey($storeId = null)
     {
-        return $this->getConfigGeneral('visible/api_key', $storeId);
+        return $this->encryptor->decrypt($this->getConfigGeneral('visible/api_key', $storeId));
     }
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getVisibleSecretKey($storeId = null)
     {
-        return $this->getConfigGeneral('visible/api_secret', $storeId);
+        return $this->encryptor->decrypt($this->getConfigGeneral('visible/api_secret', $storeId));
     }
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function isCaptchaBackend($storeId = null)
     {
-        return $this->isEnabled() && $this->getConfigBackend('enabled', $storeId);
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
+        return $this->getConfigBackend('enabled', $storeId);
     }
 
     /**
      * @param null $storeId
+     *
      * @return array
      */
     public function getFormsBackend($storeId = null)
@@ -104,6 +134,7 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getSizeBackend($storeId = null)
@@ -113,6 +144,7 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getThemeBackend($storeId = null)
@@ -123,6 +155,7 @@ class Data extends AbstractData
     /**
      * @param string $code
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getConfigBackend($code = '', $storeId = null)
@@ -133,8 +166,13 @@ class Data extends AbstractData
     }
 
     /**
+     * Frontend
+     */
+
+    /**
      * @param string $code
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function getConfigFrontend($code = '', $storeId = null)
@@ -146,15 +184,21 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function isCaptchaFrontend($storeId = null)
     {
-        return $this->isEnabled() && $this->getConfigFrontend('enabled', $storeId);
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
+        return $this->getConfigFrontend('enabled', $storeId);
     }
 
     /**
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function getPositionFrontend($storeId = null)
@@ -164,6 +208,7 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function getThemeFrontend($storeId = null)
@@ -173,6 +218,7 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return array
      */
     public function getFormsFrontend($storeId = null)
@@ -184,24 +230,27 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getInvisibleKey($storeId = null)
     {
-        return $this->getConfigGeneral('invisible/api_key', $storeId);
+        return $this->encryptor->decrypt($this->getConfigGeneral('invisible/api_key', $storeId));
     }
 
     /**
      * @param null $storeId
+     *
      * @return mixed
      */
     public function getInvisibleSecretKey($storeId = null)
     {
-        return $this->getConfigGeneral('invisible/api_secret', $storeId);
+        return $this->encryptor->decrypt($this->getConfigGeneral('invisible/api_secret', $storeId));
     }
 
     /**
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function getFormPostPaths($storeId = null)
@@ -212,7 +261,7 @@ class Data extends AbstractData
                 $data[] = $value;
             }
         }
-        $custom = explode("\n", str_replace("\r", "", $this->getConfigFrontend('custom/paths', $storeId)));
+        $custom = explode("\n", str_replace("\r", '', $this->getConfigFrontend('custom/paths', $storeId)));
         if (!$custom) {
             return $data;
         }
@@ -222,17 +271,33 @@ class Data extends AbstractData
 
     /**
      * @param null $storeId
+     *
      * @return array|mixed
      */
     public function getCssSelectors($storeId = null)
     {
-        $data = $this->getConfigFrontend('custom/css', $storeId);
+        $data  = $this->getConfigFrontend('custom/css', $storeId);
+        $forms = explode("\n", str_replace("\r", '', $data));
+        foreach ($forms as $key => $value) {
+            $forms[$key] = trim($value, ' ');
+        }
 
-        return explode("\n", str_replace("\r", "", $data));
+        return $forms;
     }
 
     /**
      * @param null $storeId
+     *
+     * @return array|mixed
+     */
+    public function allowGuestCheckout($storeId = null)
+    {
+        return $this->getConfigValue(CheckoutData::XML_PATH_GUEST_CHECKOUT, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     *
      * @return mixed
      */
     public function getLanguageCode($storeId = null)
@@ -241,36 +306,64 @@ class Data extends AbstractData
     }
 
     /**
+     * get reCAPTCHA server response
+     *
      * @param null $end
      * @param null $recaptcha
+     *
      * @return array
      */
     public function verifyResponse($end = null, $recaptcha = null)
     {
-        $result = ['success' => false];
-
-        $recaptcha = $recaptcha ?: $this->_request->getParam('g-recaptcha-response');
-        if (!$recaptcha) {
+        $result['success'] = false;
+        $recaptcha         = $recaptcha ?: $this->_request->getParam('g-recaptcha-response');
+        if (empty($recaptcha)) {
             $result['message'] = __('The response parameter is missing.');
 
             return $result;
         }
         try {
-            $recaptchaClass = new \ReCaptcha\ReCaptcha($end ? $this->getVisibleSecretKey() : $this->getInvisibleSecretKey());
-            $resp = $recaptchaClass->verify($recaptcha, $this->_request->getClientIp());
-            if ($resp) {
-                if ($resp->isSuccess()) {
-                    $result['success'] = true;
-                } else {
-                    $result['message'] = __('The request is invalid or malformed.');
-                }
+            $recaptchaClass = new ReCaptcha($end === 'visible' ? $this->getVisibleSecretKey() : $this->getInvisibleSecretKey());
+            $resp           = $recaptchaClass->verify($recaptcha, $this->_request->getClientIp());
+            if ($resp && $resp->isSuccess()) {
+                $result['success'] = true;
             } else {
                 $result['message'] = __('The request is invalid or malformed.');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result['message'] = $e->getMessage();
         }
 
         return $result;
+    }
+
+    /**
+     * @param null $storeId
+     *
+     * @return array|mixed
+     */
+    public function getRecaptchaType($storeId = null)
+    {
+        return $this->getConfigFrontend('type', $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     *
+     * @return array|mixed
+     */
+    public function isAgeVerificationEnabled($storeId = null)
+    {
+        return $this->getConfigValue('mpageverify/general/enabled', $storeId);
+    }
+
+    /**
+     * @param $storeId
+     *
+     * @return array|mixed
+     */
+    public function getSizeFrontend($storeId = null)
+    {
+        return $this->getConfigFrontend('size', $storeId);
     }
 }

@@ -39,6 +39,7 @@ class Captcha extends Template
 
     /**
      * Captcha constructor.
+     *
      * @param Context $context
      * @param HelperData $helperData
      * @param array $data
@@ -47,8 +48,7 @@ class Captcha extends Template
         Context $context,
         HelperData $helperData,
         array $data = []
-    )
-    {
+    ) {
         $this->_helperData = $helperData;
 
         parent::__construct($context, $data);
@@ -93,16 +93,11 @@ class Captcha extends Template
     {
         $form = $this->_helperData->getFormsBackend();
         if (!empty($form)) {
-            if ($this->_request->getFullActionName() == 'adminhtml_auth_login') {
-                if (in_array(FormsAdmin::TYPE_LOGIN, $form)) {
-                    return true;
-                }
-            } else {
-                if ($this->_request->getFullActionName() == 'adminhtml_auth_forgotpassword') {
-                    if (in_array(FormsAdmin::TYPE_FORGOT, $form)) {
-                        return true;
-                    }
-                }
+            if ($this->_request->getFullActionName() === 'adminhtml_auth_login') {
+                return in_array(FormsAdmin::TYPE_LOGIN, $form);
+            }
+            if ($this->_request->getFullActionName() === 'adminhtml_auth_forgotpassword') {
+                return in_array(FormsAdmin::TYPE_FORGOT, $form);
             }
         }
 
