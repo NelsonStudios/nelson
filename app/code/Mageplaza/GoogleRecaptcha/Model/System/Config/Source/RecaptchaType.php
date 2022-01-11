@@ -24,22 +24,21 @@ namespace Mageplaza\GoogleRecaptcha\Model\System\Config\Source;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
- * Class Position
+ * Class RecaptchaType
  * @package Mageplaza\GoogleRecaptcha\Model\System\Config\Source
  */
-class Position implements ArrayInterface
+class RecaptchaType implements ArrayInterface
 {
     /**
      * @return array
      */
     public function toOptionArray()
     {
-        $positionOptionArray = [
-            ['label' => __('Bottom Right'), 'value' => 'bottomright'],
-            ['label' => __('Bottom Left'), 'value' => 'bottomleft'],
-            ['label' => __('Inline'), 'value' => 'inline'],
+        $recaptchaTypeOptionArray = [
+            ['label' => __('Visible'), 'value' => 'visible'],
+            ['label' => __('Invisible'), 'value' => 'invisible']
         ];
 
-        return $positionOptionArray;
+        return $recaptchaTypeOptionArray;
     }
 }
