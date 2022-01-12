@@ -27,8 +27,7 @@ class Ajaxr extends \Magento\Framework\App\Action\Action
   	{
 		$orderId =  $this->getRequest()->getPost('id', false);
 	  	if($orderId!=''){
-			$orderi = $this->_order->create()->loadByIncrementId($orderId)->getOrderId(); 
-			$order = $this->_order->create()->load($orderi);
+			$order = $this->_order->create()->loadByIncrementId($orderId);
 			$quote = $this->_quote->create()->load($order->getQuoteId());
 		 	$data = $this->getRequest()->getPost('q', false); 
 		 	$ignor=array('firstname','lastname','street','city','country_id','region_id','postcode','region','telephone','company');
