@@ -1,3 +1,9 @@
+"Disable backend captcha","Disable backend captcha"
+"The captcha is disable for your admin website.","The captcha is disable for your admin website."
+"The captcha backend has been successfully disabled. Please run the flush cache command again","The captcha backend has been successfully disabled. Please run the flush cache command again"
+"Enable backend captcha","Enable backend captcha"
+"The captcha is enabled for your admin website.","The captcha is enabled for your admin website."
+"The captcha backend has been successfully enabled. Please run the flush cache command again","The captcha backend has been successfully enabled. Please run the flush cache command again"
 "The response parameter is missing.","The response parameter is missing."
 "The request is invalid or malformed.","The request is invalid or malformed."
 "Admin Login","Admin Login"
@@ -8,6 +14,7 @@ Login,Login
 "Contact Us","Contact Us"
 "Change Password","Change Password"
 "Product Review","Product Review"
+"Age Verification","Age Verification"
 "-- Auto Detected --","-- Auto Detected --"
 Arabic,Arabic
 Afrikaans,Afrikaans
@@ -81,6 +88,8 @@ Zulu,Zulu
 "Bottom Right","Bottom Right"
 "Bottom Left","Bottom Left"
 Inline,Inline
+Visible,Visible
+Invisible,Invisible
 Compact,Compact
 Normal,Normal
 Dark,Dark
@@ -88,23 +97,30 @@ Light,Light
 message,message
 "Missing required parameters recaptcha!","Missing required parameters recaptcha!"
 "Missing Url in ""Form Post Paths"" configuration field!","Missing Url in ""Form Post Paths"" configuration field!"
+"You need select captcha","You need select captcha"
 "Google Recaptcha","Google Recaptcha"
 General,General
 Enable,Enable
-Invisible,Invisible
 "Google API Key","Google API Key"
 "Create app <a href=""https://www.google.com/recaptcha/admin"" target=""_blank"">here</a>.","Create app <a href=""https://www.google.com/recaptcha/admin"" target=""_blank"">here</a>."
 "Google API Secret Key","Google API Secret Key"
-Visible,Visible
 "Language Code","Language Code"
 "Backend Configuration","Backend Configuration"
 Forms,Forms
 Size,Size
 Theme,Theme
 "Frontend Configuration","Frontend Configuration"
+"Recaptcha Type","Recaptcha Type"
 "Badge Position","Badge Position"
 "Custom Form Position","Custom Form Position"
 "Form Post Paths","Form Post Paths"
-"For Example: newsletter/subscriber/new/  <br> Each Url Post must be separated by a new line","For Example: newsletter/subscriber/new/  <br> Each Url Post must be separated by a new line"
+"For Example: newsletter/subscriber/new/  <br><br>Compatible with Mageplaza SocialLogin: <br>
+                        customer/ajax/login/<br>
+                        sociallogin/popup/create/<br>
+                        sociallogin/popup/forgot/<br>
+                        <br> Each Url Post must be separated by a new line","For Example: newsletter/subscriber/new/  <br><br>Compatible with Mageplaza SocialLogin: <br>
+                        customer/ajax/login/<br>
+                        sociallogin/popup/create/<br>
+                        sociallogin/popup/forgot/<br>
+                        <br> Each Url Post must be separated by a new line"
 "CSS Selectors","CSS Selectors"
-"For Example: #newsletter-validate-detail  <br> Each CSS Selector must be separated by a new line","For Example: #newsletter-validate-detail  <br> Each CSS Selector must be separated by a new line"

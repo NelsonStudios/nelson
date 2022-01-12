@@ -24,6 +24,7 @@ namespace Mageplaza\GoogleRecaptcha\Observer;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\Request\Http;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Event\Observer;
@@ -32,23 +33,23 @@ use Magento\Framework\Message\ManagerInterface;
 use Mageplaza\GoogleRecaptcha\Helper\Data as HelperData;
 
 /**
- * Class Captcha
- * @package Mageplaza\GoogleRecaptcha\Observer
+ * Class Login
+ * @package Mageplaza\GoogleRecaptcha\Observer\Adminhtml
  */
 class Captcha implements ObserverInterface
 {
     /**
-     * @var \Magento\Framework\App\ResponseInterface
+     * @var ResponseInterface
      */
     protected $_responseInterface;
 
     /**
-     * @var \Mageplaza\GoogleRecaptcha\Helper\Data
+     * @var HelperData
      */
     protected $_helperData;
 
     /**
-     * @var \Magento\Framework\App\Request\Http
+     * @var Http
      */
     protected $_request;
 
@@ -58,23 +59,30 @@ class Captcha implements ObserverInterface
     private $_actionFlag;
 
     /**
-     * @var \Magento\Framework\Message\ManagerInterface
+     * @var ManagerInterface
      */
     protected $messageManager;
 
     /**
-     * @var \Magento\Framework\App\Response\RedirectInterface
+     * @var RedirectInterface
      */
     protected $redirect;
 
     /**
+     * @var RequestInterface
+     */
+    protected $requestInterface;
+
+    /**
      * Captcha constructor.
-     * @param \Mageplaza\GoogleRecaptcha\Helper\Data $helperData
-     * @param \Magento\Framework\App\Request\Http $request
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \Magento\Framework\App\ActionFlag $actionFlag
-     * @param \Magento\Framework\App\ResponseInterface $responseInterface
-     * @param \Magento\Framework\App\Response\RedirectInterface $redirect
+     *
+     * @param HelperData $helperData
+     * @param Http $request
+     * @param ManagerInterface $messageManager
+     * @param ActionFlag $actionFlag
+     * @param ResponseInterface $responseInterface
+     * @param RedirectInterface $redirect
+     * @param RequestInterface $requestInterface
      */
     public function __construct(
         HelperData $helperData,
@@ -82,29 +90,47 @@ class Captcha implements ObserverInterface
         ManagerInterface $messageManager,
         ActionFlag $actionFlag,
         ResponseInterface $responseInterface,
-        RedirectInterface $redirect
-    )
-    {
-        $this->_helperData = $helperData;
-        $this->_request = $request;
-        $this->messageManager = $messageManager;
-        $this->_actionFlag = $actionFlag;
+        RedirectInterface $redirect,
+        RequestInterface $requestInterface
+    ) {
+        $this->_helperData        = $helperData;
+        $this->_request           = $request;
+        $this->messageManager     = $messageManager;
+        $this->_actionFlag        = $actionFlag;
         $this->_responseInterface = $responseInterface;
-        $this->redirect = $redirect;
+        $this->redirect           = $redirect;
+        $this->requestInterface   = $requestInterface;
     }
 
     /**
      * @param Observer $observer
+     *
+     * @return array|void
      */
     public function execute(Observer $observer)
     {
-        if ($this->_helperData->isCaptchaFrontend()) {
-            $checkResponse = true;
+        if ($this->_helperData->isEnabled() && $this->_helperData->isCaptchaFrontend()) {
+            $checkResponse = 1;
+            $captcha       = false;
+            if ($this->_request->getFullActionName() === 'wishlist_index_add') {
+                return;
+            }
             foreach ($this->_helperData->getFormPostPaths() as $item) {
-                if ($item != "" && strpos($this->_request->getRequestUri(), $item) !== false) {
-                    $checkResponse = false;
-                    if ($this->_request->getParam('g-recaptcha-response') !== null) {
-                        $response = $this->_helperData->verifyResponse();
+                if ($item !== '' && strpos($this->_request->getRequestUri(), trim($item, ' ')) !== false) {
+                    $checkResponse = 0;
+                    $captcha       = $this->_request->getParam('g-recaptcha-response');
+                    // case ajax login
+                    if ($item === 'customer/ajax/login' && !empty($captcha) && $this->_request->isAjax()) {
+                        $formData = HelperData::jsonDecode($this->requestInterface->getContent());
+                        if (array_key_exists('g-recaptcha-response', $formData)) {
+                            $captcha = $formData['g-recaptcha-response'];
+                        } else {
+                            return $this->redirectUrlError(__('Missing required parameters recaptcha!'));
+                        }
+                    }
+                    if (!empty($captcha)) {
+                        $type     = $this->_helperData->getRecaptchaType();
+                        $response = $this->_helperData->verifyResponse($type);
                         if (isset($response['success']) && !$response['success']) {
                             $this->redirectUrlError($response['message']);
                         }
@@ -113,17 +139,36 @@ class Captcha implements ObserverInterface
                     }
                 }
             }
-            if ($checkResponse && $this->_request->getParam('g-recaptcha-response') !== null) {
+
+            if ($checkResponse === 1 && $captcha !== false) {
                 $this->redirectUrlError(__('Missing Url in "Form Post Paths" configuration field!'));
             }
         }
     }
 
     /**
-     * @param $message
+     * @param string $message
+     *
+     * @return array
      */
     public function redirectUrlError($message)
     {
+        if (strpos($this->_request->getRequestUri(), 'customer/ajax/login') !== false
+            || strpos($this->_request->getRequestUri(), 'sociallogin/popup/forgot') !== false
+        ) {
+            return [
+                'errors'  => true,
+                'message' => $message
+            ];
+        }
+        if (strpos($this->_request->getRequestUri(), 'sociallogin/popup/create') !== false) {
+            return [
+                'success' > false,
+                'message' => $message
+            ];
+        }
+
+        $this->messageManager->getMessages(true);
         $this->messageManager->addErrorMessage($message);
         $this->_actionFlag->set('', Action::FLAG_NO_DISPATCH, true);
         $this->_responseInterface->setRedirect($this->redirect->getRefererUrl());

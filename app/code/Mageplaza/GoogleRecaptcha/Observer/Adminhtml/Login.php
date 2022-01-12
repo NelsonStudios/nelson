@@ -21,7 +21,6 @@
 
 namespace Mageplaza\GoogleRecaptcha\Observer\Adminhtml;
 
-use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\Plugin\AuthenticationException as PluginAuthenticationException;
@@ -35,40 +34,34 @@ use Mageplaza\GoogleRecaptcha\Helper\Data as HelperData;
 class Login implements ObserverInterface
 {
     /**
-     * @type \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_resultJsonFactory;
-
-    /**
-     * @var \Mageplaza\GoogleRecaptcha\Helper\Data
+     * @var HelperData
      */
     protected $_helperData;
 
     /**
      * Login constructor.
-     * @param \Mageplaza\GoogleRecaptcha\Helper\Data $helperData
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     *
+     * @param HelperData $helperData
      */
     public function __construct(
-        HelperData $helperData,
-        JsonFactory $resultJsonFactory
-    )
-    {
+        HelperData $helperData
+    ) {
         $this->_helperData = $helperData;
-        $this->_resultJsonFactory = $resultJsonFactory;
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
-     * @throws \Magento\Framework\Exception\Plugin\AuthenticationException
+     * @param Observer $observer
+     *
+     * @throws PluginAuthenticationException
      */
     public function execute(Observer $observer)
     {
         if ($this->_helperData->isCaptchaBackend()
-            && in_array('backend_login', $this->_helperData->getFormsBackend())
+            && (in_array('backend_login', $this->_helperData->getFormsBackend(), true))
+            && ($this->_helperData->getVisibleKey() !== null && $this->_helperData->getVisibleSecretKey() !== null)
         ) {
-            $response = $this->_helperData->verifyResponse('backend');
-            if (isset($response['success']) && !$response['success']) {
+            $response = $this->_helperData->verifyResponse('visible');
+            if (!array_key_exists('success', $response) || empty($response['success'])) {
                 throw new PluginAuthenticationException(
                     new Phrase($response['message'])
                 );
