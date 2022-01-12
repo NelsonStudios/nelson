@@ -3,7 +3,7 @@ $logger = $block->getLogger();
 $ip  =  $block->getRemoteAddress();
 
 try {
-  $xml = simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$ip);
+  $xml = $xml = $this->getXmlData();
 } catch(\Exception $e) {
   $logger->debug($e->getMessage());
 }

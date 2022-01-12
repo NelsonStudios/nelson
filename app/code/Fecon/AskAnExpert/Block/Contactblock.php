@@ -351,4 +351,13 @@ class Contactblock extends Template {
     {
         return $this->_loggerInterface;
     }
+
+    /**
+     * getXmlData
+     * @return string config value 
+     */
+    public function getXmlData()
+    {
+        return simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$this->getRemoteAddress());
+    }
 }

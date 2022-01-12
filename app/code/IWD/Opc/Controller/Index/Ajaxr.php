@@ -13,25 +13,23 @@ class Ajaxr extends \Magento\Framework\App\Action\Action
 {
 	
     public function __construct(
-	\Magento\Framework\App\Action\Context $context,
-	\Magento\Sales\Model\Order $order,
-	\Magento\Quote\Model\Quote $qoute
-      
-	)
-  {
-  	$this->_order = $order;
-  	$this->_qoute = $qoute;
-	  return parent::__construct($context);
-  }
+		\Magento\Framework\App\Action\Context $context,
+		\Magento\Sales\Model\OrderFactory $order,
+		\Magento\Quote\Model\QuoteFactory $quote
+    )
+  	{
+  		$this->_order = $order;
+  		$this->_quote = $quote;
+		return parent::__construct($context);
+  	}
     
-  public function execute()
-  {
-	
+  	public function execute()
+  	{
 		$orderId =  $this->getRequest()->getPost('id', false);
 	  	if($orderId!=''){
-			$orderi = $this->_order->loadByIncrementId($orderId)->getOrderId(); 
-			$order = $this->_order->load($orderi);
-			$quote = $this->_qoute->load($order->getQuoteId());
+			$orderi = $this->_order->create()->loadByIncrementId($orderId)->getOrderId(); 
+			$order = $this->_order->create()->load($orderi);
+			$quote = $this->_quote->create()->load($order->getQuoteId());
 		 	$data = $this->getRequest()->getPost('q', false); 
 		 	$ignor=array('firstname','lastname','street','city','country_id','region_id','postcode','region','telephone','company');
 		 
