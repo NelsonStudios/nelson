@@ -1,9 +1,9 @@
 <?php 
-$logger = $block->getLogger();
-$ip  =  $block->getRemoteAddress();
+$logger = $this->getLogger();
+$ip  =  $this->getRemoteAddress();
 
 try {
-  $xml = $xml = $this->getXmlData();
+  $xml = $this->getXmlData();
 } catch(\Exception $e) {
   $logger->debug($e->getMessage());
 }
