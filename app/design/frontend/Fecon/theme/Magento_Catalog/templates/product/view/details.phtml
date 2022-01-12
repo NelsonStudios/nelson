@@ -62,7 +62,7 @@
                             </div>
                         <?php endforeach;?>
                         <?php
-                        if($custom_cms_tabs = $_helper->getCustomTabs($block->getProduct())) {
+                        if($custom_cms_tabs = $_helper->getCustomTabs($porto_helper->getProduct())) {
                             $i = 1;
                             foreach($custom_cms_tabs as $_item) {
                                 if (empty(trim($_item['tab_content']))) {

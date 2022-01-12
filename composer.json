@@ -10,7 +10,6 @@
     "require": {
         "andreyco/instagram": "3.0.0",
         "magepal/magento2-gmailsmtpapp": "^2.5",
-        "mageplaza/module-banner-slider": "2.0.0",
         "cweagans/composer-patches": "^1.6",
         "avalara/avatax-magento": "^2.1",
         "mageplaza/module-smtp": "^4.1",
