@@ -3,6 +3,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 use Magento\Tax\Model\Calculation;
 use Magento\Tax\Model\Config;
@@ -20,7 +21,7 @@ $taxCalculationData['including_tax_apply_tax_after_discount'] = [
         SetupUtil::TAX_RATE_OVERRIDES => [
             SetupUtil::TAX_RATE_TX => 10,
             SetupUtil::TAX_STORE_RATE => 10,
-            SetupUtil::TAX_RATE_SHIPPING => 10
+            SetupUtil::TAX_RATE_SHIPPING => 10,
         ],
         SetupUtil::TAX_RULE_OVERRIDES => [
             [
@@ -72,14 +73,14 @@ $taxCalculationData['including_tax_apply_tax_after_discount'] = [
             'base_shipping_incl_tax' => 5,
             'shipping_tax_amount' => 0.25,
             'base_shipping_tax_amount' => 0.25,
-            'discount_amount' => -15.455,
-            'base_discount_amount' => -15.455,
+            'discount_amount' => -15.46,
+            'base_discount_amount' => -15.46,
             'discount_tax_compensation_amount' => 1.2,
             'base_discount_tax_compensation_amount' => 1.2,
             'shipping_discount_tax_compensation_amount' => 0.2,
             'base_shipping_discount_tax_compensation_amount' => 0.2,
-            'grand_total' => 18.545,
-            'base_grand_total' => 18.545,
+            'grand_total' => 18.54,
+            'base_grand_total' => 18.54,
             'applied_taxes' => [
                 SetupUtil::TAX_RATE_TX => [
                     'percent' => 10,

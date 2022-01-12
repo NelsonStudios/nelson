@@ -8,7 +8,6 @@ namespace Magento\Customer\Model;
 
 /**
  * Test for \Magento\Customer\Model\GroupRegistry
- * @magentoAppIsolation enabled
  */
 class GroupRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +21,7 @@ class GroupRegistryTest extends \PHPUnit\Framework\TestCase
      */
     protected $_model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
             ->create(\Magento\Customer\Model\GroupRegistry::class);
@@ -91,20 +90,22 @@ class GroupRegistryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Magento\Framework\Exception\NoSuchEntityException
      */
     public function testRetrieveException()
     {
+        $this->expectException(\Magento\Framework\Exception\NoSuchEntityException::class);
+
         $groupId = $this->_findGroupIdWithCode(self::GROUP_CODE);
         $this->_model->retrieve($groupId);
     }
 
     /**
      * @magentoDataFixture Magento/Customer/_files/customer_group.php
-     * @expectedException \Magento\Framework\Exception\NoSuchEntityException
      */
     public function testRemove()
     {
+        $this->expectException(\Magento\Framework\Exception\NoSuchEntityException::class);
+
         $groupId = $this->_findGroupIdWithCode(self::GROUP_CODE);
         $group = $this->_model->retrieve($groupId);
         $this->assertInstanceOf(\Magento\Customer\Model\Group::class, $group);

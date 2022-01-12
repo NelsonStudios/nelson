@@ -3,16 +3,14 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-
-// @codingStandardsIgnoreFile
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
 \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(\Magento\Framework\App\AreaList::class)
     ->getArea('adminhtml')
     ->load(\Magento\Framework\App\Area::PART_CONFIG);
-
-require __DIR__ . '/../../../Magento/Catalog/_files/product_simple.php';
-require __DIR__ . '/../../../Magento/Catalog/_files/product_simple_duplicated.php';
-require __DIR__ . '/../../../Magento/Catalog/_files/product_virtual.php';
+Resolver::getInstance()->requireDataFixture('Magento/Catalog/_files/product_simple.php');
+Resolver::getInstance()->requireDataFixture('Magento/Catalog/_files/product_simple_duplicated.php');
+Resolver::getInstance()->requireDataFixture('Magento/Catalog/_files/product_virtual.php');
 
 /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepository */
 $productRepository = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
@@ -21,6 +19,15 @@ $productRepository = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
 $simpleId = $productRepository->get('simple')->getId();
 $simpleDuplicatedId = $productRepository->get('simple-1')->getId();
 $virtualId = $productRepository->get('virtual-product')->getId();
+
+$config = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
+    \Magento\Framework\App\Config\MutableScopeConfigInterface::class
+);
+$config->setValue(
+    'reports/options/enabled',
+    1,
+    \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+);
 
 // imitate product views
 /** @var \Magento\Reports\Observer\CatalogProductViewObserver $reportObserver */
@@ -35,10 +42,10 @@ foreach ($productIds as $productId) {
         new \Magento\Framework\Event\Observer(
             [
                 'event' => new \Magento\Framework\DataObject(
-                        [
-                            'product' => new \Magento\Framework\DataObject(['id' => $productId]),
+                    [
+                        'product' => new \Magento\Framework\DataObject(['id' => $productId]),
                         ]
-                    ),
+                ),
             ]
         )
     );

@@ -3,14 +3,16 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\Customer\Model\Address;
 use Magento\Customer\Model\Customer;
 use Magento\Store\Model\Website;
 use Magento\Store\Model\Store;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-include __DIR__ . '/../../Store/_files/websites_different_countries.php';
+Resolver::getInstance()->requireDataFixture('Magento/Store/_files/websites_different_countries.php');
 
 //Creating two customers for different websites.
 $objectManager = Bootstrap::getObjectManager();
@@ -83,10 +85,8 @@ $customerAddress->setData(
         'parent_id' => 1,
         'region_id' => 1,
     ]
-)->setCustomerId(
-    1
-);
-$customerAddress->setStoreId(1)
+)->setCustomerId(1)
+    ->setStoreId(1)
     ->setWebsiteId(1);
 $customerAddress->save();
 //Address for the 2nd customer
@@ -107,9 +107,7 @@ $customerAddress->setData(
         'parent_id' => 1,
         'region_id' => 1,
     ]
-)->setCustomerId(
-    2
-);
-$customerAddress->setStoreId($secondStore->getId())
+)->setCustomerId(2)
+    ->setStoreId($secondStore->getId())
     ->setWebsiteId($secondWebsite->getId());
 $customerAddress->save();

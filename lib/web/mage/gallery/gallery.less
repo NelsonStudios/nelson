@@ -181,8 +181,8 @@
 
 .fotorama__active {
     .fotorama__dot {
-        background-color: @color-orange-red1;
-        border-color: @color-orange-red1;
+        background-color: @active__color;
+        border-color: @active__color;
     }
 }
 
@@ -237,7 +237,7 @@
     &:extend(.fotorama-print-background);
     backface-visibility: hidden;
     background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.25), rgba(64, 64, 64, 0.1));
-    border: 1px solid @color-orange-red1;
+    border: 1px solid @active__color;
     left: 0;
     position: absolute;
     top: 0;
@@ -395,15 +395,16 @@
     position: absolute;
     top: 0;
     width: @fotorama-arw-size;
+
+    ._block-content-loading & {
+        opacity: 0;
+    }
+
     .fotorama__arr__arr {
         &:extend(.fotorama-sprite);
         .fotorama-abs-center();
         height: @size-fotorama-block;
         width: @size-fotorama-block;
-
-        .ie9 & {
-            margin: (-@size-fotorama-block/2) 0 0 (-@size-fotorama-block/2);
-        }
     }
 }
 
@@ -422,9 +423,8 @@
 }
 
 .fotorama__arr--disabled {
-    *display: none;
     cursor: default;
-    opacity: 0.1;
+    opacity: 0;
     pointer-events: none;
 }
 
@@ -641,7 +641,7 @@
     }
     &.fotorama__shadows--top:before,
     &.fotorama__shadows--bottom:after {
-        background-size: 100% 1px, 100% 5px;
+        background-size: 100% 1px, 100% 5px ;
         height:10px;
         left: 0;
         right:0;
@@ -701,8 +701,8 @@
     }
     .fotorama_horizontal_ratio {
         .fotorama__img {
-            .translateX(-50%);
-            height: 100%;
+            .translate(-50%, -50%);
+            top: 50%;
             left: 50%;
             position: absolute;
             width: auto;
@@ -766,8 +766,10 @@
     img {
         left: 0;
         max-width: inherit;
+        max-height: inherit;
         position: absolute;
         top: 0;
+        object-fit: scale-down;
     }
 }
 
@@ -873,10 +875,6 @@
         .fotorama__thumb--icon {
             .fotorama-abs-center();
             width: 100%;
-
-            .ie9 & {
-                margin: (-@fotorama-thumb-arrow/2) 0 0 (-@fotorama-thumb-arrow/2);
-            }
         }
     }
     .fotorama__thumb__arr--left {
@@ -984,12 +982,9 @@
 
 // While first time init
 .gallery-placeholder {
-    .loading-mask {
-        padding: 0 0 50%;
-        position: static;
-    }
-    .loader img {
-        position: absolute;
+    &__image {
+        display: block;
+        margin: auto;
     }
 }
 
@@ -1010,6 +1005,7 @@
         display: block;
     }
 }
+
 .fotorama__product-video--loaded {
     .fotorama__img, .fotorama__img--full {
         display: none !important;

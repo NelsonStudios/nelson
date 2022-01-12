@@ -4,22 +4,27 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\CustomerImportExport\Model\Import;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\ImportExport\Model\Import;
+use Magento\Framework\Indexer\StateInterface;
 
 /**
  * Test for class \Magento\CustomerImportExport\Model\Import\Customer which covers validation logic
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CustomerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Model object which used for tests
      *
-     * @var Customer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Customer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $_model;
 
@@ -36,15 +41,22 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
     protected $directoryWrite;
 
     /**
+     * @var \Magento\Customer\Model\Indexer\Processor
+     */
+    private $indexerProcessor;
+
+    /**
      * Create all necessary data for tests
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
             ->create(\Magento\CustomerImportExport\Model\Import\Customer::class);
         $this->_model->setParameters(['behavior' => Import::BEHAVIOR_ADD_UPDATE]);
+        $this->indexerProcessor = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
+            ->create(\Magento\Customer\Model\Indexer\Processor::class);
 
         $propertyAccessor = new \ReflectionProperty($this->_model, 'errorMessageTemplates');
         $propertyAccessor->setAccessible(true);
@@ -80,9 +92,11 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $expectAddedCustomers = 5;
 
         $source = new \Magento\ImportExport\Model\Import\Source\Csv(
-            __DIR__ . '/_files/customers_to_import.csv',
+            __DIR__ . '/_files/customers_with_gender_to_import.csv',
             $this->directoryWrite
         );
+
+        $existingCustomer = $this->getCustomer('CharlesTAlston@teleworm.us', 1);
 
         /** @var $customersCollection \Magento\Customer\Model\ResourceModel\Customer\Collection */
         $customersCollection = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
@@ -109,15 +123,6 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expectAddedCustomers, $addedCustomers, 'Added unexpected amount of customers');
 
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
-        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-
-        $existingCustomer = $objectManager->get(
-            \Magento\Framework\Registry::class
-        )->registry(
-                '_fixture/Magento_ImportExport_Customer'
-            );
-
         $updatedCustomer = $customers[$existingCustomer->getId()];
 
         $this->assertNotEquals(
@@ -137,19 +142,32 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
             $updatedCustomer->getCreatedAt(),
             'Creation date must be changed'
         );
+        $this->assertEquals(
+            $existingCustomer->getGender(),
+            $updatedCustomer->getGender(),
+            'Gender must be changed'
+        );
     }
 
     /**
-     * Test importData() method
+     * Tests importData() method.
      *
      * @magentoDataFixture Magento/Customer/_files/import_export/customer.php
+     *
+     * @return void
      */
-    public function testImportDataWithOneAdditionalColumn()
+    public function testImportDataWithOneAdditionalColumn(): void
     {
         $source = new \Magento\ImportExport\Model\Import\Source\Csv(
             __DIR__ . '/_files/customer_to_import_with_one_additional_column.csv',
             $this->directoryWrite
         );
+
+        $existingCustomer = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            \Magento\Customer\Model\Customer::class
+        );
+        $existingCustomer->setWebsiteId(1);
+        $existingCustomer = $existingCustomer->loadByEmail('CharlesTAlston@teleworm.us');
 
         /** @var $customersCollection \Magento\Customer\Model\ResourceModel\Customer\Collection */
         $customersCollection = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
@@ -167,15 +185,6 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->importData();
 
         $customers = $customersCollection->getItems();
-
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
-        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-
-        $existingCustomer = $objectManager->get(
-            \Magento\Framework\Registry::class
-        )->registry(
-            '_fixture/Magento_ImportExport_Customer'
-        );
 
         $updatedCustomer = $customers[$existingCustomer->getId()];
 
@@ -210,8 +219,8 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            $existingCustomer->getCustomerGroupId(),
-            $updatedCustomer->getCustomerGroupId(),
+            $existingCustomer->getGroupId(),
+            $updatedCustomer->getGroupId(),
             'Customer group must not be changed'
         );
     }
@@ -264,8 +273,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 1);
         $this->assertEquals(1, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_DUPLICATE_EMAIL_SITE]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_DUPLICATE_EMAIL_SITE])
         );
     }
 
@@ -276,8 +284,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 0);
         $this->assertEquals(1, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_EMAIL]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_EMAIL])
         );
     }
 
@@ -288,8 +295,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 0);
         $this->assertEquals(1, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_WEBSITE]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_WEBSITE])
         );
     }
 
@@ -300,8 +306,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 0);
         $this->assertEquals(1, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_STORE]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_INVALID_STORE])
         );
     }
 
@@ -312,8 +317,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 0);
         $this->assertEquals(1, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_PASSWORD_LENGTH]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_PASSWORD_LENGTH])
         );
     }
 
@@ -342,8 +346,7 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 1);
         $this->assertGreaterThan(0, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_VALUE_IS_REQUIRED]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_VALUE_IS_REQUIRED])
         );
     }
 
@@ -355,8 +358,81 @@ class CustomerTest extends \PHPUnit\Framework\TestCase
         $this->_model->validateRow($this->_customerData, 0);
         $this->assertGreaterThan(0, $this->_model->getErrorAggregator()->getErrorsCount());
         $this->assertNotEmpty(
-            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_CUSTOMER_NOT_FOUND]
-            )
+            $this->_model->getErrorAggregator()->getErrorsByCode([Customer::ERROR_CUSTOMER_NOT_FOUND])
         );
+    }
+
+    /**
+     * Test import existing customers
+     *
+     * @magentoDataFixture Magento/Customer/_files/import_export/customers.php
+     * @return void
+     */
+    public function testUpdateExistingCustomers(): void
+    {
+        $this->doImport(__DIR__ . '/_files/customers_to_update.csv', Import::BEHAVIOR_ADD_UPDATE);
+        $customer = $this->getCustomer('customer@example.com', 1);
+        $this->assertEquals('Firstname-updated', $customer->getFirstname());
+        $this->assertEquals('Lastname-updated', $customer->getLastname());
+        $this->assertEquals(1, $customer->getStoreId());
+        $customer = $this->getCustomer('julie.worrell@example.com', 1);
+        $this->assertEquals('Julie-updated', $customer->getFirstname());
+        $this->assertEquals('Worrell-updated', $customer->getLastname());
+        $this->assertEquals(1, $customer->getStoreId());
+        $customer = $this->getCustomer('david.lamar@example.com', 1);
+        $this->assertEquals('David-updated', $customer->getFirstname());
+        $this->assertEquals('Lamar-updated', $customer->getLastname());
+        $this->assertEquals(1, $customer->getStoreId());
+    }
+
+    /**
+     * Test customer indexer gets invalidated after import when Update on Schedule mode is set
+     *
+     * @magentoDbIsolation enabled
+     * @return void
+     */
+    public function testCustomerIndexer(): void
+    {
+        $this->indexerProcessor->getIndexer()->reindexAll();
+        $statusBeforeImport = $this->indexerProcessor->getIndexer()->getStatus();
+        $this->indexerProcessor->getIndexer()->setScheduled(true);
+        $this->doImport(__DIR__ . '/_files/customers_with_gender_to_import.csv', Import::BEHAVIOR_ADD_UPDATE);
+        $statusAfterImport = $this->indexerProcessor->getIndexer()->getStatus();
+        $this->assertEquals(StateInterface::STATUS_VALID, $statusBeforeImport);
+        $this->assertEquals(StateInterface::STATUS_INVALID, $statusAfterImport);
+    }
+
+    /**
+     * Gets customer entity.
+     *
+     * @param string $email
+     * @param int $websiteId
+     * @return CustomerInterface
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getCustomer(string $email, int $websiteId): CustomerInterface
+    {
+        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        /** @var CustomerRepositoryInterface $repository */
+        $repository = $objectManager->get(CustomerRepositoryInterface::class);
+        return $repository->get($email, $websiteId);
+    }
+
+    /**
+     * Import using given file and behavior
+     *
+     * @param string $file
+     * @param string $behavior
+     */
+    private function doImport(string $file, string $behavior): void
+    {
+        $source = new \Magento\ImportExport\Model\Import\Source\Csv($file, $this->directoryWrite);
+        $this->_model
+            ->setParameters(['behavior' => $behavior])
+            ->setSource($source)
+            ->validateData()
+            ->hasToBeTerminated();
+        $this->_model->importData();
     }
 }

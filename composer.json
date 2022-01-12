@@ -8,33 +8,35 @@
         "AFL-3.0"
     ],
     "require": {
-        "magento/product-community-edition": "2.2.6",
-        "composer/composer": "@alpha",
         "andreyco/instagram": "3.0.0",
         "magepal/magento2-gmailsmtpapp": "^2.5",
-        "m2e/ebay-amazon-magento2": "^1.3",
-        "vsourz/html-sitemap": "1.0.2",
-        "mageworx/module-shippingrulesmeta": "^2.3",
         "mageplaza/module-banner-slider": "2.0.0",
-        "extait/admin-notify": "^1.4",
         "cweagans/composer-patches": "^1.6",
         "avalara/avatax-magento": "^2.1",
-        "mageplaza/module-smtp": "^4.1"
+        "mageplaza/module-smtp": "^4.1",
+        "magento/composer-root-update-plugin": "~1.0",
+        "magento/product-community-edition": "2.4.3-p1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.2.0",
-        "squizlabs/php_codesniffer": "3.2.2",
-        "phpmd/phpmd": "@stable",
-        "pdepend/pdepend": "2.5.2",
-        "friendsofphp/php-cs-fixer": "~2.2.0",
+        "allure-framework/allure-phpunit": "~1.4",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+        "magento/magento-coding-standard": "*",
+        "magento/magento2-functional-testing-framework": "^3.0",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "phpstan/phpstan": ">=0.12.3 <=0.12.23",
+        "phpunit/phpunit": "^9",
+        "squizlabs/php_codesniffer": "~3.5.4",
+        "phpmd/phpmd": "^2.8.0",
+        "pdepend/pdepend": "~2.7.1",
         "lusitanian/oauth": "~0.8.10",
-        "sebastian/phpcpd": "2.0.4"
+        "sebastian/phpcpd": "~5.0.0"
     },
     "autoload": {
         "psr-4": {
             "Magento\\Framework\\": "lib/internal/Magento/Framework/",
             "Magento\\Setup\\": "setup/src/Magento/Setup/",
-            "Magento\\": "app/code/Magento/"
+            "Magento\\": "app/code/Magento/",
+            "Zend\\Mvc\\Controller\\": "setup/src/Zend/Mvc/Controller/"
         },
         "psr-0": {
             "": [
@@ -71,13 +73,17 @@
             "url": "./mageworx"
         }
     },
-    "extra": {
-        "magento-force": "override",
-        "composer-exit-on-patch-failure": true,
-        "patches": {
-            "magento/module-customer": {
-                "Reset password throws error since 2.2.6": "patches/composer/github-issue-18256.diff"
-            }
+    "config": {
+        "allow-plugins": {
+            "magento/magento-composer-installer": false,
+            "cweagans/composer-patches": true,
+            "magento/composer-root-update-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "magento/inventory-composer-installer": true,
+            "laminas/laminas-dependency-plugin": true
         }
+    },
+    "conflict": {
+        "gene/bluefoot": "*"
     }
 }

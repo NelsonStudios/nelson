@@ -3,16 +3,17 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Setup\CategorySetup;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
 \Magento\TestFramework\Helper\Bootstrap::getInstance()
     ->loadArea(\Magento\Backend\App\Area\FrontNameResolver::AREA_CODE);
 
-require __DIR__ . '/../../Store/_files/store.php';
-
+Resolver::getInstance()->requireDataFixture('Magento/Store/_files/store.php');
 /** @var $installer CategorySetup */
 $objectManager = Bootstrap::getObjectManager();
 $installer = $objectManager->create(CategorySetup::class);

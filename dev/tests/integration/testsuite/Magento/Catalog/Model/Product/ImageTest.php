@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Catalog\Model\Product;
 
 /**
@@ -25,7 +23,8 @@ class ImageTest extends \PHPUnit\Framework\TestCase
         );
         /** @var \Magento\Catalog\Model\View\Asset\Placeholder $defaultPlaceholder */
         $defaultPlaceholder = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->create(\Magento\Catalog\Model\View\Asset\Placeholder::class,
+            ->create(
+                \Magento\Catalog\Model\View\Asset\Placeholder::class,
                 ['type' => 'image']
             );
 
@@ -63,19 +62,33 @@ class ImageTest extends \PHPUnit\Framework\TestCase
         $inputFile = 'watermark.png';
         $expectedFile = '/somewhere/watermark.png';
 
-        /** @var \Magento\Framework\View\FileSystem|\PHPUnit_Framework_MockObject_MockObject $viewFilesystem */
+        /** @var \Magento\Framework\View\FileSystem|\PHPUnit\Framework\MockObject\MockObject $viewFilesystem */
         $viewFileSystem = $this->createMock(\Magento\Framework\View\FileSystem::class);
         $viewFileSystem->expects($this->once())
             ->method('getStaticFileName')
             ->with($inputFile)
-            ->will($this->returnValue($expectedFile));
+            ->willReturn($expectedFile);
 
         /** @var $model \Magento\Catalog\Model\Product\Image */
         $model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
             ->create(\Magento\Catalog\Model\Product\Image::class, ['viewFileSystem' => $viewFileSystem]);
-        $processor = $this->createPartialMock(\Magento\Framework\Image::class, ['save', 'keepAspectRatio', 'keepFrame', 'keepTransparency', 'constrainOnly', 'backgroundColor', 'quality',
-                'setWatermarkPosition', 'setWatermarkImageOpacity', 'setWatermarkWidth', 'setWatermarkHeight',
-                'watermark']);
+        $processor = $this->createPartialMock(
+            \Magento\Framework\Image::class,
+            [
+                'save',
+                'keepAspectRatio',
+                'keepFrame',
+                'keepTransparency',
+                'constrainOnly',
+                'backgroundColor',
+                'quality',
+                'setWatermarkPosition',
+                'setWatermarkImageOpacity',
+                'setWatermarkWidth',
+                'setWatermarkHeight',
+                'watermark'
+            ]
+        );
         $processor->expects($this->once())
             ->method('watermark')
             ->with($expectedFile);

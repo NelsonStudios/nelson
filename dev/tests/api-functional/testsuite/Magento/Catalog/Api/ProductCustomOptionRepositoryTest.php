@@ -5,8 +5,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Catalog\Api;
 
 use Magento\Catalog\Model\ProductRepository;
@@ -27,7 +25,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
      */
     protected $productFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->productFactory = $this->objectManager->get(\Magento\Catalog\Model\ProductFactory::class);
@@ -63,7 +61,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
         /** @var  \Magento\Catalog\Model\Product $product */
         $product = $productRepository->get($sku, false, null, true);
         $this->assertNull($product->getOptionById($optionId));
-        $this->assertEquals(9, count($product->getOptions()));
+        $this->assertCount(9, $product->getOptions());
     }
 
     /**
@@ -148,6 +146,10 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
     public function testSave($optionData)
     {
         $productSku = 'simple';
+        /** @var \Magento\Catalog\Model\ProductRepository $productRepository */
+        $productRepository = $this->objectManager->create(
+            \Magento\Catalog\Model\ProductRepository::class
+        );
 
         $optionDataPost = $optionData;
         $optionDataPost['product_sku'] = $productSku;
@@ -164,6 +166,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
         ];
 
         $result = $this->_webApiCall($serviceInfo, ['option' => $optionDataPost]);
+        $product = $productRepository->get($productSku);
         unset($result['product_sku']);
         unset($result['option_id']);
         if (!empty($result['values'])) {
@@ -171,7 +174,12 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
                 unset($result['values'][$key]['option_type_id']);
             }
         }
+
         $this->assertEquals($optionData, $result);
+        $this->assertTrue($product->getHasOptions() == 1);
+        if ($optionDataPost['is_require']) {
+            $this->assertTrue($product->getRequiredOptions() == 1);
+        }
     }
 
     public function optionDataProvider()
@@ -182,7 +190,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
             $fixtureOptions[$item['type']] = [
                 'optionData' => $item,
             ];
-        };
+        }
 
         return $fixtureOptions;
     }
@@ -210,7 +218,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
         ];
 
         if (TESTS_WEB_API_ADAPTER == self::ADAPTER_SOAP) {
-            if (isset($optionDataPost['title']) && empty($optionDataPost['title'])) {
+            if ($optionDataPost['title'] === null || $optionDataPost['title'] === '') {
                 $this->expectException('SoapFault');
                 $this->expectExceptionMessage('Missed values for option required fields');
             } else {
@@ -219,7 +227,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
             }
         } else {
             $this->expectException('Exception');
-            $this->expectExceptionMessage('', 400);
+            $this->expectExceptionCode(400);
         }
         $this->_webApiCall($serviceInfo, ['option' => $optionDataPost]);
     }
@@ -232,7 +240,7 @@ class ProductCustomOptionRepositoryTest extends WebapiAbstract
             $fixtureOptions[$key] = [
                 'optionData' => $item,
             ];
-        };
+        }
 
         return $fixtureOptions;
     }

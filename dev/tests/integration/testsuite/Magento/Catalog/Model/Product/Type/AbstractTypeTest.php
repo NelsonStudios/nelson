@@ -3,6 +3,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 namespace Magento\Catalog\Model\Product\Type;
 
 /**
@@ -15,7 +16,7 @@ class AbstractTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $_model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $productRepository = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
             \Magento\Catalog\Api\ProductRepositoryInterface::class
@@ -198,8 +199,8 @@ class AbstractTypeTest extends \PHPUnit\Framework\TestCase
         $product = $repository->get('simple');
         // fixture
 
-        $this->assertContains(
-            'Please specify product\'s required option(s).',
+        $this->assertStringContainsString(
+            "The product's required option(s) weren't entered. Make sure the options are entered and try again.",
             $this->_model->prepareForCart(new \Magento\Framework\DataObject(), $product)
         );
     }
@@ -207,7 +208,7 @@ class AbstractTypeTest extends \PHPUnit\Framework\TestCase
     public function testGetSpecifyOptionMessage()
     {
         $this->assertEquals(
-            'Please specify product\'s required option(s).',
+            "The product's required option(s) weren't entered. Make sure the options are entered and try again.",
             $this->_model->getSpecifyOptionMessage()
         );
     }
@@ -224,10 +225,11 @@ class AbstractTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
-     * @expectedException \Magento\Framework\Exception\LocalizedException
      */
     public function testCheckProductBuyStateException()
     {
+        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+
         $repository = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             \Magento\Catalog\Model\ProductRepository::class
         );

@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Customer\Controller;
 
 use Magento\TestFramework\Helper\Bootstrap;
@@ -37,7 +35,6 @@ class AjaxLoginTest extends \Magento\TestFramework\TestCase\AbstractController
         $logoutMessage = Bootstrap::getObjectManager()->get(
             \Magento\Framework\Json\Helper\Data::class
         )->jsonDecode($body);
-        $this->assertContains('Logout Successful', $logoutMessage['message']);
+        $this->assertStringContainsString('Logout Successful', $logoutMessage['message']);
     }
 }
-

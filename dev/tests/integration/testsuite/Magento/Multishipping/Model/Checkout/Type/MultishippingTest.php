@@ -21,7 +21,7 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Service\OrderService;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\ObjectManager;
-use \PHPUnit_Framework_MockObject_MockObject as MockObject;
+use \PHPUnit\Framework\MockObject\MockObject as MockObject;
 
 /**
  * @magentoAppArea frontend
@@ -53,7 +53,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
      */
     private $customerRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = Bootstrap::getObjectManager();
 
@@ -202,11 +202,14 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
         self::assertNull($address, "When customer has no addresses, null is expected.");
     }
 
+    /**
+     * @return array
+     */
     public function getCustomerDefaultAddressDataProvider()
     {
         return [
             self::ADDRESS_TYPE_SHIPPING => [self::ADDRESS_TYPE_SHIPPING],
-            self::ADDRESS_TYPE_BILLING => [self::ADDRESS_TYPE_BILLING]
+            self::ADDRESS_TYPE_BILLING => [self::ADDRESS_TYPE_BILLING],
         ];
     }
 
@@ -215,6 +218,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
      *
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Multishipping/Fixtures/quote_with_split_items.php
+     * @return void
      */
     public function testCreateOrders()
     {
@@ -225,8 +229,8 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
 
         $this->model->createOrders();
 
-        $orderList = $this->getOrderList($quote->getId());
-        self::assertEquals(3, sizeof($orderList));
+        $orderList = $this->getOrderList((int)$quote->getId());
+        self::assertCount(3, $orderList);
 
         /**
          * @var Order $firstOrder
@@ -250,7 +254,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                 'street' => ['Main Division 1'],
                 'city' => 'Culver City',
                 'region' => 'California',
-                'postcode' => 90800
+                'postcode' => 90800,
             ]
         );
         $this->performOrderAddressAssertions(
@@ -259,7 +263,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                 'street' => ['Second Division 2'],
                 'city' => 'Denver',
                 'region' => 'Colorado',
-                'postcode' => 80203
+                'postcode' => 80203,
             ]
         );
         $this->performOrderAddressAssertions(
@@ -268,7 +272,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                 'street' => ['Third Division 1'],
                 'city' => 'New York',
                 'region' => 'New York',
-                'postcode' => 10029
+                'postcode' => 10029,
             ]
         );
 
@@ -291,6 +295,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
      *
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Multishipping/Fixtures/quote_with_split_items.php
+     * @return void
      */
     public function testCreateOrdersWithSomeFailedOrders()
     {
@@ -319,7 +324,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                     'street' => ['Main Division 1'],
                     'city' => 'Culver City',
                     'region' => 'California',
-                    'postcode' => '90800'
+                    'postcode' => '90800',
                 ],
                 $this->model->getQuote()
             ),
@@ -334,7 +339,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                     'street' => ['Second Division 2'],
                     'city' => 'Denver',
                     'region' => 'Colorado',
-                    'postcode' => '80203'
+                    'postcode' => '80203',
                 ],
                 $this->model->getQuote()
             ),
@@ -348,12 +353,48 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
                     'street' => ['Third Division 1'],
                     'city' => 'New York',
                     'region' => 'New York',
-                    'postcode' => '10029'
+                    'postcode' => '10029',
                 ],
                 $this->model->getQuote()
             ),
             'Billing address should be present in quote'
         );
+    }
+
+    /**
+     * Check product parent item id in order item
+     *
+     * @magentoDataFixture Magento/Multishipping/Fixtures/quote_with_configurable_product.php
+     */
+    public function testCreateOrdersWithConfigurableProduct()
+    {
+        $quote = $this->getQuote('test_order_with_configurable_product');
+        /** @var CheckoutSession $session */
+        $session = $this->objectManager->get(CheckoutSession::class);
+        $session->replaceQuote($quote);
+
+        $this->model->createOrders();
+
+        $quoteItemParentIds = [];
+        foreach ($quote->getAllItems() as $quoteItem) {
+            $quoteItemParentIds[] = $quoteItem->getParentItemId();
+        }
+
+        $orderList = $this->getOrderList((int)$quote->getId());
+        $firstOrder = array_shift($orderList);
+        $secondOrder = array_shift($orderList);
+
+        $firstOrderItemParentsIds = [];
+        foreach ($firstOrder->getItems() as $orderItem) {
+            $firstOrderItemParentsIds[] = $orderItem->getParentItemId();
+        }
+        $secondOrderItemParentsIds = [];
+        foreach ($secondOrder->getItems() as $orderItem) {
+            $secondOrderItemParentsIds[] = $orderItem->getParentItemId();
+        }
+
+        $this->assertNotNull($firstOrderItemParentsIds[1]);
+        $this->assertNotNull($secondOrderItemParentsIds[1]);
     }
 
     /**
@@ -465,6 +506,7 @@ class MultishippingTest extends \PHPUnit\Framework\TestCase
      *
      * @param float $total
      * @param float $expected
+     * @return void
      */
     private function performOrderTotalAssertions(float $total, float $expected)
     {

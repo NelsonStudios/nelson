@@ -6,32 +6,40 @@
 
 namespace Magento\Setup\Model;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Magento\Setup\Module\ResourceFactory;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Magento\Framework\App\ErrorHandler;
-use Magento\Framework\App\State\CleanupFiles;
 use Magento\Framework\Setup\LoggerInterface;
+use Magento\Setup\Module\ResourceFactory;
 
 /**
+ * Factory for \Magento\Setup\Model\Installer
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class InstallerFactory
 {
     /**
-     * Zend Framework's service locator
+     * Laminas Framework's service locator
      *
      * @var ServiceLocatorInterface
      */
     protected $serviceLocator;
 
     /**
-     * Constructor
-     *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @var ResourceFactory
      */
-    public function __construct(ServiceLocatorInterface $serviceLocator)
-    {
+    private $resourceFactory;
+
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     * @param ResourceFactory $resourceFactory
+     */
+    public function __construct(
+        ServiceLocatorInterface $serviceLocator,
+        ResourceFactory $resourceFactory
+    ) {
         $this->serviceLocator = $serviceLocator;
+        $this->resourceFactory = $resourceFactory;
         // For Setup Wizard we are using our customized error handler
         $handler = new ErrorHandler();
         set_error_handler([$handler, 'handler']);
@@ -42,6 +50,7 @@ class InstallerFactory
      *
      * @param LoggerInterface $log
      * @return Installer
+     * @throws \Magento\Setup\Exception
      */
     public function create(LoggerInterface $log)
     {
@@ -58,6 +67,11 @@ class InstallerFactory
             $this->serviceLocator->get(\Magento\Framework\App\MaintenanceMode::class),
             $this->serviceLocator->get(\Magento\Framework\Filesystem::class),
             $this->serviceLocator->get(\Magento\Setup\Model\ObjectManagerProvider::class),
+            new \Magento\Framework\Model\ResourceModel\Db\Context(
+                $this->getResource(),
+                $this->serviceLocator->get(\Magento\Framework\Model\ResourceModel\Db\TransactionManager::class),
+                $this->serviceLocator->get(\Magento\Framework\Model\ResourceModel\Db\ObjectRelationProcessor::class)
+            ),
             $this->serviceLocator->get(\Magento\Setup\Model\ConfigModel::class),
             $this->serviceLocator->get(\Magento\Framework\App\State\CleanupFiles::class),
             $this->serviceLocator->get(\Magento\Setup\Validator\DbValidator::class),
@@ -67,5 +81,16 @@ class InstallerFactory
             new \Magento\Framework\Component\ComponentRegistrar(),
             $this->serviceLocator->get(\Magento\Setup\Model\PhpReadinessCheck::class)
         );
+    }
+
+    /**
+     * Create Resource Factory
+     *
+     * @return Resource
+     */
+    private function getResource()
+    {
+        $deploymentConfig = $this->serviceLocator->get(\Magento\Framework\App\DeploymentConfig::class);
+        return $this->resourceFactory->create($deploymentConfig);
     }
 }
