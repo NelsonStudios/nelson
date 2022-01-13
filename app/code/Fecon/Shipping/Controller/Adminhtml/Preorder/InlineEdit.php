@@ -42,7 +42,9 @@ class InlineEdit extends \Magento\Backend\App\Action
             } else {
                 foreach (array_keys($postItems) as $modelid) {
                     /** @var \Fecon\Shipping\Model\Preorder $model */
-                    $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($modelid);
+                    $model = $this->_objectManager->create(
+                        \Fecon\Shipping\Model\Preorder::class
+                    )->load($modelid);
                     $status = (int) $model->getStatus();
                     if ($status !== PreorderInterface::STATUS_NEW && $status !== PreorderInterface::STATUS_PENDING) {
                         $messages[] = "You cannot edit the shipping price of a Preorder that has a Canceled or Complete status.";

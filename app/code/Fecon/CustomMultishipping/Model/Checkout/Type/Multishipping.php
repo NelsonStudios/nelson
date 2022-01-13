@@ -1346,7 +1346,9 @@ $this->_logger->debug('Shipping ID-'.$address->getId().' debug(flag '.$debugflag
      */
     private function cloneCustomerAddress($customerId, $address)
     {
-        $addressFactory = ObjectManager::getInstance()->get('\Magento\Customer\Model\AddressFactory');
+        $addressFactory = ObjectManager::getInstance()->get(
+            \Magento\Customer\Model\AddressFactory::class
+        );
         $newAddress = $addressFactory->create();
 
         $newAddress->setCustomerId($customerId)

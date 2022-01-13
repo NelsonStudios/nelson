@@ -29,7 +29,9 @@ class Delete extends \Magento\Backend\App\Action
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($id) {
             try {
-                $model = $this->_objectManager->create('Magento\Customer\Model\Attribute');
+                $model = $this->_objectManager->create(
+                    \Magento\Customer\Model\Attribute::class
+                );
                 $model->load($id);
                 $model->delete();
                 $this->messageManager->addSuccess(__('The attribute has been deleted.'));

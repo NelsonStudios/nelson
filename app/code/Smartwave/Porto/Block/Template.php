@@ -41,5 +41,10 @@ class Template extends \Magento\Framework\View\Element\Template {
         $urlRewrite = $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
         return $currentUrl == $urlRewrite;
     }
+
+    public function getCurrentCategory()
+    {
+       return $this->_coreRegistry->registry('current_category');
+    }
 }
 ?>

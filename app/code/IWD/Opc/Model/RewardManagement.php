@@ -40,7 +40,9 @@ class RewardManagement implements RewardManagementInterface
         /**
          * @var $rewardHelper \Magento\Reward\Helper\Data
          */
-        $rewardHelper = $this->objectManager->create('\Magento\Reward\Helper\Data');
+        $rewardHelper = $this->objectManager->create(
+            \Magento\Reward\Helper\Data::class
+        );
         if ($rewardHelper->isEnabledOnFront()) {
             $quote = $this->quoteRepository->get($cartId);
             $quote->setUseRewardPoints(false);

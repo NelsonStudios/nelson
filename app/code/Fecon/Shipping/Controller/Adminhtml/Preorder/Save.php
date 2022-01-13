@@ -45,7 +45,9 @@ class Save extends \Magento\Backend\App\Action
             $data['shipping_method'] = $this->serializer->serialize($data['data']['shipping_method']);
             $id = $this->getRequest()->getParam('preorder_id');
         
-            $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder')->load($id);
+            $model = $this->_objectManager->create(
+                \Fecon\Shipping\Model\Preorder::class
+            )->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Preorder no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
