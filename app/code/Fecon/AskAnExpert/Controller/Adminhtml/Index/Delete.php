@@ -26,7 +26,9 @@ class Delete extends \Magento\Backend\App\Action
             $title = "";
             try {
                 // init model and delete
-                $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact');
+                $model = $this->_objectManager->create(
+                    \Fecon\AskAnExpert\Model\Contact::class
+                );
                 $model->load($id);
                 $title = $model->getName();
                 $model->delete();

@@ -24,22 +24,30 @@ class Post extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected $dateTime;
 
     /**
+     * @var \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
+     */
+    protected $pageIdentifierGenerator;
+
+    /**
      * Construct
      *
      * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
      * @param \Magento\Framework\Stdlib\DateTime $dateTime
+     * @param \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
      * @param string|null $resourcePrefix
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
         \Magento\Framework\Stdlib\DateTime $dateTime,
+        \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator $pageIdentifierGenerator,
         $resourcePrefix = null
     ) {
         parent::__construct($context, $resourcePrefix);
         $this->_date = $date;
         $this->dateTime = $dateTime;
+        $this->_pageIdentifierGenerator = $pageIdentifierGenerator;
     }
 
     /**
@@ -106,8 +114,7 @@ class Post extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             $object->setData($field, $this->dateTime->formatDate($value));
         }
 
-        $identifierGenerator = \Magento\Framework\App\ObjectManager::getInstance()
-                ->create('Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator');
+        $identifierGenerator = $this->_pageIdentifierGenerator;
         $identifierGenerator->generate($object);
 
         if (!$this->isValidPageIdentifier($object)) {

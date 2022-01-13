@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="MageWorx\ShippingRules\Controller\Adminhtml\Shippingrules\ExtendedZone\ImageUpload" type="Core\ShippingRules\Controller\Adminhtml\Shippingrules\ExtendedZone\ImageUpload" />
+    <preference for="MageWorx\ShippingRules\Setup\UpgradeData" type="Core\ShippingRules\Setup\UpgradeData" />
+
+    <preference for="MageWorx\ShippingRules\Model\Rule\Action\RateFactory" type="Core\ShippingRules\Model\Rule\Action\RateFactory" />
+</config>

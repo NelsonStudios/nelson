@@ -71,7 +71,9 @@ class Data extends AbstractData
 
 		$this->getFilterModel()->getLayerConfiguration($filters, $config);
 
-		return $this->objectManager->get('Magento\Framework\Json\EncoderInterface')->encode($config->getData());
+		return $this->objectManager->get(
+			\Magento\Framework\Json\EncoderInterface::class
+		)->encode($config->getData());
 	}
 
 	/**
@@ -80,7 +82,9 @@ class Data extends AbstractData
 	public function getFilterModel()
 	{
 		if (!$this->filterModel) {
-			$this->filterModel = $this->objectManager->create('Mageplaza\LayeredNavigation\Model\Layer\Filter');
+			$this->filterModel = $this->objectManager->create(
+				\Mageplaza\LayeredNavigation\Model\Layer\Filter::class
+			);
 		}
 
 		return $this->filterModel;

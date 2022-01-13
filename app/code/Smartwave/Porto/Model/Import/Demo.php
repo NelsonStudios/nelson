@@ -82,8 +82,12 @@ class Demo
             }
 
             //$gatewayResponse->setData("import_path",$config);
-            $this->_objectManager->get('Smartwave\Porto\Model\Cssconfig\Generator')->generateCss('design','','');
-            $this->_objectManager->get('Smartwave\Porto\Model\Cssconfig\Generator')->generateCss('settings','','');
+            $this->_objectManager->get(
+                \Smartwave\Porto\Model\Cssconfig\Generator::class
+            )->generateCss('design','','');
+            $this->_objectManager->get(
+                \Smartwave\Porto\Model\Cssconfig\Generator::class
+            )->generateCss('settings','','');
 
             $gatewayResponse->setIsValid(true);
             $gatewayResponse->setRequestSuccess(true);
