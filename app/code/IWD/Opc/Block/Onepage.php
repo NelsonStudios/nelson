@@ -7,25 +7,27 @@ use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Checkout\Model\CompositeConfigProvider;
-use \Magento\Framework\Module\Manager;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 class Onepage extends CheckoutOnepage
 {
 
     public $checkoutSession;
+    protected $moduleManager;
     public $quote = null;
 
     public function __construct(
-        Context $context,
-        FormKey $formKey,
+        Context                 $context,
+        FormKey                 $formKey,
         CompositeConfigProvider $configProvider,
-        CheckoutSession $checkoutSession,
-        Manager $manager,
-        array $layoutProcessors = [],
-        array $data = []
-    ) {
+        CheckoutSession         $checkoutSession,
+        ModuleManager           $moduleManager,
+        array                   $layoutProcessors = [],
+        array                   $data = []
+    )
+    {
         $this->checkoutSession = $checkoutSession;
-        $this->manager = $manager;
+        $this->moduleManager = $moduleManager;
         parent::__construct($context, $formKey, $configProvider, $layoutProcessors, $data);
     }
 
@@ -36,8 +38,9 @@ class Onepage extends CheckoutOnepage
         }
         return $this->quote;
     }
-    public function getManager()
+
+    public function amazonLoginEnabled()
     {
-        return $this->manager;
+        return $this->moduleManager->isEnabled('Amazon_Login');
     }
 }
