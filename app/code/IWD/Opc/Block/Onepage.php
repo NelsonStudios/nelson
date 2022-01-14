@@ -36,7 +36,6 @@ class Onepage extends CheckoutOnepage
         if (null === $this->quote) {
             $this->quote = $this->checkoutSession->getQuote();
         }
-
         return $this->quote;
     }
 
