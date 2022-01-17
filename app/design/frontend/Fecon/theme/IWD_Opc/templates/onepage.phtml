@@ -4,14 +4,6 @@
  */
 $isVirtual = $block->getQuote()->isVirtual()
 ?>
-<?php //$isVirtual = $block->getQuote()->isVirtual() ?>
-<?php
-/**
- * @var $checkoutSession \Magento\Checkout\Model\Session\Proxy
- */
-$checkoutSession = \Magento\Framework\App\ObjectManager::getInstance()
-    ->get(\Magento\Checkout\Model\Session\Proxy::class);
-$isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
 <div class="iwd_opc_clear"></div>
 <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
     <div class="loader"></div>
@@ -24,7 +16,6 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
                     <?php echo __('Choose a Different Payment Method'); ?>
                 </div>
                 <div class="iwd_opc_column_content">
-
                 </div>
             </div>
         </div>
@@ -67,7 +58,6 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
             });
         </script>
     </div>
-
     <?php if ($block->amazonLoginEnabled()) : ?>
         <div class="amazon-button-container" id="minicart-amazon-pay-button" style="display:none;">
             <div class="amazon-button-container centered-button" style="margin-left:45%;">
@@ -75,7 +65,6 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
                     <div id="PayWithAmazon-<?php echo $block->getJsId() ?>" class="login-with-amazon"
                          data-mage-init='{"amazonButton": {"buttonType": "PwA"}}'></div>
                 </div>
-
                 <div class="amazon-button-container__cell">
                     <div class="field-tooltip toggle">
                         <span class="field-tooltip-action action-help"
@@ -87,18 +76,14 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
                     </div>
                 </div>
             </div>
-
         </div>
     <?php endif; ?>
-
-
 </div>
 <script>
     require([
         "jquery",
         "jquery/ui"
     ], function ($) {
-
         $.extend(true, $, {
             calendarConfig: {
                 dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -134,15 +119,12 @@ $isVirtual = $checkoutSession->getQuote()->isVirtual() ?>
                 yearRange: '1918:2118'
             }
         });
-
         enUS = {
             "m": {
                 "wide": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
                 "abbr": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
             }
         }; // en_US locale reference
-
     });
-
 </script>
 <div class="iwd_opc_clear"></div>
