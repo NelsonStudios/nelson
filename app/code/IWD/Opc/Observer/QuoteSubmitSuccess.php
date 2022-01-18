@@ -156,7 +156,9 @@ class QuoteSubmitSuccess implements ObserverInterface
                         $customer   = $this->customerFactory->create();
                         $websiteId = $order->getStore()->getWebsiteId();
                         $customer->setWebsiteId($websiteId);
-                        $order_details = $this->objectManager->create('Magento\Sales\Model\Order')->load($order->getId());
+                        $order_details = $this->objectManager->create(
+                            \Magento\Sales\Model\Order::class
+                        )->load($order->getId());
                         // Preparing data for new customer
 
                         $addresses = $order_details->getAddresses();

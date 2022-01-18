@@ -80,7 +80,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
 		$query->setStoreId($this->_storeManager->getStore()->getId());
 
 		if ($query->getQueryText() != '') {
-			if ($this->_objectManager->get('Magento\CatalogSearch\Helper\Data')->isMinQueryLength()) {
+			if ($this->_objectManager->get(
+                \Magento\CatalogSearch\Helper\Data::class
+            )->isMinQueryLength()) {
 				$query->setId(0)->setIsActive(1)->setIsProcessed(1);
 			} else {
 				$query->saveIncrementalPopularity();
@@ -91,7 +93,9 @@ class Index extends \Magento\CatalogSearch\Controller\Result\Index
 				}
 			}
 
-			$this->_objectManager->get('Magento\CatalogSearch\Helper\Data')->checkNotes();
+			$this->_objectManager->get(
+                \Magento\CatalogSearch\Helper\Data::class
+            )->checkNotes();
 			
             $full_width = $this->_scopeConfig->getValue('porto_settings/general/layout', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->_storeManager->getStore()->getId());
             $additional_class = '';

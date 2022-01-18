@@ -27,7 +27,9 @@ class RelatedList extends \Magento\Catalog\Block\Product\ListProduct {
         
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
         
-        $this->currentProduct = $objectManager->get('Magento\Framework\Registry')->registry('current_product');
+        $this->currentProduct = $objectManager->get(
+            \Magento\Framework\Registry::class
+        )->registry('current_product');
 
         $this->categoryRepository = $categoryRepository;
         $this->_collection = $collection;

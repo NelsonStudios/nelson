@@ -74,7 +74,9 @@ class Save extends \Magento\Backend\App\Action
                 $data['contact_id'] = null;
             }
             /** @var \Magento\Cms\Model\Block $model */
-            $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact')->load($id);
+            $model = $this->_objectManager->create(
+                \Fecon\AskAnExpert\Model\Contact::class
+            )->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addError(__('This Submission no longer exists.'));
                 return $resultRedirect->setPath('*/*/');

@@ -60,7 +60,9 @@ class Edit extends \Magento\Backend\App\Action
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('contact_id');
-        $model = $this->_objectManager->create('Fecon\AskAnExpert\Model\Contact');
+        $model = $this->_objectManager->create(
+            \Fecon\AskAnExpert\Model\Contact::class
+        );
 
         // 2. Initial checking
         if ($id) {
@@ -75,7 +77,9 @@ class Edit extends \Magento\Backend\App\Action
         }
 
         // 3. Set entered data if was error when we do save
-        $data = $this->_objectManager->get('Magento\Backend\Model\Session')->getFormData(true);
+        $data = $this->_objectManager->get(
+            \Magento\Backend\Model\Session::class
+        )->getFormData(true);
         if (!empty($data)) {
             $model->setData($data);
         }
