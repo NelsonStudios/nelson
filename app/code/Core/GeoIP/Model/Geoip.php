@@ -16,7 +16,7 @@ use GeoIp2\Database\Reader as GeoIP2Reader;
  *
  * Work with customer location
  */
-class Geoip extends \Magento\Framework\Model\AbstractModel
+class Geoip extends \MageWorx\GeoIP\Model\Geoip
 {
     /**
      * @var \Magento\Framework\ObjectManagerInterface

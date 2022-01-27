@@ -8,7 +8,7 @@ namespace Core\ShippingRules\Model\Rule\Action;
 
 use Magento\Framework\ObjectManagerInterface as ObjectManager;
 
-class RateFactory
+class RateFactory extends \MageWorx\ShippingRules\Model\Rule\Action\RateFactory
 {
 
     /**
@@ -60,7 +60,7 @@ class RateFactory
         $this->type = $type;
 
         $this->prepareType();
-        $validator = $this->objectManager->create('\MageWorx\ShippingRules\Model\Rule\Action\RateFactoryValidator');
+        $validator = $this->objectManager->create(\MageWorx\ShippingRules\Model\Rule\Action\RateFactoryValidator::class);
         $validator->validate($this->map, $this->type, $this->realType);
 
         $class = $this->getClass();
