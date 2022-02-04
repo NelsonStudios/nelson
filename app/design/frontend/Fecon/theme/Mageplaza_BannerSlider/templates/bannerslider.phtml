@@ -1,36 +1,38 @@
 <?php
-
+$images = $this->getBaseImagePath();
 if ($items = $block->getBannerCollection()): ?>
     <div class="carousel-container">
         <div id="banner-slider-carousel">
             <?php $iterator = 1; ?>
-            <div id="bannerslider-list-items-<?php echo $id =$block->getSliderId().'-'.uniqid(); ?>" class="owl-carousel owl-banner-carousel owl-bottom-narrow owl-bottom-absolute-narrow">
-                <?php foreach ($items as $item): ?>
-                    <?php echo ($iterator++ == 1) ? '<div class="banner-item banner-slider">' : '</div><div class="banner-item banner-slider">' ?>
+            <div id="bannerslider-list-items-<?= $id =$block->getSliderId().'-'.uniqid(); ?>" class="owl-carousel owl-banner-carousel owl-bottom-narrow owl-bottom-absolute-narrow">
+                <?php foreach ($items as $item): 
+                    ?>
+                    <?= ($iterator++ == 1) ? '<div class="banner-item banner-slider">' : '</div><div class="banner-item banner-slider">' ?>
                     <?php if ($item->getType() == 1): ?>
                     <div class="item-video">
-                        <a class="owl-video" href="<?php echo $item->getUrlVideo() ?>"></a>
+                        <a class="owl-video" href="<?= $item->getUrlVideo() ?>"></a>
                     </div>
                     <?php elseif ($item->getType() == 2): ?>
                     <div class="item-content">
-                        <?php echo $block->getPageFilter($item->getContent()); ?>
+                        <?= $block->getPageFilter($item->getContent()); ?>
                     </div>
                     <?php else: ?>
-                    <div class="item" style="background:url(<?php echo $item->getImageUrl() ?>) center center no-repeat;background-size:cover;">
+                         <?php $sliderImage = $this->resize($item->getImage(),'600','500'); ?>
+                    <div class="item" style="background:url(<?= $sliderImage ?>) center center no-repeat;background-size:cover;">
                         <div class="black-overlay">
                             <div class="container" style="position:relative">
-                                <img src="<?= $this->helper('\Magento\Cms\Helper\Wysiwyg\Images')->getBaseUrl() . "wysiwyg/homepage/slider/02-2.png" ?>" alt="" />
+                               <img src="<?= $sliderImage; ?>" alt="" />
                                 <div class="content content-slide-2" style="">
-                                    <p><span class="green-header"><?php echo $item->getTitle() ?></span></p>
+                                    <p><span class="green-header"><?= $item->getTitle() ?></span></p>
                                     <?php if ($item->getSubtitle()): ?>
-                                    <p class="big-gray-underline white-header"><span><?php echo $item->getSubtitle() ?></span></p>
+                                    <p class="big-gray-underline white-header"><span><?= $item->getSubtitle() ?></span></p>
                                     <?php endif; ?>
                                     <?php if ($item->getImageDescription()): ?>
-                                    <p class="banner-subtitle"><?php echo $item->getImageDescription() ?></p>
+                                    <p class="banner-subtitle"><?= $item->getImageDescription() ?></p>
                                     <?php endif; ?>
                                     <?php if ($item->getCtaText()): ?>
-                                    <a href="<?php echo $item->getCtaLink() ?>" class="btn btn-default btn-red-slider" <?php echo ($item->getCtaTarget() == 1) ? 'target="_blank"' : '' ?>>
-                                        <?php echo $item->getCtaText() ?>
+                                    <a href="<?= $item->getCtaLink() ?>" class="btn btn-default btn-red-slider" <?= ($item->getCtaTarget() == 1) ? 'target="_blank"' : '' ?>>
+                                        <?= $item->getCtaText() ?>
                                     </a>
                                     <?php endif; ?>
                                 </div>
@@ -38,16 +40,16 @@ if ($items = $block->getBannerCollection()): ?>
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php echo ($iterator == count($items) + 1) ? '</div>' : '' ?>
+                    <?= ($iterator == count($items) + 1) ? '</div>' : '' ?>
                 <?php endforeach; ?>
             </div>
         </div>
-        <?php echo $block->getPagerHtml() ?>
+        <?= $block->getPagerHtml() ?>
     </div>
 
     <script>
         require(['jquery', 'mageplaza/bannerslider/owlcarousel'], function ($) {
-            $('#bannerslider-list-items-<?php echo $id; ?>').owlCarousel(<?php echo($block->getAllOptions())?>);
+            $('#bannerslider-list-items-<?= $id; ?>').owlCarousel(<?php echo($block->getAllOptions())?>);
         });
     </script>
 <?php endif; ?>
