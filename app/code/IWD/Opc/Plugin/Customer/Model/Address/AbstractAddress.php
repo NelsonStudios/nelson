@@ -37,7 +37,7 @@ class AbstractAddress
     public function afterValidate(ParentClass $subject, $result)
     {
         //If only 1 mistake with regionId field
-        if (count($result) == 1 && $result[0] instanceof Phrase && $result[0]->getArguments()) {
+        if (is_countable($result) && count($result) == 1 && $result[0] instanceof Phrase && $result[0]->getArguments()) {
             $arguments = $result[0]->getArguments();
             $countryId = $subject->getCountryId();
             if(empty($arguments['fieldName']) || $arguments['fieldName'] != 'regionId' || empty($countryId)) {
@@ -53,7 +53,6 @@ class AbstractAddress
                 return true;
             }
         }
-
         return $result;
     }
 }

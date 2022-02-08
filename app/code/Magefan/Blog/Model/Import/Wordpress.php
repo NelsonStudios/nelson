@@ -125,7 +125,7 @@ class Wordpress extends AbstractImport
                 $data[$key] = mb_convert_encoding($data[$key], 'HTML-ENTITIES', 'UTF-8');
             }
 
-            if ($data['title']{0} == '?') {
+            if ($data['title'][0] == '?') {
                 /* fix for ???? titles */
                 $data['title'] = $data['identifier'];
             }

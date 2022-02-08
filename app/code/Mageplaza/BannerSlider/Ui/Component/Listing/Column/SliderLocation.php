@@ -43,8 +43,10 @@ class SliderLocation extends Column
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item[$this->getData('name')])) {
                     $data = $this->getLocation($item[$this->getData('name')]);
-                    $type = array_unique($data['type']);
-                    $item[$this->getData('name')] = '<b>' . implode(', ', $type) . '</b></br>';
+                    if($data){
+                        $type = array_unique($data['type']);
+                        $item[$this->getData('name')] = '<b>' . implode(', ', $type) . '</b></br>';
+                    }
                 }
             }
         }
