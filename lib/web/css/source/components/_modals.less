@@ -102,7 +102,11 @@
 
     &.confirm {
         .modal-inner-wrap {
-            .lib-css(width, @modal-popup-confirm__width);
+            .lib-css(max-width, @modal-popup-confirm__width);
+
+            .modal-content {
+                padding-right: 7rem;
+            }
         }
     }
 
@@ -146,7 +150,6 @@
 
     //  Modals overlay
     .modals-overlay {
-        &:extend(.abs-modal-overlay all);
         .lib-css(z-index, @overlay__z-index);
     }
 
@@ -198,18 +201,14 @@
         &._inner-scroll {
             overflow-y: visible;
 
-            .ie11 &,
-            .ie10 &,
-            .ie9 & {
+            .ie11 & {
                 overflow-y: auto;
             }
 
             .modal-inner-wrap {
                 max-height: 90%;
 
-                .ie11 &,
-                .ie10 &,
-                .ie9 & {
+                .ie11 & {
                     max-height: none;
                 }
             }

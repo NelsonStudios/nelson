@@ -19,8 +19,9 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testCompanyDefault()
+    public function testCompanyDefault(): void
     {
         /** @var \Magento\Customer\Block\Widget\Company $block */
         $block = Bootstrap::getObjectManager()->create(Register::class)
@@ -28,14 +29,15 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
             ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertContains('title="Company"', $block->toHtml());
+        $this->assertStringContainsString('title="Company"', $block->toHtml());
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testTelephoneDefault()
+    public function testTelephoneDefault(): void
     {
         /** @var \Magento\Customer\Block\Widget\Company $block */
         $block = Bootstrap::getObjectManager()->create(
@@ -44,14 +46,15 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
         ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertContains('title="Phone&#x20;Number"', $block->toHtml());
+        $this->assertStringContainsString('title="Phone&#x20;Number"', $block->toHtml());
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testFaxDefault()
+    public function testFaxDefault(): void
     {
         /** @var \Magento\Customer\Block\Widget\Company $block */
         $block = Bootstrap::getObjectManager()->create(
@@ -60,14 +63,15 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
         ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertNotContains('title="Fax"', $block->toHtml());
+        $this->assertStringNotContainsString('title="Fax"', $block->toHtml());
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testCompanyDisabled()
+    public function testCompanyDisabled(): void
     {
         /** @var \Magento\Customer\Model\Attribute $model */
         $model = Bootstrap::getObjectManager()->create(
@@ -83,14 +87,15 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
         ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertNotContains('title="Company"', $block->toHtml());
+        $this->assertStringNotContainsString('title="Company"', $block->toHtml());
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testTelephoneDisabled()
+    public function testTelephoneDisabled(): void
     {
         /** @var \Magento\Customer\Model\Attribute $model */
         $model = Bootstrap::getObjectManager()->create(
@@ -106,14 +111,15 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
         ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertNotContains('title="Phone&#x20;Number"', $block->toHtml());
+        $this->assertStringNotContainsString('title="Phone&#x20;Number"', $block->toHtml());
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @return void
      */
-    public function testFaxEnabled()
+    public function testFaxEnabled(): void
     {
         /** @var \Magento\Customer\Model\Attribute $model */
         $model = Bootstrap::getObjectManager()->create(
@@ -129,10 +135,29 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
         ->setShowAddressFields(true);
         $this->setAttributeDataProvider($block);
 
-        $this->assertContains('title="Fax"', $block->toHtml());
+        $this->assertStringContainsString('title="Fax"', $block->toHtml());
     }
 
-    protected function tearDown()
+    /**
+     * @magentoDataFixture Magento/Customer/_files/attribute_city_store_label_address.php
+     */
+    public function testCityWithStoreLabel(): void
+    {
+        /** @var \Magento\Customer\Block\Form\Register $block */
+        $block = Bootstrap::getObjectManager()->create(
+            Register::class
+        )->setTemplate('Magento_Customer::form/register.phtml')
+            ->setShowAddressFields(true);
+        $this->setAttributeDataProvider($block);
+
+        $this->assertStringNotContainsString('title="City"', $block->toHtml());
+        $this->assertStringContainsString('title="Suburb"', $block->toHtml());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown(): void
     {
         /** @var \Magento\Eav\Model\Config $eavConfig */
         $eavConfig = Bootstrap::getObjectManager()->get(\Magento\Eav\Model\Config::class);
@@ -145,7 +170,7 @@ class RegisterTest extends \PHPUnit\Framework\TestCase
      * @param Template $block
      * @return void
      */
-    private function setAttributeDataProvider(Template $block)
+    private function setAttributeDataProvider(Template $block): void
     {
         $attributeData = Bootstrap::getObjectManager()->get(AddressAttributeData::class);
         $block->setAttributeData($attributeData);

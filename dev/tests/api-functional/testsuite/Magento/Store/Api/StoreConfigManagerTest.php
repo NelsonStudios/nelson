@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Store\Api;
 
 use Magento\TestFramework\TestCase\WebapiAbstract;
@@ -41,7 +39,7 @@ class StoreConfigManagerTest extends WebapiAbstract
         ];
         $storeConfigs = $this->_webApiCall($serviceInfo, $requestData);
         $this->assertNotNull($storeConfigs);
-        $this->assertEquals(1, count($storeConfigs));
+        $this->assertCount(1, $storeConfigs);
         $expectedKeys = [
             'id',
             'code',

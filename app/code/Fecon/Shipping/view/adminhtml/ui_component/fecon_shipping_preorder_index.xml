@@ -1,24 +1,11 @@
 <?xml version="1.0" ?>
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
-    <argument name="context" xsi:type="configurableObject">
-        <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\Context</argument>
-        <argument name="namespace" xsi:type="string">fecon_shipping_preorder_index</argument>
-    </argument>
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_grid_data_source</item>
             <item name="deps" xsi:type="string">fecon_shipping_preorder_index.fecon_shipping_preorder_grid_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">fecon_shipping_preorder_columns</item>
-            <!-- I leave this below commented out in case is needed in the future -->
-<!--        <item name="buttons" xsi:type="array">
-            <item name="add" xsi:type="array">
-                <item name="name" xsi:type="string">add</item>
-                <item name="label" translate="true" xsi:type="string">Add new Preorder</item>
-                <item name="class" xsi:type="string">primary</item>
-                <item name="url" xsi:type="string">*/*/new</item>
-            </item>
-        </item>-->
     </argument>
     <dataSource name="fecon_shipping_preorder_grid_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
@@ -88,10 +75,9 @@
                 </item>
             </argument>
         </column>
-        <column name="created_at">
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="timezone" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">dateRange</item>
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="label" xsi:type="string" translate="true">Created</item>
@@ -99,10 +85,9 @@
                 </item>
             </argument>
         </column>
-        <column name="updated_at">
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="timezone" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">dateRange</item>
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="label" xsi:type="string" translate="true">Updated</item>

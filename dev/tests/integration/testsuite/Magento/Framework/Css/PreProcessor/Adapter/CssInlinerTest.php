@@ -17,7 +17,7 @@ class CssInlinerTest extends \PHPUnit\Framework\TestCase
      */
     private $objectManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
@@ -37,7 +37,7 @@ class CssInlinerTest extends \PHPUnit\Framework\TestCase
         $this->model->setCss($css);
         $this->model->setHtml($html);
         $result = $this->model->process();
-        $this->assertContains($cssExpected, $result);
+        $this->assertStringContainsString($cssExpected, $result);
     }
 
     /**
@@ -75,11 +75,12 @@ class CssInlinerTest extends \PHPUnit\Framework\TestCase
         $emogrifier->setCss($css);
         $emogrifier->setHtml($html);
         $result = $emogrifier->emogrify();
+
         /**
          * This test was implemented for the issue which existed in the older version of Emogrifier.
          * Test was updated, as the library got updated as well.
          */
-        $this->assertContains($cssExpected, $result);
+        $this->assertStringContainsString($cssExpected, $result);
     }
 
     /**

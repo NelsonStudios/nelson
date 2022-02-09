@@ -8,22 +8,26 @@ namespace Magento\Framework;
 
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\Helper\CacheCleaner;
-use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject as MockObject;
 
 /**
  * @magentoAppIsolation enabled
  * @magentoCache all disabled
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class TranslateTest extends TestCase
+class TranslateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Magento\Framework\Translate */
+    /**
+     * @var \Magento\Framework\Translate
+     */
     private $translate;
 
-    protected function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp(): void
     {
-        /** @var \Magento\Framework\View\FileSystem | PHPUnit_Framework_MockObject_MockObject $viewFileSystem */
+        /** @var \Magento\Framework\View\FileSystem|MockObject $viewFileSystem */
         $viewFileSystem = $this->createPartialMock(
             \Magento\Framework\View\FileSystem::class,
             ['getLocaleFileName']
@@ -31,15 +35,15 @@ class TranslateTest extends TestCase
 
         $viewFileSystem->expects($this->any())
             ->method('getLocaleFileName')
-            ->will(
-                $this->returnValue(
+            ->willReturn(
+
                     dirname(__DIR__) . '/Translation/Model/_files/Magento/design/Magento/theme/i18n/en_US.csv'
-                )
+
             );
 
-        /** @var \Magento\Framework\View\Design\ThemeInterface | PHPUnit_Framework_MockObject_MockObject $theme */
+        /** @var \Magento\Framework\View\Design\ThemeInterface|MockObject $theme */
         $theme = $this->createMock(\Magento\Framework\View\Design\ThemeInterface::class);
-        $theme->expects($this->any())->method('getThemePath')->will($this->returnValue('Magento/luma'));
+        $theme->expects($this->any())->method('getThemePath')->willReturn('Magento/luma');
 
         /** @var \Magento\TestFramework\ObjectManager $objectManager */
         $objectManager = Bootstrap::getObjectManager();
@@ -58,7 +62,7 @@ class TranslateTest extends TestCase
             dirname(__DIR__) . '/Translation/Model/_files/Magento/Catalog/i18n'
         );
 
-        /** @var \Magento\Theme\Model\View\Design | \PHPUnit_Framework_MockObject_MockObject $designModel */
+        /** @var \Magento\Theme\Model\View\Design|MockObject $designModel */
         $designModel = $this->getMockBuilder(\Magento\Theme\Model\View\Design::class)
             ->setMethods(['getDesignTheme'])
             ->setConstructorArgs(
@@ -74,7 +78,7 @@ class TranslateTest extends TestCase
             )
             ->getMock();
 
-        $designModel->expects($this->any())->method('getDesignTheme')->will($this->returnValue($theme));
+        $designModel->expects($this->any())->method('getDesignTheme')->willReturn($theme);
 
         $objectManager->addSharedInstance($designModel, \Magento\Theme\Model\View\Design\Proxy::class);
 
@@ -99,8 +103,10 @@ class TranslateTest extends TestCase
     /**
      * @magentoCache all disabled
      * @dataProvider translateDataProvider
+     *
      * @param string $inputText
      * @param string $expectedTranslation
+     * @return void
      * @throws Exception\LocalizedException
      */
     public function testTranslate($inputText, $expectedTranslation)
@@ -130,12 +136,12 @@ class TranslateTest extends TestCase
                 'Phrase in Magento_Catalog module that doesn\'t need translation',
             ],
             [
-                'Magento_Store module phrase will be override by theme translation',
-                'Magento_Store module phrase is override by theme translation',
+                'Magento_Store module phrase will be overridden by theme translation',
+                'Magento_Store module phrase is overridden by theme translation',
             ],
             [
-                'Magento_Catalog module phrase will be override by theme translation',
-                'Magento_Catalog module phrase is override by theme translation',
+                'Magento_Catalog module phrase will be overridden by theme translation',
+                'Magento_Catalog module phrase is overridden by theme translation',
             ],
         ];
     }

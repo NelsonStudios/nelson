@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Framework\Stdlib\Cookie;
 
 class PhpCookieReaderTest extends \PHPUnit\Framework\TestCase
@@ -24,7 +22,7 @@ class PhpCookieReaderTest extends \PHPUnit\Framework\TestCase
     const VALUE = 'cookie-val';
     const DEFAULT_VAL = 'default-val';
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->preTestCookies = $_COOKIE;
         $_COOKIE = [];
@@ -49,7 +47,7 @@ class PhpCookieReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->model->getCookie(null));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $_COOKIE = $this->preTestCookies;
     }

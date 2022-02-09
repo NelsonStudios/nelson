@@ -17,7 +17,6 @@ use Magento\Framework\Api\ExtensionAttributesFactory;
  * Class to test the JoinProcessor functionality
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- * @magentoAppIsolation enabled
  */
 class JoinProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,27 +26,27 @@ class JoinProcessorTest extends \PHPUnit\Framework\TestCase
     private $joinProcessor;
 
     /**
-     * @var Reader|\PHPUnit_Framework_MockObject_MockObject
+     * @var Reader|\PHPUnit\Framework\MockObject\MockObject
      */
     private $config;
 
     /**
-     * @var JoinDataInterfaceFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var JoinDataInterfaceFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     private $extensionAttributeJoinDataFactory;
 
     /**
-     * @var TypeProcessor|\PHPUnit_Framework_MockObject_MockObject
+     * @var TypeProcessor|\PHPUnit\Framework\MockObject\MockObject
      */
     private $typeProcessor;
 
     /**
-     * @var AppResource|\PHPUnit_Framework_MockObject_MockObject
+     * @var AppResource|\PHPUnit\Framework\MockObject\MockObject
      */
     private $appResource;
 
     /**
-     * @var ExtensionAttributesFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionAttributesFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     private $extensionAttributesFactory;
 
@@ -56,7 +55,7 @@ class JoinProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private $joinProcessorHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->config = $this->getMockBuilder(\Magento\Framework\Api\ExtensionAttribute\Config::class)
             ->disableOriginalConstructor()
@@ -103,7 +102,7 @@ class JoinProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->config->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($this->getConfig()));
+            ->willReturn($this->getConfig());
 
         $collection = $this->getMockBuilder(\Magento\Framework\Data\Collection\AbstractDb::class)
             ->disableOriginalConstructor()
@@ -145,55 +144,55 @@ class JoinProcessorTest extends \PHPUnit\Framework\TestCase
     private function getConfig()
     {
         return [\Magento\Catalog\Api\Data\ProductInterface::class => [
-            'review_id' => [
-                Converter::DATA_TYPE => 'string',
-                Converter::RESOURCE_PERMISSIONS => [],
-                Converter::JOIN_DIRECTIVE => [
-                    Converter::JOIN_REFERENCE_TABLE => "reviews",
-                    Converter::JOIN_REFERENCE_FIELD => "product_id",
-                    Converter::JOIN_FIELDS => [
-                        [
-                            Converter::JOIN_FIELD => "review_id",
-                            Converter::JOIN_FIELD_COLUMN => "db_review_id",
+                'review_id' => [
+                    Converter::DATA_TYPE => 'string',
+                    Converter::RESOURCE_PERMISSIONS => [],
+                    Converter::JOIN_DIRECTIVE => [
+                        Converter::JOIN_REFERENCE_TABLE => "reviews",
+                        Converter::JOIN_REFERENCE_FIELD => "product_id",
+                        Converter::JOIN_FIELDS => [
+                            [
+                                Converter::JOIN_FIELD => "review_id",
+                                Converter::JOIN_FIELD_COLUMN => "db_review_id",
+                            ],
                         ],
+                        Converter::JOIN_ON_FIELD => "id",
                     ],
-                    Converter::JOIN_ON_FIELD => "id",
+                ],
+            ], \Magento\Customer\Api\Data\CustomerInterface::class => [
+                'library_card_id' => [
+                    Converter::DATA_TYPE => 'string',
+                    Converter::RESOURCE_PERMISSIONS => [],
+                    Converter::JOIN_DIRECTIVE => [
+                        Converter::JOIN_REFERENCE_TABLE => "library_account",
+                        Converter::JOIN_FIELDS => [
+                            [
+                                Converter::JOIN_FIELD => "library_card_id",
+                                Converter::JOIN_FIELD_COLUMN => "",
+                            ],
+                        ],
+                        Converter::JOIN_ON_FIELD => "customer_id",
+                    ],
+                ],
+                'reviews' => [
+                    Converter::DATA_TYPE => 'Magento\Reviews\Api\Data\Reviews[]',
+                    Converter::RESOURCE_PERMISSIONS => [],
+                    Converter::JOIN_DIRECTIVE => [
+                        Converter::JOIN_REFERENCE_TABLE => "reviews",
+                        Converter::JOIN_FIELDS => [
+                            [
+                                Converter::JOIN_FIELD => "comment",
+                                Converter::JOIN_FIELD_COLUMN => "",
+                            ],
+                            [
+                                Converter::JOIN_FIELD => "rating",
+                                Converter::JOIN_FIELD_COLUMN => "",
+                            ],
+                        ],
+                        Converter::JOIN_ON_FIELD => "customer_id",
+                    ],
                 ],
             ],
-        ], \Magento\Customer\Api\Data\CustomerInterface::class => [
-            'library_card_id' => [
-                Converter::DATA_TYPE => 'string',
-                Converter::RESOURCE_PERMISSIONS => [],
-                Converter::JOIN_DIRECTIVE => [
-                    Converter::JOIN_REFERENCE_TABLE => "library_account",
-                    Converter::JOIN_FIELDS => [
-                        [
-                            Converter::JOIN_FIELD => "library_card_id",
-                            Converter::JOIN_FIELD_COLUMN => "",
-                        ],
-                    ],
-                    Converter::JOIN_ON_FIELD => "customer_id",
-                ],
-            ],
-            'reviews' => [
-                Converter::DATA_TYPE => 'Magento\Reviews\Api\Data\Reviews[]',
-                Converter::RESOURCE_PERMISSIONS => [],
-                Converter::JOIN_DIRECTIVE => [
-                    Converter::JOIN_REFERENCE_TABLE => "reviews",
-                    Converter::JOIN_FIELDS => [
-                        [
-                            Converter::JOIN_FIELD => "comment",
-                            Converter::JOIN_FIELD_COLUMN => "",
-                        ],
-                        [
-                            Converter::JOIN_FIELD => "rating",
-                            Converter::JOIN_FIELD_COLUMN => "",
-                        ],
-                    ],
-                    Converter::JOIN_ON_FIELD => "customer_id",
-                ],
-            ],
-        ],
         ];
     }
 
@@ -253,7 +252,7 @@ SELECT `e`.*,
 EXPECTED_SQL;
         $resultSql = $collection->getSelectSql(true);
         $formattedResultSql = str_replace(',', ",\n    ", $resultSql);
-        $this->assertContains($expectedSql, $formattedResultSql);
+        $this->assertStringContainsString($expectedSql, $formattedResultSql);
     }
 
     /**

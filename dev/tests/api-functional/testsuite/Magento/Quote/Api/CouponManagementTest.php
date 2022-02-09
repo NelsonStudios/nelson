@@ -9,6 +9,9 @@ namespace Magento\Quote\Api;
 
 use Magento\TestFramework\TestCase\WebapiAbstract;
 
+/**
+ * Coupon management service tests
+ */
 class CouponManagementTest extends WebapiAbstract
 {
     const SERVICE_VERSION = 'V1';
@@ -20,7 +23,7 @@ class CouponManagementTest extends WebapiAbstract
      */
     protected $objectManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
     }
@@ -79,11 +82,12 @@ class CouponManagementTest extends WebapiAbstract
 
     /**
      * @magentoApiDataFixture Magento/Checkout/_files/quote_with_address_saved.php
-     * @expectedException \Exception
-     * @expectedExceptionMessage Coupon code is not valid
      */
     public function testSetCouponThrowsExceptionIfCouponDoesNotExist()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The coupon code isn\'t valid. Verify the code and try again.');
+
         /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $this->objectManager->create(\Magento\Quote\Model\Quote::class);
         $quote->load('test_order_1', 'reserved_order_id');
@@ -93,7 +97,7 @@ class CouponManagementTest extends WebapiAbstract
 
         $serviceInfo = [
             'rest' => [
-                'resourcePath' => self::RESOURCE_PATH . $cartId . '/coupons/' . $couponCode,
+                'resourcePath' => self::RESOURCE_PATH . $cartId . '/coupons/' . urlencode($couponCode),
                 'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_PUT,
             ],
             'soap' => [
@@ -129,7 +133,7 @@ class CouponManagementTest extends WebapiAbstract
         $couponCode = $salesRule->getPrimaryCoupon()->getCode();
         $serviceInfo = [
             'rest' => [
-                'resourcePath' => self::RESOURCE_PATH . $cartId . '/coupons/' . $couponCode,
+                'resourcePath' => self::RESOURCE_PATH . $cartId . '/coupons/' . urlencode($couponCode),
                 'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_PUT,
             ],
             'soap' => [
@@ -214,11 +218,12 @@ class CouponManagementTest extends WebapiAbstract
 
     /**
      * @magentoApiDataFixture Magento/Checkout/_files/quote_with_address_saved.php
-     * @expectedException \Exception
-     * @expectedExceptionMessage Coupon code is not valid
      */
     public function testSetMyCouponThrowsExceptionIfCouponDoesNotExist()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The coupon code isn\'t valid. Verify the code and try again.');
+
         $this->_markTestAsRestOnly();
 
         // get customer ID token
@@ -232,7 +237,7 @@ class CouponManagementTest extends WebapiAbstract
 
         $serviceInfo = [
             'rest' => [
-                'resourcePath' => self::RESOURCE_PATH . 'mine/coupons/' . $couponCode,
+                'resourcePath' => self::RESOURCE_PATH . 'mine/coupons/' . urlencode($couponCode),
                 'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_PUT,
                 'token' => $token,
             ],
@@ -280,55 +285,13 @@ class CouponManagementTest extends WebapiAbstract
 
         $serviceInfo = [
             'rest' => [
-                'resourcePath' => self::RESOURCE_PATH . 'mine/coupons/' . $couponCode,
+                'resourcePath' => self::RESOURCE_PATH . 'mine/coupons/' . urlencode($couponCode),
                 'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_PUT,
                 'token' => $token,
             ],
         ];
 
         $requestData = [
-            "couponCode" => $couponCode,
-        ];
-
-        $this->assertTrue($this->_webApiCall($serviceInfo, $requestData));
-
-        $quoteWithCoupon = $this->objectManager->create(\Magento\Quote\Model\Quote::class);
-        $quoteWithCoupon->load('test01', 'reserved_order_id');
-
-        $this->assertEquals($quoteWithCoupon->getCouponCode(), $couponCode);
-    }
-
-    /**
-     * @magentoApiDataFixture Magento/Sales/_files/quote.php
-     * @magentoApiDataFixture Magento/Checkout/_files/discount_10percent.php
-     */
-    public function testSetCouponWihSpaces()
-    {
-        /** @var \Magento\Quote\Model\Quote $quote */
-        $quote = $this->objectManager->create(\Magento\Quote\Model\Quote::class);
-        $quote->load('test01', 'reserved_order_id');
-        $cartId = $quote->getId();
-        /** @var \Magento\SalesRule\Model\Rule $salesRule */
-        $salesRule = $this->objectManager->create(\Magento\SalesRule\Model\Rule::class);
-        $salesRuleId = $this->objectManager->get(\Magento\Framework\Registry::class)
-            ->registry('Magento/Checkout/_file/discount_10percent');
-        $salesRule->load($salesRuleId);
-        $couponCode = $salesRule->getPrimaryCoupon()->getCode();
-        $serviceInfo = [
-            'rest' => [
-                'resourcePath' => self::RESOURCE_PATH . $cartId . '/coupons/'
-                    . rawurlencode(' ') . $couponCode . rawurlencode(' '),
-                'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_PUT,
-            ],
-            'soap' => [
-                'service' => self::SERVICE_NAME,
-                'serviceVersion' => self::SERVICE_VERSION,
-                'operation' => self::SERVICE_NAME . 'Set',
-            ],
-        ];
-
-        $requestData = [
-            "cartId" => $cartId,
             "couponCode" => $couponCode,
         ];
 

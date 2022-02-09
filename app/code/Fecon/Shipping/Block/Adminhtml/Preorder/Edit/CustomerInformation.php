@@ -65,7 +65,11 @@ class CustomerInformation extends \Magento\Backend\Block\Template
         if (!$this->customer) {
             $preorder = $this->coreRegistry->registry('fecon_shipping_preorder');
             $customerId = $preorder->getData(PreorderInterface::CUSTOMER_ID);
-            $this->customer = $this->customerRepository->getById($customerId);
+            try{
+                $this->customer = $this->customerRepository->getById($customerId);
+            }catch(\Exception $e){
+                return false;
+            }
         }
 
         return $this->customer;
@@ -78,7 +82,11 @@ class CustomerInformation extends \Magento\Backend\Block\Template
      */
     public function getCustomerViewUrl()
     {
-        return $this->getUrl('customer/index/edit', ['id' => $this->getCustomer()->getId()]);
+        if($this->getCustomer()){
+            return $this->getUrl('customer/index/edit', ['id' => $this->getCustomer()->getId()]);
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -86,9 +94,12 @@ class CustomerInformation extends \Magento\Backend\Block\Template
      */
     public function getCustomerName()
     {
-        $customerName = $this->getCustomer()->getFirstname() . ' ' . $this->getCustomer()->getLastname();
-
-        return $this->escapeHtml($customerName);
+        if($this->getCustomer()){
+            $customerName = $this->getCustomer()->getFirstname() . ' ' . $this->getCustomer()->getLastname();
+            return $this->escapeHtml($customerName);
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -96,9 +107,12 @@ class CustomerInformation extends \Magento\Backend\Block\Template
      */
     public function getCustomerEmail()
     {
-        $customerEmail = $this->getCustomer()->getEmail();
-
-        return $this->escapeHtml($customerEmail);
+        if($this->getCustomer()){
+            $customerEmail = $this->getCustomer()->getEmail();
+            return $this->escapeHtml($customerEmail);
+        }else{
+            return null;
+        }
     }
 
     /**

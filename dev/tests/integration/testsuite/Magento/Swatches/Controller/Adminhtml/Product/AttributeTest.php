@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Magento\Swatches\Controller\Adminhtml\Product;
 
+use Magento\Framework\App\Request\Http as HttpRequest;
+use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -18,13 +20,28 @@ use Magento\Framework\Exception\LocalizedException;
 class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendController
 {
     /**
+     * @var FormKey
+     */
+    private $formKey;
+
+    /**
+     * @inheritDoc
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->formKey = $this->_objectManager->get(FormKey::class);
+    }
+
+    /**
      * Generate random hex color.
      *
      * @return string
      */
-    private function getRandomColor(): string
+    private function getRandomColor() : string
     {
-        return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        return '#' . str_pad(dechex(random_int(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -33,35 +50,39 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
      * @param int $optionsCount
      * @return array
      */
-    private function getSwatchVisualDataSet(int $optionsCount): array
+    private function getSwatchVisualDataSet(int $optionsCount) : array
     {
         $optionsData = [];
         $expectedOptionsLabels = [];
         for ($i = 0; $i < $optionsCount; $i++) {
-            $order = $i + 1;
-            $expectedOptionLabelOnStoreView = "value_{$i}_store_1";
+            $expectedOptionLabelOnStoreView = 'value_' . $i .'_store_1';
             $expectedOptionsLabels[$i+1] = $expectedOptionLabelOnStoreView;
-            $optionsData []= "optionvisual[order][option_{$i}]={$order}";
-            $optionsData []= "defaultvisual[]=option_{$i}";
-            $optionsData []= "swatchvisual[value][option_{$i}]={$this->getRandomColor()}";
-            $optionsData []= "optionvisual[value][option_{$i}][0]=value_{$i}_admin";
-            $optionsData []= "optionvisual[value][option_{$i}][1]={$expectedOptionLabelOnStoreView}";
-            $optionsData []= "optionvisual[delete][option_{$i}]=";
+            $optionId = 'option_' .$i;
+            $optionRowData = [];
+            $optionRowData['optionvisual']['order'][$optionId] = $i + 1;
+            $optionRowData['defaultvisual'][] = $optionId;
+            $optionRowData['swatchvisual']['value'][$optionId] = $this->getRandomColor();
+            $optionRowData['optionvisual']['value'][$optionId][0] = 'value_' . $i .'_admin';
+            $optionRowData['optionvisual']['value'][$optionId][1] = $expectedOptionLabelOnStoreView;
+            $optionRowData['optionvisual']['delete'][$optionId] = '';
+            $optionsData[] = http_build_query($optionRowData);
         }
-        $optionsData []= "visual_swatch_validation=";
-        $optionsData []= "visual_swatch_validation_unique=";
         return [
             'attribute_data' => array_merge_recursive(
                 [
-                    'serialized_swatch_values' => json_encode($optionsData),
+                    'serialized_options' => json_encode($optionsData),
+                ],
+                [
+                    'visual_swatch_validation' => '',
+                    'visual_swatch_validation_unique' => '',
                 ],
                 $this->getAttributePreset(),
                 [
-                    'frontend_input' => 'swatch_visual',
+                    'frontend_input' => 'swatch_visual'
                 ]
             ),
             'expected_options_count' => $optionsCount + 1,
-            'expected_store_labels' => $expectedOptionsLabels,
+            'expected_store_labels' => $expectedOptionsLabels
         ];
     }
 
@@ -71,35 +92,39 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
      * @param int $optionsCount
      * @return array
      */
-    private function getSwatchTextDataSet(int $optionsCount): array
+    private function getSwatchTextDataSet(int $optionsCount) : array
     {
         $optionsData = [];
         $expectedOptionsLabels = [];
         for ($i = 0; $i < $optionsCount; $i++) {
-            $order = $i + 1;
-            $expectedOptionLabelOnStoreView = "value_{$i}_store_1";
+            $expectedOptionLabelOnStoreView = 'value_' . $i . '_store_1';
             $expectedOptionsLabels[$i+1] = $expectedOptionLabelOnStoreView;
-            $optionsData []= "optiontext[order][option_{$i}]={$order}";
-            $optionsData []= "defaulttext[]=option_{$i}";
-            $optionsData []= "swatchtext[value][option_{$i}]=x{$i}";
-            $optionsData []= "optiontext[value][option_{$i}][0]=value_{$i}_admin";
-            $optionsData []= "optiontext[value][option_{$i}][1]={$expectedOptionLabelOnStoreView}";
-            $optionsData []= "optiontext[delete][option_{$i}]=";
+            $optionId = 'option_' . $i;
+            $optionRowData = [];
+            $optionRowData['optiontext']['order'][$optionId] = $i + 1;
+            $optionRowData['defaulttext'][] = $optionId;
+            $optionRowData['swatchtext']['value'][$optionId] = 'x' . $i ;
+            $optionRowData['optiontext']['value'][$optionId][0] = 'value_' . $i . '_admin';
+            $optionRowData['optiontext']['value'][$optionId][1]= $expectedOptionLabelOnStoreView;
+            $optionRowData['optiontext']['delete'][$optionId]='';
+            $optionsData[] = http_build_query($optionRowData);
         }
-        $optionsData []= "text_swatch_validation=";
-        $optionsData []= "text_swatch_validation_unique=";
         return [
             'attribute_data' => array_merge_recursive(
                 [
-                    'serialized_swatch_values' => json_encode($optionsData),
+                    'serialized_options' => json_encode($optionsData),
+                ],
+                [
+                    'text_swatch_validation' => '',
+                    'text_swatch_validation_unique' => '',
                 ],
                 $this->getAttributePreset(),
                 [
-                    'frontend_input' => 'swatch_text',
+                    'frontend_input' => 'swatch_text'
                 ]
             ),
             'expected_options_count' => $optionsCount + 1,
-            'expected_store_labels' => $expectedOptionsLabels,
+            'expected_store_labels' => $expectedOptionsLabels
         ];
     }
 
@@ -108,10 +133,9 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
      *
      * @return array
      */
-    private function getAttributePreset(): array
+    private function getAttributePreset() : array
     {
         return [
-            'serialized_options' => '[]',
             'form_key' => 'XxtpPYjm2YPYUlAt',
             'frontend_label' => [
                 0 => 'asdasd',
@@ -149,7 +173,7 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
      *
      * @return array
      */
-    public function getLargeSwatchesAmountAttributeData(): array
+    public function getLargeSwatchesAmountAttributeData() : array
     {
         $maxInputVars = ini_get('max_input_vars');
         // Each option is at least 7 variables array for a visual swatch.
@@ -158,13 +182,12 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
         $swatchTextOptionsCount = (int)floor($maxInputVars / 4) + 80;
         return [
             'visual swatches' => $this->getSwatchVisualDataSet($swatchVisualOptionsCount),
-            'text swatches' => $this->getSwatchTextDataSet($swatchTextOptionsCount),
+            'text swatches' => $this->getSwatchTextDataSet($swatchTextOptionsCount)
         ];
     }
 
     /**
      * Test attribute saving with large amount of options exceeding maximum allowed by max_input_vars limit.
-     *
      * @dataProvider getLargeSwatchesAmountAttributeData()
      * @param array $attributeData
      * @param int $expectedOptionsCount
@@ -175,8 +198,10 @@ class AttributeTest extends \Magento\TestFramework\TestCase\AbstractBackendContr
         array $attributeData,
         int $expectedOptionsCount,
         array $expectedLabels
-    ) {
+    ) : void {
+        $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
         $this->getRequest()->setPostValue($attributeData);
+        $this->getRequest()->setPostValue('form_key', $this->formKey->getFormKey());
         $this->dispatch('backend/catalog/product_attribute/save');
         $entityTypeId = $this->_objectManager->create(
             \Magento\Eav\Model\Entity::class

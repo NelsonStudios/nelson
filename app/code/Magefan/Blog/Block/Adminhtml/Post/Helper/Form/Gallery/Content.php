@@ -45,10 +45,10 @@ class Content extends \Magento\Backend\Block\Widget
      */
     protected function _prepareLayout()
     {
-        $this->addChild('uploader', 'Magento\Backend\Block\Media\Uploader');
 
+        $this->addChild('uploader', 'Magento\Backend\Block\Media\Uploader');
         $this->getUploader()->getConfig()->setUrl(
-            $this->_urlBuilder->addSessionParam()->getUrl('blog/post_upload/gallery')
+            $this->_urlBuilder->setSessionParam()->getUrl('blog/post_upload/gallery')
         )->setFileField(
             'image'
         )->setFilters(

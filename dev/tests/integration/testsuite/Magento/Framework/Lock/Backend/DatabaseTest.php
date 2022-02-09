@@ -3,12 +3,16 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
-/**
- * \Magento\Framework\Lock\Backend\Database test case
- */
 namespace Magento\Framework\Lock\Backend;
 
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\App\DeploymentConfig;
+
+/**
+ * \Magento\Framework\Lock\Backend\Database test case.
+ */
 class DatabaseTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -21,10 +25,13 @@ class DatabaseTest extends \PHPUnit\Framework\TestCase
      */
     private $objectManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-        $this->model = $this->objectManager->create(\Magento\Framework\Lock\Backend\Database::class);
+        $resourceConnection = $this->objectManager->create(ResourceConnection::class);
+        $deploymentConfig = $this->objectManager->create(DeploymentConfig::class);
+        // create object with new otherwise dummy locker is created because of di.xml preference for integration tests
+        $this->model = new Database($resourceConnection, $deploymentConfig);
     }
 
     public function testLockAndUnlock()

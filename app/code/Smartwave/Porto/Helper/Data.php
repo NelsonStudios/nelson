@@ -16,7 +16,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     private $_checkedPurchaseCode;
     private $_messageManager;
     protected $_configFactory;
-    
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\ObjectManagerInterface $objectManager,
@@ -34,9 +34,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_messageManager = $messageManager;
         $this->_configFactory = $configFactory;
         $this->_state = $state;
-        
+
         parent::__construct($context);
     }
+
+    public function getProduct(){
+        return $this->_registry->registry('current_product');
+    }
+
     public function checkPurchaseCode($save = false) {
         if($this->isLocalhost()){
             return "localhost";
@@ -44,7 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if(!$this->_checkedPurchaseCode){
             $code = $this->scopeConfig->getValue('porto_license/general/purchase_code');
             $code_confirm = $this->scopeConfig->getValue('porto_license/general/purchase_code_confirm');
-            
+
             if($save) {
                 $site_url = $this->scopeConfig->getValue('web/unsecure/base_url');
                 $domain = trim(preg_replace('/^.*?\\/\\/(.*)?\\//', '$1', $site_url));
@@ -79,7 +84,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $this->_checkedPurchaseCode = "verified";
             }
         }
-    
+
         return $this->_checkedPurchaseCode;
     }
     public function curlPurchaseCode($code, $domain, $act) {
@@ -99,7 +104,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             '127.0.0.1',
             '::1'
         );
-        
+
         return in_array($_SERVER['REMOTE_ADDR'], $whitelist);
     }
     public function isAdmin() {
@@ -144,7 +149,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ->addAttributeToFilter('is_saleable', 1, 'left')
             ->addAttributeToSort('position','asc');
         $cat_prod_ids = $category_products->getAllIds();
-        
+
         return $cat_prod_ids;
     }
     public function getPrevProduct($product) {

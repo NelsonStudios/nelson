@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Magento\Customer\Controller\Adminhtml\Index;
 
 use Magento\Backend\Model\Session;
+use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Message\MessageInterface;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Newsletter\Model\SubscriberFactory;
@@ -27,7 +28,7 @@ class MassSubscribeTest extends \Magento\TestFramework\TestCase\AbstractBackendC
      */
     protected $baseControllerUrl = 'http://localhost/index.php/backend/customer/index/index';
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         /**
          * Unset customer data
@@ -68,20 +69,15 @@ class MassSubscribeTest extends \Magento\TestFramework\TestCase\AbstractBackendC
         /** @var CustomerInterface $customer2 */
         $customer2 = $customerRepository->get('customer2@example.com');
 
-        /** @var \Magento\Framework\Data\Form\FormKey $formKey */
-        $formKey = $this->_objectManager->get(\Magento\Framework\Data\Form\FormKey::class);
-
         $params = [
             'selected' => [
                 $customer1->getId(),
                 $customer2->getId(),
             ],
             'namespace' => 'customer_listing',
-            'form_key' => $formKey->getFormKey()
         ];
-
-        $this->getRequest()->setParams($params);
-        $this->getRequest()->setMethod('POST');
+        $this->getRequest()->setParams($params)
+            ->setMethod(HttpRequest::METHOD_POST);
 
         $this->dispatch('backend/customer/index/massSubscribe');
 
@@ -111,21 +107,17 @@ class MassSubscribeTest extends \Magento\TestFramework\TestCase\AbstractBackendC
      */
     public function testMassSubscriberActionNoSelection()
     {
-        /** @var \Magento\Framework\Data\Form\FormKey $formKey */
-        $formKey = $this->_objectManager->get(\Magento\Framework\Data\Form\FormKey::class);
-
         $params = [
-            'namespace' => 'customer_listing',
-            'form_key' => $formKey->getFormKey()
+            'namespace' => 'customer_listing'
         ];
 
-        $this->getRequest()->setParams($params);
-        $this->getRequest()->setMethod('POST');
+        $this->getRequest()->setParams($params)
+            ->setMethod(HttpRequest::METHOD_POST);
         $this->dispatch('backend/customer/index/massSubscribe');
 
         $this->assertRedirect($this->stringStartsWith($this->baseControllerUrl));
         $this->assertSessionMessages(
-            self::equalTo(['Please select item(s).']),
+            self::equalTo(['An item needs to be selected. Select and try again.']),
             MessageInterface::TYPE_ERROR
         );
     }

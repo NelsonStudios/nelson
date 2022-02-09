@@ -140,7 +140,7 @@ class Price extends AbstractFilter
 	/**
 	 * @inheritdoc
 	 */
-	protected function _renderRangeLabel($fromPrice, $toPrice)
+	protected function _renderRangeLabel($fromPrice, $toPrice,$isLast = false)
 	{
 		if (!$this->_moduleHelper->isEnabled()) {
 			return parent::_renderRangeLabel($fromPrice, $toPrice);

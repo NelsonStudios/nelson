@@ -5,12 +5,15 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Catalog\Api;
 
 use Magento\TestFramework\TestCase\WebapiAbstract;
 
+/**
+ * Class ProductTierPriceManagementTest
+ *
+ * @package Magento\Catalog\Api
+ */
 class ProductTierPriceManagementTest extends WebapiAbstract
 {
     const SERVICE_NAME = 'catalogProductTierPriceManagementV1';
@@ -36,22 +39,22 @@ class ProductTierPriceManagementTest extends WebapiAbstract
             ],
         ];
 
-        $tearPriceList = $this->_webApiCall(
+        $tierPriceList = $this->_webApiCall(
             $serviceInfo,
             ['sku' => $productSku, 'customerGroupId' => $customerGroupId]
         );
 
-        $this->assertCount($count, $tearPriceList);
+        $this->assertCount($count, $tierPriceList);
         if ($count) {
-            $this->assertEquals($value, $tearPriceList[0]['value']);
-            $this->assertEquals($qty, $tearPriceList[0]['qty']);
+            $this->assertEquals($value, $tierPriceList[0]['value']);
+            $this->assertEquals($qty, $tierPriceList[0]['qty']);
         }
     }
 
     public function getListDataProvider()
     {
         return [
-            [0, 2, 5, 3],
+            [0, 3, 5, 3],
             [1, 0, null, null],
             ['all', 2, 8, 2],
         ];
@@ -60,17 +63,15 @@ class ProductTierPriceManagementTest extends WebapiAbstract
     /**
      * @param string|int $customerGroupId
      * @param int $qty
-     * @magentoApiDataFixture Magento/Catalog/_files/product_with_image.php
+     * @magentoApiDataFixture Magento/Catalog/_files/product_simple.php
      * @dataProvider deleteDataProvider
      */
     public function testDelete($customerGroupId, $qty)
     {
         $productSku = 'simple';
-        $objectManager = \Magento\TestFramework\ObjectManager::getInstance();
-        $productBefore = $objectManager->get(ProductRepositoryInterface::class)->get($productSku, false, null, true);
         $serviceInfo = [
             'rest' => [
-                'resourcePath' => self::RESOURCE_PATH
+                'resourcePath' =>   self::RESOURCE_PATH
                     . $productSku . "/group-prices/" . $customerGroupId . "/tiers/" . $qty,
                 'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_DELETE,
             ],
@@ -82,10 +83,6 @@ class ProductTierPriceManagementTest extends WebapiAbstract
         ];
         $requestData = ['sku' => $productSku, 'customerGroupId' => $customerGroupId, 'qty' => $qty];
         $this->assertTrue($this->_webApiCall($serviceInfo, $requestData));
-        $productAfter = $objectManager->get(ProductRepositoryInterface::class)->get($productSku, false, null, true);
-        $this->assertSame($productBefore->getImage(), $productAfter->getImage());
-        $this->assertSame($productBefore->getSmallImage(), $productAfter->getSmallImage());
-        $this->assertSame($productBefore->getThumbnail(), $productAfter->getThumbnail());
     }
 
     public function deleteDataProvider()
