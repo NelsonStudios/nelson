@@ -3,6 +3,8 @@
 namespace  Fecon\AskAnExpert\Block;
 
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
+use Psr\Log\LoggerInterface;
 
 class Contactblock extends Template {
     protected $_storeInfo;
@@ -15,11 +17,13 @@ class Contactblock extends Template {
      * @param \Fecon\AskAnExpert\Helper\Data   $myModuleHelper 
      * @param \Magento\Store\Model\Information $storeInfo      
      */
-    public function __construct(Template\Context $context, array $data = [], \Fecon\AskAnExpert\Helper\Data $myModuleHelper, \Magento\Store\Model\Information $storeInfo) {
+    public function __construct(Template\Context $context, array $data = [], \Fecon\AskAnExpert\Helper\Data $myModuleHelper, \Magento\Store\Model\Information $storeInfo,RemoteAddress $remoteAddress, LoggerInterface $loggerInterface) {
         
         parent::__construct($context, $data);
         $this->_mymoduleHelper = $myModuleHelper;
         $this->_storeInfo = $storeInfo;
+        $this->_remoteAddress = $remoteAddress;
+        $this->_loggerInterface = $loggerInterface;
         $this->_isScopePrivate = true;
     }
 
@@ -330,5 +334,30 @@ class Contactblock extends Template {
     public function getproductsbycatajaxurl()
     {
         return $this->_mymoduleHelper->getproductsbycatajaxurl();
+    }
+    /**
+     * getRemoteAddress
+     * @return string config value 
+     */
+    public function getRemoteAddress()
+    {
+        return $this->_remoteAddress->getRemoteAddress();
+    }
+    /**
+     * getRemoteAddress
+     * @return string config value 
+     */
+    public function getLogger()
+    {
+        return $this->_loggerInterface;
+    }
+
+    /**
+     * getXmlData
+     * @return string config value 
+     */
+    public function getXmlData()
+    {
+        return simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=".$this->getRemoteAddress());
     }
 }

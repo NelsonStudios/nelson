@@ -15,6 +15,21 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
     /**
+     * @var \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
+     */
+    protected $pageIdentifierGenerator;
+
+    /**
+     * Construct
+     *
+     * @param \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
+     */
+    public function __construct(
+        \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator $pageIdentifierGenerator
+    ) {
+        $this->_pageIdentifierGenerator = $pageIdentifierGenerator;
+    }
+    /**
      * Initialize resource model
      * Get tablename from config
      *
@@ -64,8 +79,7 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             }
         }
 
-        $identifierGenerator = \Magento\Framework\App\ObjectManager::getInstance()
-                ->create('Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator');
+        $identifierGenerator = $this->_pageIdentifierGenerator;
         $identifierGenerator->generate($object);
 
         if (!$this->isValidPageIdentifier($object)) {
