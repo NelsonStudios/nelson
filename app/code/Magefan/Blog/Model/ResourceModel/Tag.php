@@ -25,8 +25,11 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * @param \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
      */
     public function __construct(
-        \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator $pageIdentifierGenerator
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+        \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator $pageIdentifierGenerator,
+        $resourcePrefix = null
     ) {
+        parent::__construct($context, $resourcePrefix);
         $this->_pageIdentifierGenerator = $pageIdentifierGenerator;
     }
     /**
