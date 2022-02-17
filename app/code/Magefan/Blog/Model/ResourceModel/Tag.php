@@ -81,10 +81,9 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 );
             }
         }
-
         $identifierGenerator = $this->_pageIdentifierGenerator;
         $identifierGenerator->generate($object);
-
+        
         if (!$this->isValidPageIdentifier($object)) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('The tag URL key contains disallowed symbols.')
