@@ -25,9 +25,9 @@ class Logger
      */
     public function init($filename)
     {
-        $writer = new \Zend\Log\Writer\Stream($filename);
-        $this->logger = new \Zend\Log\Logger();
-        $this->logger->addWriter($writer);
+        $writer = new \Zend_Log_Writer_Stream($filename);
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
 
         return $this;
     }
