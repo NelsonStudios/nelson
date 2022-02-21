@@ -50,13 +50,6 @@ class Amount extends \Magento\Framework\Pricing\Render\Amount
     {
         $action = $this->getRequest()->getFullActionName();
         $shouldReload = false;
-        $customerGroup = $this->customerSession->getCustomerGroupId();
-        if ($action == 'catalog_product_view' &&
-            $customerGroup != Group::NOT_LOGGED_IN_ID
-        ) {
-            $shouldReload = true;
-        }
-
         return $shouldReload;
     }
 
