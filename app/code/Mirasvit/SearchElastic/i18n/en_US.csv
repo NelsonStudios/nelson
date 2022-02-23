@@ -1,0 +1,15 @@
+Done.,Done.
+"Elasticsearch library is not installed, please run the following :","Elasticsearch library is not installed, please run the following :"
+"composer require elasticsearch/elasticsearch:~5.1","composer require elasticsearch/elasticsearch:~5.1"
+"Elasticsearch is running.","Elasticsearch is running."
+"Elasticsearch is not running.","Elasticsearch is not running."
+"Elasticsearch Host","Elasticsearch Host"
+"Elasticsearch Port","Elasticsearch Port"
+"Elasticsearch Index Prefix","Elasticsearch Index Prefix"
+"Fast Mode","Fast Mode"
+"This option is available for Sphinx search and Elastic engines only.","This option is available for Sphinx search and Elastic engines only."
+"The autocomplete results with <br/>
+                                ""fast mode"" enabled are less accurate <br/>
+                                and may be somewhat different from the main search results. <br/>","The autocomplete results with <br/>
+                                ""fast mode"" enabled are less accurate <br/>
+                                and may be somewhat different from the main search results. <br/>"

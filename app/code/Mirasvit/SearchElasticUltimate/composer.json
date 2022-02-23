@@ -1,0 +1,24 @@
+{
+    "name": "mirasvit/module-search-elastic-ultimate",
+    "description": "Elastic Search Ultimate",
+    "require": {
+        "mirasvit/module-search-elastic": "1.2.*",
+        "mirasvit/module-search-autocomplete": "1.1.*|1.2.*",
+        "mirasvit/module-misspell": "1.0.*",
+        "mirasvit/module-search-landing": "1.0.*",
+        "mirasvit/module-search-report": "1.0.*"
+    },
+    "type": "magento2-module",
+    "version": "1.1.1",
+    "license": [
+        "proprietary"
+    ],
+    "autoload": {
+        "files": [
+          "src/SearchElasticUltimate/registration.php"
+        ],
+        "psr-4": {
+          "Mirasvit\\SearchElasticUltimate\\": "src/SearchElasticUltimate"
+        }
+    }
+}

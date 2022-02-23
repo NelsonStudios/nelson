@@ -1,0 +1,31 @@
+<?php
+//@codingStandardsIgnoreFile
+/** @var \Mirasvit\Search\Block\Index\Base $block */
+
+/** @var \Aheadworks\Blog\Block\PostList $list */
+$list = $this->getLayout()->createBlock('Aheadworks\Blog\Block\PostList', 'aw_blog_post.list',
+	[
+        'data' => [
+            'social_icons_block' => 'Aheadworks\Blog\Block\Sharethis'
+        ]
+    ]
+);
+
+$postList = $list->getPosts();
+$resultIds = $block->getCollection()->getAllIds();
+$resultPostList = [];
+
+foreach ($postList as $post) {
+	if ( in_array($post->getId(), $resultIds)) {
+	    $resultPostList[] = $post;
+	}
+}
+?>
+<div class="mst-search__index mst-search__index-aheadworks-blog-post">
+    <div class="blog-posts">
+        <?php /** @var \Aheadworks\Blog\Model\Post $post */ ?>
+        <?php foreach ($resultPostList as $post): ?>
+            <?= $list->getItemHtml($post); ?>
+        <?php endforeach ?>
+    </div>
+</div>

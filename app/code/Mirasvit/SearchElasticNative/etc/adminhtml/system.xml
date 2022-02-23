@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="search">
+            <group id="engine">
+                <field id="engine_unsupported" translate="comment" type="hidden" sortOrder="20" showInDefault="1">
+                    <depends>
+                        <field id="engine">elasticsearch</field>
+                    </depends>
+                    <comment>This engine is not supported</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
