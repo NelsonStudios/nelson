@@ -3,6 +3,8 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
+
 namespace Magento\Catalog\Model\Product\Attribute\Backend;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -35,7 +37,7 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
      */
     protected $_model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             \Magento\Catalog\Model\Product\Attribute\Backend\Tierprice::class
@@ -66,38 +68,62 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
             [
                 ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
                 ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 5, 'price' => 5],
+                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 5.6, 'price' => 4],
             ]
         );
         $this->assertTrue($this->_model->validate($product));
     }
 
     /**
-     * @expectedException \Magento\Framework\Exception\LocalizedException
+     * Test that duplicated tier price values issues exception during validation.
+     *
+     * @dataProvider validateDuplicateDataProvider
      */
-    public function testValidateDuplicate()
+    public function testValidateDuplicate(array $tierPricesData)
     {
+        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+
         $product = new \Magento\Framework\DataObject();
-        $product->setTierPrice(
-            [
-                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
-                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
-            ]
-        );
+        $product->setTierPrice($tierPricesData);
 
         $this->_model->validate($product);
     }
 
     /**
-     * @expectedException \Magento\Framework\Exception\LocalizedException
+     * testValidateDuplicate data provider.
+     *
+     * @return array
+     */
+    public function validateDuplicateDataProvider(): array
+    {
+        return [
+            [
+                [
+                    ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
+                    ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
+                ],
+            ],
+            [
+                [
+                    ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2.2, 'price' => 8],
+                    ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2.2, 'price' => 8],
+                ],
+            ],
+        ];
+    }
+
+    /**
      */
     public function testValidateDuplicateWebsite()
     {
+        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+
         $product = new \Magento\Framework\DataObject();
         $product->setTierPrice(
             [
-                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
-                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 5, 'price' => 5],
-                ['website_id' => 1, 'cust_group' => 1, 'price_qty' => 5, 'price' => 5],
+                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2.2, 'price' => 8],
+                ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 5.3, 'price' => 5],
+                ['website_id' => 1, 'cust_group' => 1, 'price_qty' => 5.3, 'price' => 5],
             ]
         );
 
@@ -105,10 +131,11 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \Magento\Framework\Exception\LocalizedException
      */
     public function testValidatePercentage()
     {
+        $this->expectException(\Magento\Framework\Exception\LocalizedException::class);
+
         $product = new \Magento\Framework\DataObject();
         $product->setTierPrice(
             [
@@ -125,12 +152,17 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
             ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 2, 'price' => 8],
             ['website_id' => 0, 'cust_group' => 1, 'price_qty' => 5, 'price' => 5],
             ['website_id' => 1, 'cust_group' => 1, 'price_qty' => 5, 'price' => 5],
+            ['website_id' => 1, 'cust_group' => 1, 'price_qty' => 5.3, 'price' => 4],
+            ['website_id' => 1, 'cust_group' => 1, 'price_qty' => 5.4, 'price' => 3],
+            ['website_id' => 1, 'cust_group' => 1, 'price_qty' => '5.40', 'price' => 2],
         ];
 
         $newData = $this->_model->preparePriceData($data, \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE, 1);
-        $this->assertEquals(2, count($newData));
+        $this->assertCount(4, $newData);
         $this->assertArrayHasKey('1-2', $newData);
         $this->assertArrayHasKey('1-5', $newData);
+        $this->assertArrayHasKey('1-5.3', $newData);
+        $this->assertArrayHasKey('1-5.4', $newData);
     }
 
     public function testAfterLoad()
@@ -146,19 +178,19 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
         $this->_model->afterLoad($product);
         $price = $product->getTierPrice();
         $this->assertNotEmpty($price);
-        $this->assertEquals(4, count($price));
+        $this->assertCount(5, $price);
     }
 
     /**
      * @dataProvider saveExistingProductDataProvider
      * @param array $tierPricesData
-     * @param $tierPriceCount
+     * @param int $tierPriceCount
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\StateException
      */
-    public function testSaveExistingProduct(array $tierPricesData, $tierPriceCount)
+    public function testSaveExistingProduct(array $tierPricesData, int $tierPriceCount): void
     {
         /** @var $product \Magento\Catalog\Model\Product */
         $product = $this->productRepository->get('simple', true);
@@ -185,6 +217,7 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 2, 'value' => 8],
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 5, 'value' => 5],
                     ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3, 'value' => 5],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3.2, 'value' => 6],
                     [
                         'website_id' => 0,
                         'customer_group_id' => 0,
@@ -192,13 +225,14 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                         'extension_attributes' => new \Magento\Framework\DataObject(['percentage_value' => 50])
                     ],
                 ],
-                4,
+                5,
             ],
             'update one' => [
                 [
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 2, 'value' => 8],
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 5, 'value' => 5],
                     ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3, 'value' => 5],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => '3.2', 'value' => 6],
                     [
                         'website_id' => 0,
                         'customer_group_id' => 0,
@@ -206,12 +240,13 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                         'extension_attributes' => new \Magento\Framework\DataObject(['percentage_value' => 10])
                     ],
                 ],
-                4,
+                5,
             ],
             'delete one' => [
                 [
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 5, 'value' => 5],
                     ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3, 'value' => 5],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => '3.2', 'value' => 6],
                     [
                         'website_id' => 0,
                         'customer_group_id' => 0,
@@ -219,13 +254,14 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                         'extension_attributes' => new \Magento\Framework\DataObject(['percentage_value' => 50])
                     ],
                 ],
-                3,
+                4,
             ],
             'add one' => [
                 [
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 2, 'value' => 8],
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 5, 'value' => 5],
                     ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3, 'value' => 5],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3.2, 'value' => 6],
                     [
                         'website_id' => 0,
                         'customer_group_id' => 32000,
@@ -239,7 +275,7 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                         'extension_attributes' => new \Magento\Framework\DataObject(['percentage_value' => 50])
                     ],
                 ],
-                5,
+                6,
             ],
             'delete all' => [[], 0,],
         ];
@@ -248,13 +284,13 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider saveNewProductDataProvider
      * @param array $tierPricesData
-     * @param $tierPriceCount
+     * @param int $tierPriceCount
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\StateException
      */
-    public function testSaveNewProduct(array $tierPricesData, $tierPriceCount)
+    public function testSaveNewProduct(array $tierPricesData, int $tierPriceCount): void
     {
         /** @var $product \Magento\Catalog\Model\Product */
         $product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
@@ -268,7 +304,7 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
         $tierPrices = [];
         foreach ($tierPricesData as $tierPrice) {
             $tierPrices[] = $this->tierPriceFactory->create([
-                'data' => $tierPrice
+                'data' => $tierPrice,
             ]);
         }
         $product->setTierPrices($tierPrices);
@@ -288,6 +324,8 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 2, 'value' => 8],
                     ['website_id' => 0, 'customer_group_id' => 32000, 'qty' => 5, 'value' => 5],
                     ['website_id' => 0, 'customer_group_id' => 0, 'qty' => 3, 'value' => 5],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => '3.2', 'value' => 4],
+                    ['website_id' => 0, 'customer_group_id' => 0, 'qty' => '3.3', 'value' => 3],
                     [
                         'website_id' => 0,
                         'customer_group_id' => 0,
@@ -295,7 +333,7 @@ class TierpriceTest extends \PHPUnit\Framework\TestCase
                         'extension_attributes' => new \Magento\Framework\DataObject(['percentage_value' => 50])
                     ],
                 ],
-                4,
+                6,
             ],
         ];
     }

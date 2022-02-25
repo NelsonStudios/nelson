@@ -5,7 +5,7 @@
 define([
     "jquery",
     "matchMedia",
-    "jquery/ui",
+    "jquery-ui-modules/menu",
     "jquery/jquery.mobile.custom",
     "mage/translate"
 ], function ($, mediaCheck) {
@@ -384,7 +384,7 @@ define([
                 return (typeof handler === "string" ? instance[handler] : handler)
                     .apply(instance, arguments);
             };
-            
+
             return setTimeout(handlerProxy, delay || 0);
         }
     });

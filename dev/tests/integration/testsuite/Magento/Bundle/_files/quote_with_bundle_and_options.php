@@ -4,11 +4,14 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 use Magento\TestFramework\Helper\Bootstrap;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-require __DIR__ . 'product_with_multiple_options.php';
+Resolver::getInstance()->requireDataFixture('Magento/Bundle/_files/product_with_multiple_options.php');
 
-$objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+$objectManager = Bootstrap::getObjectManager();
 
 /** @var $product \Magento\Catalog\Model\Product */
 $product = $objectManager->create(\Magento\Catalog\Model\Product::class);
@@ -46,6 +49,14 @@ $cart = Bootstrap::getObjectManager()->create(\Magento\Checkout\Model\Cart::clas
 $cart->addProduct($product, $requestInfo);
 $cart->getQuote()->setReservedOrderId('test_cart_with_bundle_and_options');
 $cart->save();
+
+/** @var \Magento\Quote\Model\QuoteIdMask $quoteIdMask */
+$quoteIdMask = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
+    ->create(\Magento\Quote\Model\QuoteIdMaskFactory::class)
+    ->create();
+$quoteIdMask->setQuoteId($cart->getQuote()->getId());
+$quoteIdMask->setDataChanges(true);
+$quoteIdMask->save();
 
 /** @var $objectManager \Magento\TestFramework\ObjectManager */
 $objectManager = Bootstrap::getObjectManager();

@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Multishipping\Block\Checkout\Address;
 
 use Magento\TestFramework\Helper\Bootstrap;
@@ -18,7 +16,7 @@ class SelectTest extends \PHPUnit\Framework\TestCase
     /** @var \Magento\Multishipping\Block\Checkout\Address\Select */
     protected $_selectBlock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->_selectBlock = Bootstrap::getObjectManager()->create(
             \Magento\Multishipping\Block\Checkout\Address\Select::class

@@ -15,6 +15,24 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
     /**
+     * @var \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
+     */
+    protected $pageIdentifierGenerator;
+
+    /**
+     * Construct
+     *
+     * @param \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator
+     */
+    public function __construct(
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+        \Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator $pageIdentifierGenerator,
+        $resourcePrefix = null
+    ) {
+        parent::__construct($context, $resourcePrefix);
+        $this->_pageIdentifierGenerator = $pageIdentifierGenerator;
+    }
+    /**
      * Initialize resource model
      * Get tablename from config
      *
@@ -63,11 +81,9 @@ class Tag extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 );
             }
         }
-
-        $identifierGenerator = \Magento\Framework\App\ObjectManager::getInstance()
-                ->create('Magefan\Blog\Model\ResourceModel\PageIdentifierGenerator');
+        $identifierGenerator = $this->_pageIdentifierGenerator;
         $identifierGenerator->generate($object);
-
+        
         if (!$this->isValidPageIdentifier($object)) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('The tag URL key contains disallowed symbols.')

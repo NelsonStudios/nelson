@@ -30,12 +30,13 @@ class ExtensibleInterfacesTest extends \PHPUnit\Framework\TestCase
             function ($filename) {
                 $errors = [];
                 $fileContent = file_get_contents($filename);
-                $extendsFromExtensibleDataInterface = preg_match(
-                    '/' . str_replace('\\', '\\\\', self::EXTENSIBLE_DATA_INTERFACE) . '/',
-                    $fileContent
-                );
+                $pattern = '/'
+                    . str_replace('\\', '\\\\', self::EXTENSIBLE_DATA_INTERFACE)
+                    . '/';
+                $extendsFromExtensibleDataInterface = preg_match($pattern, $fileContent);
+                $namespacePattern = '/namespace ([\w\\\\]+).*interface ([\w\\\\]+)/s';
                 if ($extendsFromExtensibleDataInterface
-                    && preg_match('/namespace ([\w\\\\]+).*interface ([\w\\\\]+)/s', $fileContent, $matches)
+                    && preg_match($namespacePattern, $fileContent, $matches)
                 ) {
                     $namespace = $matches[1];
                     $interfaceName = $matches[2];
@@ -154,7 +155,7 @@ class ExtensibleInterfacesTest extends \PHPUnit\Framework\TestCase
     /**
      * Ensure that all classes extended from extensible classes implement getter and setter for extension attributes.
      */
-    public function testExtensibleClassesWithMissingInterface()
+    public function testExtensibleClassesWithMissingInterface() //phpcs:ignore Generic.Metrics.NestingLevel
     {
         $invoker = new \Magento\Framework\App\Utility\AggregateInvoker($this);
         $invoker(
@@ -169,7 +170,7 @@ class ExtensibleInterfacesTest extends \PHPUnit\Framework\TestCase
                 if (preg_match('/' . $extensibleClassPattern . '/', $fileContent) &&
                     !preg_match('/' . $abstractExtensibleClassPattern . '/', $fileContent)
                 ) {
-                    $fileReflection = new \Zend\Code\Reflection\FileReflection($filename, true);
+                    $fileReflection = new \Laminas\Code\Reflection\FileReflection($filename, true);
                     foreach ($fileReflection->getClasses() as $classReflection) {
                         if ($classReflection->isSubclassOf(self::EXTENSIBLE_DATA_INTERFACE)) {
                             $methodsToCheck = ['setExtensionAttributes', 'getExtensionAttributes'];
@@ -240,6 +241,7 @@ class ExtensibleInterfacesTest extends \PHPUnit\Framework\TestCase
     {
         $files = glob($dir . '/' . $pattern, GLOB_NOSORT);
         foreach (glob($dir . '/*', GLOB_ONLYDIR | GLOB_NOSORT) as $newDir) {
+            // phpcs:ignore Magento2.Performance.ForeachArrayMerge
             $files = array_merge($files, $this->getFiles($newDir, $pattern));
         }
         return $files;

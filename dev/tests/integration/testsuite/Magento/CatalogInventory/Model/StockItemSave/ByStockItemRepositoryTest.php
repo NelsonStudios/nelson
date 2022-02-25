@@ -40,10 +40,10 @@ class ByStockItemRepositoryTest extends \PHPUnit\Framework\TestCase
     private $stockItemData = [
         StockItemInterface::QTY => 555,
         StockItemInterface::MANAGE_STOCK => true,
-        StockItemInterface::IS_IN_STOCK => true,
+        StockItemInterface::IS_IN_STOCK => false,
     ];
 
-    public function setUp()
+    protected function setUp(): void
     {
         $objectManager = Bootstrap::getObjectManager();
         $this->productRepository = $objectManager->get(ProductRepositoryInterface::class);

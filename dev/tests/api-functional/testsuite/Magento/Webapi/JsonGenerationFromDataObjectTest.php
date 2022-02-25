@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Webapi;
 
 use Magento\TestFramework\Helper\Bootstrap;
@@ -31,7 +29,7 @@ class JsonGenerationFromDataObjectTest extends \Magento\TestFramework\TestCase\W
      */
     protected $productMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->_markTestAsRestOnly("JSON generation tests are intended to be executed for REST adapter only.");
 
@@ -79,11 +77,12 @@ class JsonGenerationFromDataObjectTest extends \Magento\TestFramework\TestCase\W
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Specified request cannot be processed.
      */
     public function testInvalidRestUrlNoServices()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Specified request cannot be processed.');
+
         $resourcePath = '';
 
         $serviceInfo = [
@@ -97,11 +96,12 @@ class JsonGenerationFromDataObjectTest extends \Magento\TestFramework\TestCase\W
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Incorrect format of request URI or Requested services are missing.
      */
     public function testInvalidRestUrlInvalidServiceName()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Incorrect format of request URI or Requested services are missing.');
+
         $this->isSingleService = false;
 
         $resourcePath = '/schema?services=invalidServiceName';
@@ -123,7 +123,7 @@ class JsonGenerationFromDataObjectTest extends \Magento\TestFramework\TestCase\W
         foreach ($expected as $expKey => $expVal) {
             $this->assertArrayHasKey($expKey, $actual, 'Schema does not contain \'' . $expKey . '\' section.');
             if (is_array($expVal)) {
-                $this->assertTrue(is_array($actual[$expKey]));
+                $this->assertIsArray($actual[$expKey]);
                 $this->assertRecursiveArray($expVal, $actual[$expKey], $checkVal);
             } elseif ($checkVal) {
                 $this->assertEquals($expVal, $actual[$expKey], '\'' . $expKey . '\' section content is invalid.');
@@ -275,13 +275,13 @@ class JsonGenerationFromDataObjectTest extends \Magento\TestFramework\TestCase\W
                                 'type' => 'boolean',
                                 'description' => 'If current entity has a property defined',
                             ],
-                            'custom_attributes' =>        [
-                            'type' => 'array',
-                            'description' => 'Custom attributes values.',
-                            'items' => [
-                                '$ref' => '#/definitions/framework-attribute-interface',
+                            'custom_attributes' => [
+                                'type' => 'array',
+                                'description' => 'Custom attributes values.',
+                                'items' => [
+                                    '$ref' => '#/definitions/framework-attribute-interface',
+                                ],
                             ],
-                        ],
                     ],
                     'required' => [
                         'entity_id',

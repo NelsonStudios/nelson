@@ -5,33 +5,12 @@
 
 'use strict';
 var app = angular.module(
-    'magentoSetup',
+    'magento',
     [
         'ui.router',
         'ui.bootstrap',
         'main',
-        'landing',
-        'readiness-check',
-        'add-database',
-        'web-configuration',
-        'customize-your-store',
-        'create-admin-account',
-        'install',
-        'success',
-        'module-grid',
-        'extension-grid',
-        'install-extension-grid',
-        'update-extension-grid',
-        'create-backup',
-        'complete-backup',
-        'data-option',
-        'start-updater',
-        'select-version',
-        'updater-success',
-        'home',
-        'auth-dialog',
-        'system-config',
-        'marketplace-credentials'
+        'landing'
     ]);
 
 app.config(['$httpProvider', '$stateProvider', function ($httpProvider, $stateProvider) {
@@ -55,6 +34,9 @@ app.config(['$httpProvider', '$stateProvider', function ($httpProvider, $statePr
             return $delegate;
         });
     })
+    .config(['$locationProvider', function($locationProvider) {
+        $locationProvider.hashPrefix('');
+    }])
     .run(function ($rootScope, $state) {
         $rootScope.$state = $state;
     });

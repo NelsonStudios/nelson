@@ -3,17 +3,17 @@
  * @var $block \Fecon\Shipping\Block\Adminhtml\Preorder\Edit\CustomerInformation
  */
 ?>
-
+<?php if ($customerUrl = $block->getCustomerViewUrl()) : ?>
 <section class="admin__page-section">
     <div class="admin__page-section-title">
+        <?php if($block->getCustomerViewUrl() === null) : ?>
         <span class="title"><?= $block->escapeHtml(__('Account Information')) ?></span>
         <div class="actions">
-            <?php if ($customerUrl = $block->getCustomerViewUrl()) : ?>
-                <a href="<?= /* @noEscape */ $block->getCustomerViewUrl() ?>" target="_blank">
-                    <?= $block->escapeHtml(__('Edit Customer')) ?>
-                </a>
-            <?php endif; ?>
+            <a href="<?= /* @noEscape */ $block->getCustomerViewUrl() ?>" target="_blank">
+                <?= $block->escapeHtml(__('Edit Customer')) ?>
+            </a>
         </div>
+            <?php endif; ?>
     </div>
     <div class="admin__page-section-item-content">
         <table class="admin__table-secondary order-account-information-table">
@@ -42,3 +42,4 @@
         </table>
     </div>
 </section>
+<?php endif; ?>

@@ -12,6 +12,9 @@ use Magento\CatalogWidget\Model\RuleFactory;
 use Magento\CatalogWidget\Model\Rule\Condition\Combine as CombineCondition;
 use Magento\CatalogWidget\Model\Rule\Condition\Product as ProductCondition;
 
+/**
+ * Test for Magento\Rule\Model\Condition\Sql\Builder
+ */
 class BuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -19,12 +22,15 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->model = Bootstrap::getObjectManager()->create(Builder::class);
     }
 
-    public function testAttachConditionToCollection()
+    /**
+     * @return void
+     */
+    public function testAttachConditionToCollection(): void
     {
         /** @var ProductCollectionFactory $collectionFactory */
         $collectionFactory = Bootstrap::getObjectManager()->create(ProductCollectionFactory::class);
@@ -40,27 +46,34 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
                     'type' => CombineCondition::class,
                     'aggregator' => 'all',
                     'value' => '1',
-                    'new_child' => ''
+                    'new_child' => '',
                 ],
                 '1--1' => [
                     'type' => ProductCondition::class,
                     'attribute' => 'category_ids',
                     'operator' => '==',
-                    'value' => '3'
+                    'value' => '3',
                 ],
                 '1--2' => [
                     'type' => ProductCondition::class,
                     'attribute' => 'special_to_date',
                     'operator' => '==',
-                    'value' => '2017-09-15'
+                    'value' => '2017-09-15',
                 ],
-            ]
+                '1--3' => [
+                    'type' => ProductCondition::class,
+                    'attribute' => 'sku',
+                    'operator' => '()',
+                    'value' => ' :(  ,  :) ',
+                ]
+            ],
         ];
 
         $rule->loadPost($ruleConditionArray);
         $this->model->attachConditionToCollection($collection, $rule->getConditions());
 
-        $whereString = "/\(category_id IN \('3'\).+\(IFNULL\(`e`\.`entity_id`,.+\) = '2017-09-15'\)/";
-        $this->assertNotFalse(preg_match($whereString, $collection->getSelectSql(true)));
+        $whereString = "/\(category_id IN \('3'\).+\(IFNULL\(`e`\.`entity_id`,.+\) = '2017-09-15 00:00:00'\)"
+            . ".+ORDER BY \(FIELD\(`e`.`sku`, ':\(', ':\)'\)\)/";
+        $this->assertEquals(1, preg_match($whereString, $collection->getSelectSql(true)));
     }
 }

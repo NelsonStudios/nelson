@@ -35,7 +35,7 @@ class TemplateFilesTest extends \Magento\TestFramework\TestCase\AbstractIntegrit
                     $template,
                     $params
                 );
-                $this->assertInternalType('string', $file, "Block class: {$class} {$template}");
+                $this->assertIsString($file, "Block class: {$class} {$template}");
                 $this->assertFileExists($file, "Block class: {$class}");
             },
             $this->allTemplatesDataProvider()
@@ -72,10 +72,10 @@ class TemplateFilesTest extends \Magento\TestFramework\TestCase\AbstractIntegrit
                 if ($module == 'Magento_Backend' || strpos(
                     $blockClass,
                     '\\Adminhtml\\'
-                ) || strpos(
+                ) !== false || strpos(
                     $blockClass,
                     '\\Backend\\'
-                ) || $class->isSubclassOf(
+                ) !== false || $class->isSubclassOf(
                     \Magento\Backend\Block\Template::class
                 )
                 ) {

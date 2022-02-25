@@ -28,7 +28,7 @@ class Update extends Command
     ) {
         parent::__construct($name);
         $this->productUpdater = $productUpdater;
-        $state->setAreaCode('adminhtml');
+        // $state->setAreaCode('adminhtml');
         
     }
 

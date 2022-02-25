@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Magento\GoogleAnalytics\Block;
 
 use Magento\TestFramework\TestCase\AbstractController;
@@ -20,7 +22,7 @@ class GaTest extends AbstractController
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->dispatch('/');

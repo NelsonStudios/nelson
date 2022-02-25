@@ -20,7 +20,10 @@ class ProductTest extends \PHPUnit\Framework\TestCase
      */
     protected $objectManager;
 
-    protected function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $rule = $this->objectManager->create(\Magento\CatalogWidget\Model\Rule::class);
@@ -30,6 +33,9 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $this->conditionProduct->setRule($rule);
     }
 
+    /**
+     * @return void
+     */
     public function testLoadAttributeOptions()
     {
         $this->conditionProduct->loadAttributeOptions();
@@ -44,6 +50,9 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    /**
+     * @return void
+     */
     public function testAddGlobalAttributeToCollection()
     {
         $collection = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\Collection::class);
@@ -52,10 +61,13 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $collectedAttributes = $this->conditionProduct->getRule()->getCollectedAttributes();
         $this->assertArrayHasKey('special_price', $collectedAttributes);
         $query = (string)$collection->getSelect();
-        $this->assertContains('special_price', $query);
+        $this->assertStringContainsString('special_price', $query);
         $this->assertEquals('at_special_price.value', $this->conditionProduct->getMappedSqlField());
     }
 
+    /**
+     * @return void
+     */
     public function testAddNonGlobalAttributeToCollectionNoProducts()
     {
         $collection = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\Collection::class);
@@ -66,7 +78,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $collectedAttributes = $this->conditionProduct->getRule()->getCollectedAttributes();
         $this->assertArrayHasKey('visibility', $collectedAttributes);
         $query = (string)$collection->getSelect();
-        $this->assertNotContains('visibility', $query);
+        $this->assertStringNotContainsString('visibility', $query);
         $this->assertEquals('', $this->conditionProduct->getMappedSqlField());
         $this->assertFalse($this->conditionProduct->hasValueParsed());
         $this->assertFalse($this->conditionProduct->hasValue());
@@ -85,7 +97,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $collectedAttributes = $this->conditionProduct->getRule()->getCollectedAttributes();
         $this->assertArrayHasKey('visibility', $collectedAttributes);
         $query = (string)$collection->getSelect();
-        $this->assertNotContains('visibility', $query);
+        $this->assertStringNotContainsString('visibility', $query);
         $this->assertEquals('e.entity_id', $this->conditionProduct->getMappedSqlField());
     }
 

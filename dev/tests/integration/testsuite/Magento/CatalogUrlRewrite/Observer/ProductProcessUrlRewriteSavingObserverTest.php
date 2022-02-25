@@ -11,13 +11,17 @@ use Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator;
 
 /**
  * @magentoAppArea adminhtml
+ * @magentoDbIsolation disabled
  */
 class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \Magento\Framework\ObjectManagerInterface */
     protected $objectManager;
 
-    protected function setUp()
+    /**
+     * Set up
+     */
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
     }
@@ -81,11 +85,12 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
         ];
         $actual = $this->getActualResults($productFilter);
         foreach ($expected as $row) {
-            $this->assertContains($row, $actual);
+            $this->assertContainsEquals($row, $actual);
         }
 
         $product->setData('save_rewrites_history', true);
         $product->setUrlKey('new-url');
+        $product->setUrlPath('new-path');
         $product->save();
 
         $expected = [
@@ -121,7 +126,7 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
 
         $actual = $this->getActualResults($productFilter);
         foreach ($expected as $row) {
-            $this->assertContains($row, $actual);
+            $this->assertContainsEquals($row, $actual);
         }
     }
 
@@ -148,6 +153,7 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
 
         $product->setData('save_rewrites_history', true);
         $product->setUrlKey('new-url');
+        $product->setUrlPath('new-path');
         $product->save();
 
         $expected = [
@@ -176,7 +182,7 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
 
         $actual = $this->getActualResults($productFilter);
         foreach ($expected as $row) {
-            $this->assertContains($row, $actual);
+            $this->assertContainsEquals($row, $actual);
         }
     }
 
@@ -203,6 +209,7 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
 
         $product->setData('save_rewrites_history', false);
         $product->setUrlKey('new-url');
+        $product->setUrlPath('new-path');
         $product->save();
 
         $expected = [
@@ -224,7 +231,7 @@ class ProductProcessUrlRewriteSavingObserverTest extends \PHPUnit\Framework\Test
 
         $actual = $this->getActualResults($productFilter);
         foreach ($expected as $row) {
-            $this->assertContains($row, $actual);
+            $this->assertContainsEquals($row, $actual);
         }
     }
 }

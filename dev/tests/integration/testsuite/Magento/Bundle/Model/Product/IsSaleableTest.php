@@ -23,7 +23,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
      */
     protected $productRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->productRepository = $this->objectManager->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
@@ -42,7 +42,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be saleable 
+            'Bundle product supposed to be saleable
             if his status is enabled'
         );
     }
@@ -60,7 +60,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if his status is disabled'
         );
     }
@@ -80,7 +80,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be saleable 
+            'Bundle product supposed to be saleable
             if his status is enabled and it has data is_salable = true'
         );
     }
@@ -100,7 +100,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if his status is enabled but his data is_salable = false'
         );
     }
@@ -118,7 +118,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be saleable 
+            'Bundle product supposed to be saleable
             if it has data all_items_salable = true'
         );
     }
@@ -136,7 +136,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if it has data all_items_salable = false'
         );
     }
@@ -164,7 +164,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if it has no options'
         );
     }
@@ -194,7 +194,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
         $bundleProduct = $this->productRepository->get('bundle-product', false, null, true);
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if it has no selections'
         );
     }
@@ -219,7 +219,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if all his selections are not saleable'
         );
     }
@@ -244,7 +244,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if it has at least one required option with no saleable selections'
         );
     }
@@ -264,7 +264,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be non saleable 
+            'Bundle product supposed to be non saleable
             if there are not enough qty of selections on required options'
         );
     }
@@ -299,7 +299,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be saleable 
+            'Bundle product supposed to be saleable
             if all his selections have selection_can_change_qty = 1'
         );
     }
@@ -336,7 +336,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be not saleable 
+            'Bundle product supposed to be not saleable
             if all his options are not required and selections are not saleable'
         );
     }
@@ -375,7 +375,7 @@ class IsSaleableTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(
             $bundleProduct->isSalable(),
-            'Bundle product supposed to be saleable 
+            'Bundle product supposed to be saleable
             if it has at least one not required option with saleable selection'
         );
     }

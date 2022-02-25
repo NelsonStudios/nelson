@@ -74,7 +74,7 @@ class Edit extends \Magento\Backend\App\Action
         $id = $this->getRequest()->getParam('attribute_id');
         /** @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
         $model = $this->_objectManager->create(
-                'Magento\Customer\Model\Attribute'
+                \Magento\Customer\Model\Attribute::class
                 )->setEntityTypeId(
                     $this->_entityTypeId
                 );
@@ -97,7 +97,9 @@ class Edit extends \Magento\Backend\App\Action
         }
 
         // set entered data if was error when we do save
-        $data = $this->_objectManager->get('Magento\Backend\Model\Session')->getAttributeData(true);
+        $data = $this->_objectManager->get(
+            \Magento\Backend\Model\Session::class
+        )->getAttributeData(true);
         if (!empty($data)) {
             $model->addData($data);
         }
@@ -145,7 +147,7 @@ class Edit extends \Magento\Backend\App\Action
     {
         
         $this->_entityTypeId = $this->_objectManager->create(
-            'Magento\Eav\Model\Entity'
+            \Magento\Eav\Model\Entity::class
         )->setType(
             \Magento\Customer\Model\Customer::ENTITY
         )->getTypeId();
@@ -164,7 +166,9 @@ class Edit extends \Magento\Backend\App\Action
             preg_replace(
                 '/[^a-z_0-9]/',
                 '_',
-                $this->_objectManager->create('Magento\Catalog\Model\Product\Url')->formatUrlKey($label)
+                $this->_objectManager->create(
+                    \Magento\Catalog\Model\Product\Url::class
+                )->formatUrlKey($label)
             ),
             0,
             30

@@ -360,8 +360,8 @@ class CardConnect extends \Magento\Payment\Model\Method\Cc
         }
 
         $logDir = $this->directoryList->getPath(DirectoryList::LOG);
-        $writer = new \Zend\Log\Writer\Stream("{$logDir}/cardconnect.log");
-        $logger = new \Zend\Log\Logger();
+        $writer = new \Zend_Log_Writer_Stream("{$logDir}/cardconnect.log");
+        $logger = new \Zend_Log();
         $logger->addWriter($writer);
         $logger->info($data);
     }

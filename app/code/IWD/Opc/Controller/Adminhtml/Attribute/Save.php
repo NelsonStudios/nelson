@@ -114,7 +114,7 @@ class Save extends \IWD\Opc\Controller\Adminhtml\Customer\Attribute
 
             /* @var $model \Magento\Customer\Model\Attribute */
             $model = $this->_objectManager->create(
-                'Magento\Customer\Model\Attribute'
+                \Magento\Customer\Model\Attribute::class
                 );
 
             if ($attributeId) {
@@ -170,14 +170,16 @@ class Save extends \IWD\Opc\Controller\Adminhtml\Customer\Attribute
             $data['used_in_forms'] = $usedInForms;
             
             //Get default attribute set id
-            $defaultAttributeSetId = $this->_objectManager->get('Magento\Eav\Model\Config')
-                    ->getEntityType(\Magento\Customer\Model\Customer::ENTITY)
+            $defaultAttributeSetId = $this->_objectManager->get(
+                \Magento\Eav\Model\Config::class
+            )->getEntityType(\Magento\Customer\Model\Customer::ENTITY)
                     ->getDefaultAttributeSetId();
             $data['attribute_set_id'] = $defaultAttributeSetId;
             
             //Get default attribute group id
-            $defaultAttributeGroupId = $this->_objectManager->get('Magento\Eav\Model\Entity\Attribute\Set')
-                    ->getDefaultGroupId($defaultAttributeSetId);
+            $defaultAttributeGroupId = $this->_objectManager->get(
+                \Magento\Eav\Model\Entity\Attribute\Set::class
+            )->getDefaultGroupId($defaultAttributeSetId);
             $data['attribute_group_id'] = $defaultAttributeGroupId;
            
             $model->addData($data);

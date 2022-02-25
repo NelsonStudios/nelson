@@ -4,6 +4,10 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
+
 /** @var \Magento\Framework\Registry $registry */
 $registry = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(\Magento\Framework\Registry::class);
 
@@ -20,7 +24,7 @@ $quote->delete();
 $quoteIdMask = $objectManager->create(\Magento\Quote\Model\QuoteIdMask::class);
 $quoteIdMask->delete($quote->getId());
 
-require __DIR__ . 'product_with_multiple_options_rollback.php';
+Resolver::getInstance()->requireDataFixture('Magento/Bundle/_files/product_with_multiple_options_rollback.php');
 
 $registry->unregister('isSecureArea');
 $registry->register('isSecureArea', false);

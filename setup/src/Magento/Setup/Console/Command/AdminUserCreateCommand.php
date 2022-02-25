@@ -7,6 +7,7 @@
 namespace Magento\Setup\Console\Command;
 
 use Magento\Framework\Setup\ConsoleLogger;
+use Magento\Framework\Validation\ValidationException;
 use Magento\Setup\Model\AdminAccount;
 use Magento\Setup\Model\InstallerFactory;
 use Magento\User\Model\UserValidationRules;
@@ -15,6 +16,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
+/**
+ * Command to create an admin user.
+ */
 class AdminUserCreateCommand extends AbstractSetupCommand
 {
     /**
@@ -52,6 +56,8 @@ class AdminUserCreateCommand extends AbstractSetupCommand
     }
 
     /**
+     * Creation admin user in interaction mode.
+     *
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
@@ -76,7 +82,7 @@ class AdminUserCreateCommand extends AbstractSetupCommand
             $question = new Question('<question>Admin password:</question> ', '');
             $question->setHidden(true);
 
-            $question->setValidator(function ($value) use ($output) {
+            $question->setValidator(function ($value) {
                 $user = new \Magento\Framework\DataObject();
                 $user->setPassword($value);
 
@@ -85,7 +91,7 @@ class AdminUserCreateCommand extends AbstractSetupCommand
 
                 $validator->isValid($user);
                 foreach ($validator->getMessages() as $message) {
-                    throw new \Exception($message);
+                    throw new ValidationException(__($message));
                 }
 
                 return $value;
@@ -129,6 +135,8 @@ class AdminUserCreateCommand extends AbstractSetupCommand
     }
 
     /**
+     * Add not empty validator.
+     *
      * @param \Symfony\Component\Console\Question\Question $question
      * @return void
      */
@@ -136,7 +144,7 @@ class AdminUserCreateCommand extends AbstractSetupCommand
     {
         $question->setValidator(function ($value) {
             if (trim($value) == '') {
-                throw new \Exception('The value cannot be empty');
+                throw new ValidationException(__('The value cannot be empty'));
             }
 
             return $value;
@@ -144,7 +152,7 @@ class AdminUserCreateCommand extends AbstractSetupCommand
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -165,25 +173,43 @@ class AdminUserCreateCommand extends AbstractSetupCommand
     /**
      * Get list of arguments for the command
      *
+     * @param int $mode The mode of options.
      * @return InputOption[]
      */
-    public function getOptionsList()
+    public function getOptionsList($mode = InputOption::VALUE_REQUIRED)
     {
+        $requiredStr = ($mode === InputOption::VALUE_REQUIRED ? '(Required) ' : '');
+
         return [
-            new InputOption(AdminAccount::KEY_USER, null, InputOption::VALUE_REQUIRED, '(Required) Admin user'),
-            new InputOption(AdminAccount::KEY_PASSWORD, null, InputOption::VALUE_REQUIRED, '(Required) Admin password'),
-            new InputOption(AdminAccount::KEY_EMAIL, null, InputOption::VALUE_REQUIRED, '(Required) Admin email'),
+            new InputOption(
+                AdminAccount::KEY_USER,
+                null,
+                $mode,
+                $requiredStr . 'Admin user'
+            ),
+            new InputOption(
+                AdminAccount::KEY_PASSWORD,
+                null,
+                $mode,
+                $requiredStr . 'Admin password'
+            ),
+            new InputOption(
+                AdminAccount::KEY_EMAIL,
+                null,
+                $mode,
+                $requiredStr . 'Admin email'
+            ),
             new InputOption(
                 AdminAccount::KEY_FIRST_NAME,
                 null,
-                InputOption::VALUE_REQUIRED,
-                '(Required) Admin first name'
+                $mode,
+                $requiredStr . 'Admin first name'
             ),
             new InputOption(
                 AdminAccount::KEY_LAST_NAME,
                 null,
-                InputOption::VALUE_REQUIRED,
-                '(Required) Admin last name'
+                $mode,
+                $requiredStr . 'Admin last name'
             ),
         ];
     }

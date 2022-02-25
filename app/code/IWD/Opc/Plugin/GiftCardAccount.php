@@ -49,7 +49,9 @@ class GiftCardAccount
                     /**
                      * @var $giftCardAccountHelper \Magento\GiftCardAccount\Helper\Data
                      */
-                    $giftCardAccountHelper = $this->objectManager->create('\Magento\GiftCardAccount\Helper\Data');
+                    $giftCardAccountHelper = $this->objectManager->create(
+                        \Magento\GiftCardAccount\Helper\Data::class
+                    );
                     $cards = $giftCardAccountHelper->getCards($quote);
                     if ($cards) {
                         foreach ($cards as $key => $card) {

@@ -3,12 +3,15 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
+
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\ObjectManager;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-require __DIR__ . '/items_rollback.php';
+Resolver::getInstance()->requireDataFixture('Magento/Multishipping/Fixtures/items_rollback.php');
 
 /** @var ObjectManager $objectManager */
 $objectManager = Bootstrap::getObjectManager();

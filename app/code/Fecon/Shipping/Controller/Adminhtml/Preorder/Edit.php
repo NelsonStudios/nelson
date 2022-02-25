@@ -31,7 +31,9 @@ class Edit extends \Fecon\Shipping\Controller\Adminhtml\Preorder
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('preorder_id');
-        $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder');
+        $model = $this->_objectManager->create(
+            \Fecon\Shipping\Model\Preorder::class
+        );
         
         // 2. Initial checking
         if ($id) {

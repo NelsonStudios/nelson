@@ -7,7 +7,7 @@
 namespace Magento\Integration\Model;
 
 use Magento\Customer\Api\AccountManagementInterface;
-use Magento\Framework\Exception\InputException;
+use Magento\Framework\Webapi\Rest\Request;
 use Magento\Integration\Model\Oauth\Token as TokenModel;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\TestCase\WebapiAbstract;
@@ -56,7 +56,7 @@ class CustomerTokenServiceTest extends WebapiAbstract
     /**
      * Setup CustomerTokenService
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->_markTestAsRestOnly();
         $this->tokenService = Bootstrap::getObjectManager()->get(
@@ -76,9 +76,15 @@ class CustomerTokenServiceTest extends WebapiAbstract
     }
 
     /**
+     * Create customer access token
+     *
+     * @dataProvider storesDataProvider
      * @magentoApiDataFixture Magento/Customer/_files/customer.php
+     *
+     * @param string|null $store
+     * @return void
      */
-    public function testCreateCustomerAccessToken()
+    public function testCreateCustomerAccessToken(?string $store): void
     {
         $userName = 'customer@example.com';
         $password = 'password';
@@ -86,13 +92,26 @@ class CustomerTokenServiceTest extends WebapiAbstract
         $serviceInfo = [
             'rest' => [
                 'resourcePath' => self::RESOURCE_PATH_CUSTOMER_TOKEN,
-                'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_POST,
+                'httpMethod' => Request::HTTP_METHOD_POST,
             ],
         ];
         $requestData = ['username' => $userName, 'password' => $password];
-        $accessToken = $this->_webApiCall($serviceInfo, $requestData);
+        $accessToken = $this->_webApiCall($serviceInfo, $requestData, null, $store);
 
         $this->assertToken($accessToken, $userName, $password);
+    }
+
+    /**
+     * DataProvider for testCreateCustomerAccessToken
+     *
+     * @return array
+     */
+    public function storesDataProvider(): array
+    {
+        return [
+            'default store' => [null],
+            'all store view' => ['all'],
+        ];
     }
 
     /**
@@ -105,7 +124,7 @@ class CustomerTokenServiceTest extends WebapiAbstract
             $serviceInfo = [
                 'rest' => [
                     'resourcePath' => self::RESOURCE_PATH_CUSTOMER_TOKEN,
-                    'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_POST,
+                    'httpMethod' => Request::HTTP_METHOD_POST,
                 ],
             ];
             $requestData = ['username' => $username, 'password' => $password];
@@ -128,7 +147,7 @@ class CustomerTokenServiceTest extends WebapiAbstract
             $serviceInfo = [
                 'rest' => [
                     'resourcePath' => self::RESOURCE_PATH_CUSTOMER_TOKEN,
-                    'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_POST,
+                    'httpMethod' => Request::HTTP_METHOD_POST,
                 ],
             ];
             $requestData = ['username' => $customerUserName, 'password' => $password];
@@ -168,13 +187,13 @@ class CustomerTokenServiceTest extends WebapiAbstract
             'message' => 'One or more input exceptions have occurred.',
             'errors' => [
                 [
-                    'message' => '%fieldName is a required field.',
+                    'message' => '"%fieldName" is required. Enter and try again.',
                     'parameters' => [
                         'fieldName' => 'username',
                     ],
                 ],
                 [
-                    'message' => '%fieldName is a required field.',
+                    'message' => '"%fieldName" is required. Enter and try again.',
                     'parameters' => [
                         'fieldName' => 'password',
                     ]
@@ -195,7 +214,7 @@ class CustomerTokenServiceTest extends WebapiAbstract
         $serviceInfo = [
             'rest' => [
                 'resourcePath' => self::RESOURCE_PATH_CUSTOMER_TOKEN,
-                'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_POST,
+                'httpMethod' => Request::HTTP_METHOD_POST,
             ],
         ];
         $invalidCredentials = [
@@ -238,7 +257,7 @@ class CustomerTokenServiceTest extends WebapiAbstract
         $serviceInfo = [
             'rest' => [
                 'resourcePath' => self::RESOURCE_PATH_CUSTOMER_TOKEN,
-                'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_POST,
+                'httpMethod' => Request::HTTP_METHOD_POST,
             ],
         ];
         $invalidCredentials = [
@@ -286,7 +305,8 @@ class CustomerTokenServiceTest extends WebapiAbstract
         $this->assertEquals(HTTPExceptionCodes::HTTP_UNAUTHORIZED, $e->getCode(), "Response HTTP code is invalid.");
         $exceptionData = $this->processRestExceptionResult($e);
         $expectedExceptionData = [
-            'message' => 'You did not sign in correctly or your account is temporarily disabled.'
+            'message' => 'The account sign-in was incorrect or your account is disabled temporarily. '
+                . 'Please wait and try again later.'
         ];
         $this->assertEquals($expectedExceptionData, $exceptionData, "Exception message is invalid.");
     }

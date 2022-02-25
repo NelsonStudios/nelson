@@ -12,7 +12,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
      */
     protected $_model;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection::class
@@ -50,6 +50,20 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
         $groups = $this->_getGroups($this->_model);
 
         $this->assertEquals([$includeGroupId], $groups);
+    }
+
+    /**
+     * Test if getAllIds method return results after using setInAllAttributeSetsFilter method
+     *
+     * @covers \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection::setInAllAttributeSetsFilter()
+     * @covers \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection::getAllIds()
+     */
+    public function testSetInAllAttributeSetsFilterWithGetAllIds()
+    {
+        $sets = [1];
+        $this->_model->setInAllAttributeSetsFilter($sets);
+        $attributeIds = $this->_model->getAllIds();
+        $this->assertGreaterThan(0, count($attributeIds));
     }
 
     /**

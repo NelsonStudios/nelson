@@ -10,6 +10,8 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 /**
  * Test for \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFiles class.
+ *
+ * @magentoAppArea adminhtml
  */
 class DeleteFilesTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,6 +33,11 @@ class DeleteFilesTest extends \PHPUnit\Framework\TestCase
     /**
      * @var string
      */
+    private $fullDirectoryPath;
+
+    /**
+     * @var string
+     */
     private $fileName = 'magento_small_image.jpg';
 
     /**
@@ -46,13 +53,23 @@ class DeleteFilesTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $directoryName = 'directory1';
         $this->filesystem = $this->objectManager->get(\Magento\Framework\Filesystem::class);
         /** @var \Magento\Cms\Helper\Wysiwyg\Images $imagesHelper */
         $this->imagesHelper = $this->objectManager->get(\Magento\Cms\Helper\Wysiwyg\Images::class);
         $this->mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
+        $this->fullDirectoryPath = $this->imagesHelper->getStorageRoot() . '/' . $directoryName;
+        $this->mediaDirectory->create($this->mediaDirectory->getRelativePath($this->fullDirectoryPath));
+        $filePath =  $this->fullDirectoryPath . DIRECTORY_SEPARATOR . $this->fileName;
+        $fixtureDir = realpath(__DIR__ . '/../../../../../Catalog/_files');
+        copy($fixtureDir . '/' . $this->fileName, $filePath);
+        $path = $this->fullDirectoryPath . '/.htaccess';
+        if (!$this->mediaDirectory->isFile($path)) {
+            $this->mediaDirectory->writeFile($path, "Order deny,allow\nDeny from all");
+        }
         $this->model = $this->objectManager->get(\Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFiles::class);
     }
 
@@ -60,26 +77,82 @@ class DeleteFilesTest extends \PHPUnit\Framework\TestCase
      * Execute method with correct directory path and file name to check that files under WYSIWYG media directory
      * can be removed.
      *
+     * @param string $filename
      * @return void
+     * @dataProvider executeDataProvider
      */
-    public function testExecute()
+    public function testExecute(string $filename)
     {
-        $directoryName = 'directory1';
-        $fullDirectoryPath = $this->imagesHelper->getStorageRoot() . '/' . $directoryName;
-        $this->mediaDirectory->create($this->mediaDirectory->getRelativePath($fullDirectoryPath));
-        $filePath =  $fullDirectoryPath . DIRECTORY_SEPARATOR . $this->fileName;
+        $filePath =  $this->fullDirectoryPath . DIRECTORY_SEPARATOR . $filename;
         $fixtureDir = realpath(__DIR__ . '/../../../../../Catalog/_files');
         copy($fixtureDir . '/' . $this->fileName, $filePath);
 
         $this->model->getRequest()->setMethod('POST')
-            ->setPostValue('files', [$this->imagesHelper->idEncode($this->fileName)]);
-        $this->model->getStorage()->getSession()->setCurrentPath($fullDirectoryPath);
+            ->setPostValue('files', [$this->imagesHelper->idEncode($filename)]);
+        $this->model->getStorage()->getSession()->setCurrentPath($this->fullDirectoryPath);
         $this->model->execute();
+
         $this->assertFalse(
             $this->mediaDirectory->isExist(
-                $this->mediaDirectory->getRelativePath($fullDirectoryPath . '/' . $this->fileName)
+                $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . '/' . $filename)
             )
         );
+    }
+
+    /**
+     * DataProvider for testExecute
+     *
+     * @return array
+     */
+    public function executeDataProvider(): array
+    {
+        return [
+            ['name with spaces.jpg'],
+            ['name with, comma.jpg'],
+            ['name with* asterisk.jpg'],
+            ['name with[ bracket.jpg'],
+            ['magento_small_image.jpg'],
+            ['_.jpg'],
+            [' - .jpg'],
+            ['-.jpg'],
+        ];
+    }
+
+    /**
+     * Check that htaccess file couldn't be removed via
+     * \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFiles::execute method
+     *
+     * @return void
+     */
+    public function testDeleteHtaccess()
+    {
+        $this->model->getRequest()->setMethod('POST')
+            ->setPostValue('files', [$this->imagesHelper->idEncode('.htaccess')]);
+        $this->model->getStorage()->getSession()->setCurrentPath($this->fullDirectoryPath);
+        $this->model->execute();
+
+        $this->assertTrue(
+            $this->mediaDirectory->isExist(
+                $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . '/' . '.htaccess')
+            )
+        );
+    }
+
+    /**
+     * Execute method with traversal file path to check that there is no ability to remove file which is not
+     * under media directory.
+     *
+     * @return void
+     */
+    public function testExecuteWithWrongFileName()
+    {
+        $fileName = '/../../../etc/env.php';
+        $this->model->getRequest()->setMethod('POST')
+            ->setPostValue('files', [$this->imagesHelper->idEncode($fileName)]);
+        $this->model->getStorage()->getSession()->setCurrentPath($this->fullDirectoryPath);
+        $this->model->execute();
+
+        $this->assertFileExists($this->fullDirectoryPath . $fileName);
     }
 
     /**
@@ -109,7 +182,7 @@ class DeleteFilesTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $filesystem = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
             ->get(\Magento\Framework\Filesystem::class);

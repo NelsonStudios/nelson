@@ -20,7 +20,9 @@ class Delete extends \Fecon\Shipping\Controller\Adminhtml\Preorder
         if ($id) {
             try {
                 // init model and delete
-                $model = $this->_objectManager->create('Fecon\Shipping\Model\Preorder');
+                $model = $this->_objectManager->create(
+                    \Fecon\Shipping\Model\Preorder::class
+                );
                 $model->load($id);
                 $model->delete();
                 // display success message

@@ -1,15 +1,13 @@
 <?php
-    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-    $category = $objectManager->get('Magento\Framework\Registry')->registry('current_category');
+    $category = $this->getCurrentCategory();
 ?>
 <?php if($category): ?>
 <?php
-    $categoryHelper = $this->helper('Magento\Catalog\Helper\Category');
+    $categoryHelper = $this->helper(\Magento\Catalog\Helper\Category::class);
     $category->setParentId($category->getId());
     $childrenCount = $category->getChildrenCount();
     $subcategories=$category->getChildrenCategories();
-
-    if(count($childrenCount)>0){
+    if($childrenCount>0){
 ?>
 <div class="block-category-list">
     <div class="block-title">

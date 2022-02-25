@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Weee\Model;
 
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
@@ -29,18 +27,18 @@ class TaxTest extends \PHPUnit\Framework\TestCase
      */
     private $_extensibleDataObjectConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $objectManager = Bootstrap::getObjectManager();
         $weeeConfig = $this->createMock(\Magento\Weee\Model\Config::class);
-        $weeeConfig->expects($this->any())->method('isEnabled')->will($this->returnValue(true));
-        $weeeConfig->expects($this->any())->method('isTaxable')->will($this->returnValue(true));
+        $weeeConfig->expects($this->any())->method('isEnabled')->willReturn(true);
+        $weeeConfig->expects($this->any())->method('isTaxable')->willReturn(true);
         $attribute = $this->createMock(\Magento\Eav\Model\Entity\Attribute::class);
-        $attribute->expects($this->any())->method('getAttributeCodesByFrontendType')->will(
-            $this->returnValue(['weee'])
+        $attribute->expects($this->any())->method('getAttributeCodesByFrontendType')->willReturn(
+            ['weee']
         );
         $attributeFactory = $this->createPartialMock(\Magento\Eav\Model\Entity\AttributeFactory::class, ['create']);
-        $attributeFactory->expects($this->any())->method('create')->will($this->returnValue($attribute));
+        $attributeFactory->expects($this->any())->method('create')->willReturn($attribute);
         $this->_model = $objectManager->create(
             \Magento\Weee\Model\Tax::class,
             ['weeeConfig' => $weeeConfig, 'attributeFactory' => $attributeFactory]
@@ -65,12 +63,15 @@ class TaxTest extends \PHPUnit\Framework\TestCase
         );
         $dataObjectHelper = Bootstrap::getObjectManager()->create(\Magento\Framework\Api\DataObjectHelper::class);
         $expected = $this->_extensibleDataObjectConverter->toFlatArray(
-            $customerRepository->getById(1), [], \Magento\Customer\Api\Data\CustomerInterface::class
+            $customerRepository->getById(1),
+            [],
+            \Magento\Customer\Api\Data\CustomerInterface::class
         );
         $customerDataSet = $customerFactory->create();
         $dataObjectHelper->populateWithArray(
             $customerDataSet,
-            $expected, \Magento\Customer\Api\Data\CustomerInterface::class
+            $expected,
+            \Magento\Customer\Api\Data\CustomerInterface::class
         );
         $fixtureGroupCode = 'custom_group';
         $fixtureTaxClassId = 3;
@@ -91,7 +92,7 @@ class TaxTest extends \PHPUnit\Framework\TestCase
         $product = $productRepository->get('simple-with-ftp');
 
         $amount = $this->_model->getProductWeeeAttributes($product, $shipping, null, null, true);
-        $this->assertTrue(is_array($amount));
+        $this->assertIsArray($amount);
         $this->assertArrayHasKey(0, $amount);
         $this->assertEquals(12.70, $amount[0]->getAmount());
     }

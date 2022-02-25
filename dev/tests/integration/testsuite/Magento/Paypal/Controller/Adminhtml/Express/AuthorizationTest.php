@@ -3,20 +3,24 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
+
 namespace Magento\Paypal\Controller\Adminhtml\Express;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment;
-use Magento\Sales\Model\Order\Payment\Transaction;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Paypal\Model\Api\Nvp;
 use Magento\Paypal\Model\Api\Type\Factory as ApiFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\OrderValidatorInterface;
-use Magento\Sales\Model\ValidatorResultInterface;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\Order\Validation\CanInvoice;
+use Magento\Sales\Model\ValidatorResultInterface;
 
 /**
+ * Makes a test of the payment authorization for Paypal Express when payment action is order.
+ *
  * @magentoAppArea adminhtml
  */
 class AuthorizationTest extends \Magento\TestFramework\TestCase\AbstractBackendController
@@ -24,7 +28,7 @@ class AuthorizationTest extends \Magento\TestFramework\TestCase\AbstractBackendC
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = 'Magento_Paypal::authorization';
         $this->uri = 'backend/paypal/express/authorization';
@@ -35,6 +39,8 @@ class AuthorizationTest extends \Magento\TestFramework\TestCase\AbstractBackendC
 
     /**
      * Negative scenario for controller calls.
+     *
+     * @return void
      */
     public function testNoOrderPassed()
     {
@@ -49,6 +55,7 @@ class AuthorizationTest extends \Magento\TestFramework\TestCase\AbstractBackendC
      * @magentoConfigFixture current_store payment/paypal_express/payment_action Order
      * @magentoDataFixture Magento/Paypal/_files/order_express_payment_action_order.php
      * @magentoDbIsolation enabled
+     * @return void
      */
     public function testAuthorization()
     {
@@ -120,7 +127,7 @@ class AuthorizationTest extends \Magento\TestFramework\TestCase\AbstractBackendC
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->_objectManager->removeSharedInstance(ApiFactory::class);
         parent::tearDown();

@@ -4,8 +4,6 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 namespace Magento\Sales\Service\V1;
 
 use Magento\TestFramework\TestCase\WebapiAbstract;
@@ -26,7 +24,7 @@ class ShipmentCreateTest extends WebapiAbstract
      */
     protected $objectManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
     }
@@ -45,13 +43,13 @@ class ShipmentCreateTest extends WebapiAbstract
                 'qty' => $orderItem->getQtyOrdered(),
                 'additional_data' => null,
                 'description' => null,
-                'entity_id' => null,
+                'entity_id' => 1,
                 'name' => null,
                 'parent_id' => null,
                 'price' => null,
                 'product_id' => null,
                 'row_total' => null,
-                'sku' => null,
+                'sku' => 'simple',
                 'weight' => null,
             ],
         ];
