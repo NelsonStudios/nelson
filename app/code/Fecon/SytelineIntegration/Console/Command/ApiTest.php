@@ -40,7 +40,7 @@ class ApiTest extends Command
         \Magento\Framework\App\State $state,
         $name = null
     ) {
-        $state->setAreaCode('frontend');
+       // $state->setAreaCode('frontend');
         parent::__construct($name);
         $this->client = $client;
         $this->testHelper = $testHelper;
