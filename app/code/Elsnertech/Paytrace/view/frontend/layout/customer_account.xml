@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" label="Customer My Account (All Pages)" design_abstraction="custom">
+    <head>
+        <title>My Account</title>
+    </head>
+    <body>
+        <attribute name="class" value="account"/>
+        <referenceBlock name="customer_account_navigation">
+            <block class="Magento\Framework\View\Element\Html\Link\Current" name="Saved-link" after="-" >
+                 <arguments>
+                     <argument name="label" xsi:type="string" translate="true">Saved card</argument>
+                     <argument name="path" xsi:type="string">paytrace/savecard/savecard</argument>
+                 </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

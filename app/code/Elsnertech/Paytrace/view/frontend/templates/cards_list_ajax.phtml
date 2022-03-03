@@ -1,0 +1,49 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+/**
+ * @var \Elsnertech\Paytrace\Block\SaveCard $block
+ */
+?>
+
+<?php $savedCards = $block->getSaveCardAjax();?>
+<?php if (!empty($savedCards)) {
+    foreach ($savedCards as $savedCard) { ?>
+        <div class="row payment-card">
+            <div class="col card-image">
+                <?php $imagePath = $savedCard['card_image']; ?>
+                <img 
+                src="<?= /* @noEscape */ $block->getViewFileUrl('Magento_Payment::images/cc/'.$imagePath); ?>" 
+                width="46" height="30" 
+                class="payment-icon">
+            </div>
+            <div class="col card-number">
+                <?= /* @noEscape */ $savedCard['last4']; ?>
+            </div>
+            <div class="col action-delete">
+                <form class="form" id="remove-card-<?= /* @noEscape */ $savedCard['entity_id']; ?>" 
+                    action="" method="post">
+                    <?= $block->getBlockHtml('formkey') ?>
+                    <input name="customer_id" 
+                    value="<?= /* @noEscape */ $savedCard['paytrace_customer_id']; ?>" 
+                    type="hidden"/>
+                    <input name="entity_id" 
+                    value="<?= /* @noEscape */ $savedCard['entity_id']; ?>" 
+                    type="hidden"/>
+                    <button type="button" class="action delete">
+                        <span><?= /* @noEscape */ __('Remove') ?></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+<?php } } else { ?>
+        <div class="row">
+            <div class="col not-found">
+                <?= /* @noEscape */ __("You don't have any cards yet, please add card details."); ?>
+            </div>
+        </div>
+<?php } ?>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <paytrace>
+                <title>Paytrace Payment</title>
+                <model>Elsnertech\Paytrace\Model\Paytrace</model>
+                <active>0</active>
+                <cctypes>AE,VI,MC,DI</cctypes>
+                <payment_action>authorize_capture</payment_action>
+                <order_status>processing</order_status>
+                <paytrace_cc_vault_active>1</paytrace_cc_vault_active>
+                <sort_order>4</sort_order>
+            </paytrace>
+            <paytracevault>
+                <title>Paytrace(Saved Credit Card)</title>
+                <model>Elsnertech\Paytrace\Model\Paytracevault</model>
+                <active>0</active>
+                <payment_action>authorize_capture</payment_action>
+                <order_status>processing</order_status>
+                <group>offline</group>
+                <sort_order>3</sort_order>
+            </paytracevault>
+        </payment>
+    </default>
+</config>
+
