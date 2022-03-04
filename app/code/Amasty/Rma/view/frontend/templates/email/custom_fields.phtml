@@ -1,0 +1,10 @@
+<?php
+$fields = $block->getCustomFields();
+?>
+<p style="text-transform: uppercase"><?= $block->escapeHtml(__('Extra Fields:')) ?></p>
+<?php
+if ($fields):
+    foreach ($fields as $field): ?>
+        <p><strong><?= $block->escapeHtml($field['label']); ?>:</strong> <?= $block->escapeHtml($field['value']); ?></p>
+    <?php endforeach;
+endif;?>

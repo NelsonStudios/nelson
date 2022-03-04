@@ -167,8 +167,8 @@ class Price extends AbstractFilter
 
 		if ($this->_filterVal) {
 			/** @type \Mageplaza\LayeredNavigation\Model\ResourceModel\Fulltext\Collection $productCollectionClone */
-			$productCollection = $productCollection->getCollectionClone()
-				->removeAttributeSearch(['price.from', 'price.to']);
+			$productCollection->removeAttributeToSelect('price.from');
+			$productCollection->removeAttributeToSelect('price.to');
 		}
 
 		$min = $productCollection->getMinPrice();
@@ -211,8 +211,9 @@ class Price extends AbstractFilter
 
 		if ($this->_filterVal) {
 			/** @type \Mageplaza\LayeredNavigation\Model\ResourceModel\Fulltext\Collection $productCollectionClone */
-			$productCollection = $productCollection->getCollectionClone()
-				->removeAttributeSearch(['price.from', 'price.to']);
+			$productCollection = clone $productCollection;
+			$productCollection->removeAttributeToSelect('price.from');
+			$productCollection->removeAttributeToSelect('price.to');
 		}
 
 		$facets = $productCollection->getFacetedData($attribute->getAttributeCode());
