@@ -1,0 +1,55 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+/**
+ * @var \Elsnertech\Paytrace\Block\Adminhtml\Order\Creditmemo\Create\PaytraceRefund $block
+ */
+?>
+<?php $requestData = $block->getOrderStatus();?>
+<?php if (isset($requestData['success']) && isset($requestData['transactions'][0])):?>
+<section class="admin__page-section order-view-account-information" style="margin-top: 10px;">
+    <div class="admin__page-section-title">
+        <span class="title"><?= /* @noEscape */ __('Paytrace Status');?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-information">
+            <div class="admin__page-section-item-content">
+                <?php $orderStatus = $requestData['transactions'][0]; ?>
+                <table class="admin__table-secondary">
+                    <tbody>
+                        <tr>
+                            <th><?= /* @noEscape */ __('Paytrace Status');?></th>
+                            <td><?= /* @noEscape */ $orderStatus['status_message'] ?></td>
+                        </tr>
+                            <tr>
+                            <th><?= /* @noEscape */ __('Transaction Id');?></th>
+                            <td><?= /* @noEscape */ $orderStatus['transaction_id'] ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php if (isset($orderStatus['settled']) && $orderStatus['settled'] == ''):?>
+        <div class="admin__page-section-label" style="color: red;">
+                <?= /* @noEscape */ __('The Transaction ID that you provided will not be refunded. 
+                Only settled transactions will be refunded. 
+                If you submitted then it will void Transaction  the full amount.');?>
+        </div>
+        <script>
+        require(['jquery'], function(jQuery){
+            var submitButtons = jQuery('.submit-button.refund span');
+            function changeText(buttons) {
+                   buttons.html('Void');
+            }
+            changeText(submitButtons);
+            });
+        </script>
+    <?php endif;?>
+</section>
+
+<?php endif;?>

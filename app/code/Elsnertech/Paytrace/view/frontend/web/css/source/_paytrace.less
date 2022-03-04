@@ -1,0 +1,86 @@
+.payment-card {
+    .col{
+        img{
+            vertical-align: text-top;
+        }
+    }
+}
+.payment-card {
+    .col {
+        padding: 0 5px;
+    }
+}
+.page-layout-2columns-left {
+    
+}
+
+.saved-customer-vault{
+    .row{
+        &.payment-card{
+            margin-bottom: 12px;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+        .card-inner{
+            border: 1px solid rgba(0, 0, 0, 0.137);
+            padding: 0.5rem;
+            outline: none;
+            min-width: unset;
+            border-radius: 5px;
+            background-color: #f6f7fa;
+            border-color: #efefef;
+            margin: 0;
+            overflow: hidden;
+            display: table;
+            width: 100%;
+            max-width: 350px;
+            .col {
+                padding: 8px;
+                display: table-cell;
+                vertical-align: middle;
+                color:#525252;
+            }
+            .col.card-number {
+                font-size: 13px;
+                font-weight: bold;
+            }
+        }
+    }
+    .action-delete{
+        text-align: right;
+        .delete{
+            background: transparent;
+            border: 0;
+            padding:0;
+            color:#525252;
+            font-weight: 600;
+            transition: .25s ease-in-out all;
+            font-size: 0;
+            &:hover{
+                color: #333333;
+            }
+            &:before {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                font-size: 18px;
+                line-height: 20px;
+                color: #757575;
+                content: '\e604';
+                font-family: 'luma-icons';
+                vertical-align: middle;
+                display: inline-block;
+                font-weight: normal;
+                overflow: hidden;
+                speak: none;
+                text-align: center;
+            }
+        }
+    }
+
+    }
+}

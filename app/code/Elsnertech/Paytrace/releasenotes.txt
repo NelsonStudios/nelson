@@ -1,0 +1,61 @@
+Version 1.0.2 Initial Release 9 Dec 2019
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.3 , Apr 1 2020
+-----------------------------------------------------------
+- added new encryption method for save Customer Vault
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.4 , Jul 20 2020
+-----------------------------------------------------------
+- added invoice # id when order place
+- now user can show PayTrace status on admin side
+- user can select transaction receipt send or not
+- change state from full name to US state code
+- solve customer vault on order place
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.5 , Sep 23 2020
+-----------------------------------------------------------
+- compatible with magento 2.4
+- solve refund isssue
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.6 , Dec 17 2020
+-----------------------------------------------------------
+- add txn id and approval code to email and order detail page
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.7 , Mar 26 2021
+-----------------------------------------------------------
+- Solve Payment detail option on Order detail page
+- Save card functionality improves
+- solve 2.4.2 code issue
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.8 , Apr 02 2021
+-----------------------------------------------------------
+- Solved customer address validation for customer vault
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.9 , Apr 08 2021
+-----------------------------------------------------------
+- Solved field validation on checkout page
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.10 , Apr 22 2021
+-----------------------------------------------------------
+- Solved Mutlishipping checkout
+- Solved admin side payment issue
+- Add Partial refund in Paytrace
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.11 , May 13 2021
+-----------------------------------------------------------
+- Solve authorize invoice issue
+
+-----------------------------------------------------------
+	Elsnertech_Paytrace 1.0.12 , July 02 2021
+-----------------------------------------------------------
+- Solved Saved card issue
+- Solved Credit Memos issue
+- solved Paytrace status issue
+
+
+
