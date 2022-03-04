@@ -1,0 +1,8 @@
+<?php
+/**
+ * @var \Amasty\Rma\Block\Order\Info\Buttons\CreateReturn $block
+ */
+
+if ($url = $block->getCreateReturnUrl()): ?>
+    <a href="<?= $block->escapeUrl($url); ?>"><?= $block->escapeHtml(__('Return')) ?></a>
+<?php endif; ?>
