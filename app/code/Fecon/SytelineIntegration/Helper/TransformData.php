@@ -118,7 +118,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "OrderPhoneNumber" => (string) $shippingAddress->getTelephone(),
                 "DigabitERPTransactionType" => "Order",
                 "DigabitERPTransactionStatus" => "SUBMITTED",
-                "OrderId" => $order->getId()
+                "OrderIncrementId" => $order->getIncrementId()
             ]
         ];
     }

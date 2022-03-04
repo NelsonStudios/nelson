@@ -95,7 +95,7 @@ class DataHandler
         $ErpSendShoppingCartRequest->OrderPhoneNumber             = $data["request"]["OrderPhoneNumber"];
         $ErpSendShoppingCartRequest->DigabitERPTransactionType    = $data["request"]["DigabitERPTransactionType"];
         $ErpSendShoppingCartRequest->DigabitERPTransactionStatus  = $data["request"]["DigabitERPTransactionStatus"];
-        $ErpSendShoppingCartRequest->OrderId  = $data["request"]["OrderId"];
+        $ErpSendShoppingCartRequest->OrderIncrementId  = $data["request"]["OrderIncrementId"];
 
         $cartData                                                 = new \stdClass();
         $cartData->ErpSendShoppingCartRequest                     = $ErpSendShoppingCartRequest;
@@ -167,7 +167,7 @@ class DataHandler
                 "OrderPhoneNumber",
                 "DigabitERPTransactionType",
                 "DigabitERPTransactionStatus",
-                "OrderId"
+                "OrderIncrementId"
             ]
         ];
     }
