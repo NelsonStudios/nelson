@@ -1,0 +1,62 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+/**
+ * @var \Magento\Payment\Block\Adminhtml\Transparent\Form $block
+ */
+?>
+<?php
+$code = $block->escapeHtml($block->getMethodCode());
+$savedCard = $block->getMethod()->getSavedCards();
+?>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?= /* @noEscape */ $code ?>"
+          style="display:none">
+    <div class="field-type admin__field _required">
+        <label class="admin__field-label" for="<?= /* @noEscape */ $code ?>_saved_cc">
+            <span><?= $block->escapeHtml(__('Saved Credit Card')) ?></span>
+        </label>
+        <div class="admin__field-control">
+            
+            <select id="<?= /* @noEscape */ $code ?>_saved_cc" name="payment[paytrace_vault]"
+                    class="required-entry admin__control-select">
+                <option value=""></option>
+                <?php if (!empty($savedCard)):?>
+                    <?php foreach ($savedCard as $item):?>
+                        <?php $imagePath = $item['card_image']; ?>
+                    <option value="<?= /* @noEscape */ $item['paytrace_customer_id']?>" 
+                        data-image="
+                        <?= /* @noEscape */ $block->getViewFileUrl('Magento_Payment::images/cc/'.$imagePath); ?>"
+                        >
+                        <?= $block->escapeHtml($item['last4']) ?>
+                    </option>
+                <?php endforeach;?>
+            <?php endif;?>
+            </select>
+            <label class="admin__field-label" 
+            style="display:none;" id="card-display-image">
+                <img src="" width="46" height="30" class="payment-icon">
+                <span >
+                </span>
+            </label>
+        </div>
+    </div>
+    <script>
+        require(['jquery'], function(jQuery){
+            var submitButtons = jQuery('#<?= /* @noEscape */ $code ?>_saved_cc');
+            function changeText() {
+                   var element = $(this);
+                   var imageSrc = element.options[element.selectedIndex].getAttribute('data-image');
+                   var text = element.options[element.selectedIndex].text;
+                   jQuery('#card-display-image img').attr('src',imageSrc);
+                   jQuery('#card-display-image span').html(text);
+                   jQuery('#card-display-image').css({'display':'inline-block','padding-top':'10px'});
+            }
+            submitButtons.on('change', changeText);
+            });
+        </script>
+</fieldset>
+

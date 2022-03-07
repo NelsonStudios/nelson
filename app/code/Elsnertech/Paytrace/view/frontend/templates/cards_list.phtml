@@ -1,0 +1,52 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+/**
+ * @var \Elsnertech\Paytrace\Block\SaveCard $block
+ */
+?>
+<div id="saved_customer_volut" class="saved-customer-vault"></div>
+
+<script type="text/javascript">
+require(['jquery', 'Elsnertech_Paytrace/js/savedcard'], function ($, script) {
+    var url = '<?= /* @noEscape */ $block->getUrl('paytrace/savecard/SaveCardAjax'); ?>';
+    var removeurl = '<?= /* @noEscape */ $block->getUrl('paytrace/savecard/deletecard'); ?>';
+    $( document ).ready(function() {
+        script.getCardListUrl = url;
+        script.getRemoveCardUrl = removeurl;
+        script.getCardList();
+    });
+});
+
+function getRemoveAction(obj){
+    require(
+        [
+            'jquery', 
+            'Elsnertech_Paytrace/js/savedcard',
+            'Magento_Ui/js/modal/confirm'
+        ], 
+        function ($, script, confirmation) {
+        var url = '<?= /* @noEscape */ $block->getUrl('paytrace/savecard/deletecard'); ?>';
+        var self = obj;
+        var form = $(obj).parent('form').get(0);
+        confirmation({
+            title: 'Remove Card Details',
+            content: 'Do you really want to remove card details?',
+            actions: {
+
+                confirm: function () {
+                    script.getRemoveCard(url, $('#'+form.id));
+                },
+
+                cancel: function () {
+                    return false;
+                }
+            }
+        });
+    });
+}
+</script>

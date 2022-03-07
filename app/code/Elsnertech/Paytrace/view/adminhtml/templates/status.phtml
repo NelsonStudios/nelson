@@ -1,0 +1,130 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+/** @var $block Magento\Backend\Block\Template */
+?>
+<?php $requestData = $block->getApiRequest();?>
+<?php if (isset($requestData['success']) && isset($requestData['transactions'][0])):?>
+<div class="page-main-actions">    
+    <div class="page-actions-placeholder">
+    </div>
+    <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
+        <div class="page-actions-inner" data-title="#000000025">
+            <div class="page-actions-buttons">
+                <button id="back" title="Back" type="button" 
+                class="action-default scalable back" 
+                onclick="setLocation(
+                    '<?= /* @noEscape */ $block->getUrl('sales/order/view', ['order_id' => $block->getOrderId()])?>'
+                )" 
+                data-ui-id="sales-order-view-ship-button-back-button">
+                    <span><?= /* @noEscape */ __('Back')?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="admin__page-section order-view-account-information">
+    <div class="admin__page-section-title">
+        <span class="title"><?= /* @noEscape */ __('Paytrace Information');?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-information">
+            <div class="admin__page-section-item-title">
+                <?php $orderStatus = $requestData['transactions'][0]; ?>
+                <span class="title">
+                        Invoice Id # <?= /* @noEscape */  $orderStatus['invoice_id'] ?> 
+                        (<span><?= /* @noEscape */ $requestData['status_message'] ?></span>)
+                </span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary">
+                <tbody>
+                    <tr>
+                        <th><?= /* @noEscape */ __('Transaction Id');?></th>
+                        <td><?= /* @noEscape */ $orderStatus['transaction_id'] ?></td>
+                    </tr>
+                    <tr>
+                        <th><?= /* @noEscape */ __('Paytrace Status');?></th>
+                        <td><h3><?= /* @noEscape */ $orderStatus['status_message'] ?></h3></td>
+                    </tr>
+                        <tr>
+                            <th><?= /* @noEscape */ __('Transaction Type');?></th>
+                            <td><?= /* @noEscape */ $orderStatus['transaction_type'] ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= /* @noEscape */ __('Through');?></th>
+                            <td><?= /* @noEscape */ __('Through : ').
+                            $orderStatus['created']['through']?>                           
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= /* @noEscape */ __('Purchased Date');?></th>
+                            <td>
+                                <?= /* @noEscape */ $orderAdminDate = $block->formatDate(
+                                    $orderStatus['created']['at'],
+                                    \IntlDateFormatter::MEDIUM,
+                                    true
+                                );?>                        
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= /* @noEscape */ __('By Customer')?></th>
+                            <td>
+                                <?= /* @noEscape */ $orderStatus['created']['by'] ?>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= /* @noEscape */ __('Receipt Email')?></th>
+                            <td><a href="mailto:<?=  /* @noEscape */ $orderStatus['receipt_emailed_to'] ?>">
+                                    <?= /* @noEscape */ $orderStatus['receipt_emailed_to'] ?>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+<section class="admin__page-section order-addresses">
+    <div class="admin__page-section-title">
+        <span class="title"><?= /* @noEscape */ __('Address Information')?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-billing-address">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= /* @noEscape */ __('Billing Address')?></span>
+            </div>
+            <address class="admin__page-section-item-content">
+                <?= /* @noEscape */ $orderStatus['billing_address']['name'] ?>
+                <br>
+                <?= /* @noEscape */ $orderStatus['billing_address']['street_address'].' '.
+                $orderStatus['billing_address']['street_address2'] ?><br>
+                <?= /* @noEscape */ $orderStatus['billing_address']['city']?>,  
+                <?= /* @noEscape */ $orderStatus['billing_address']['state']?>, 
+                <?= /* @noEscape */ $orderStatus['billing_address']['zip']?><br>
+                <?= /* @noEscape */ $orderStatus['billing_address']['country']?><br>
+            </address>
+        </div>
+    </div>
+</section>
+<?php else:?>
+    <section class="admin__page-section order-view-account-information">
+        <div class="admin__page-section-title">
+            <span class="title"><?= /* @noEscape */ __('Paytrace Information');?></span>
+        </div>
+        <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-information">
+            <div class="admin__page-section-item-title">
+                <span class="title">
+                        <?= /* @noEscape */ __('Record not found')?>
+                </span>
+            </div>
+        </div>
+    </section>
+<?php endif;?>

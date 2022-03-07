@@ -1,0 +1,20 @@
+<?php
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+
+namespace Elsnertech\Paytrace\Block;
+
+class Billing extends \Magento\Framework\View\Element\Template
+{
+    
+    /**
+     * @return string
+     */
+    public function isAllowProduct()
+    {
+        return '';
+    }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Elsner Team
+ * @copyright Copyright (c) 2021 Elsner Technologies Pvt. Ltd (https://www.elsner.com/)
+ * @package Elsnertech_Paytrace
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd"> 
+    <update handle="customer_account"/> 
+    <head>
+        <title>Saved Cards</title>
+    </head>
+    <body> 
+        <referenceContainer name="content">
+            <block class="Elsnertech\Paytrace\Block\SaveCard" name="save_card" template="Elsnertech_Paytrace::cards_list.phtml" />
+        </referenceContainer>
+    </body> 
+</page>
