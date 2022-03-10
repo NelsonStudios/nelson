@@ -4,6 +4,7 @@
         <remove src="Magento_Catalog::js/jquery.zoom.min.js" />
     </head>
     <body>
+        <move element="product.info.details" destination="content.aside" after="catalog.product.related"/>
         <referenceContainer name="content">
             <referenceBlock name="product.attributes" remove="true" />
             <referenceContainer name="sidebar.additional" remove="true" />
