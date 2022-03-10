@@ -137,7 +137,8 @@ class ApiTest extends Command
                 "OrderStock" => "Yes",
                 "OrderPhoneNumber" => "3031234567",
                 "DigabitERPTransactionType" => "Order",
-                "DigabitERPTransactionStatus" => "SUBMITTED"
+                "DigabitERPTransactionStatus" => "SUBMITTED",
+                "OrderIncrementId" => "000000122"
             ]
         ];
     }

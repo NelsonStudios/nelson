@@ -84,7 +84,8 @@ class TestGetCart
                 "OrderStock" => "Yes",
                 "OrderPhoneNumber" => $order->getShippingAddress()->getTelephone(),
                 "DigabitERPTransactionType" => "Order",
-                "DigabitERPTransactionStatus" => "SUBMITTED"
+                "DigabitERPTransactionStatus" => "SUBMITTED",
+                "OrderIncrementId" => $order->getIncrementId()
             ]
         ];
     }
