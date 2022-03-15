@@ -36,7 +36,7 @@ if (!empty($images) && empty($mainImage)) {
 
 $helper = $block->getData('imageHelper');
 $mainImageData = $mainImage ?
-    $mainImage->getData('medium_image_url') :
+    $mainImage->getData('url') :
     $helper->getDefaultPlaceholderUrl('image');
 
 ?>
