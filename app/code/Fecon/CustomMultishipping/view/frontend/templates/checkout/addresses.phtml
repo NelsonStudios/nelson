@@ -85,8 +85,15 @@
                             <?php endif; ?>
                         </td>
                         <td class="col actions" data-th="<?= $block->escapeHtml(__('Actions')) ?>">
-                            <a href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($_item) ?>" title="<?= /* @escapeNotVerified */ __('Remove Item') ?>" class="action delete" data-multiship-item-update="">
-                                <span><?= /* @escapeNotVerified */ __('Remove item') ?></span>
+                            <a href="#"
+                               title="<?= $block->escapeHtml(__('Remove Item')) ?>"
+                               data-post='<?= /* @noEscape */
+                                $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)
+                                   ->getPostData($block->getItemDeleteUrl($_item))
+                                ?>'
+                               class="action delete"
+                               data-multiship-item-remove="">
+                                <span><?= $block->escapeHtml(__('Remove item')) ?></span>
                             </a>
                         </td>
                     </tr>
