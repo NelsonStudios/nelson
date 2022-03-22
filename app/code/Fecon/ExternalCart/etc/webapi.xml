@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-    <!-- 
+    <!--
         Cart Routes
     -->
     <route url="/V1/external-cart/create-cart-token/" method="GET">
@@ -41,7 +41,7 @@
                         "sku": "BH-080",
                         "qty": "1"
                     }
-                }   
+                }
             %</parameter>
         </data>
     </route>
@@ -63,7 +63,7 @@
                         "sku": "BH-080",
                         "qty": "1"
                     }
-                }   
+                }
             %</parameter>
         </data>
     </route>
@@ -93,7 +93,7 @@
         </resources>
     </route>
     <route url="/V1/external-cart/get-documoto-customer/" method="GET">
-        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerByDocumotoId"/>
+        <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerByDocumotoUsername"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
