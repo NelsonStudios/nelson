@@ -22,4 +22,5 @@
     <preference for="Magento\Multishipping\Block\Checkout\Payment\Info" type="Fecon\CustomMultishipping\Block\Checkout\Payment\Info"/>
     <preference for="Magento\Payment\Model\Method\SpecificationInterface" type="Magento\Payment\Model\Method\Specification\Composite"/>
     <preference for="ClassyLlama\AvaTax\Block\Multishipping\Checkout\Shipping" type="Fecon\CustomMultishipping\Block\Multishipping\Checkout\Shipping"/>
+    <preference for="ClassyLlama\AvaTax\Block\Multishipping\Checkout\Billing" type="Fecon\CustomMultishipping\Block\Multishipping\Checkout\Billing"/>
 </config>
