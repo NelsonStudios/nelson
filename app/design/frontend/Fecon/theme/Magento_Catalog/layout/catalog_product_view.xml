@@ -65,5 +65,8 @@
                 <argument name="template" xsi:type="string">Magento_Catalog::product/view/short_description.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceContainer name="footer-container">
+            <block class="Magento\Framework\View\Element\Template" name="style-title" template="Magento_Catalog::product/view/title.phtml"/>
+        </referenceContainer>
     </body>
 </page>
