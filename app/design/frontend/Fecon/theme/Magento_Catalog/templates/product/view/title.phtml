@@ -1,0 +1,18 @@
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        function changeMarginLeft(x) {
+            if (x.matches) {
+                const titleElement = document.getElementsByClassName("page-title")[0];
+                if (typeof titleElement != "undefined") {
+                    const height = document.getElementsByClassName("page-title")[0].offsetHeight;
+                    const marginLeft = height/(2*2.60508);
+                    titleElement.style.setProperty("margin-left", `${marginLeft}px`, "important");
+                }
+            } else {
+                titleElement.style.setProperty("margin-left", `-68px`, "important");
+            }
+        }
+        var x = window.matchMedia("(min-width: 768px)")
+        changeMarginLeft(x)
+    });
+</script>
