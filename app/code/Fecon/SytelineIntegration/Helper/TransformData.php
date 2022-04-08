@@ -337,12 +337,6 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $methodMappingJson = $this->scopeConfig->getValue('syteline_integration/mapping_methods/mapping_options');
         $methodMappingArray = json_decode($methodMappingJson, true);
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/travis_syteline.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info(print_r($methodMappingJson, true));
-        $logger->info(print_r($shippingMethodTitle, true));
-        $logger->info(print_r($methodMappingArray, true));
         foreach ($methodMappingArray as $methodMapping){
             if ($methodMapping['method_name'] == $shippingMethodTitle){
                 return $methodMapping['method_mapping'];
