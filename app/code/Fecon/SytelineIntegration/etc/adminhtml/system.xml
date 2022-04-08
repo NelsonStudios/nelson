@@ -36,6 +36,14 @@
                     <source_model>Fecon\SytelineIntegration\Model\Config\Source\SoapVersion</source_model>
                 </field>
             </group>
+            <group id="mapping_methods" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Method Name Mapping For ShipVia</label>
+                <field id="mapping_options" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mapping List</label>
+                    <frontend_model>Fecon\SytelineIntegration\Block\Adminhtml\Form\Field\MethodMapping\Options</frontend_model>
+                    <backend_model>Fecon\SytelineIntegration\Model\Config\Backend\Serialized\MethodMappingSerialized</backend_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>
