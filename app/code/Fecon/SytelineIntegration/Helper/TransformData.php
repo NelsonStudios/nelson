@@ -7,35 +7,35 @@ use Magento\Framework\Serialize\SerializerInterface;
 /**
  * Transform Magento entities to arrays, in order to use with the Syteline Web Services
  *
- *
+ * 
  */
 class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      *
-     * @var \Magento\Directory\Model\RegionFactory
+     * @var \Magento\Directory\Model\RegionFactory 
      */
     protected $regionFactory;
 
     /**
      *
-     * @var \Magento\Directory\Model\CountryFactory
+     * @var \Magento\Directory\Model\CountryFactory 
      */
     protected $countryFactory;
 
     /**
      *
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface 
      */
     protected $productRepository;
 
     /**
-     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper
+     * @var \Fecon\SytelineIntegration\Helper\ConfigHelper 
      */
     protected $configHelper;
 
     /**
-     * @var \Magento\Customer\Model\Session
+     * @var \Magento\Customer\Model\Session 
      */
     protected $customerSession;
 
@@ -111,7 +111,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "EmailAddress" => (string) $order->getCustomerEmail(),
                 "AccountNumber" => $this->getAccountNumber($order),
                 "SerialNumber" => $this->getSerialNumber($order),
-                "ShipVia" => $this->getShippingMethodMapping($order->getShippingDescription()),
+                "ShipVia" => "BEST",
                 "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
                 "OrderStock" => $this->getOrderStock($order),
@@ -122,7 +122,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
             ]
         ];
     }
-
+    
     /**
      * Generate array data to send via GetPartInfo Web Service
      *
@@ -143,7 +143,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get region code based on region id
-     *
+     * 
      * @param string $regionId
      * @return string
      */
@@ -191,7 +191,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $cartLines;
     }
-
+    
     /**
      * Get Shipping Address
      *
@@ -201,10 +201,10 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getShippingAddress($shippingAddress)
     {
         $address = isset($shippingAddress->getStreet()[0]) ? $shippingAddress->getStreet()[0] : '';
-
+        
         return (string) $address;
     }
-
+    
     /**
      * Get Part Number from $productId
      *
@@ -258,7 +258,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getSytelineCustomerId($customer)
     {
         $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
-        //if customer is logged in and attribute 'customer_number' is not empty,
+        //if customer is logged in and attribute 'customer_number' is not empty, 
         //then, we should use the customer ID from syteline not default from config
         if ($customer && $customer->getCustomAttribute('customer_number') ) {
             $customerId = $customer->getCustomAttribute('customer_number')->getValue();
@@ -331,22 +331,5 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $orderStock;
-    }
-
-    protected function getShippingMethodMapping($shippingMethodTitle)
-    {
-        $methodMappingJson = $this->scopeConfig->getValue('syteline_integration/mapping_methods/mapping_options');
-        $methodMappingArray = json_decode($methodMappingJson, true);
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/travis_syteline.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info(print_r($methodMappingJson, true));
-        $logger->info(print_r($shippingMethodTitle, true));
-        $logger->info(print_r($methodMappingArray, true));
-        foreach ($methodMappingArray as $methodMapping){
-            if ($methodMapping['method_name'] == $shippingMethodTitle){
-                return $methodMapping['method_mapping'];
-            }
-        }
     }
 }
