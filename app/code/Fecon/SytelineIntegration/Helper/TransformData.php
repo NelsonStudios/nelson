@@ -96,14 +96,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return [
             "address" => [
-                "CustomerId" => $this->getSytelineCustomerId($customer),
-                "Line1" => $this->getShippingAddress($shippingAddress),
-                "Line2" => "",
-                "Line3" => "",
-                "City" => (string) $shippingAddress->getCity(),
-                "State" => $this->getRegionCode($shippingAddress->getRegionId()),
-                "Zipcode" => (string) $shippingAddress->getPostCode(),
-                "Country" => $this->getCountryName($shippingAddress->getCountryId())
+                "CustomerId" => $this->getSytelineCustomerId($customer)
             ],
             "cartLines" => $this->getLinesCart($order->getItems()),
             "request" => [
