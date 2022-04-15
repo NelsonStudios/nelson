@@ -1,6 +1,7 @@
-<?php 
+<?php
 namespace Fecon\ExternalCart\Controller\Cart;
 
+use Magento\Quote\Api\CartRepositoryInterface;
 /**
  * Controller to load quote and redirect to cart/checkout
  */
@@ -13,61 +14,61 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $quoteCartRepositoryV1;
     /**
      * $quoteFactory
-     * 
-     * @var \Magento\Quote\Model\QuoteFactory 
+     *
+     * @var \Magento\Quote\Model\QuoteFactory
      */
     protected $quoteFactory;
     /**
      * $responseFactory
-     * 
-     * @var \Magento\Framework\App\ResponseFactory 
+     *
+     * @var \Magento\Framework\App\ResponseFactory
      */
     protected $responseFactory;
     /**
      * $request
-     * 
-     * @var \Magento\Framework\App\Request\Http 
+     *
+     * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
     /**
      * $checkoutSession
-     * 
-     * @var \Magento\Checkout\Model\Session 
+     *
+     * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
     /**
      * $externalCartHelper
-     * 
-     * @var \Fecon\ExternalCart\Helper\Data 
+     *
+     * @var \Fecon\ExternalCart\Helper\Data
      */
-    protected $externalCartHelper;
+    protected $cartHelper;
     /**
      * $$messageManager
-     * 
-     * @var \Magento\Framework\Message\ManagerInterface 
+     *
+     * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
     /**
      * $protocol
-     * 
+     *
      * @var string
      */
     protected $protocol;
     /**
      * $hostname
-     * 
+     *
      * @var string
      */
     protected $hostname;
     /**
-     * $port 
-     * 
+     * $port
+     *
      * @var string
      */
     protected $port;
     /**
-     * $port 
-     * 
+     * $port
+     *
      * @var string
      */
     protected $access_token;
@@ -82,22 +83,23 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $customerLoggedIn = false;
     /**
-     * $opts 
+     * $opts
      * Options array to be sent in SOAP request.
      * @var array
      */
     protected $opts;
+    private CartRepositoryInterface $cartRepository;
 
     /**
      * Constructor
-     * 
-     * @param \Magento\Framework\App\Action\Context       $context           
-     * @param \Magento\Framework\App\ResponseFactory      $responseFactory   
-     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory      
-     * @param \Magento\Framework\App\Request\Http         $request           
-     * @param \Magento\Checkout\Model\Session             $checkoutSession   
+     *
+     * @param \Magento\Framework\App\Action\Context       $context
+     * @param \Magento\Framework\App\ResponseFactory      $responseFactory
+     * @param \Magento\Quote\Model\QuoteFactory           $quoteFactory
+     * @param \Magento\Framework\App\Request\Http         $request
+     * @param \Magento\Checkout\Model\Session             $checkoutSession
      * @param \Fecon\ExternalCart\Helper\Data             $externalCartHelper
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager    
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -105,15 +107,16 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Fecon\ExternalCart\Helper\Data $externalCartHelper,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Fecon\ExternalCart\Helper\Data $cartHelper,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        CartRepositoryInterface $cartRepository
     ) {
         $this->responseFactory = $responseFactory;
-        
+
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
         $this->request = $request;
-        $this->cartHelper = $externalCartHelper;
+        $this->cartHelper = $cartHelper;
         $this->messageManager = $messageManager;
 
         $this->protocol = $this->cartHelper->protocol();
@@ -134,6 +137,7 @@ class Index extends \Magento\Framework\App\Action\Action
             );
         }
 
+        $this->cartRepository = $cartRepository;
         parent::__construct($context);
     }
 
@@ -144,75 +148,56 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $cartId = $this->request->getParam('cartId');
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/external_cart_' . date('Ymd') . '.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
         $customerToken = $this->request->getParam('customerToken');
-        if(!empty($cartId) || !empty($customerToken)) {
-            /**
-             * Get wsdl endpoint names based on guest or non-guest customers.
-             */
-            $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
-            $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
-            if($customerToken) {
-                $this->opts['stream_context'] = stream_context_create([
-                    'http' => [
-                        'header' => sprintf('Authorization: Bearer %s', $this->access_token)
-                    ]
-                ]);
-                $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
-                if(!empty($customerData)) {
-                    $customerInfo = $this->cartHelper->jsonDecode($customerData);
-                    if(!empty($customerInfo['id'])) {
-                        $requestData = ['customerId' => $customerInfo['id']];
-                        /* Perform user login */
-                        $this->cartHelper->makeUserLogin($customerInfo['email']);
-                    }
-                }
-            } else {
-                $requestData = ['cartId' => $cartId];
-            }
-            /* byPass Authorization access for internal use only */
-            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : [] ));
-            try {
-                /* Get quote */
-                $cartInfo = $client->{$this->quoteGuestCartRepositoryV1}(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
-                if(!empty($cartInfo->result->id)) {
-                    $quoteId = $cartInfo->result->id;
-                    unset($cartInfo);
-                    /* Load quote */
-                    $q = $this->quoteFactory->create()->load($quoteId);
-                    /* Load in checkout session as guest */
-                    $this->checkoutSession->setQuoteId($quoteId);
-                    /* Redirect to cart page */
-                    $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
-                    return;
-                } else {
-                    /* Display error and go to cart page */
-                    $this->displayErrorMsg('/checkout/cart/index');
-                }
-            } catch(\SoapFault $e) {
-                /* Display error and go to cart page */
-                $this->displayErrorMsg('/checkout/cart/index');
-            }
-        } else {
+        $logger->info("Customer Token: {$customerToken}");
+        $customerId = null;
+        $redirect = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
+
+        if(empty($customerToken)) {
+            $logger->err("Missing Arguments");
             /* Go to home page */
-            $this->responseFactory->create()->setRedirect('/')->sendResponse();
-            return;
+            $redirect->setUrl('/');
+        } else {
+            $redirect->setUrl('/checkout/cart/index');
         }
-    }
-    /**
-     * displayErrorMsg
-     * 
-     * This function queue the error message and then redirect to specified path
-     * in var $redirectPath otherwise redirects to "/"
-     * 
-     * @param  string $redirectPath The redirect path.
-     * @return \Magento\Framework\Message\ManagerInterface
-     */
-    private function displayErrorMsg($redirectPath = '/') {
-        $this->messageManager->addError(
-            __('We can\'t process your request right now. Please try again later.')
-        );
-        $this->responseFactory->create()->setRedirect($redirectPath)->sendResponse(); 
-        return;
+
+        $logger->info("Access Token: {$this->access_token}");
+        $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
+        if(!empty($customerData)) {
+            $customerInfo = $this->cartHelper->jsonDecode($customerData);
+            if(empty($customerInfo['id'])) {
+                $this->messageManager->addErrorMessage(
+                    __('We can\'t process your request right now. Please try again later.')
+                );
+                return $redirect;
+
+            }
+            $logger->info("Customer Data : {$customerData}");
+            $customerId = $customerInfo['id'];
+            /* Perform user login */
+            $this->cartHelper->makeUserLogin($customerInfo['email']);
+            $logger->info("Login Success");
+        }
+        try {
+            $cart = $this->cartRepository->getForCustomer($customerId);
+            $quoteId = $cart->getId();
+            $logger->info("Quote Id: {$quoteId}");
+            //Todo remove
+            $this->checkoutSession->setQuoteId($quoteId);
+            /* Redirect to cart page */
+            $logger->info("Success Quote Id: {$quoteId}");
+        } catch(\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $logger->crit("Error: {$e->getMessage()}");
+            /* Display error and go to cart page */
+            $this->messageManager->addErrorMessage(
+                __('We can\'t process your request right now. Please try again later.')
+            );
+        }
+
+        return $redirect;
     }
 }

@@ -7,7 +7,7 @@
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CartInterface;
- 
+
 /**
  * Defines the implementaiton class of the CartInterface
  */
@@ -49,49 +49,49 @@ class Cart implements CartInterface {
     protected $customerToken;
     /**
      * $coreSession
-     * 
-     * @var \Magento\Framework\Session\SessionManagerInterface 
+     *
+     * @var \Magento\Framework\Session\SessionManagerInterface
      */
     protected $coreSession;
     /**
      * $customerSession
-     * 
-     * @var \Magento\Customer\Model\Session 
+     *
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
     /**
      * $request
-     * 
+     *
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
     /**
      * $externalCartHelper
-     * 
-     * @var \Fecon\ExternalCart\Helper\Data 
+     *
+     * @var \Fecon\ExternalCart\Helper\Data
      */
     protected $externalCartHelper;
     /**
      * $protocol
-     * 
+     *
      * @var string
      */
     protected $protocol;
     /**
      * $hostname
-     * 
+     *
      * @var string
      */
     protected $hostname;
     /**
-     * $port 
-     * 
+     * $port
+     *
      * @var string
      */
     protected $port;
     /**
-     * $port 
-     * 
+     * $port
+     *
      * @var string
      */
     protected $access_token;
@@ -101,7 +101,7 @@ class Cart implements CartInterface {
      */
     public $origin;
     /**
-     * $opts 
+     * $opts
      * Options array to be sent in SOAP request.
      * @var array
      */
@@ -135,7 +135,7 @@ class Cart implements CartInterface {
         /**
          * First check if it's allowed to use the API.
          */
-        $this->cartHelper->checkAllowed();
+        //$this->cartHelper->checkAllowed();
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
@@ -220,7 +220,7 @@ class Cart implements CartInterface {
     }
     /**
      * Get the cart information.
-     * 
+     *
      * @api
      * @param  string $cartId The cartId to search in
      * @return stdObject $cartInfo The cart information as an object.
@@ -237,7 +237,7 @@ class Cart implements CartInterface {
     }
     /**
      * Function to add products into guest cart.
-     * 
+     *
      * @api
      * @param  string $cartId created guest cart id.
      * @param  array  $cartItem array with product data
@@ -250,7 +250,7 @@ class Cart implements CartInterface {
     }
     /**
      * Function to get the cart url to access to the guest cart (with previously generated token).
-     * 
+     *
      * @api
      * @return string $url The cart url
      */
@@ -258,7 +258,7 @@ class Cart implements CartInterface {
         $cartId = $this->getCartToken();
         $customerToken = $this->customerSession->getData('loggedInUserToken');
         if(!empty($customerToken)) { //It's a customerToken
-            return $this->origin . '/externalcart/cart/?customerToken=' . $customerToken;
+            return $this->origin . '/externalcart/cart/?customerToken=' . $this->customerToken;
         } else if(!empty($cartId)) {
             //Make sure user is logged out.
             $this->customerSession->logout();
@@ -271,13 +271,13 @@ class Cart implements CartInterface {
      *  - Generate token if not exists
      *  - If token exists only add to cart in the current sessioned cart.
      *
-     * This function will allow you to add to cart without previously generate a token, 
+     * This function will allow you to add to cart without previously generate a token,
      * so the token it's automatically generated and then retrieved from session if exist
      * for next "add-to-cart" actions the user perform.
      *
      * This function doesn't require you to send "cartId" or "quoteId" params.
      *
-     * Example data: 
+     * Example data:
      *   {
      *     "cartItem":
      *     {
@@ -285,7 +285,7 @@ class Cart implements CartInterface {
      *       "qty":1
      *     }
      *   }
-     * 
+     *
      * @api
      * @param cartId The cart id where you want to store the items (optional, if is not sent, a new will be created and used in next requests)
      * @param body The body (json object) post data with items you want to store. (quoteId is optional)
@@ -309,7 +309,7 @@ class Cart implements CartInterface {
     /**
      * Function to add product into cart using Magneto 2 REST API (with SOAP in this case)
      * Updated to set quoteId of the customer if customer id is sent, user must be logged-in first.
-     * 
+     *
      * @api
      * @param $postData array with product data.
      * @return integer $productId on success otherwise throws SoapFault
@@ -328,7 +328,7 @@ class Cart implements CartInterface {
             $cartItemData['cartItem']['quoteId'] = (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']);
         }
         $productData = [
-            'cartId' => (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']), 
+            'cartId' => (($postData['quoteId'])? $postData['quoteId'] : $postData['cartId']),
             'cartItem' => $cartItemData['cartItem']
         ];
         try {
@@ -345,7 +345,7 @@ class Cart implements CartInterface {
     /**
      * setEndpoints function to set proper endpoints paths (customer or guest) and options
      * for SOAP client.
-     * 
+     *
      * @param void
      */
     private function setEndpoints($customer) {
@@ -372,7 +372,7 @@ class Cart implements CartInterface {
      *   - Then add products
      *     - If product doesn't exist, send admin notification (email)
      *     - Return error response.
-     *     
+     *
      * @param  $body The body json data that should looks like:
      *         - See iterface for more information.
      * @return mixed $response json response or exteption.
@@ -380,7 +380,7 @@ class Cart implements CartInterface {
     public function submitCart() {
         /* Post data formatted as Documoto requested. (See Api/Cart interface for more info) */
         $postData = $this->apiRequest->getBodyParams();
-        
+
 	if(!empty($postData)) {
             /* Request array structure to send to Magento 2 Rest API */
             $productDataMap = ['quoteId' => '', 'body' => ['cartItem' => []]];
@@ -407,7 +407,7 @@ class Cart implements CartInterface {
             /* This is only to avoid to access subzero in further var usage. */
             $customerData = $customerDataRaw[0];
             unset($customerDataRaw);
-            /* Get customer token otherwise we can't add products into cart as a valid logged-in user 
+            /* Get customer token otherwise we can't add products into cart as a valid logged-in user
              * Verified: entity_id is the customer id.
              */
             if(!empty($customerData['entity_id'])) {
@@ -420,9 +420,9 @@ class Cart implements CartInterface {
                 /* If we not set endpoints for logged-in customer, this will fail on first execution time */
                 $this->setEndpoints($this->customerToken);
             }
-            
-            /* Make customer autologin 
-             * Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail 
+
+            /* Make customer autologin
+             * Before run this, you should ensure that user was logged-in through Magento 2 API rest, otherwise this will fail
              */
             if(!empty($customerData['entity_id'])) {
                 $requestData = ['customerId' => $customerData['entity_id']];
@@ -431,17 +431,17 @@ class Cart implements CartInterface {
             }
             unset($customerData);
             /* Get quote id before add products into the cart
-             * byPass Authorization access for internal use only 
+             * byPass Authorization access for internal use only
              */
             $opts['stream_context'] = stream_context_create([
                 'http' => [
-                    'header' => sprintf('Authorization: Bearer %s', $this->access_token)
+                    'header' => sprintf('Authorization: Bearer %s', $this->customerToken)
                 ]
             ]);
             $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
             try {
                 /* Create empty cart */
-                $client->quoteCartManagementV1CreateEmptyCartForCustomer(((!empty($requestData))? $requestData : '' ));
+                //$client->quoteCartManagementV1CreateEmptyCartForCustomer(((!empty($requestData))? $requestData : '' ));
                 /* Get quote */
                 $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); /* If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {
@@ -459,12 +459,12 @@ class Cart implements CartInterface {
             } catch(\SoapFault $e) {
                 return $e->getMessage();
             }
-            /* Get current quote 
-             * !Without this param we'll not be able to add products into the logged-in customer cart. 
+            /* Get current quote
+             * !Without this param we'll not be able to add products into the logged-in customer cart.
              */
             $productDataMap['quoteId'] = $quoteId;
-            /* 
-             * Add products 
+            /*
+             * Add products
              */
             foreach ($shippingCartData['ShoppingCartLine'] as $key => $productData) {
                 $productDataMap['body']['cartItem'] = [
@@ -482,7 +482,7 @@ class Cart implements CartInterface {
                                 'ErpResponse' => [
                                     'Success' => 'false',
                                     'Message' => $product,
-                                    'ReferenceNumber' => 'N/A',    
+                                    'ReferenceNumber' => 'N/A',
                                     'ExternalOrderID' => 'false'
                                 ]
                             ]
@@ -496,7 +496,7 @@ class Cart implements CartInterface {
                         'ErpResponse' => [
                             'Success' => 'true',
                             'Message' => 'Cart submitted successfully.',
-                            'ReferenceNumber' => $productDataMap['quoteId'],    
+                            'ReferenceNumber' => $productDataMap['quoteId'],
                             'ExternalOrderID' => 'false',
                             'RedirectionURL' => $this->getCartUrl()
                         ]
