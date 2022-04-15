@@ -1,6 +1,7 @@
 <?php
 namespace Fecon\ExternalCart\Controller\Cart;
 
+use Magento\Quote\Api\CartRepositoryInterface;
 /**
  * Controller to load quote and redirect to cart/checkout
  */
@@ -40,7 +41,7 @@ class Index extends \Magento\Framework\App\Action\Action
      *
      * @var \Fecon\ExternalCart\Helper\Data
      */
-    protected $externalCartHelper;
+    protected $cartHelper;
     /**
      * $$messageManager
      *
@@ -87,6 +88,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var array
      */
     protected $opts;
+    private CartRepositoryInterface $cartRepository;
 
     /**
      * Constructor
@@ -105,15 +107,16 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Fecon\ExternalCart\Helper\Data $externalCartHelper,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Fecon\ExternalCart\Helper\Data $cartHelper,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        CartRepositoryInterface $cartRepository
     ) {
         $this->responseFactory = $responseFactory;
 
         $this->quoteFactory = $quoteFactory;
         $this->checkoutSession = $checkoutSession;
         $this->request = $request;
-        $this->cartHelper = $externalCartHelper;
+        $this->cartHelper = $cartHelper;
         $this->messageManager = $messageManager;
 
         $this->protocol = $this->cartHelper->protocol();
@@ -134,6 +137,7 @@ class Index extends \Magento\Framework\App\Action\Action
             );
         }
 
+        $this->cartRepository = $cartRepository;
         parent::__construct($context);
     }
 
@@ -148,58 +152,36 @@ class Index extends \Magento\Framework\App\Action\Action
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
 
-        $cartId = $this->request->getParam('cartId');
         $customerToken = $this->request->getParam('customerToken');
-        $logger->info("Cart Id: {$cartId}");
         $logger->info("Customer Token: {$customerToken}");
-        if(!empty($cartId) || !empty($customerToken)) {
-            /**
-             * Get wsdl endpoint names based on guest or non-guest customers.
-             */
-            $this->quoteCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1' : 'quoteGuestCartRepositoryV1');
-            $this->quoteGuestCartRepositoryV1 = (($customerToken)? 'quoteCartManagementV1GetCartForCustomer' : 'quoteGuestCartRepositoryV1Get');
-            if($customerToken) {
-                $this->opts['stream_context'] = stream_context_create([
-                    'http' => [
-                        'header' => sprintf('Authorization: Bearer %s', $this->access_token)
-                    ]
-                ]);
-                $logger->info("Access Token: {$this->access_token}");
-                $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
-                if(!empty($customerData)) {
-                    $customerInfo = $this->cartHelper->jsonDecode($customerData);
-                    if(!empty($customerInfo['id'])) {
-                        $requestData = ['customerId' => $customerInfo['id']];
-                        /* Perform user login */
-                        $this->cartHelper->makeUserLogin($customerInfo['email']);
-                        $logger->info("Login Success");
-                    }
-                }
-            } else {
-                $requestData = ['cartId' => $cartId];
-            }
-            /* byPass Authorization access for internal use only */
-            $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartRepositoryV1, (($this->opts)? $this->opts : [] ));
-            try {
-                /* Get quote */
-                $cartInfo = $client->{$this->quoteGuestCartRepositoryV1}(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
-                if(!empty($cartInfo->result->id)) {
-                    $quoteId = $cartInfo->result->id;
-                    $logger->info("Quote Id: {$quoteId}");
-                    unset($cartInfo);
-                    /* Load quote */
-                    $q = $this->quoteFactory->create()->load($quoteId);
-                    /* Load in checkout session as guest */
-                    $this->checkoutSession->setQuoteId($quoteId);
-                    /* Redirect to cart page */
-                    $logger->info("Success Quote Id: {$quoteId}");
-                    return $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
+        $customerId = null;
+        if(!empty($customerToken)) {
+            $logger->info("Access Token: {$this->access_token}");
+            $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
+            if(!empty($customerData)) {
+                $customerInfo = $this->cartHelper->jsonDecode($customerData);
+                if(!empty($customerInfo['id'])) {
+                    $logger->info("Customer Data : {$customerData}");
+                    $customerId = $customerInfo['id'];
+                    /* Perform user login */
+                    $this->cartHelper->makeUserLogin($customerInfo['email']);
+                    $logger->info("Login Success");
                 } else {
-                    $logger->crit("Error: Cart Data Empty");
-                    /* Display error and go to cart page */
                     $this->displayErrorMsg('/checkout/cart/index');
+                    return $this;
                 }
-            } catch(\SoapFault $e) {
+            }
+            try {
+                $cart = $this->cartRepository->getForCustomer($customerId);
+                $quoteId = $cart->getId();
+                $logger->info("Quote Id: {$quoteId}");
+                //Todo remove
+                $this->checkoutSession->setQuoteId($quoteId);
+                /* Redirect to cart page */
+                $logger->info("Success Quote Id: {$quoteId}");
+                $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
+                return $this;
+            } catch(\Magento\Framework\Exception\NoSuchEntityException $e) {
                 $logger->crit("Error: {$e->getMessage()}");
                 /* Display error and go to cart page */
                 $this->displayErrorMsg('/checkout/cart/index');
@@ -208,7 +190,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $logger->err("Missing Arguments");
             /* Go to home page */
             $this->responseFactory->create()->setRedirect('/')->sendResponse();
-            return;
+            return $this;
         }
     }
     /**
