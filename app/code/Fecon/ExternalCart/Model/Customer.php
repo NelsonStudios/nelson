@@ -7,98 +7,98 @@
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CustomerInterface;
- 
+
 /**
  * Defines the implementaiton class of the CustomerInterface
  */
 class Customer implements CustomerInterface {
     /**
      * integrationCustomerTokenServiceV1
-     * 
+     *
      * @var string
      */
     protected $integrationCustomerTokenServiceV1;
     /**
      * customerCustomerRepositoryV1
-     * 
+     *
      * @var string
      */
     protected $customerCustomerRepositoryV1;
     /**
-     * $customerData 
-     * 
+     * $customerData
+     *
      * @var stdClass
      */
     protected $customerData;
     /**
      * $coreSession
-     * 
-     * @var \Magento\Framework\Session\SessionManagerInterface 
+     *
+     * @var \Magento\Framework\Session\SessionManagerInterface
      */
     protected $coreSession;
     /**
      * $customerSession
-     * 
-     * @var \Magento\Customer\Model\Session 
+     *
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
     /**
      * $customerCollection
-     * 
+     *
      * @var \Magento\Customer\Model\ResourceModel\Customer\Collection
      */
     protected $customerCollection;
     /**
      * $customerAddressFactory
-     * 
+     *
      * @var \Magento\Customer\Model\AddressFactory
      */
     protected $customerAddressFactory;
     /**
      * $customerFactory
-     * 
+     *
      * @var \Magento\Customer\Model\CustomerFactory
      */
     protected $customerFactory;
     /**
      * $countryFactory
-     * 
+     *
      * @var \Magento\Directory\Model\CountryFactory
      */
     protected $countryFactory;
     /**
      * $regionFactory
-     * 
+     *
      * @var \Magento\Directory\Model\regionFactory
      */
     protected $regionFactory;
     /**
      * $request
-     * 
+     *
      * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
     /**
      * $externalCartHelper
-     * 
-     * @var \Fecon\ExternalCart\Helper\Data 
+     *
+     * @var \Fecon\ExternalCart\Helper\Data
      */
     protected $externalCartHelper;
     /**
      * $protocol
-     * 
+     *
      * @var string
      */
     protected $protocol;
     /**
      * $hostname
-     * 
+     *
      * @var string
      */
     protected $hostname;
     /**
-     * $port 
-     * 
+     * $port
+     *
      * @var string
      */
     protected $port;
@@ -110,16 +110,16 @@ class Customer implements CustomerInterface {
 
     /**
      * Constructor
-     * 
-     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession           
-     * @param \Magento\Customer\Model\Session                           $customerSession       
-     * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection    
+     *
+     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession
+     * @param \Magento\Customer\Model\Session                           $customerSession
+     * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection
      * @param \Magento\Customer\Model\AddressFactory                    $customerAddressFactory
-     * @param \Magento\Customer\Model\CustomerFactory                   $customerFactory       
-     * @param \Magento\Directory\Model\CountryFactory                   $countryFactory        
-     * @param \Magento\Directory\Model\RegionFactory                    $regionFactory         
-     * @param \Magento\Framework\App\Request\Http                       $request               
-     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper    
+     * @param \Magento\Customer\Model\CustomerFactory                   $customerFactory
+     * @param \Magento\Directory\Model\CountryFactory                   $countryFactory
+     * @param \Magento\Directory\Model\RegionFactory                    $regionFactory
+     * @param \Magento\Framework\App\Request\Http                       $request
+     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper
      */
     public function __construct(
         \Magento\Framework\Session\SessionManagerInterface $coreSession,
@@ -131,12 +131,12 @@ class Customer implements CustomerInterface {
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper
-    ) { 
+    ) {
         $this->cartHelper = $externalCartHelper;
         /**
          * First check if it's allowed to use the API.
          */
-        $this->cartHelper->checkAllowed();
+        //$this->cartHelper->checkAllowed();
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
@@ -197,7 +197,7 @@ class Customer implements CustomerInterface {
      * getCustomerData function to perform customer login using Magento 2 REST API
      * This wrapper will log-in the customer and return the token, also will save information to be
      * used in cart session for already logged-in customer.
-     * 
+     *
      * @api
      * @return string $customerData The data of logged-in customer.
      */
@@ -251,7 +251,7 @@ class Customer implements CustomerInterface {
         } catch(\Excepetion $e) {
             return $e->getMessage();
         }
-        
+
         if(count($collection->getData()) === 1) {
             return $collection->getData();
         } else {
@@ -302,12 +302,12 @@ class Customer implements CustomerInterface {
         && !empty($customerAddressData[$addressType]['SiteAddress']['Zipcode'])) {
             $address->setStreet($customerAddressData[$addressType]['SiteAddress']['Line1']);
             $address->setCity($customerAddressData[$addressType]['SiteAddress']['City']);
-            
+
             /* Country id map */
             $country = $this->countryFactory->create()->loadByCode($customerAddressData[$addressType]['SiteAddress']['Country']);
             $countryId = $country->getId();
             $address->setCountryId($countryId);
-            
+
             /* Region id map only for USA counrty */
             if($customerAddressData[$addressType]['SiteAddress']['Country'] === 'USA' || $customerAddressData[$addressType]['SiteAddress']['Country'] === 'US') {
                 $region = $this->regionFactory->create()->loadByCode($customerAddressData[$addressType]['SiteAddress']['State'], $countryId);
@@ -322,7 +322,7 @@ class Customer implements CustomerInterface {
             if($addressType === 'BillTo') {
                 $address->setIsDefaultBilling('1')
                 ->setSaveInAddressBook('1');
-                
+
             } else {
                 $address->setIsDefaultShipping('1')
                 ->setSaveInAddressBook('1');
@@ -332,7 +332,7 @@ class Customer implements CustomerInterface {
             } catch (Exception $e) {
                 return $e->getMessage();
             }
-        } 
+        }
         return false;
     }
 }

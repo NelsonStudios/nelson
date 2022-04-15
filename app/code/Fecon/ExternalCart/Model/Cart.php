@@ -135,7 +135,7 @@ class Cart implements CartInterface {
         /**
          * First check if it's allowed to use the API.
          */
-        $this->cartHelper->checkAllowed();
+        //$this->cartHelper->checkAllowed();
 
         $this->coreSession = $coreSession;
         $this->customerSession = $customerSession;
@@ -441,7 +441,7 @@ class Cart implements CartInterface {
             $client = new \SoapClient($this->origin . '/soap/?wsdl&services=quoteCartManagementV1', $opts);
             try {
                 /* Create empty cart */
-                $client->quoteCartManagementV1CreateEmptyCartForCustomer(((!empty($requestData))? $requestData : '' ));
+                //$client->quoteCartManagementV1CreateEmptyCartForCustomer(((!empty($requestData))? $requestData : '' ));
                 /* Get quote */
                 $cartInfo = $client->quoteCartManagementV1GetCartForCustomer(((!empty($requestData))? $requestData : '' )); /* If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {

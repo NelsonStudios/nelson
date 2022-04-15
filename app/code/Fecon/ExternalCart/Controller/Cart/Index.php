@@ -192,9 +192,8 @@ class Index extends \Magento\Framework\App\Action\Action
                     /* Load in checkout session as guest */
                     $this->checkoutSession->setQuoteId($quoteId);
                     /* Redirect to cart page */
-                    $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
                     $logger->info("Success Quote Id: {$quoteId}");
-                    return;
+                    return $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
                 } else {
                     $logger->crit("Error: Cart Data Empty");
                     /* Display error and go to cart page */
