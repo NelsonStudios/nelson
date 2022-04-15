@@ -133,7 +133,7 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), "1.0.4", "<")) {
             // Set is_documoto_user as true by default
             $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'is_documoto_user')
-                ->setData('default_value', 1);
+                ->setData('default_value', 0);
             $attribute->save();
         }
 
@@ -205,6 +205,13 @@ class UpgradeData implements UpgradeDataInterface
                 $this->productAttributeRepository->save($attribute);
                 $attribute->unsetData();
             }
+        }
+
+        if (version_compare($context->getVersion(), "1.0.9", "<")) {
+            // Set is_documoto_user as true by default
+            $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'is_documoto_user')
+                ->setData('default_value', 0);
+            $attribute->save();
         }
     }
 }
