@@ -144,8 +144,14 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/external_cart_' . date('Ymd') . '.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
         $cartId = $this->request->getParam('cartId');
         $customerToken = $this->request->getParam('customerToken');
+        $logger->info("Cart Id: {$cartId}");
+        $logger->info("Customer Token: {$customerToken}");
         if(!empty($cartId) || !empty($customerToken)) {
             /**
              * Get wsdl endpoint names based on guest or non-guest customers.
@@ -155,9 +161,10 @@ class Index extends \Magento\Framework\App\Action\Action
             if($customerToken) {
                 $this->opts['stream_context'] = stream_context_create([
                     'http' => [
-                        'header' => sprintf('Authorization: Bearer %s', $customerToken)
+                        'header' => sprintf('Authorization: Bearer %s', $this->access_token)
                     ]
                 ]);
+                $logger->info("Access Token: {$this->access_token}");
                 $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
                 if(!empty($customerData)) {
                     $customerInfo = $this->cartHelper->jsonDecode($customerData);
@@ -165,6 +172,7 @@ class Index extends \Magento\Framework\App\Action\Action
                         $requestData = ['customerId' => $customerInfo['id']];
                         /* Perform user login */
                         $this->cartHelper->makeUserLogin($customerInfo['email']);
+                        $logger->info("Login Success");
                     }
                 }
             } else {
@@ -177,22 +185,27 @@ class Index extends \Magento\Framework\App\Action\Action
                 $cartInfo = $client->{$this->quoteGuestCartRepositoryV1}(((!empty($requestData))? $requestData : '' )); // If $requestData is empty an exception is thrown */
                 if(!empty($cartInfo->result->id)) {
                     $quoteId = $cartInfo->result->id;
+                    $logger->info("Quote Id: {$quoteId}");
                     unset($cartInfo);
                     /* Load quote */
                     $q = $this->quoteFactory->create()->load($quoteId);
                     /* Load in checkout session as guest */
                     $this->checkoutSession->setQuoteId($quoteId);
                     /* Redirect to cart page */
+                    $logger->info("Success Quote Id: {$quoteId}");
                     return $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
                 } else {
+                    $logger->crit("Error: Cart Data Empty");
                     /* Display error and go to cart page */
                     $this->displayErrorMsg('/checkout/cart/index');
                 }
             } catch(\SoapFault $e) {
+                $logger->crit("Error: {$e->getMessage()}");
                 /* Display error and go to cart page */
                 $this->displayErrorMsg('/checkout/cart/index');
             }
         } else {
+            $logger->err("Missing Arguments");
             /* Go to home page */
             $this->responseFactory->create()->setRedirect('/')->sendResponse();
             return;
