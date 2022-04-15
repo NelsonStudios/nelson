@@ -155,58 +155,49 @@ class Index extends \Magento\Framework\App\Action\Action
         $customerToken = $this->request->getParam('customerToken');
         $logger->info("Customer Token: {$customerToken}");
         $customerId = null;
-        if(!empty($customerToken)) {
-            $logger->info("Access Token: {$this->access_token}");
-            $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
-            if(!empty($customerData)) {
-                $customerInfo = $this->cartHelper->jsonDecode($customerData);
-                if(!empty($customerInfo['id'])) {
-                    $logger->info("Customer Data : {$customerData}");
-                    $customerId = $customerInfo['id'];
-                    /* Perform user login */
-                    $this->cartHelper->makeUserLogin($customerInfo['email']);
-                    $logger->info("Login Success");
-                } else {
-                    $this->displayErrorMsg('/checkout/cart/index');
-                    return $this;
-                }
-            }
-            try {
-                $cart = $this->cartRepository->getForCustomer($customerId);
-                $quoteId = $cart->getId();
-                $logger->info("Quote Id: {$quoteId}");
-                //Todo remove
-                $this->checkoutSession->setQuoteId($quoteId);
-                /* Redirect to cart page */
-                $logger->info("Success Quote Id: {$quoteId}");
-                $this->responseFactory->create()->setRedirect($this->origin . '/checkout/cart/index')->sendResponse();
-                return $this;
-            } catch(\Magento\Framework\Exception\NoSuchEntityException $e) {
-                $logger->crit("Error: {$e->getMessage()}");
-                /* Display error and go to cart page */
-                $this->displayErrorMsg('/checkout/cart/index');
-            }
-        } else {
+        $redirect = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
+
+        if(empty($customerToken)) {
             $logger->err("Missing Arguments");
             /* Go to home page */
-            $this->responseFactory->create()->setRedirect('/')->sendResponse();
-            return $this;
+            $redirect->setUrl('/');
+        } else {
+            $redirect->setUrl('/checkout/cart/index');
         }
-    }
-    /**
-     * displayErrorMsg
-     *
-     * This function queue the error message and then redirect to specified path
-     * in var $redirectPath otherwise redirects to "/"
-     *
-     * @param  string $redirectPath The redirect path.
-     * @return \Magento\Framework\Message\ManagerInterface
-     */
-    private function displayErrorMsg($redirectPath = '/') {
-        $this->messageManager->addError(
-            __('We can\'t process your request right now. Please try again later.')
-        );
-        $this->responseFactory->create()->setRedirect($redirectPath)->sendResponse();
-        return;
+
+        $logger->info("Access Token: {$this->access_token}");
+        $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $customerToken, 'GET');
+        if(!empty($customerData)) {
+            $customerInfo = $this->cartHelper->jsonDecode($customerData);
+            if(empty($customerInfo['id'])) {
+                $this->messageManager->addErrorMessage(
+                    __('We can\'t process your request right now. Please try again later.')
+                );
+                return $redirect;
+
+            }
+            $logger->info("Customer Data : {$customerData}");
+            $customerId = $customerInfo['id'];
+            /* Perform user login */
+            $this->cartHelper->makeUserLogin($customerInfo['email']);
+            $logger->info("Login Success");
+        }
+        try {
+            $cart = $this->cartRepository->getForCustomer($customerId);
+            $quoteId = $cart->getId();
+            $logger->info("Quote Id: {$quoteId}");
+            //Todo remove
+            $this->checkoutSession->setQuoteId($quoteId);
+            /* Redirect to cart page */
+            $logger->info("Success Quote Id: {$quoteId}");
+        } catch(\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $logger->crit("Error: {$e->getMessage()}");
+            /* Display error and go to cart page */
+            $this->messageManager->addErrorMessage(
+                __('We can\'t process your request right now. Please try again later.')
+            );
+        }
+
+        return $redirect;
     }
 }
