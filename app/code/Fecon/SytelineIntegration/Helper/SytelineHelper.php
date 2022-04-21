@@ -12,28 +12,28 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Api Helper
      *
-     * @var \Fecon\SytelineIntegration\Helper\ApiHelper 
+     * @var \Fecon\SytelineIntegration\Helper\ApiHelper
      */
     protected $apiHelper;
 
     /**
      * Logger
      *
-     * @var \Fecon\SytelineIntegration\Logger\Handler 
+     * @var \Fecon\SytelineIntegration\Logger\Handler
      */
     protected $logger;
-    
+
     /**
      * Data Transformer
      *
-     * @var \Fecon\SytelineIntegration\Helper\TransformData 
+     * @var \Fecon\SytelineIntegration\Helper\TransformData
      */
     protected $dataTransformHelper;
 
     /**
      * Submission Helper
      *
-     * @var \Fecon\SytelineIntegration\Helper\SubmissionHelper 
+     * @var \Fecon\SytelineIntegration\Helper\SubmissionHelper
      */
     protected $submissionHelper;
 
@@ -256,7 +256,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->submissionHelper->createSubmission($orderId, $orderData, null, $successfullRequest, $errors);
         }
 
-        return $successfullRequest;
+        return $successfullRequest ?? false;
     }
 
     protected function getLoadedProduct($product)

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright Copyright (c) Shop.Fecon.com, Inc. (http://shop.fecon.com)
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Fecon\Sales\Block\Order\Info" as="info" name="sales.order.info" after="sales.order.view"/>
+        </referenceContainer>
+    </body>
+</page>
