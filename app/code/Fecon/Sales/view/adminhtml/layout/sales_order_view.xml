@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright Copyright (c) Shop.Fecon.com, Inc. (http://shop.fecon.com)
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="left">
+            <referenceBlock class="Fecon\Sales\Block\Adminhtml\Order\View\Info" name="order_info">
+                <action method="setTemplate">
+                    <argument name="template" translate="true" xsi:type="string">Fecon_Sales::order/view/info.phtml</argument>
+                </action>
+            </referenceBlock >
+        </referenceContainer>
+    </body>
+</page>
