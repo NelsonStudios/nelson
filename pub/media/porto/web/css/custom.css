@@ -817,10 +817,78 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
 
 
 
-@media (max-width: 880px) {
+@media (max-width: 768px) {
     .page-header.type16.header-newskin .header.content .block-search {
-    display: none;
-}
+        display: block !important;
+    }
+    .page-header.type16.header-newskin .header.content .logo {
+        top: 30px;
+    }
+    .page-header.type16.header-newskin .header.content .header-inner {
+        padding: 0;
+    }
+    .page-header.type16.header-newskin .header.content .block-search {
+        transform: none;
+        width: 100%;
+        margin-top: 8px;
+    }
+    .page-header.type16.header-newskin .header.content .minicart-wrapper {
+        top: -10px;
+        right: 15px
+    }
+    .page-header.type16.header-newskin .header.content .block-search .control input {
+        width: 100%;
+    }
+    .block-search .action.search {
+        position: absolute;
+        right: 2px;
+        top: 0;
+        z-index: 1;
+        height: 40px;
+        display: inline-block;
+        background-image: none;
+        background: 0 0;
+        -moz-box-sizing: content-box;
+        border: 0;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+        text-shadow: none;
+        font-weight: 400;
+        line-height: 40px;
+    }
+
+    .block-search .action.search span {
+        display: none;
+    }
+
+    .block-search .action.search:before {
+        padding: 0 10px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 14px;
+        line-height: inherit;
+        color: #333 !important;
+        content: '\f818';
+        font-family: 'porto-icons';
+        margin: 0;
+        vertical-align: top;
+        display: inline-block;
+        font-weight: 400;
+        overflow: hidden;
+        speak: none;
+        text-align: center;
+    }
+    .page-header.type16 .block-search .action.search:before {
+        color: #333 !important;
+    }
+    .mst-searchautocomplete__autocomplete._active {
+        top: 31px !important;
+    }
+    .page-header.type16.header-newskin .header.content .block-search input {
+        color: #333 !important;
+    }
 }
 
 .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
