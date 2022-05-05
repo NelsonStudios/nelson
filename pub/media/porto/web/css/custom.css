@@ -761,7 +761,7 @@ select.sorter-options, body .page-wrapper main#maincontent .columns .column.main
     height: auto;
     padding: 25px 0;
     background: rgba(0,0,0,0.9);
-    max-height: 92px;
+    max-height: 100px;
 }
 body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper
 .product-items li.product-item .product-item-info .product-item-photo {
