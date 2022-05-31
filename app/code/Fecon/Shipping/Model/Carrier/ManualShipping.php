@@ -7,7 +7,7 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 /**
  * Shipping method to calculate rates manually
  *
- * 
+ *
  */
 class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implements \Magento\Shipping\Model\Carrier\CarrierInterface
 {
@@ -28,23 +28,28 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
     /**
      * Rate Result Factory
      *
-     * @var \Magento\Shipping\Model\Rate\ResultFactory 
+     * @var \Magento\Shipping\Model\Rate\ResultFactory
      */
     protected $rateResultFactory;
 
     /**
      * Rate Method Factory
      *
-     * @var \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory 
+     * @var \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory
      */
     protected $rateMethodFactory;
 
     /**
      * Shipping Helper
      *
-     * @var \Fecon\Shipping\Helper\ShippingHelper 
+     * @var \Fecon\Shipping\Helper\ShippingHelper
      */
     protected $shippingHelper;
+
+    /**
+     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
+     */
+    protected $stockRegistry;
 
     /**
      * Constructor
@@ -63,11 +68,13 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
         \Fecon\Shipping\Helper\ShippingHelper $shippingHelper,
+        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->shippingHelper = $shippingHelper;
+        $this->stockRegistry = $stockRegistry;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -108,6 +115,97 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         return [$this->_code => $this->getConfigData('name')];
     }
 
+    public function isZipCodeRequired($countryId = null)
+    {
+        return true;
+    }
+
+    public function processAdditionalValidation(\Magento\Framework\DataObject $request)
+    {
+        //Skip by item validation if there is no items in request
+        if (!count($this->getAllItems($request))) {
+            return $this;
+        }
+
+        $minWeight = (double)$this->getConfigData('min_package_weight');
+        $errorMsg = '';
+        $configErrorMsg = $this->getConfigData('specificerrmsg');
+        $defaultErrorMsg = __('The shipping module is not available.');
+        $showMethod = $this->getConfigData('showmethod');
+
+        /** @var $item \Magento\Quote\Model\Quote\Item */
+        foreach ($this->getAllItems($request) as $item) {
+            $product = $item->getProduct();
+            if ($product && $product->getId()) {
+                $weight = $product->getWeight();
+                $stockItemData = $this->stockRegistry->getStockItem(
+                    $product->getId(),
+                    $item->getStore()->getWebsiteId()
+                );
+                $doValidation = true;
+
+                if ($stockItemData->getIsQtyDecimal() && $stockItemData->getIsDecimalDivided()) {
+                    if ($stockItemData->getEnableQtyIncrements() && $stockItemData->getQtyIncrements()
+                    ) {
+                        $weight = $weight * $stockItemData->getQtyIncrements();
+                    } else {
+                        $doValidation = false;
+                    }
+                } elseif ($stockItemData->getIsQtyDecimal() && !$stockItemData->getIsDecimalDivided()) {
+                    $weight = $weight * $item->getQty();
+                }
+
+                if ($doValidation && $weight < $minWeight) {
+                    $errorMsg = $configErrorMsg ?? $defaultErrorMsg;
+                    break;
+                }
+            }
+        }
+
+        if (!$errorMsg && !$request->getDestPostcode() && $this->isZipCodeRequired($request->getDestCountryId())) {
+            $errorMsg = __('This shipping method is not available. Please specify the zip code.');
+        }
+        echo($showMethod);
+        if ($errorMsg && $showMethod) {
+            $error = $this->_rateErrorFactory->create();
+            $error->setCarrier($this->_code);
+            $error->setCarrierTitle($this->getConfigData('title'));
+            $error->setErrorMessage($errorMsg);
+
+            return $error;
+        } elseif ($errorMsg) {
+            return false;
+        }
+
+        return $this;
+    }
+
+    public function getAllItems(RateRequest $request)
+    {
+        $items = [];
+        if ($request->getAllItems()) {
+            foreach ($request->getAllItems() as $item) {
+                /* @var $item \Magento\Quote\Model\Quote\Item */
+                if ($item->getProduct()->isVirtual() || $item->getParentItem()) {
+                    // Don't process children here - we will process (or already have processed) them below
+                    continue;
+                }
+
+                if ($item->getHasChildren() && $item->isShipSeparately()) {
+                    foreach ($item->getChildren() as $child) {
+                        if (!$child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
+                            $items[] = $child;
+                        }
+                    }
+                } else {
+                    // Ship together - count compound item as one solid
+                    $items[] = $item;
+                }
+            }
+        }
+
+        return $items;
+    }
 
     /**
      * Get configuration data of carrier
