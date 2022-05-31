@@ -11,6 +11,9 @@
                 <field id="name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
                     <label>Method Name</label>
                 </field>
+                <field id="min_package_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="25" translate="label" type="text">
+                    <label>Min Pack Weight</label>
+                </field>
                 <field id="fulfillment_email_address" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="25" translate="label" type="text">
                     <label>Fulfillment Email Address</label>
                     <validate>validate-email</validate>
@@ -37,6 +40,11 @@
                     <label>Ship to Specific Countries</label>
                     <can_be_empty>1</can_be_empty>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+                <field id="showmethod" translate="label" type="select" sortOrder="1940" showInDefault="1" showInWebsite="1">
+                    <label>Show Method if Not Applicable</label>
+                    <frontend_class>shipping-skip-hide</frontend_class>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
         </section>
