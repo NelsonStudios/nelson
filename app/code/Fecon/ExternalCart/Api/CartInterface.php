@@ -38,7 +38,7 @@ interface CartInterface
     public function getCartToken();
     /**
      * Get the cart information.
-     * 
+     *
      * @api
      * @param  string $cartId The cartId to search in
      * @return \Fecon\ExternalCart\Api\CartInterface $cartInfo The cart information as an object.
@@ -47,7 +47,7 @@ interface CartInterface
     public function getCartInfo($cartId);
     /**
      * Function to add products into guest cart.
-     * 
+     *
      * @api
      * @param  $cartId The cart id token that should look like: 7c6aa34c8ed9ccdb71f78f7b25d047b1
      * @param  $body The body json data that should looks like:
@@ -57,14 +57,26 @@ interface CartInterface
      *         "sku": "BH-080",
      *         "qty": "1"
      *     }
-     * } 
+     * }
      * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
     public function addProductIntoCart();
+
+    /**
+     * Add/update the specified cart item.
+     *
+     * @param \Fecon\ExternalCart\Api\Data\CartInterface $cart The item.
+     * @return \Magento\Quote\Api\Data\CartItemInterface[] Item.
+     * @throws \Magento\Framework\Exception\NoSuchEntityException The specified cart does not exist.
+     * @throws \Magento\Framework\Exception\CouldNotSaveException The specified item could not be saved to the cart.
+     * @throws \Magento\Framework\Exception\InputException The specified item or cart is not valid.
+     */
+    public function guestAddProductIntoCart($cart);
+
     /**
      * Function to get the cart url to access to the guest cart (with previously generated token).
-     * 
+     *
      * @api
      * @return string $url The cart url
      */
@@ -73,7 +85,7 @@ interface CartInterface
      * Function to add products into cart but also:
      *  - Generate token if not exists
      *  - If token exists only add to cart in the current sessioned cart.
-     * 
+     *
      * @api
      * @param  $cartId The cart id token that should look like: 7c6aa34c8ed9ccdb71f78f7b25d047b1 (optional)
      * @param  $body The body json data that should looks like:
@@ -83,19 +95,19 @@ interface CartInterface
      *         "sku": "BH-080",
      *         "qty": "1"
      *     }
-     * } 
+     * }
      * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
      * @throws \SoapFault response
      */
     public function addToCart();
     /**
      * Function to add products into guest cart.
-     * 
+     *
      * @api
      * @param  $body The body json data that should looks like:
-     * 
-     * Request structure: 
-     * 
+     *
+     * Request structure:
+     *
      * {
      *   "GetCart": {
      *     "ErpSendShoppingCartRequest": {
@@ -142,7 +154,7 @@ interface CartInterface
      *   }
      * }
      *
-     * Response structure: 
+     * Response structure:
      * [
      *   {
      *     "ErpResponse": {
@@ -155,10 +167,10 @@ interface CartInterface
      * ]
      *
      * *Possible errors:
-     *   - Requested product doesn't exist 
+     *   - Requested product doesn't exist
      *   - Request does not match any route. (Check Authorization header)
      *   - %fieldName is a required field (Check if user was logged-in correctly through the Magento API)
-     * 
+     *
      * @return \Fecon\ExternalCart\Api\CartInterface $response object with response information (Documoto style).
      * @throws \Exception response
      */

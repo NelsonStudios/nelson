@@ -7,6 +7,9 @@
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CartInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
+use Magento\Quote\Model\QuoteIdMaskFactory;
+use Magento\Framework\Webapi\Rest\Request;
 
 /**
  * Defines the implementaiton class of the CartInterface
@@ -108,6 +111,9 @@ class Cart implements CartInterface {
     protected $opts;
 
     protected $apiRequest;
+    private \Magento\Quote\Api\CartItemRepositoryInterface $repository;
+    private QuoteIdMaskFactory $quoteIdMaskFactory;
+    private Request $restRequest;
 
     /**
      * Constructor
@@ -129,7 +135,10 @@ class Cart implements CartInterface {
         \Magento\Framework\App\Request\Http $request,
         \Fecon\ExternalCart\Model\Customer $customerModel,
         \Fecon\ExternalCart\Helper\Data $externalCartHelper,
-        \Magento\Framework\Webapi\Rest\Request $apiRequest
+        \Magento\Framework\Webapi\Rest\Request $apiRequest,
+        \Magento\Quote\Api\CartItemRepositoryInterface $repository,
+        QuoteIdMaskFactory $quoteIdMaskFactory,
+        Request $restRequest
     ) {
         $this->cartHelper = $externalCartHelper;
         /**
@@ -167,6 +176,9 @@ class Cart implements CartInterface {
          */
         $this->customerToken = $this->customerSession->getData('loggedInUserToken');
         $this->setEndpoints($this->customerToken);
+        $this->repository = $repository;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->restRequest = $restRequest;
     }
     /**
      * Create and get new token of the created guest/customer cart
@@ -247,6 +259,28 @@ class Cart implements CartInterface {
     public function addProductIntoCart() {
         $postData = $this->request->getPost();
         return $this->_addProduct($postData);
+    }
+
+    /**
+     * @inheirtDoc
+     */
+    public function guestAddProductIntoCart($cart) {
+        $cartId = $this->restRequest->getParam('cartId');
+        $result = [];
+        if ($cartId) {
+            $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+            foreach ($cart->getCartItems() as $cartItem) {
+                $cartItem->setQuoteId($quoteIdMask->getQuoteId());
+                $this->repository->save($cartItem);
+            }
+            $cartItemList = $this->repository->getList($quoteIdMask->getQuoteId());
+            /** @var $item CartItemInterface */
+            foreach ($cartItemList as $item) {
+                $item->setQuoteId($quoteIdMask->getMaskedId());
+            }
+            $result = $cartItemList;
+        }
+        return $result;
     }
     /**
      * Function to get the cart url to access to the guest cart (with previously generated token).

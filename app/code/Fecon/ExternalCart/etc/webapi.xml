@@ -98,4 +98,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/external-cart/guest-add-product/:cartId/items" method="POST">
+        <service class="Fecon\ExternalCart\Api\CartInterface" method="guestAddProductIntoCart"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
