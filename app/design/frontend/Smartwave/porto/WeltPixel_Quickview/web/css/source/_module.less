@@ -10,6 +10,11 @@
 .side-list .product-item .weltpixel-quickview {
     display: none !important;
 }
+.product-item-photo {
+    > a:not(.weltpixel-quickview):before {
+        display: none!important;
+    }
+}
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
 
   .weltpixel-quickview-catalog-product-view {
