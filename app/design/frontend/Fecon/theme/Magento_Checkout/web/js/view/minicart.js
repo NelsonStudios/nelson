@@ -78,7 +78,7 @@ define([
         $('.minus-btn').on('click', function() {
             var inputQty = $('.cart-item-qty');
             var inputVal = inputQty.val();
-            if(inputVal > 1) { 
+            if(inputVal > 1) {
                 inputQty.val(--inputVal);
                 inputQty.trigger('change');
                 $('.update-cart-item').show();
@@ -100,6 +100,7 @@ define([
          */
         initialize: function () {
             var self = this,
+                sections = ['cart'],
                 cartData = customerData.get('cart');
 
             this.update(cartData());
@@ -119,6 +120,8 @@ define([
                 customerData.reload(['cart'], false);
             }
 
+            customerData.invalidate(sections);
+            customerData.reload(sections, true)
             return this._super();
         },
         isLoading: ko.observable(false),
