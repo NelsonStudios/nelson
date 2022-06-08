@@ -2,14 +2,19 @@
 
 namespace Fecon\DealersPayment\Plugin\Magento\OfflinePayments\Model;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
 /**
  * Plugin for the Cash On Delivery payment method
  */
 class Cashondelivery
 {
-
     /**
-     * @var \Magento\Customer\Model\Session 
+     *
+     */
+    const XML_PATH_DEALER_PAYMENT_ALLOW_CUSTOMERS = 'payment/cashondelivery/allow_customer_ids';
+    /**
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
@@ -19,17 +24,32 @@ class Cashondelivery
     protected $customerRepository;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $_config;
+
+    /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serialize;
+
+    /**
      * Constructor
      *
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-    ) {
+        \Magento\Customer\Model\Session                   $customerSession,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        ScopeConfigInterface                              $config,
+        \Magento\Framework\Serialize\Serializer\Json      $serialize
+    )
+    {
         $this->customerSession = $customerSession;
         $this->customerRepository = $customerRepository;
+        $this->_config = $config;
+        $this->serialize = $serialize;
     }
 
     /**
@@ -41,12 +61,30 @@ class Cashondelivery
      */
     public function afterIsActive(
         \Magento\OfflinePayments\Model\Cashondelivery $subject,
-        $result
-    ) {
+                                                      $result
+    )
+    {
         $isDocumotoUser = $this->isDocumotoUser();
-        $resultNewValue = $result && $isDocumotoUser;
+        $isAllow = $this->isAllowCustomer();
+        $resultNewValue = $result && $isDocumotoUser && $isAllow;
 
         return $resultNewValue;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAllowCustomer()
+    {
+        $customer = $this->getCustomer();
+        $result = false;
+        $allowCustomerIds = $this->getAllowCustomerIds();
+        if ($customer && $customer->getId() && $allowCustomerIds) {
+            if (in_array($customer->getId(), $allowCustomerIds)) {
+                $result = true;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -59,7 +97,7 @@ class Cashondelivery
         $customer = $this->getCustomer();
         $isDocumotoUser = false;
         if ($customer && $customer->getCustomAttribute('is_documoto_user')) {
-            $isDocumotoUser = (bool) $customer->getCustomAttribute('is_documoto_user')->getValue();
+            $isDocumotoUser = (bool)$customer->getCustomAttribute('is_documoto_user')->getValue();
         }
 
         return $isDocumotoUser;
@@ -86,5 +124,21 @@ class Cashondelivery
         }
 
         return $customer;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAllowCustomerIds()
+    {
+        $data = $this->_config->getValue(self::XML_PATH_DEALER_PAYMENT_ALLOW_CUSTOMERS);
+        $customerIds = array();
+        if ($data) {
+            $unserializedata = $this->serialize->unserialize($data);
+            foreach ($unserializedata as $key => $row) {
+                $customerIds[] = $row['customer_id'];
+            }
+        }
+        return $customerIds;
     }
 }
