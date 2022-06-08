@@ -65,8 +65,8 @@ class Cashondelivery
     )
     {
         $isDocumotoUser = $this->isDocumotoUser();
-        $isAllow = $this->isAllowCustomer();
-        $resultNewValue = $result && $isDocumotoUser && $isAllow;
+        $isNotAllow = $this->isNotAllowCustomer();
+        $resultNewValue = $result && $isDocumotoUser && !$isNotAllow;
 
         return $resultNewValue;
     }
@@ -74,13 +74,13 @@ class Cashondelivery
     /**
      * @return bool
      */
-    protected function isAllowCustomer()
+    protected function isNotAllowCustomer()
     {
         $customer = $this->getCustomer();
         $result = false;
-        $allowCustomerIds = $this->getAllowCustomerIds();
-        if ($customer && $customer->getId() && $allowCustomerIds) {
-            if (in_array($customer->getId(), $allowCustomerIds)) {
+        $notAllowCustomerIds = $this->getNotAllowCustomerIds();
+        if ($customer && $customer->getId() && $notAllowCustomerIds) {
+            if (in_array($customer->getId(), $notAllowCustomerIds)) {
                 $result = true;
             }
         }
@@ -129,7 +129,7 @@ class Cashondelivery
     /**
      * @return array
      */
-    protected function getAllowCustomerIds()
+    protected function getNotAllowCustomerIds()
     {
         $data = $this->_config->getValue(self::XML_PATH_DEALER_PAYMENT_ALLOW_CUSTOMERS);
         $customerIds = array();
