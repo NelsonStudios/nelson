@@ -4,4 +4,6 @@
                 type="Fecon\ExternalCart\Model\Cart" />
     <preference for="Fecon\ExternalCart\Api\CustomerInterface"
                 type="Fecon\ExternalCart\Model\Customer" />
+    <preference for="Fecon\ExternalCart\Api\Data\CartInterface"
+                type="Fecon\ExternalCart\Model\Data\Cart" />
 </config>
