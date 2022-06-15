@@ -165,7 +165,6 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         if (!$errorMsg && !$request->getDestPostcode() && $this->isZipCodeRequired($request->getDestCountryId())) {
             $errorMsg = __('This shipping method is not available. Please specify the zip code.');
         }
-        echo($showMethod);
         if ($errorMsg && $showMethod) {
             $error = $this->_rateErrorFactory->create();
             $error->setCarrier($this->_code);
