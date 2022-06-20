@@ -6,26 +6,52 @@
                 <div class="field">
                     <div class="control">
                         <input type="text"
-                        id="syteline_company_name"
-                        tabindex="-1"
-                        data-validate="{required:true}"
-                        class="input-text"
-                        data-bind="attr: {placeholder: $t('Company Name / ATTN'), title: $t('Company Name / ATTN')}"/>
+                               id="syteline_company_name"
+                               tabindex="-1"
+                               data-validate="{required:true}"
+                               class="input-text"
+                               data-bind="attr: {placeholder: $t('Company Name / ATTN'), title: $t('Company Name / ATTN')}"/>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="iwd_opc_alternative_column">
-        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Address'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
-
             <!-- ko if: (!quoteIsVirtual) -->
             <!-- ko foreach: getRegion('customer-email') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
             <!--/ko-->
+            <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Purchase Order Number'"></div>
 
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <input type="text"
+                               id="syteline_purchase_order_number"
+                               tabindex="-1"
+                               data-validate="{required:true}"
+                               class="input-text"
+                               data-bind="attr: {placeholder: $t('PO Number *'), title: $t('PO Number *')}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Serial Number'"></div>
+            <div class="fieldset">
+                <div class="field">
+                    <div class="control">
+                        <input type="text"
+                               id="syteline_serial_number"
+                               tabindex="-1"
+                               data-validate="{required:true}"
+                               class="input-text"
+                               data-bind="attr: {placeholder: $t('Serial Number *'), title: $t('Serial Number')}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="iwd_opc_section_delimiter"></div>
+            <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Address'"></div>
             <!-- ko template: 'IWD_Opc/shipping-address/list' --><!-- /ko -->
 
             <!-- ko foreach: getRegion('address-list-additional-addresses') -->
@@ -44,7 +70,7 @@
             </div>
         </div>
     </div>
-    <div class="iwd_opc_alternative_column">
+    <div class="iwd_opc_alternative_column" id="iwd_opc_shipping_method_section">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Method'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
             <div id="iwd_opc_shipping_method"
@@ -130,43 +156,10 @@
             <!-- /ko -->
         </div>
     </div>
-    <div class="iwd_opc_alternative_column">
-        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Purchase Order Number'"></div>
-        <div tabindex="-1" class="iwd_opc_column_content">
-            <div class="fieldset">
-                <div class="field">
-                    <div class="control">
-                        <input type="text"
-                        id="syteline_purchase_order_number"
-                        tabindex="-1"
-                        data-validate="{required:false}"
-                        class="input-text"
-                        data-bind="attr: {placeholder: $t('PO Number'), title: $t('PO Number')}"/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="iwd_opc_alternative_column">
-        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Serial Number'"></div>
-        <div tabindex="-1" class="iwd_opc_column_content">
-            <div class="fieldset">
-                <div class="field">
-                    <div class="control">
-                        <input type="text"
-                        id="syteline_serial_number"
-                        tabindex="-1"
-                        data-validate="{required:false}"
-                        class="input-text"
-                        data-bind="attr: {placeholder: $t('Serial Number'), title: $t('Serial Number')}"/>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- ko if: canDisplaySytelineFields -->
     <div class="iwd_opc_alternative_column">
-        <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Do you want this order applied as your monthly stock order if all requirements are met?'"></div>
+        <div class="iwd_opc_universal_wrapper iwd_opc_column_name"
+             data-bind="i18n: 'Do you want this order applied as your monthly stock order if all requirements are met?'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
             <div class="fieldset">
                 <div class="field">
