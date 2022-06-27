@@ -15,6 +15,17 @@ define([
                     $('#syteline_company_name').addClass('mage-error');
                     isValid = false;
                 }
+                if (!sytelineExtraFields.purchaseOrderNumber) {
+                    messageList.addErrorMessage({ message: $t('Purchase Order Number is a required field') });
+                    $('#syteline_purchase_order_number').addClass('mage-error');
+                    isValid = false;
+                }
+
+                if (!sytelineExtraFields.serialNumber) {
+                    messageList.addErrorMessage({ message: $t('Machine Serial Number is a required field') });
+                    $('#syteline_serial_number').addClass('mage-error');
+                    isValid = false;
+                }
                 if (quote.paymentMethod().method === "cashondelivery") {
                     if (!sytelineExtraFields.purchaseOrderNumber) {
                         messageList.addErrorMessage({ message: $t('Purchase Order Number is a required field') });
