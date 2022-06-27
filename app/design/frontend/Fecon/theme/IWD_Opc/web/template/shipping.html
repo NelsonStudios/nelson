@@ -24,33 +24,32 @@
             <!--/ko-->
             <!--/ko-->
             <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Purchase Order Number'"></div>
-
             <div class="fieldset">
                 <div class="field">
                     <div class="control">
                         <input type="text"
                                id="syteline_purchase_order_number"
-                               tabindex="-1"
                                data-validate="{required:true}"
                                class="input-text"
                                data-bind="attr: {placeholder: $t('PO Number *'), title: $t('PO Number *')}"/>
                     </div>
                 </div>
             </div>
-            <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Serial Number'"></div>
+            <div class="iwd_opc_universal_wrapper iwd_opc_column_name"
+                 data-bind="i18n: 'Machine Serial Number'"></div>
             <div class="fieldset">
                 <div class="field">
                     <div class="control">
                         <input type="text"
                                id="syteline_serial_number"
-                               tabindex="-1"
                                data-validate="{required:true}"
                                class="input-text"
-                               data-bind="attr: {placeholder: $t('Serial Number *'), title: $t('Serial Number')}"/>
+                               data-bind="attr: {placeholder: $t('Machine Serial Number *'), title: $t('Machine Serial Number')}"/>
                     </div>
                 </div>
             </div>
-            <div class="iwd_opc_universal_wrapper error" style="color: red;font-size: 12px" data-bind="i18n: 'IMPORTANT: Please complete this field to help us ensure that your order is accurate.'"></div>
+            <div class="iwd_opc_universal_wrapper error" style="color: red;font-size: 12px"
+                 data-bind="i18n: 'IMPORTANT: Please complete this field to help us ensure that your order is accurate.'"></div>
             <div class="iwd_opc_section_delimiter"></div>
             <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Address'"></div>
             <!-- ko template: 'IWD_Opc/shipping-address/list' --><!-- /ko -->
