@@ -27,24 +27,34 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+<!--    <route url="/V1/external-cart/add-product/" method="POST">-->
+<!--        <service class="Fecon\ExternalCart\Api\CartInterface" method="addProductIntoCart"/>-->
+<!--        <resources>-->
+<!--            <resource ref="anonymous"/>-->
+<!--        </resources>-->
+<!--        <data>-->
+<!--            <parameter name="cartId" force="true">%cart_id%</parameter>-->
+<!--            <parameter name="body" force="true">%-->
+<!--                {-->
+<!--                    "cartItem": {-->
+<!--                        "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",-->
+<!--                        "sku": "BH-080",-->
+<!--                        "qty": "1"-->
+<!--                    }-->
+<!--                }-->
+<!--            %</parameter>-->
+<!--        </data>-->
+<!--    </route>-->
+
+
     <route url="/V1/external-cart/add-product/" method="POST">
         <service class="Fecon\ExternalCart\Api\CartInterface" method="addProductIntoCart"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-            <parameter name="body" force="true">%
-                {
-                    "cartItem": {
-                        "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",
-                        "sku": "BH-080",
-                        "qty": "1"
-                    }
-                }
-            %</parameter>
-        </data>
     </route>
+
+
     <route url="/V1/external-cart/get-cart-url/" method="GET">
         <service class="Fecon\ExternalCart\Api\CartInterface" method="getCartUrl"/>
         <resources>
@@ -81,10 +91,6 @@
         <resources>
             <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="username" force="true">%username%</parameter>
-            <parameter name="password" force="true">%password%</parameter>
-        </data>
     </route>
     <route url="/V1/external-cart/get-customer-info/" method="GET">
         <service class="Fecon\ExternalCart\Api\CustomerInterface" method="getCustomerData"/>

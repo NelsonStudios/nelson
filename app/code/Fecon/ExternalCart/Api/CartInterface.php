@@ -45,23 +45,15 @@ interface CartInterface
      * @throws \SoapFault response
      */
     public function getCartInfo($cartId);
+
+
     /**
-     * Function to add products into guest cart.
-     *
-     * @api
-     * @param  $cartId The cart id token that should look like: 7c6aa34c8ed9ccdb71f78f7b25d047b1
-     * @param  $body The body json data that should looks like:
-     * {
-     *     "cartItem": {
-     *         "quoteId": "7c6aa34c8ed9ccdb71f78f7b25d047b1",
-     *         "sku": "BH-080",
-     *         "qty": "1"
-     *     }
-     * }
-     * @return \Fecon\ExternalCart\Api\CartInterface $productAdded object with product related information.
-     * @throws \SoapFault response
+     * @param boolean $isGuest
+     * @param string $cartId
+     * @param \Fecon\ExternalCart\Api\Data\CartInterface $cart The Item
+     * @return \Magento\Quote\Api\Data\CartItemInterface[] Item.
      */
-    public function addProductIntoCart();
+    public function addProductIntoCart($isGuest, $cartId, $cart);
 
     /**
      * Add/update the specified cart item.
