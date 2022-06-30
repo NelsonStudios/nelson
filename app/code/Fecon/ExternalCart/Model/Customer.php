@@ -173,11 +173,15 @@ class Customer implements CustomerInterface {
      * customerLogIn
      *
      * @api
+     * @param string $username The password to save
+     * @param string $password The password to save
      * @return string $customerToken The token of logged-in customer.
      */
-    public function customerLogIn() {
-        /* Get post data */
-        $postData = $this->request->getPost();
+    public function customerLogIn($username,$password) {
+        $post = [
+            'username' => $username,
+            'password' => $password
+        ];
         $opts = [
             'soap_version' => SOAP_1_2,
             'trace' => 1,
@@ -185,7 +189,8 @@ class Customer implements CustomerInterface {
         ];
         $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->integrationCustomerTokenServiceV1, $opts);
         try {
-            $customerToken = $client->integrationCustomerTokenServiceV1CreateCustomerAccessToken($postData);
+            $customerToken = $client->integrationCustomerTokenServiceV1CreateCustomerAccessToken($post);
+            $this->cartHelper->makeUserLogin($username);
             $this->customerSession->setData('loggedInUserToken', $customerToken->result);
             return $customerToken->result;
         } catch (\Exception $e) {

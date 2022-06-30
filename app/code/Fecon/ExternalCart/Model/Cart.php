@@ -112,9 +112,21 @@ class Cart implements CartInterface
      */
     protected $opts;
 
+    /**
+     * @var Request
+     */
     protected $apiRequest;
+    /**
+     * @var \Magento\Quote\Api\CartItemRepositoryInterface
+     */
     private \Magento\Quote\Api\CartItemRepositoryInterface $repository;
+    /**
+     * @var QuoteIdMaskFactory
+     */
     private QuoteIdMaskFactory $quoteIdMaskFactory;
+    /**
+     * @var Request
+     */
     private Request $restRequest;
 
     /**
@@ -199,16 +211,17 @@ class Cart implements CartInterface
         }
         $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->quoteCartManagementV1, (($this->opts) ? $this->opts : []));
         try {
-            $token = $client->{$this->quoteCartManagementV1Endpoint}(((!$forceGuest && $this->customerToken) ? ['customerId' => $this->customerSession->getId()] : ''));
-            if (!empty($token->result->id)) {
-                // Magneto 2 return an object with cart data instead a token here.
-                $this->setCartToken($token->result->id);
-                return $token->result->id;
+            $token = '';
+            if (!$forceGuest && $this->customerToken) {
+                $quote = $this->cartHelper->getActiveQuoteForCustomer($this->customerSession->getId());
+                $token = $quote->getId();
+                $this->checkoutSession->setQuoteId($quote->getId());
+                $this->setCartToken($token);
             } else {
-                /* Store cartId token in session temporary */
-                $this->setCartToken($token->result);
-                return $token->result; //token id of recently created cart.
+                $token = $client->{$this->quoteCartManagementV1Endpoint}(['']);
             }
+            $this->setCartToken($token);
+            return $token;
         } catch (\SoapFault $e) {
             return $e->getMessage();
         }
@@ -259,19 +272,35 @@ class Cart implements CartInterface
         }
     }
 
+
     /**
-     * Function to add products into guest cart.
-     *
-     * @param string $cartId created guest cart id.
-     * @param array $cartItem array with product data
-     * @return integer $product related information on success otherwise throws SoapFault
-     * @throws \SoapFault response
-     * @api
+     * @param $isGuest
+     * @param $cartId
+     * @param $cart
+     * @return CartItemInterface[]
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function addProductIntoCart()
+    public function addProductIntoCart($isGuest, $cartId, $cart)
     {
-        $postData = $this->request->getPost();
-        return $this->_addProduct($postData);
+        if ($isGuest) {
+            $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+            $quoteId = $quoteIdMask->getQuoteId();
+        } else {
+            $quoteId = $cartId;
+        }
+        foreach ($cart->getCartItems() as $cartItem) {
+            $cartItem->setQuoteId($quoteId);
+            $this->repository->save($cartItem);
+        }
+        $cartItemList = $this->repository->getList($quoteId);
+        /** @var $item CartItemInterface */
+        foreach ($cartItemList as $item) {
+            $item->setQuoteId($quoteId);
+        }
+        $result = $cartItemList;
+        return $result;
     }
 
     /**
@@ -363,6 +392,7 @@ class Cart implements CartInterface
      * Function to add product into cart using Magneto 2 REST API (with SOAP in this case)
      * Updated to set quoteId of the customer if customer id is sent, user must be logged-in first.
      *
+     * @api
      * @param $postData array with product data.
      * @return integer $productId on success otherwise throws SoapFault
      * @throws \SoapFault response
