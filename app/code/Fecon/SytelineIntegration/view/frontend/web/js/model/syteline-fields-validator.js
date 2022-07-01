@@ -26,6 +26,13 @@ define([
                     $('#syteline_serial_number').addClass('mage-error');
                     isValid = false;
                 }
+
+                if(sytelineExtraFields.serialNumber && sytelineExtraFields.serialNumber.length > 30){
+                    messageList.addErrorMessage({ message: $t('Machine Serial Number max length = 30') });
+                    $('#syteline_serial_number').addClass('mage-error');
+                    isValid = false;
+                }
+
                 if (quote.paymentMethod().method === "cashondelivery") {
                     if (!sytelineExtraFields.purchaseOrderNumber) {
                         messageList.addErrorMessage({ message: $t('Purchase Order Number is a required field') });
