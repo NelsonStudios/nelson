@@ -219,6 +219,7 @@ class Cart implements CartInterface
                 $this->setCartToken($token);
             } else {
                 $token = $client->{$this->quoteCartManagementV1Endpoint}(['']);
+                $token = $token->result;
             }
             $this->setCartToken($token);
             return $token;
