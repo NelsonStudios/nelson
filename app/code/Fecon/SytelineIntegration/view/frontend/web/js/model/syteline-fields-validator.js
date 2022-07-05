@@ -39,6 +39,10 @@ define([
                     }
                 }
 
+                if(isValid){
+                    messageList.clear();
+                }
+
                 return isValid;
             }
         }
