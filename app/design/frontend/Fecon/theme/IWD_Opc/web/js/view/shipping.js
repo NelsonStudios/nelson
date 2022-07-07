@@ -512,6 +512,13 @@ define(
                         fieldObj.error(false);
                     }
                 }
+            },
+            checkLength: function(data,event){
+                event.preventDefault();
+                var elm = $(event.currentTarget);
+                if(elm.val().length > 2) {
+                    elm.val(elm.val().substr(0, 2));
+                }
             }
         });
     }
