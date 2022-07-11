@@ -13,30 +13,30 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      *
-     * @var \Magento\Customer\Model\Session 
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
     /**
      *
-     * @var \Fecon\Shipping\Model\PreorderFactory 
+     * @var \Fecon\Shipping\Model\PreorderFactory
      */
     protected $preorderFactory;
 
     /**
      *
-     * @var \Fecon\Shipping\Api\PreorderRepositoryInterface 
+     * @var \Fecon\Shipping\Api\PreorderRepositoryInterface
      */
     protected $preorderRepository;
 
     /**
      *
-     * @var \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory 
+     * @var \Fecon\Shipping\Model\ResourceModel\Preorder\CollectionFactory
      */
     protected $preorderCollectionFactory;
 
     /**
-     * @var \Fecon\Shipping\Helper\CustomerHelper 
+     * @var \Fecon\Shipping\Helper\CustomerHelper
      */
     protected $customerHelper;
 
@@ -165,6 +165,20 @@ class PreorderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             ->getLastItem();
 
         return $preorder->getId();
+    }
+
+    public function getPreorder(){
+        $customerId = $this->customerSession->getCustomer()->getId();
+        if(!$customerId){
+            return null;
+        }
+        $preorderCollection = $this->preorderCollectionFactory->create();
+        $preorder = $preorderCollection
+            ->addFieldToFilter(PreorderInterface::CUSTOMER_ID, $customerId)
+            ->addFieldToFilter(PreorderInterface::IS_AVAILABLE, \Fecon\Shipping\Model\Preorder::AVAILABLE)
+            ->getLastItem();
+
+        return $preorder;
     }
 
     /**
