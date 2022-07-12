@@ -2,6 +2,7 @@
 
 namespace Fecon\SytelineIntegration\Helper;
 
+use Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options;
 use Magento\Framework\Serialize\SerializerInterface;
 
 /**
@@ -122,7 +123,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "EmailAddress" => (string)$order->getCustomerEmail(),
                 "AccountNumber" => $this->getAccountNumber($order),
                 "SerialNumber" => $this->getSerialNumber($order),
-                "ShipVia" => $this->getShipVie($order),
+                "ShipVia" => (string)$this->getShipVie($order),
                 "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
                 "OrderStock" => $this->getOrderStock($order),
@@ -138,16 +139,25 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $shippingDescription = $order->getShippingDescription();
         $result = $this->getShippingMethodMapping($shippingDescription);
-        if (strpos($shippingDescription, 'Manually Calculated') !== false) {
-            $preorder = $this->preorderHelper->getPreorderFromOrder($order);
-            if ($preorder & $preorder->getPreorderId()) {
-                $shippingMethod = $preorder->getShippingMethod();
-                $shippingMethod = explode(',', $shippingMethod, 2);
-                if (count($shippingMethod) > 1) {
-                    $result = $shippingMethod[1];
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/$method.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info(print_r($result, true));
+
+        if (strpos($shippingDescription, 'Manual Shipping') !== false) {
+            $methodTitle = explode('-', $shippingDescription);
+            $logger->info(print_r($methodTitle, true));
+            if (count($methodTitle) > 1) {
+                $methodTitle = trim($methodTitle[1]);
+                $allMethods = Options::SHIPPING_METHODS;
+                foreach ($allMethods as $method => $lable) {
+                    if ($lable == $methodTitle) {
+                        $result = $method;
+                    }
                 }
             }
         }
+        $logger->info(print_r($result, true));
         return $result;
     }
 
@@ -371,5 +381,6 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 return $methodMapping['method_mapping'];
             }
         }
+        return '';
     }
 }
