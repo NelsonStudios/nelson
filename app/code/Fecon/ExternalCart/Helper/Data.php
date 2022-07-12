@@ -286,7 +286,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $email
      * @return boolean
      */
-    private function getCustomerByEmail($email)
+    public function getCustomerByEmail($email)
     {
         $websiteId = $this->storeManager->getStore()->getWebsiteId();
         try {
