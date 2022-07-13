@@ -73,6 +73,8 @@
     </div>
     <div class="iwd_opc_alternative_column" id="iwd_opc_shipping_method_section">
         <div class="iwd_opc_universal_wrapper iwd_opc_column_name" data-bind="i18n: 'Shipping Method'"></div>
+        <div class="iwd_opc_universal_wrapper error" style="color: red;font-size: 12px"
+             data-bind="i18n: 'Orders place after 2PM ET may ship the following business day.'"></div>
         <div tabindex="-1" class="iwd_opc_column_content">
             <div id="iwd_opc_shipping_method"
                  data-bind="iwdBlockLoader:isRatesLoading">
