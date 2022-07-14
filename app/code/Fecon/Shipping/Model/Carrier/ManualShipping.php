@@ -93,7 +93,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         }
         $result = $this->rateResultFactory->create();
         $preorder = $this->preorderHelper->getPreorder();
-        if ($preorder){
+        if ($preorder && $preorder->getId()){
             $methodCodes = $preorder->getData('shipping_method');
             $methodCodes = trim($methodCodes,'\'[');
             $methodCodes = trim($methodCodes,']\'');
@@ -101,6 +101,9 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
             foreach($methodCodes as $methodCode){
                 $method = $this->rateMethodFactory->create();
                 $methodCode = trim($methodCode,'"');
+                if($methodCode == 'manualshipping_manualshipping'){
+                    continue;
+                }
                 $title = $this->getConfigData('title');
                 if (isset(Options::SHIPPING_METHODS[$methodCode])) {
                     $title = Options::SHIPPING_METHODS[$methodCode];
