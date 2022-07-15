@@ -144,18 +144,8 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $logger->addWriter($writer);
         $logger->info(print_r($result, true));
 
-        if (strpos($shippingDescription, 'Manual Shipping') !== false) {
-            $methodTitle = explode('-', $shippingDescription);
-            $logger->info(print_r($methodTitle, true));
-            if (count($methodTitle) > 1) {
-                $methodTitle = trim($methodTitle[1]);
-                $allMethods = Options::SHIPPING_METHODS;
-                foreach ($allMethods as $method => $lable) {
-                    if ($lable == $methodTitle) {
-                        $result = $method;
-                    }
-                }
-            }
+        if (strpos($shippingDescription, 'Manual Shipping') !== false || strpos($shippingDescription, 'Best Way to Ship') !== false) {
+            $result = 'BEST';
         }
         $logger->info(print_r($result, true));
         return $result;
