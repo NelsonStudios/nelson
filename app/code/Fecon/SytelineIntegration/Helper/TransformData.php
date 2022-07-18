@@ -2,6 +2,7 @@
 
 namespace Fecon\SytelineIntegration\Helper;
 
+use Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options;
 use Magento\Framework\Serialize\SerializerInterface;
 
 /**
@@ -45,9 +46,16 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customerRepository;
 
     /**
-    * @var SerializerInterface
-    */
-   private $serializer;
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * Preorder Helper
+     *
+     * @var \Fecon\Shipping\Helper\PreorderHelper
+     */
+    protected $preorderHelper;
 
     /**
      * Constructor
@@ -61,15 +69,17 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Directory\Model\RegionFactory $regionFactory,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Directory\Model\CountryFactory $countryFactory,
-        \Fecon\SytelineIntegration\Helper\ConfigHelper $configHelper,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\App\Helper\Context             $context,
+        \Magento\Directory\Model\RegionFactory            $regionFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository,
+        \Magento\Directory\Model\CountryFactory           $countryFactory,
+        \Fecon\SytelineIntegration\Helper\ConfigHelper    $configHelper,
+        \Magento\Customer\Model\Session                   $customerSession,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        SerializerInterface $serializer
-    ) {
+        \Fecon\Shipping\Helper\PreorderHelper             $preorderHelper,
+        SerializerInterface                               $serializer
+    )
+    {
         parent::__construct($context);
 
         $this->regionFactory = $regionFactory;
@@ -79,7 +89,9 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $this->customerSession = $customerSession;
         $this->customerRepository = $customerRepository;
         $this->serializer = $serializer;
+        $this->preorderHelper = $preorderHelper;
     }
+
     /**
      * Transform Magento order to array
      *
@@ -91,7 +103,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $shippingAddress = $order->getShippingAddress();
         $customer = $this->getCustomer($order);
-        if(!$shippingAddress) {
+        if (!$shippingAddress) {
             throw new Exception('The order has null Shipping Address');
         }
         return [
@@ -100,27 +112,43 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "Line1" => $this->getShippingAddress($shippingAddress),
                 "Line2" => "",
                 "Line3" => "",
-                "City" => (string) $shippingAddress->getCity(),
+                "City" => (string)$shippingAddress->getCity(),
                 "State" => $this->getRegionCode($shippingAddress->getRegionId()),
-                "Zipcode" => (string) $shippingAddress->getPostCode(),
+                "Zipcode" => (string)$shippingAddress->getPostCode(),
                 "Country" => $this->getCountryName($shippingAddress->getCountryId())
             ],
             "cartLines" => $this->getLinesCart($order->getItems()),
             "request" => [
-                "Comments" => (string) $order->getCustomerNote(),
-                "EmailAddress" => (string) $order->getCustomerEmail(),
+                "Comments" => (string)$order->getCustomerNote(),
+                "EmailAddress" => (string)$order->getCustomerEmail(),
                 "AccountNumber" => $this->getAccountNumber($order),
                 "SerialNumber" => $this->getSerialNumber($order),
-                "ShipVia" => $this->getShippingMethodMapping($order->getShippingDescription()),
+                "ShipVia" => (string)$this->getShipVie($order),
                 "OrderCustomerName" => $shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname(),
                 "CollectAccountNumber" => "",
                 "OrderStock" => $this->getOrderStock($order),
-                "OrderPhoneNumber" => (string) $shippingAddress->getTelephone(),
+                "OrderPhoneNumber" => (string)$shippingAddress->getTelephone(),
                 "DigabitERPTransactionType" => "Order",
                 "DigabitERPTransactionStatus" => "SUBMITTED",
                 "OrderIncrementId" => $order->getIncrementId()
             ]
         ];
+    }
+
+    protected function getShipVie($order)
+    {
+        $shippingDescription = $order->getShippingDescription();
+        $result = $this->getShippingMethodMapping($shippingDescription);
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/$method.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info(print_r($result, true));
+
+        if (strpos($shippingDescription, 'Manual Shipping') !== false || strpos($shippingDescription, 'Best Way to Ship') !== false) {
+            $result = 'BEST';
+        }
+        $logger->info(print_r($result, true));
+        return $result;
     }
 
     /**
@@ -151,7 +179,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $region = $this->regionFactory->create()->load($regionId);
 
-        return (string) $region->getCode();
+        return (string)$region->getCode();
     }
 
     /**
@@ -164,7 +192,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $country = $this->countryFactory->create()->loadByCode($countryCode);
 
-        return (string) $country->getName();
+        return (string)$country->getName();
     }
 
     /**
@@ -183,7 +211,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
                 "PartNumber" => $partNumber,
                 "Quantity" => $item->getQtyOrdered(),
                 "UOM" => "EA",
-                "Line" => (string) $itemCount
+                "Line" => (string)$itemCount
             ];
             $cartLines[] = $cartLine;
             $itemCount++;
@@ -202,7 +230,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $address = isset($shippingAddress->getStreet()[0]) ? $shippingAddress->getStreet()[0] : '';
 
-        return (string) $address;
+        return (string)$address;
     }
 
     /**
@@ -215,7 +243,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         try {
             $loadedProduct = $this->productRepository->getById($productId);
-            $partNumber = (string) $loadedProduct->getPartNumber();
+            $partNumber = (string)$loadedProduct->getPartNumber();
         } catch (\Magento\Framework\Exception\NoSuchEntityException $ex) {
             $partNumber = '';
         }
@@ -260,7 +288,7 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
         //if customer is logged in and attribute 'customer_number' is not empty,
         //then, we should use the customer ID from syteline not default from config
-        if ($customer && $customer->getCustomAttribute('customer_number') ) {
+        if ($customer && $customer->getCustomAttribute('customer_number')) {
             $customerId = $customer->getCustomAttribute('customer_number')->getValue();
             $sytelineCustomerId = $customerId ? $customerId : $sytelineCustomerId;
         }
@@ -292,7 +320,8 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
         $value = '';
         try {
             $data = $this->serializer->unserialize($order->getSytelineCheckoutExtraFields());
-        } catch (\Exception $ex) { }
+        } catch (\Exception $ex) {
+        }
         if (isset($data[$key])) {
             $value = $data[$key];
         }
@@ -337,10 +366,11 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $methodMappingJson = $this->scopeConfig->getValue('syteline_integration/mapping_methods/mapping_options');
         $methodMappingArray = json_decode($methodMappingJson, true);
-        foreach ($methodMappingArray as $methodMapping){
-            if ($methodMapping['method_name'] == $shippingMethodTitle){
+        foreach ($methodMappingArray as $methodMapping) {
+            if ($methodMapping['method_name'] == $shippingMethodTitle) {
                 return $methodMapping['method_mapping'];
             }
         }
+        return '';
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Fecon\Shipping\Model\Carrier;
 
+use Fecon\Shipping\Ui\Component\Create\Form\Shipping\Options;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 
 /**
@@ -51,6 +52,8 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      */
     protected $stockRegistry;
 
+    protected $preorderHelper;
+
     /**
      * Constructor
      *
@@ -69,12 +72,14 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
         \Fecon\Shipping\Helper\ShippingHelper $shippingHelper,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
+        \Fecon\Shipping\Helper\PreorderHelper $preorderHelper,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->shippingHelper = $shippingHelper;
         $this->stockRegistry = $stockRegistry;
+        $this->preorderHelper = $preorderHelper;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -87,20 +92,48 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
             return false;
         }
         $result = $this->rateResultFactory->create();
+        $preorder = $this->preorderHelper->getPreorder();
+        if ($preorder && $preorder->getId()){
+            $methodCodes = $preorder->getData('shipping_method');
+            $methodCodes = trim($methodCodes,'\'[');
+            $methodCodes = trim($methodCodes,']\'');
+            $methodCodes = explode(',',$methodCodes);
+            foreach($methodCodes as $methodCode){
+                $method = $this->rateMethodFactory->create();
+                $methodCode = trim($methodCode,'"');
+                if($methodCode == 'manualshipping_manualshipping'){
+                    continue;
+                }
+                $title = $this->getConfigData('title');
+                if (isset(Options::SHIPPING_METHODS[$methodCode])) {
+                    $title = Options::SHIPPING_METHODS[$methodCode];
+                }
+                $method->setCarrier($this->_code);
+                $method->setCarrierTitle($this->getConfigData('name'));
 
-        $method = $this->rateMethodFactory->create();
+                $method->setMethod($methodCode);
+                $method->setMethodTitle($title);
 
-        $method->setCarrier($this->_code);
-        $method->setCarrierTitle($this->getConfigData('title'));
+                $shippingPrice = $preorder->getShippingPrice();
 
-        $method->setMethod($this->_code);
-        $method->setMethodTitle($this->getConfigData('name'));
+                $method->setPrice($shippingPrice);
+                $method->setCost($shippingPrice);
+                $result->append($method);
+            }
+        }else{
+            $method = $this->rateMethodFactory->create();
+            $method->setCarrier($this->_code);
+            $method->setCarrierTitle($this->getConfigData('title'));
 
-        $shippingPrice = $this->shippingHelper->getShippingPrice($this->_code);
+            $method->setMethod($this->_code);
+            $method->setMethodTitle($this->getConfigData('name'));
 
-        $method->setPrice($shippingPrice);
-        $method->setCost($shippingPrice);
-        $result->append($method);
+            $shippingPrice = $this->shippingHelper->getShippingPrice($this->_code);
+
+            $method->setPrice($shippingPrice);
+            $method->setCost($shippingPrice);
+            $result->append($method);
+        }
 
         return $result;
     }
@@ -112,7 +145,9 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      */
     public function getAllowedMethods()
     {
-        return [$this->_code => $this->getConfigData('name')];
+        $result = Options::SHIPPING_METHODS;
+        $result[$this->_code] = $this->getConfigData('name');
+        return $result;
     }
 
     public function isZipCodeRequired($countryId = null)
