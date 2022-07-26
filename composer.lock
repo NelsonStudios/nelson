@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53171891c64cd803bf74ea4d8079c192",
+    "content-hash": "d8009c3ae2513deb5587327624f92de5",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -283,9 +283,6 @@
                 "api",
                 "instagram"
             ],
-            "support": {
-                "source": "https://github.com/Andreyco/Instagram-for-PHP/tree/v3.0"
-            },
             "time": "2014-07-08T19:09:06+00:00"
         },
         {
@@ -331,11 +328,6 @@
         {
             "name": "avalara/avatax-magento",
             "version": "2.2.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/avadev/Avalara-AvaTax-for-Magento2.git",
-                "reference": "d8671f7ad37636f59db0daa583f0d477c994edf7"
-            },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/avadev/Avalara-AvaTax-for-Magento2/zipball/d8671f7ad37636f59db0daa583f0d477c994edf7",
@@ -1505,10 +1497,6 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
-            "support": {
-                "issues": "https://github.com/container-interop/container-interop/issues",
-                "source": "https://github.com/container-interop/container-interop/tree/master"
-            },
             "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
@@ -1891,6 +1879,51 @@
                 "MIT"
             ],
             "description": "Engagement Cloud for Magento 2: SMS module"
+        },
+        {
+            "name": "ebizmarts/mailchimp-lib",
+            "version": "3.0.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ebizmarts/mailchimp-lib.git",
+                "reference": "759baaaa4c402e57406a7b458a20a73f74171068"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ebizmarts/mailchimp-lib/zipball/759baaaa4c402e57406a7b458a20a73f74171068",
+                "reference": "759baaaa4c402e57406a7b458a20a73f74171068",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Mailchimp": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ebizmarts Corp.",
+                    "email": "info@ebizmarts.com",
+                    "homepage": "http://ebizmarts.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "API client library for the MailChimp",
+            "homepage": "https://github.com/ebizmarts/mailchimp-lib",
+            "keywords": [
+                "api",
+                "email",
+                "mailchimp"
+            ],
+            "time": "2022-04-19T00:36:41+00:00"
         },
         {
             "name": "elasticsearch/elasticsearch",
@@ -17971,6 +18004,41 @@
             "time": "2021-12-28T10:00:15+00:00"
         },
         {
+            "name": "mailchimp/mc-magento2",
+            "version": "103.4.46",
+            "dist": {
+                "type": "zip",
+                "url": "https://repo.magento.com/archives/mailchimp/mc-magento2/mailchimp-mc-magento2-103.4.46.0.zip",
+                "shasum": "306e74eaf0bc9089f623c0a1022e7b9e55926ab0"
+            },
+            "require": {
+                "ebizmarts/mailchimp-lib": ">=3.0.35",
+                "ext-json": "*",
+                "magento/framework": "103.0.*"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "psr-4": {
+                    "Ebizmarts\\MailChimp\\": ""
+                },
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "license": [
+                "OSL-3.0",
+                "AFL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Ebizmarts Corp",
+                    "email": "mailchimp@ebizmarts-desk.zendesk.com",
+                    "homepage": "http://ebizmarts.com"
+                }
+            ],
+            "description": "Connect MailChimp with Magento"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.26.1",
             "source": {
@@ -19245,9 +19313,6 @@
                 "request",
                 "response"
             ],
-            "support": {
-                "source": "https://github.com/php-fig/http-message/tree/master"
-            },
             "time": "2016-08-06T14:39:51+00:00"
         },
         {
@@ -20191,6 +20256,7 @@
                     "type": "tidelift"
                 }
             ],
+            "abandoned": "symfony/error-handler",
             "time": "2021-11-29T08:40:48+00:00"
         },
         {
@@ -28082,5 +28148,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "1.1.0"
 }

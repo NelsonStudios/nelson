@@ -14,7 +14,8 @@
         "avalara/avatax-magento": "^2.1",
         "mageplaza/module-smtp": "^4.1",
         "magento/composer-root-update-plugin": "~1.0",
-        "magento/product-community-edition": "2.4.3-p1"
+        "magento/product-community-edition": "2.4.3-p1",
+        "mailchimp/mc-magento2": "103.4.46"
     },
     "require-dev": {
         "allure-framework/allure-phpunit": "~1.4",
