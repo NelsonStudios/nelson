@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2021 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_DimensionalShipping
+ */
+-->
+<!--
+/**
+ * Copyright © 2017 Aitoc. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Aitoc_DimensionalShipping::main"
+             translate="title"
+             sortOrder="11"
+             title="Dimensional Shipping"
+             module="Aitoc_DimensionalShipping"
+             parent="Magento_Sales::sales"
+             resource="Aitoc_DimensionalShipping::boxes"/>
+        <add id="Aitoc_DimensionalShipping::boxes"
+             action="aitdimensionalshipping/boxes/index"
+             title="Shipping Boxes (Parcels)"
+             translate="title"
+             module="Aitoc_DimensionalShipping"
+             sortOrder="10"
+             parent="Aitoc_DimensionalShipping::main"
+             resource="Aitoc_DimensionalShipping::boxes"/>
+    </menu>
+</config>
