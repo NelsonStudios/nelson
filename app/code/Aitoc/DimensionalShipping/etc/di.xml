@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2021 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_DimensionalShipping
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+    <preference for="Magento\Ups\Model\Carrier" type="Aitoc\DimensionalShipping\Model\Rewrite\Ups\Carrier" />
+    <preference for="Magento\Usps\Model\Carrier" type="Aitoc\DimensionalShipping\Model\Rewrite\Usps\Carrier" />
+    <preference for="Magento\Fedex\Model\Carrier" type="Aitoc\DimensionalShipping\Model\Rewrite\Fedex\Carrier" />
+    <virtualType name="AitocDimensionalShippingBoxFilterPool" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Shipping\Model\Shipping" >
+        <plugin name="Aitoc_DimensionalShipping::onlineCarriers"
+                type="Aitoc\DimensionalShipping\Plugin\Shipping" />
+    </type>
+    <type name="Magento\Shipping\Model\Carrier\AbstractCarrierOnline" >
+        <plugin name="Aitoc_DimensionalShipping::getConfigData"
+                type="Aitoc\DimensionalShipping\Plugin\CarrierOnline" />
+    </type>
+</config>

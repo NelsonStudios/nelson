@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2021 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_DimensionalShipping
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <DimensionalShipping>
+            <general>
+                <unit>mm</unit>
+                <redistribution>1</redistribution>
+            </general>
+            <shipping_rates>
+                <billable_weight>1</billable_weight>
+                <dim_weight_divisor>0</dim_weight_divisor>
+                <separate_requests>1</separate_requests>
+            </shipping_rates>
+        </DimensionalShipping>
+    </default>
+</config>

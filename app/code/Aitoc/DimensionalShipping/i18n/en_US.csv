@@ -1,0 +1,71 @@
+Back,Back
+"Delete Box","Delete Box"
+"Are you sure you want to do this?","Are you sure you want to do this?"
+"Save Box","Save Box"
+Boxes,Boxes
+"The box has been deleted.","The box has been deleted."
+"Something went wrong while deleting. Please review the error log.","Something went wrong while deleting. Please review the error log."
+"This Supplier no longer exists.","This Supplier no longer exists."
+"Dimensional Shipping: New Box","Dimensional Shipping: New Box"
+"Dimensional Shipping: Edit Box","Dimensional Shipping: Edit Box"
+"Manage Shipping Boxes (Parcels)","Manage Shipping Boxes (Parcels)"
+"A total of %1 element(s) have been deleted.","A total of %1 element(s) have been deleted."
+"The box saved successfully.","The box saved successfully."
+"Something went wrong while saving. Please review the error log.","Something went wrong while saving. Please review the error log."
+"The qty is incorrect.","The qty is incorrect."
+"Box changed successful.","Box changed successful."
+"Unable to save model %1","Unable to save model %1"
+"Unable to remove entity with ID ""%1""","Unable to remove entity with ID ""%1"""
+mm,mm
+cm,cm
+in,in
+ft,ft
+"Entity with specified ID ""%1"" not found.","Entity with specified ID ""%1"" not found."
+"Boxes have not been packed yet.","Boxes have not been packed yet."
+"Items are required to pack order.","Items are required to pack order."
+"Unable to remove entity with ID%","Unable to remove entity with ID%"
+"Packing Slip # ","Packing Slip # "
+"Order Boxes: ","Order Boxes: "
+"Box: ","Box: "
+Products,Products
+SKU,SKU
+QTY,QTY
+Edit,Edit
+"Dimensional Shipping Options","Dimensional Shipping Options"
+"Box Items","Box Items"
+"Box #","Box #"
+Product,Product
+Qty,Qty
+Action,Action
+"Select new box...","Select new box..."
+"-- Select --","-- Select --"
+"Items without box","Items without box"
+Message,Message
+"Shipping Boxes (Parcels)","Shipping Boxes (Parcels)"
+"Dimensional Shipping","Dimensional Shipping"
+General,General
+"Length Unit","Length Unit"
+"For boxes and products dimensional options.<br>Weight Unit Settings is Under <b>General > General > Locale Options > Weight Unit</b>","For boxes and products dimensional options.<br>Weight Unit Settings is Under <b>General > General > Locale Options > Weight Unit</b>"
+"Enable Weight Redistribution","Enable Weight Redistribution"
+"For example:<br><b>YES:</b> 4 boxes with 77 items each<br><b>NO:</b> 3 boxes with 100 items and 1 box with 6 items but faster calculations on cart and checkout","For example:<br><b>YES:</b> 4 boxes with 77 items each<br><b>NO:</b> 3 boxes with 100 items and 1 box with 6 items but faster calculations on cart and checkout"
+"Shipping Rates Calculation (Advanced)","Shipping Rates Calculation (Advanced)"
+"Replace Weight with Billable Weight","Replace Weight with Billable Weight"
+"Dimensional Weight Divisor","Dimensional Weight Divisor"
+"Set 0 to use default value.<br>Default is <b>5000</b> for metric system (<u>cm/kg</u> relation is always used)<br> and <b>139</b> for imperial system (<u>in/lb</u> relation is always used).","Set 0 to use default value.<br>Default is <b>5000</b> for metric system (<u>cm/kg</u> relation is always used)<br> and <b>139</b> for imperial system (<u>in/lb</u> relation is always used)."
+"Use Separate Request per Each Box","Use Separate Request per Each Box"
+"Emulates <b>Packages Request Type</b> set to <i>Few Requests</i>.<br>Use separate request per box for UPS, USPS and DHL carriers in shipping rate requests.<br><i>Separate Request per Each Box</i> always used for <b>Fedex</b>.","Emulates <b>Packages Request Type</b> set to <i>Few Requests</i>.<br>Use separate request per box for UPS, USPS and DHL carriers in shipping rate requests.<br><i>Separate Request per Each Box</i> always used for <b>Fedex</b>."
+Supplier,Supplier
+"Edit Options Box","Edit Options Box"
+Name,Name
+Length,Length
+Width,Width
+Height,Height
+"Outer Length","Outer Length"
+"Outer Width","Outer Width"
+"Outer Height","Outer Height"
+"Max Weight","Max Weight"
+"Empty Weight","Empty Weight"
+"Add New Box","Add New Box"
+Delete,Delete
+"Delete Posts","Delete Posts"
+"Are you sure you want to delete the selected boxes?","Are you sure you want to delete the selected boxes?"
