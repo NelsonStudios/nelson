@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2021 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_DimensionalShipping
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="OrderPlaceAfter" instance="Aitoc\DimensionalShipping\Observer\OrderPlaceAfter"/>
+    </event>
+</config>

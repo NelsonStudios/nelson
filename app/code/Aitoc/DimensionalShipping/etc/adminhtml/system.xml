@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2021 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_DimensionalShipping
+ */
+-->
+<!--
+/**
+ * Copyright © 2016 Aitoc. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="DimensionalShipping" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Dimensional Shipping</label>
+            <tab>aitoc_extensions</tab>
+            <resource>Aitoc_DimensionalShipping::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="unit" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Length Unit</label>
+                    <source_model>Aitoc\DimensionalShipping\Model\Config\Source\UnitsList</source_model>
+                    <comment><![CDATA[For boxes and products dimensional options.<br>Weight Unit Settings is Under <b>General > General > Locale Options > Weight Unit</b>]]></comment>
+                </field>
+                <field id="redistribution" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Weight Redistribution</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[For example:<br><b>YES:</b> 4 boxes with 77 items each<br><b>NO:</b> 3 boxes with 100 items and 1 box with 6 items but faster calculations on cart and checkout]]></comment>
+                </field>
+            </group>
+            <group id="shipping_rates" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipping Rates Calculation (Advanced)</label>
+                <field id="billable_weight" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Replace Weight with Billable Weight</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Billable weight is the higher weight (dimensional or actual weight).<br>If enabled, billable weight will be used in shipping rate requests (wherever actual dimensions transfer is not possible).]]></comment>
+                </field>
+                <field id="dim_weight_divisor" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Dimensional Weight Divisor</label>
+                    <comment><![CDATA[Set 0 to use default value.<br>Default is <b>5000</b> for metric system (<u>cm/kg</u> relation is always used)<br> and <b>139</b> for imperial system (<u>in/lb</u> relation is always used).]]></comment>
+                    <validate>integer validate-greater-than-zero</validate>
+                    <depends>
+                        <field id="billable_weight">1</field>
+                    </depends>
+                </field>
+                <field id="separate_requests" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Use Separate Request per Each Box</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Emulates <b>Packages Request Type</b> set to <i>Few Requests</i>.<br>Use separate request per box for UPS, USPS and DHL carriers in shipping rate requests.<br><i>Separate Request per Each Box</i> always used for <b>Fedex</b>.]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
