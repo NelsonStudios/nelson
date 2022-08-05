@@ -400,4 +400,29 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $addresses;
     }
+
+    /**
+     * Get QTY from API Response
+     *
+     * @param array|\stdClass $response
+     * @param string $productId
+     * @param boolean $specialPrice
+     * @return float|boolean    Returns false if response has no price
+     */
+    public function extractQtyFromResponse($response, $productId)
+    {
+        $qty = 0;
+        if (is_array($response)) {
+            $errors = $response;
+        } else {
+            if (!$this->responseHasErrors($response, $errors)) {
+                $qty = ($response->ErpGetPartInfoResponse->Availability == self::SYTELINE_AVAIALABLE_STATUS) ? 5 : 0;
+            }
+        }
+        if (isset($errors) && !empty($errors)) {
+            $this->logDataErrors($errors, null, $productId);
+        }
+
+        return $qty;
+    }
 }
