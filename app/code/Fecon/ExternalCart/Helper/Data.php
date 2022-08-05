@@ -55,6 +55,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $cartManagerment;
 
+    protected $quoteManagement;
+
     /**
      * Constructor
      *
@@ -80,7 +82,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         CartRepositoryInterface $cartRepository,
         \Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
-        CartManagementInterface $cartManagement
+        CartManagementInterface $cartManagement,
+        \Magento\Quote\Model\QuoteManagement $quoteManagement
     ) {
         $this->authorize = $authorize;
         $this->jsonHelper = $jsonHelper;
@@ -93,6 +96,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->quoteRepository = $cartRepository;
         $this->quoteIdToMaskedQuoteId = $quoteIdToMaskedQuoteId;
         $this->cartManagerment = $cartManagement;
+        $this->quoteManagement = $quoteManagement;
         parent::__construct($context);
     }
     /**
@@ -349,7 +353,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     public function getActiveQuoteForCustomer($customerId){
-        return $this->quoteRepository->getActiveForCustomer($customerId);
+        return $this->quoteManagement->createEmptyCartForCustomer($customerId);
+//        return $this->quoteRepository->getForCustomer($customerId);
     }
 
     public function getMaskQuoteId($quoteId){

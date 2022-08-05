@@ -213,9 +213,8 @@ class Cart implements CartInterface
         try {
             $token = '';
             if (!$forceGuest && $this->customerToken) {
-                $quote = $this->cartHelper->getActiveQuoteForCustomer($this->customerSession->getId());
-                $token = $quote->getId();
-                $this->checkoutSession->setQuoteId($quote->getId());
+                $token = $this->cartHelper->getActiveQuoteForCustomer($this->customerSession->getId());
+                $this->checkoutSession->setQuoteId($token);
                 $this->setCartToken($token);
             } else {
                 $token = $client->{$this->quoteCartManagementV1Endpoint}(['']);
