@@ -6,6 +6,9 @@
  */
 namespace Fecon\ExternalCart\Helper;
 
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\CartManagementInterface;
+
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const PROTOCOL = 'externalcart/active_display/protocol';
@@ -28,36 +31,44 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $_escaper;
     /**
-     * $authorize 
-     * 
+     * $authorize
+     *
      * @var \Magento\Framework\AuthorizationInterface
      */
     protected $authorize;
     /**
      * $jsonHelper
-     * 
+     *
      * @var \Magento\Framework\Json\Helper\Data
      */
     protected $jsonHelper;
     /**
      * $customerToken
-     * 
+     *
      * @var string
      */
     protected $customerToken;
 
+    protected $quoteRepository;
+
+    private $quoteIdToMaskedQuoteId;
+
+    protected $cartManagerment;
+
+    protected $quoteManagement;
+
     /**
      * Constructor
-     * 
-     * @param \Magento\Framework\App\Helper\Context              $context           
-     * @param \Magento\Framework\AuthorizationInterface          $authorize         
-     * @param \Magento\Framework\Json\Helper\Data                $jsonHelper        
-     * @param \Magento\Framework\Mail\Template\TransportBuilder  $transportBuilder  
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig       
-     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager      
-     * @param \Magento\Customer\Model\Session                    $customerSession   
+     *
+     * @param \Magento\Framework\App\Helper\Context              $context
+     * @param \Magento\Framework\AuthorizationInterface          $authorize
+     * @param \Magento\Framework\Json\Helper\Data                $jsonHelper
+     * @param \Magento\Framework\Mail\Template\TransportBuilder  $transportBuilder
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager
+     * @param \Magento\Customer\Model\Session                    $customerSession
      * @param \Magento\Customer\Api\CustomerRepositoryInterface  $customerRepository
-     * @param \Magento\Customer\Model\CustomerFactory            $customerFactory   
+     * @param \Magento\Customer\Model\CustomerFactory            $customerFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -68,7 +79,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Customer\Model\CustomerFactory $customerFactory
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
+        CartRepositoryInterface $cartRepository,
+        \Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
+        CartManagementInterface $cartManagement,
+        \Magento\Quote\Model\QuoteManagement $quoteManagement
     ) {
         $this->authorize = $authorize;
         $this->jsonHelper = $jsonHelper;
@@ -78,11 +93,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->customerSession = $customerSession;
         $this->customerRepository = $customerRepository;
         $this->customerFactory = $customerFactory;
+        $this->quoteRepository = $cartRepository;
+        $this->quoteIdToMaskedQuoteId = $quoteIdToMaskedQuoteId;
+        $this->cartManagerment = $cartManagement;
+        $this->quoteManagement = $quoteManagement;
         parent::__construct($context);
     }
     /**
      * protocol
-     * 
+     *
      * @return string protocol config value
      */
     public function protocol()
@@ -94,7 +113,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * hostname
-     * 
+     *
      * @return string hostname config value
      */
     public function hostname()
@@ -105,8 +124,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * port 
-     * 
+     * port
+     *
      * @return string port config value
      */
     public function port()
@@ -117,8 +136,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * access token 
-     * 
+     * access token
+     *
      * @return string access_token config value
      */
     public function access_token()
@@ -129,8 +148,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * email sender 
-     * 
+     * email sender
+     *
      * @return string email_sender config value
      */
     public function email_sender()
@@ -141,8 +160,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * email recipient 
-     * 
+     * email recipient
+     *
      * @return string email_recipient config value
      */
     public function email_recipient()
@@ -153,8 +172,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * email template 
-     * 
+     * email template
+     *
      * @return string email_template config value
      */
     public function email_template()
@@ -184,11 +203,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->jsonHelper->jsonEncode($response);
     }
     /**
-     * jsonDecode return a decoded json string to return a 
-     * 
+     * jsonDecode return a decoded json string to return a
+     *
      * ResultInterface|ResponseInterface
      * Note the second parameter.
-     * 
+     *
      * @param  string $strToDecode json string to decode
      * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
      */
@@ -199,12 +218,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * makeCurlRequest
      * This function is intended to perform curl requests when needed.
-     * 
+     *
      * @param  string $origin The origin with protocol + domain + port
      * @param  string $endpointPath The endpoint path when the request need to be performed.
      * @param  string $accessToken The user token if there's a logged-in customer or the Authorization access-token.
      * @param  string $type The method type like "POST", "GET", etc
-     * @return string $response The response result from curl request or error message.               
+     * @return string $response The response result from curl request or error message.
      */
     public function makeCurlRequest($origin, $endpointPath, $accessToken, $type) {
         $curl = curl_init();
@@ -217,7 +236,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => $type,
           CURLOPT_HTTPHEADER => array(
-            "Authorization: Bearer " . $accessToken, 
+            "Authorization: Bearer " . $accessToken,
             "cache-control: no-cache"
           ),
         ));
@@ -233,7 +252,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * checkUserTypeAndSetEndpoints
-     * 
+     *
      * @param  boolean $isCustomer in order to check if settings need to be prepared for guest or customer user type.
      * @return array $settings settings to be used in SOAP requests.
      */
@@ -271,7 +290,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $email
      * @return boolean
      */
-    private function getCustomerByEmail($email)
+    public function getCustomerByEmail($email)
     {
         $websiteId = $this->storeManager->getStore()->getWebsiteId();
         try {
@@ -284,10 +303,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * makeUserLogin auto login user.
-     * 
-     * This maybe look redundant, first get by email then load by id, but since is not 
+     *
+     * This maybe look redundant, first get by email then load by id, but since is not
      * loaded correctly we need to make that additional step.
-     * 
+     *
      * @return void
      */
     public function makeUserLogin($customerEmail) {
@@ -301,7 +320,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * sendAdminErrorNotification function
      * Send an admin notification in case of error.
-     * 
+     *
      * @param  string $errorMsg [description]
      * @return mixed true on success | Exception on failure.
      */
@@ -312,10 +331,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'email' => (!empty($this->email_sender())? $this->email_sender() : 'test@devphase.io')
             ];
             $transport = $this->transportBuilder
-            ->setTemplateIdentifier($this->email_template()) 
+            ->setTemplateIdentifier($this->email_template())
             ->setTemplateOptions(
                 [
-                    'area' => \Magento\Framework\App\Area::AREA_ADMINHTML, 
+                    'area' => \Magento\Framework\App\Area::AREA_ADMINHTML,
                     'store' => $this->storeManager->getStore()->getStoreId(),
                 ]
             )
@@ -331,5 +350,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 __('Error, sending admin error notification email: '. $e->getMessage())
             );
         }
+    }
+
+    public function getActiveQuoteForCustomer($customerId){
+        return $this->quoteManagement->createEmptyCartForCustomer($customerId);
+//        return $this->quoteRepository->getForCustomer($customerId);
+    }
+
+    public function getMaskQuoteId($quoteId){
+        return $this->quoteIdToMaskedQuoteId->execute($quoteId);
     }
 }
