@@ -4,6 +4,7 @@
  * Contributor Author : <fecon.com>
  * Date: 2018/08/02
  */
+
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CustomerInterface;
@@ -11,7 +12,8 @@ use Fecon\ExternalCart\Api\CustomerInterface;
 /**
  * Defines the implementaiton class of the CustomerInterface
  */
-class Customer implements CustomerInterface {
+class Customer implements CustomerInterface
+{
     /**
      * integrationCustomerTokenServiceV1
      *
@@ -109,29 +111,51 @@ class Customer implements CustomerInterface {
     public $origin;
 
     /**
+     *
+     * @var \Magento\Framework\Math\Random
+     */
+    protected $mathRandom;
+
+    /**
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * $customerToken
+     * @var mixed integer/boolean
+     */
+    protected $customerToken;
+
+    /**
      * Constructor
      *
-     * @param \Magento\Framework\Session\SessionManagerInterface        $coreSession
-     * @param \Magento\Customer\Model\Session                           $customerSession
+     * @param \Magento\Framework\Session\SessionManagerInterface $coreSession
+     * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection
-     * @param \Magento\Customer\Model\AddressFactory                    $customerAddressFactory
-     * @param \Magento\Customer\Model\CustomerFactory                   $customerFactory
-     * @param \Magento\Directory\Model\CountryFactory                   $countryFactory
-     * @param \Magento\Directory\Model\RegionFactory                    $regionFactory
-     * @param \Magento\Framework\App\Request\Http                       $request
-     * @param \Fecon\ExternalCart\Helper\Data                           $externalCartHelper
+     * @param \Magento\Customer\Model\AddressFactory $customerAddressFactory
+     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param \Magento\Directory\Model\RegionFactory $regionFactory
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Fecon\ExternalCart\Helper\Data $externalCartHelper
      */
     public function __construct(
-        \Magento\Framework\Session\SessionManagerInterface $coreSession,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\Session\SessionManagerInterface        $coreSession,
+        \Magento\Customer\Model\Session                           $customerSession,
         \Magento\Customer\Model\ResourceModel\Customer\Collection $customerCollection,
-        \Magento\Customer\Model\AddressFactory $customerAddressFactory,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Directory\Model\CountryFactory $countryFactory,
-        \Magento\Directory\Model\RegionFactory $regionFactory,
-        \Magento\Framework\App\Request\Http $request,
-        \Fecon\ExternalCart\Helper\Data $externalCartHelper
-    ) {
+        \Magento\Customer\Model\AddressFactory                    $customerAddressFactory,
+        \Magento\Customer\Model\CustomerFactory                   $customerFactory,
+        \Magento\Directory\Model\CountryFactory                   $countryFactory,
+        \Magento\Directory\Model\RegionFactory                    $regionFactory,
+        \Magento\Framework\App\Request\Http                       $request,
+        \Fecon\ExternalCart\Helper\Data                           $externalCartHelper,
+        \Magento\Framework\Math\Random                            $mathRandom,
+        \Magento\Store\Model\StoreManagerInterface                $storeManager,
+        \Magento\Integration\Model\Oauth\TokenFactory             $tokenModelFactory
+    )
+    {
         $this->cartHelper = $externalCartHelper;
         /**
          * First check if it's allowed to use the API.
@@ -146,19 +170,20 @@ class Customer implements CustomerInterface {
         $this->countryFactory = $countryFactory;
         $this->regionFactory = $regionFactory;
         $this->request = $request;
-
+        $this->mathRandom = $mathRandom;
         $this->protocol = $this->cartHelper->protocol();
         $this->hostname = $this->cartHelper->hostname();
         $this->port = $this->cartHelper->port();
-
-        if(!empty($this->protocol) && !empty($this->hostname)) {
+        $this->storeManager = $storeManager;
+        $this->tokenModelFactory = $tokenModelFactory;
+        if (!empty($this->protocol) && !empty($this->hostname)) {
             $this->origin = $this->protocol . $this->hostname;
         }
-        if(!empty($this->port)) {
+        if (!empty($this->port)) {
             $this->origin .= ':' . $this->port;
         }
         /* Add backend settings validation */
-        if(empty($this->origin)) {
+        if (empty($this->origin)) {
             throw new \Exception(
                 __('Please check External Cart Settings in Admin section.')
             );
@@ -172,25 +197,53 @@ class Customer implements CustomerInterface {
     /**
      * customerLogIn
      *
-     * @api
+     * @param string $username The password to save
      * @return string $customerToken The token of logged-in customer.
+     * @api
      */
-    public function customerLogIn() {
-        /* Get post data */
-        $postData = $this->request->getPost();
-        $opts = [
-            'soap_version' => SOAP_1_2,
-            'trace' => 1,
-            'connection_timeout' => 120,
-        ];
-        $client = new \SoapClient($this->origin . '/soap/?wsdl&services=' . $this->integrationCustomerTokenServiceV1, $opts);
+    public function customerLogIn($username)
+    {
+        $customer = $this->cartHelper->getCustomerByEmail($username);
+        if (!$customer) {
+            $customer = $this->createCustomer($username);
+        }
         try {
-            $customerToken = $client->integrationCustomerTokenServiceV1CreateCustomerAccessToken($postData);
-            $this->customerSession->setData('loggedInUserToken', $customerToken->result);
-            return $customerToken->result;
+            $customerToken = $this->tokenModelFactory->create();
+            /* Create customer token based on customer id */
+            $token = $customerToken->createCustomerToken($customer->getId())->getToken();
+            $this->cartHelper->makeUserLogin($username);
+            $this->customerSession->setData('loggedInUserToken', $token);
+            return $token;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    protected function createCustomer($username)
+    {
+
+        $customerData = [
+            'email' => $username,
+            'firstname' => '-',
+            'lastname' => '-',
+            'password' => $this->mathRandom->getRandomString(15)
+        ];
+
+        $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
+        $customer = $this->customerFactory->create();
+        $customer->setWebsiteId($websiteId);
+        // Preparing data for new customer
+        $customer->addData($customerData);
+        try {
+            $customer->save();
+            $customer->sendNewAccountEmail();
+            $newCustomer = $customer;
+        } catch (\Exception $exc) {
+            $newCustomer = false;
+        }
+
+        return $newCustomer;
+
     }
 
     /**
@@ -198,12 +251,13 @@ class Customer implements CustomerInterface {
      * This wrapper will log-in the customer and return the token, also will save information to be
      * used in cart session for already logged-in customer.
      *
-     * @api
      * @return string $customerData The data of logged-in customer.
+     * @api
      */
-    public function getCustomerData() {
+    public function getCustomerData()
+    {
         $loggedInUserToken = $this->customerSession->getData('loggedInUserToken');
-        if($loggedInUserToken) {
+        if ($loggedInUserToken) {
             $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $loggedInUserToken);
             $cData = $this->cartHelper->jsonDecode($customerData);
             /* Save customer id in session */
@@ -212,47 +266,53 @@ class Customer implements CustomerInterface {
         }
         return false;
     }
+
     /**
      * Set the token of the recently created customer
      *
-     * @api
-     * @param  string $customerId The customerId to save.
+     * @param string $customerId The customerId to save.
      * @return string $customerId
+     * @api
      */
-    public function setCustomerToken($customerId) {
+    public function setCustomerToken($customerId)
+    {
         $this->coreSession->start();
         $this->coreSession->setCustomerId($customerId);
         return $this->getCustomerToken();
     }
+
     /**
      * Get the token of the recently created customer cart
      *
-     * @api
      * @return string $token of created customer cart or empty array otherwise.
+     * @api
      */
-    public function getCustomerToken() {
+    public function getCustomerToken()
+    {
         $this->coreSession->start();
         return $this->coreSession->getCustomerId();
     }
+
     /**
      * Get the customer data customer
      *
-     * @api
-     * @param  string $documotoCustomerUsername The customerUsername (email) to search.
+     * @param string $documotoCustomerUsername The customerUsername (email) to search.
      * @return string $customerData
+     * @api
      */
-    public function getCustomerByDocumotoUsername($documotoCustomerUsername) {
+    public function getCustomerByDocumotoUsername($documotoCustomerUsername)
+    {
         //$documotoCustomerId = $this->request->getParam('Username');// Enable for testing only.
         try {
             $collection = $this->customerCollection
-              ->addAttributeToSelect(array('id', 'firstname', 'customer_number',  'email'))
-              ->addAttributeToFilter('username', array('eq' => $documotoCustomerUsername))
-              ->load();
-        } catch(\Excepetion $e) {
+                ->addAttributeToSelect(array('id', 'firstname', 'customer_number', 'email'))
+                ->addAttributeToFilter('username', array('eq' => $documotoCustomerUsername))
+                ->load();
+        } catch (\Excepetion $e) {
             return $e->getMessage();
         }
 
-        if(count($collection->getData()) === 1) {
+        if (count($collection->getData()) === 1) {
             return $collection->getData();
         } else {
             throw new \Exception(
@@ -260,46 +320,48 @@ class Customer implements CustomerInterface {
             );
         }
     }
+
     /**
      * Set the customer address
      * State code must be formated as ISO "ALPHA-2 Code"
      *
-     * @api
-     * @param  string $customerData The customerData to search.
-     * @param  string $customerAddressData The customerAddressData to save.
+     * @param string $customerData The customerData to search.
+     * @param string $customerAddressData The customerAddressData to save.
      * @return boolean true on success or false is address data isn't coming.
+     * @api
      */
-    public function setCustomerAddress($customerData, $customerAddressData, $addressType) {
+    public function setCustomerAddress($customerData, $customerAddressData, $addressType)
+    {
         $address = null;
         /* Load customer by id */
         $customer = $this->customerFactory->create()->load($customerData['entity_id']);
         // Check if billing address exists
-        if($addressType === 'BillTo') {
+        if ($addressType === 'BillTo') {
             $billingAddressId = $customer->getDefaultBilling();
-            if($billingAddressId) {
+            if ($billingAddressId) {
                 $address = $this->customerAddressFactory->create()->load($billingAddressId);
             }
         } else {
             // Check if shipping address exists
             $shippingAddressId = $customer->getDefaultShipping();
-            if($shippingAddressId) {
+            if ($shippingAddressId) {
                 $address = $this->customerAddressFactory->create()->load($shippingAddressId);
             }
         }
-        if(empty($address)) {
+        if (empty($address)) {
             $address = $this->customerAddressFactory->create();
         }
         $address->setCustomerId($customerData['entity_id'])
             ->setFirstname($customerData['firstname'])
             ->setLastname($customerData['lastname']);
-            //Magento require a phone number value, but is not coming in request from Documoto, we must set a default value:
-            $address->setTelephone('0');
+        //Magento require a phone number value, but is not coming in request from Documoto, we must set a default value:
+        $address->setTelephone('0');
 
-        if(!empty($customerAddressData[$addressType]['SiteAddress']['Line1'])
-        && !empty($customerAddressData[$addressType]['SiteAddress']['City'])
-        && !empty($customerAddressData[$addressType]['SiteAddress']['State'])
-        && !empty($customerAddressData[$addressType]['SiteAddress']['Country'])
-        && !empty($customerAddressData[$addressType]['SiteAddress']['Zipcode'])) {
+        if (!empty($customerAddressData[$addressType]['SiteAddress']['Line1'])
+            && !empty($customerAddressData[$addressType]['SiteAddress']['City'])
+            && !empty($customerAddressData[$addressType]['SiteAddress']['State'])
+            && !empty($customerAddressData[$addressType]['SiteAddress']['Country'])
+            && !empty($customerAddressData[$addressType]['SiteAddress']['Zipcode'])) {
             $address->setStreet($customerAddressData[$addressType]['SiteAddress']['Line1']);
             $address->setCity($customerAddressData[$addressType]['SiteAddress']['City']);
 
@@ -309,7 +371,7 @@ class Customer implements CustomerInterface {
             $address->setCountryId($countryId);
 
             /* Region id map only for USA counrty */
-            if($customerAddressData[$addressType]['SiteAddress']['Country'] === 'USA' || $customerAddressData[$addressType]['SiteAddress']['Country'] === 'US') {
+            if ($customerAddressData[$addressType]['SiteAddress']['Country'] === 'USA' || $customerAddressData[$addressType]['SiteAddress']['Country'] === 'US') {
                 $region = $this->regionFactory->create()->loadByCode($customerAddressData[$addressType]['SiteAddress']['State'], $countryId);
                 $address->setRegionId($region->getId());
             }
@@ -319,13 +381,13 @@ class Customer implements CustomerInterface {
             /**
              * Check address type and save in address book.
              */
-            if($addressType === 'BillTo') {
+            if ($addressType === 'BillTo') {
                 $address->setIsDefaultBilling('1')
-                ->setSaveInAddressBook('1');
+                    ->setSaveInAddressBook('1');
 
             } else {
                 $address->setIsDefaultShipping('1')
-                ->setSaveInAddressBook('1');
+                    ->setSaveInAddressBook('1');
             }
             try {
                 return $address->save();
