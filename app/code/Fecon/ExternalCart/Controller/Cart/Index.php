@@ -196,12 +196,14 @@ class Index extends \Magento\Framework\App\Action\Action
             }
             if ($cartId) {
                 $cart = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+                $cart = $this->cartRepository->get($cart->getQuoteId());
             }
             if ($cart) {
                 $quoteId = $cart->getId();
                 $logger->info("Quote Id: {$quoteId}");
                 //Todo remove
                 $this->checkoutSession->setQuoteId($quoteId);
+                $this->checkoutSession->replaceQuote($cart);
                 /* Redirect to cart page */
                 $logger->info("Success Quote Id: {$quoteId}");
             }
