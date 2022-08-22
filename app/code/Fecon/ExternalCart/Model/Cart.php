@@ -4,7 +4,6 @@
  * Contributor Author : <fecon.com>
  * Date: 2018/08/02
  */
-
 namespace Fecon\ExternalCart\Model;
 
 use Fecon\ExternalCart\Api\CartInterface;
@@ -15,8 +14,7 @@ use Magento\Framework\Webapi\Rest\Request;
 /**
  * Defines the implementaiton class of the CartInterface
  */
-class Cart implements CartInterface
-{
+class Cart implements CartInterface {
     /**
      * $quoteCartManagementV1
      * @var string
@@ -199,6 +197,7 @@ class Cart implements CartInterface
     /**
      * Create and get new token of the created guest/customer cart
      *
+     * @api
      * @return string $token of created guest cart.
      * @throws \SoapFault response
      * @api

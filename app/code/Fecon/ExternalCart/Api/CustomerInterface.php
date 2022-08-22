@@ -19,9 +19,12 @@ interface CustomerInterface
      *
      * @api
      *  @param  string $username The username to save.
+     * @param  string $customerNumber The username to save.
+     * @param  string $firstname The username to save.
+     * @param  string $lastname The username to save.
      * @return string $customerToken The token of logged-in customer.
      */
-    public function customerLogIn($username);
+    public function customerLogIn($username, $customerNumber = "", $firstName = "", $lastName = "");
     /**
      * getCustomerData function to perform customer login using Magento 2 REST API
      * This wrapper will log-in the customer and return the token, also will save information to be
