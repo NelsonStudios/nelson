@@ -201,11 +201,11 @@ class Customer implements CustomerInterface
      * @return string $customerToken The token of logged-in customer.
      * @api
      */
-    public function customerLogIn($username, $customerNumber, $firstname, $lastname)
+    public function customerLogIn($username, $customerNumber="", $firstName="", $lastName="")
     {
         $customer = $this->cartHelper->getCustomerByEmail($username, $customerNumber);
         if (!$customer) {
-            $customer = $this->createCustomer($username, $customerNumber, $firstname, $lastname);
+            $customer = $this->createCustomer($username, $customerNumber, $firstName, $lastName);
         }
         try {
             $customerToken = $this->tokenModelFactory->create();
@@ -224,11 +224,12 @@ class Customer implements CustomerInterface
 
         $customerData = [
             'email' => $username,
-            'firstname' => $firstname ?? '-',
-            'lastname' => $lastname ?? '-',
+            'firstname' => !empty($firstname) ? $firstname :  '-',
+            'lastname' => !empty($lastname) ? $lastname: '-',
             'password' => $this->mathRandom->getRandomString(15),
             'customer_number' => $customerNumber ?? '',
-            'username' => $username
+            'username' => $username,
+            'is_documoto_user'=> true
         ];
 
         $websiteId = $this->storeManager->getWebsite()->getWebsiteId();
