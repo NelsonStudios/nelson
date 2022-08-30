@@ -48,5 +48,21 @@
                 </field>
             </group>
         </section>
+        <section id="fecon_shipping" type="text" translate="label" sortOrder="400"  showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Margin to Freight Costs</label>
+            <tab>fecon</tab>
+            <resource>Fecon_Shipping::config</resource>
+            <group id="configuration_shipping" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Configuration Shipping Amount</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="shipping_amount" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="25" translate="label" type="text">
+                    <label>Add Rate For Shipping Costs(Percent)</label>
+                </field>
+            </group>
+        </section>
     </system>
 </config>
