@@ -12,11 +12,5 @@
                 <sallowspecific>0</sallowspecific>
             </manualshipping>
         </carriers>
-        <fecon_shipping>
-            <configuration_shipping>
-                <enable>1</enable>
-                <shipping_amount>30</shipping_amount>
-            </configuration_shipping>
-        </fecon_shipping>
     </default>
 </config>
