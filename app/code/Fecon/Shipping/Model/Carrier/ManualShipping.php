@@ -296,8 +296,8 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         $percentShippingAmountEnable = $this->shippingAmount->getShippingCostsEnable();
         if ($percentShippingAmountEnable) {
             $percentForShipping = $this->shippingAmount->getPercentForShippingCost();
-            $shippingPrice = $shippingPrice && $percentForShipping ?
-                ($shippingPrice * $percentForShipping) / 100 : $shippingPrice;
+            $shippingPrice = $shippingPrice && $percentForShipping ? $shippingPrice +
+                (($shippingPrice * $percentForShipping) / 100) : $shippingPrice;
         }
         return $shippingPrice;
     }
