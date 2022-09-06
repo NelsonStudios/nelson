@@ -298,6 +298,7 @@ class Cart implements CartInterface {
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e){
             $_product = $this->_productFactory->create();
             $_product->setName($cartItem->getSku());
+            $_product->setPartNumber($cartItem->getSku());
             $_product->setTypeId('simple');
             $_product->setAttributeSetId(4);
             $_product->setSku($cartItem->getSku());
