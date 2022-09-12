@@ -10,6 +10,8 @@ use Fecon\ExternalCart\Api\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Framework\Webapi\Rest\Request;
+use Magento\Catalog\Model\ProductRepository;
+use Magento\Catalog\Model\ProductFactory;
 
 /**
  * Defines the implementaiton class of the CartInterface
@@ -128,6 +130,16 @@ class Cart implements CartInterface {
     private Request $restRequest;
 
     /**
+     * @var ProductRepository
+     */
+    protected $_productRepository;
+
+    /**
+     * @var ProductFactory
+     */
+    protected $_productFactory;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\Session\SessionManagerInterface $coreSession
@@ -150,7 +162,9 @@ class Cart implements CartInterface {
         \Magento\Framework\Webapi\Rest\Request             $apiRequest,
         \Magento\Quote\Api\CartItemRepositoryInterface     $repository,
         QuoteIdMaskFactory                                 $quoteIdMaskFactory,
-        Request                                            $restRequest
+        Request                                            $restRequest,
+        ProductRepository                                  $productRepository,
+        ProductFactory                                     $productFactory
     )
     {
         $this->cartHelper = $externalCartHelper;
@@ -192,6 +206,8 @@ class Cart implements CartInterface {
         $this->repository = $repository;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->restRequest = $restRequest;
+        $this->_productRepository = $productRepository;
+        $this->_productFactory = $productFactory;
     }
 
     /**
@@ -271,6 +287,38 @@ class Cart implements CartInterface {
         }
     }
 
+    /**
+     * create new product if not exits.
+     * @param $cartItem
+     * @throws \Exception
+     */
+    public function handleProductBeforeSaveCart($cartItem): void {
+        try {
+            $product =  $this->_productRepository->get($cartItem->getSku());
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+            $_product = $this->_productFactory->create();
+            $_product->setName($cartItem->getSku());
+            $_product->setPartNumber($cartItem->getSku());
+            $_product->setTypeId('simple');
+            $_product->setAttributeSetId(4);
+            $_product->setSku($cartItem->getSku());
+            $_product->setWeight(1.0000);
+            $_product->setStatus(1);
+            $_product->setWebsiteIds(array(1));
+            $_product->setVisibility(3);
+            $_product->setPrice(10);
+            $_product->setExistsInSyteline(1);
+            $_product->setStockData(array(
+                    'use_config_manage_stock' => 0,
+                    'manage_stock' => 1,
+                    'min_sale_qty' => 1,
+                    'is_in_stock' => 1,
+                    'qty' => 999999
+                )
+            );
+            $_product->save();
+        }
+    }
 
     /**
      * @param $isGuest
@@ -280,6 +328,7 @@ class Cart implements CartInterface {
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Exception
      */
     public function addProductIntoCart($isGuest, $cartId, $cart)
     {
@@ -291,6 +340,7 @@ class Cart implements CartInterface {
         }
         foreach ($cart->getCartItems() as $cartItem) {
             $cartItem->setQuoteId($quoteId);
+            $this->handleProductBeforeSaveCart($cartItem);
             $this->repository->save($cartItem);
         }
         $cartItemList = $this->repository->getList($quoteId);
