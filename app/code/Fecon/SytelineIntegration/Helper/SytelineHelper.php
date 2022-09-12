@@ -300,6 +300,7 @@ class SytelineHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $productData = $this->dataTransformHelper->productToArray($product, $qty);
         $productId = $product->getId();
         $cachePrice = $this->cacheHelper->getPrice($productId, $productData['CustomerId'], $specialPrice);
+        $forceApi = true;
         if ($cachePrice !== false && $forceApi === false) {
             $price = $cachePrice;
         } else {
