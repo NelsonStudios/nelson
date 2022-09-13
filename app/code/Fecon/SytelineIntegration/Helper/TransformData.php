@@ -285,14 +285,23 @@ class TransformData extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getSytelineCustomerId($customer)
     {
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $session = $om->get('Magento\Customer\Model\Session');
+        if($session->getCustomerCodeNumber()) {
+            return $session->getCustomerCodeNumber();
+        }elseif($this->customerSession->getCustomerCodeNumber()) {
+            return $this->customerSession->getCustomerCodeNumber();
+        }
+        //$customerObj = $om->create('Magento\Customer\Model\Customer')->load($customer->getId());
+        //$logger->info("Customer number".$customerObj->getCustomerNumber());
         $sytelineCustomerId = $this->configHelper->getDefaultSytelineCustomerId();
         //if customer is logged in and attribute 'customer_number' is not empty,
         //then, we should use the customer ID from syteline not default from config
-        if ($customer && $customer->getCustomAttribute('customer_number')) {
-            $customerId = $customer->getCustomAttribute('customer_number')->getValue();
+        if ($customer) {
+            $customerObj = $om->create('Magento\Customer\Model\Customer')->load($customer->getId());
+            $customerId = $customerObj->getCustomerNumber();
             $sytelineCustomerId = $customerId ? $customerId : $sytelineCustomerId;
         }
-
         return $sytelineCustomerId;
     }
 

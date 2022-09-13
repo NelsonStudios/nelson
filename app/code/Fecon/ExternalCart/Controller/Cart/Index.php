@@ -187,8 +187,13 @@ class Index extends \Magento\Framework\App\Action\Action
             $logger->info("Customer Data : {$customerData}");
             $customerId = $customerInfo['id'];
             /* Perform user login */
-            $this->cartHelper->makeUserLogin($customerInfo['email']);
+            $this->cartHelper->makeUserLogin($customerInfo['email'], true, $customerId);
             $logger->info("Login Success");
+        } else {
+            $om = \Magento\Framework\App\ObjectManager::getInstance();
+            $session = $om->get('Magento\Customer\Model\Session');
+            $session->setCustomerCodeNumber("");
+            $session->setCustomerLoggedId("");
         }
         try {
             if ($customerId) {

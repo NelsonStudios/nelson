@@ -84,8 +84,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         CartRepositoryInterface                              $cartRepository,
         \Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
         CartManagementInterface                              $cartManagement,
-        \Magento\Quote\Model\QuoteManagement                 $quoteManagement
-    ) {
+        \Magento\Quote\Model\QuoteManagement                 $quoteManagement,
+        \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
+        \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
+    )
+    {
         $this->authorize = $authorize;
         $this->jsonHelper = $jsonHelper;
         $this->transportBuilder = $transportBuilder;
@@ -98,6 +101,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->quoteIdToMaskedQuoteId = $quoteIdToMaskedQuoteId;
         $this->cartManagerment = $cartManagement;
         $this->quoteManagement = $quoteManagement;
+        $this->cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
         parent::__construct($context);
     }
 
@@ -334,14 +339,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return void
      */
-    public function makeUserLogin($customerEmail)
+    public function makeUserLogin($customerEmail, $isFrontend = false, $customerId=0)
     {
         //Load customer first by id
         $customer = $this->getCustomerByEmail($customerEmail);
         $customerId = $customer->getId();
-        //Then since repository does not return the correct type, so we need to load the customer
-        $customer = $this->customerFactory->create()->load($customerId);
-        $this->customerSession->setCustomerAsLoggedIn($customer);
+        $customerObj = $this->customerFactory->create()->load($customerId);
+        if(!$isFrontend) {
+            //Then since repository does not return the correct type, so we need to load the customer
+            $this->customerSession->setCustomerAsLoggedIn($customerObj);
+            $this->customerSession->setCustomerCodeNumber($customerObj->getCustomerNumber() ? $customerObj->getCustomerNumber() : '');
+        } else {
+            $this->customerSession->loginById($customerId);
+            $this->customerSession->setCustomerLoggedId($customerId);
+            $this->customerSession->setCustomerCodeNumber($customerObj->getCustomerNumber() ? $customerObj->getCustomerNumber() : '');
+            if ($this->cookieManager->getCookie('mage-cache-sessid')) {
+                $metadata = $this->cookieMetadataFactory->createCookieMetadata();
+                $metadata->setPath('/');
+                $this->cookieManager->deleteCookie('mage-cache-sessid', $metadata);
+            }
+        }
     }
 
     /**

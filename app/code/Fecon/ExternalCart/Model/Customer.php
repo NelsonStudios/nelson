@@ -213,6 +213,7 @@ class Customer implements CustomerInterface
             $token = $customerToken->createCustomerToken($customer->getId())->getToken();
             $this->cartHelper->makeUserLogin($username);
             $this->customerSession->setData('loggedInUserToken', $token);
+            $this->coreSession->setData('loggedInUserToken', $token);
             return $token;
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -259,7 +260,7 @@ class Customer implements CustomerInterface
      */
     public function getCustomerData()
     {
-        $loggedInUserToken = $this->customerSession->getData('loggedInUserToken');
+        $loggedInUserToken = $this->customerSession->getData('loggedInUserToken')?? $this->coreSession->getData('loggedInUserToken');
         if ($loggedInUserToken) {
             $customerData = $this->cartHelper->makeCurlRequest($this->origin, '/rest/V1/customers/me', $loggedInUserToken);
             $cData = $this->cartHelper->jsonDecode($customerData);

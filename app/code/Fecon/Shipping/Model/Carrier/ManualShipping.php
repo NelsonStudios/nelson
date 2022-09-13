@@ -128,7 +128,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
                 $method->setMethod($methodCode);
                 $method->setMethodTitle($title);
 
-                $shippingPrice = $this->calculatorShippingAmount($preorder->getShippingPrice());
+                $shippingPrice = $preorder->getShippingPrice();
 
                 $method->setPrice($shippingPrice);
                 $method->setCost($shippingPrice);
@@ -142,7 +142,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
             $method->setMethod($this->_code);
             $method->setMethodTitle($this->getConfigData('name'));
 
-            $shippingPrice = $this->calculatorShippingAmount($this->shippingHelper->getShippingPrice($this->_code));
+            $shippingPrice = $this->shippingHelper->getShippingPrice($this->_code);
 
             $method->setPrice($shippingPrice);
             $method->setCost($shippingPrice);

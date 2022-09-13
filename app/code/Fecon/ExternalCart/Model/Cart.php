@@ -332,10 +332,18 @@ class Cart implements CartInterface {
      */
     public function addProductIntoCart($isGuest, $cartId, $cart)
     {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/guest-cart.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info("addProductIntoCart");
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $om->get('Fecon\SytelineIntegration\Helper\SytelineHelper');
         if ($isGuest) {
             $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
             $quoteId = $quoteIdMask->getQuoteId();
+            $logger->info("Guest");
         } else {
+            $logger->info("No Guest");
             $quoteId = $cartId;
         }
         foreach ($cart->getCartItems() as $cartItem) {
@@ -346,6 +354,21 @@ class Cart implements CartInterface {
         $cartItemList = $this->repository->getList($quoteId);
         /** @var $item CartItemInterface */
         foreach ($cartItemList as $item) {
+            if($isGuest) {
+                $logger->info("No discount");
+                $price = $helper->getProductPrice($om->create('Magento\Catalog\Model\Product')->load($item->getProductId()), false); //set your price here
+                $item->setCustomPrice($price);
+                $item->setRowTotal($price * $item->getQty());
+                $item->setOriginalCustomPrice($price);
+                $item->save();
+            } else {
+                $logger->info("Discount");
+                $price = $helper->getProductPrice($om->create('Magento\Catalog\Model\Product')->load($item->getProductId()), true); //set your price here
+                $item->setCustomPrice($price);
+                $item->setOriginalCustomPrice($price);
+                $item->save();
+            }
+            $logger->info($price);
             $item->setQuoteId($quoteId);
         }
         $result = $cartItemList;
