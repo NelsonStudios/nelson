@@ -52,7 +52,15 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      */
     protected $stockRegistry;
 
+    /**
+     * @var \Fecon\Shipping\Helper\PreorderHelper
+     */
     protected $preorderHelper;
+
+    /**
+     * @var \Fecon\Shipping\Model\Config\ShippingAmount
+     */
+    protected $shippingAmount;
 
     /**
      * Constructor
@@ -62,6 +70,10 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
+     * @param \Fecon\Shipping\Helper\ShippingHelper $shippingHelper
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \Fecon\Shipping\Helper\PreorderHelper $preorderHelper
+     * @param \Fecon\Shipping\Model\Config\ShippingAmount $shippingAmount
      * @param array $data
      */
     public function __construct(
@@ -73,6 +85,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         \Fecon\Shipping\Helper\ShippingHelper $shippingHelper,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \Fecon\Shipping\Helper\PreorderHelper $preorderHelper,
+        \Fecon\Shipping\Model\Config\ShippingAmount $shippingAmount,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
@@ -80,6 +93,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         $this->shippingHelper = $shippingHelper;
         $this->stockRegistry = $stockRegistry;
         $this->preorderHelper = $preorderHelper;
+        $this->shippingAmount = $shippingAmount;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -271,5 +285,20 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         } else {
             return $codes[$type][$code];
         }
+    }
+
+    /**
+     * Update Shipping Amount.
+     * @param $shippingPrice
+     * @return float|int|mixed
+     */
+    public function calculatorShippingAmount($shippingPrice) {
+        $percentShippingAmountEnable = $this->shippingAmount->getShippingCostsEnable();
+        if ($percentShippingAmountEnable) {
+            $percentForShipping = $this->shippingAmount->getPercentForShippingCost();
+            $shippingPrice = $shippingPrice && $percentForShipping ? $shippingPrice +
+                (($shippingPrice * $percentForShipping) / 100) : $shippingPrice;
+        }
+        return $shippingPrice;
     }
 }
