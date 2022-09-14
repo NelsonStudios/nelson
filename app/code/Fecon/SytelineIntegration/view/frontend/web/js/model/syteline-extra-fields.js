@@ -18,7 +18,8 @@ define([
                 orderStock: $('#syteline_order_monthly_stock').val(),
                 companyName: $('#syteline_company_name').val(),
                 serialNumber: $('#syteline_serial_number').val(),
-                sytelineCompanyName: $('#syteline_company_name').val()
+                sytelineCompanyName: $('#syteline_company_name').val(),
+                dealerNumberFields: $('#dealer-number-cookie').val(),
             };
         }
     };
