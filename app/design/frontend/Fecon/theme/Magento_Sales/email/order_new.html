@@ -36,9 +36,9 @@
         <td>
             <h1>{{trans 'Your Order <span class="no-link">#%increment_id</span>' increment_id=$order.increment_id |raw}}</h1>
             <p>{{trans 'Placed on <span class="no-link">%created_at</span>' created_at=$order.getCreatedAtFormatted(1) |raw}}</p>
-            <p>{{trans 'Company Name / ATTN: '|raw}} {{var companyName|raw}}</p>
-            <p>{{trans 'PO Number: '|raw}} {{var purchaseOrderNumber|raw}}</p>
-            <p>{{trans 'Machine Serial Number: '|raw}} {{var serialNumber|raw}}</p>
+            <p><b>{{trans 'Company Name: '|raw}}</b> {{var companyName|raw}}</p>
+            <p><b>{{trans 'PO Number: '|raw}}</b> {{var purchaseOrderNumber|raw}}</p>
+            <p><b>{{trans 'Machine Serial Number: '|raw}}</b> {{var serialNumber|raw}}</p>
         </td>
     </tr>
     <tr class="email-information">
