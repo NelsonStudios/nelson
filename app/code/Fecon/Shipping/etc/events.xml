@@ -6,4 +6,7 @@
     <event name="checkout_submit_all_after">
         <observer name="fecon_shipping_checkout_submit_all_after" instance="Fecon\Shipping\Observer\Checkout\Submit" />
     </event>
+    <event name="email_order_set_template_vars_before">
+        <observer name="fecon_email_order_set_template_vars_beforer" instance="Fecon\Shipping\Observer\Checkout\OrderSender" />
+    </event>
 </config>
