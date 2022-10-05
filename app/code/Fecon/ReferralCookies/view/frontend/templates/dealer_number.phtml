@@ -1,0 +1,27 @@
+<?php
+/** @var \Fecon\ReferralCookies\Block\DealerNumber $block */
+
+$cookieStatus = $block->getReferralCookiesEnable();
+$cookieLifeTime = $block->getReferralCookiesTime() ?? '';
+$dealer_number = $block->getDealerNumberInParamsUrl();
+?>
+<?php if ($cookieStatus): ?>
+<input type="hidden" value="" class="dealer-number-cookie" id="dealer-number-cookie">
+
+<script type="text/javascript">
+    requirejs(['jquery','mage/cookies'],function(jQuery){
+        (function($) {
+            var cookielifeTime = '<?= $cookieLifeTime; ?>';
+            var dealerNumber = '<?= $dealer_number; ?>';
+            if (!$.cookie('dealer_number')) {
+                if (cookielifeTime && dealerNumber) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (cookielifeTime * 60 * 1000));
+                    $.cookie("dealer_number", dealerNumber, { expires: date });
+                }
+            }
+            $('#dealer-number-cookie').val($.cookie('dealer_number'))
+        })(jQuery);
+    });
+</script>
+<?php endif; ?>

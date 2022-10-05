@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="fecon_cookies" type="text" translate="label" sortOrder="400"  showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Referral Cookies</label>
+            <tab>fecon</tab>
+            <resource>Fecon_ReferralCookies::config</resource>
+            <group id="configuration_cookies" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Configuration Referral Cookies</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="time" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="25" translate="label" type="text">
+                    <label>Add Time for Referral Cookies(minute)</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
