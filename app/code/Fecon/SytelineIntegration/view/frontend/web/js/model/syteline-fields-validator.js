@@ -11,9 +11,10 @@ define([
                 var isValid = true,
                     sytelineExtraFields = sytelineExtraFieldsModel.getSytelineExtraFields();
                 if (!sytelineExtraFields.sytelineCompanyName) {
-                    messageList.addErrorMessage({ message: $t('Company name is a required field') });
+                    messageList.addErrorMessage({ message: $t('Company Name / ATTN is a required field') });
                     $('#syteline_company_name').addClass('mage-error');
                     isValid = false;
+                    $("body").scrollTop(100);
                 }
 
                 if(sytelineExtraFields.serialNumber && sytelineExtraFields.serialNumber.length > 30){
@@ -33,7 +34,6 @@ define([
                 if(isValid){
                     messageList.clear();
                 }
-
                 return isValid;
             }
         }
