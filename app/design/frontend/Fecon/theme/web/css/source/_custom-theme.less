@@ -37,3 +37,27 @@
         }
     }
 }
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .page-header.type16.header-newskin .panel.wrapper .panel.header {
+        .main-nav li {
+            &:last-child {
+                margin: 10px 40px 0 0 !important;
+                height: 20px;
+                line-height: 20px;
+                padding-right: 20px !important;
+                border-color: #bbb !important;
+                border-right: solid 1px;
+                z-index: 0;
+            }
+        }
+
+        .authorization-link {
+            z-index: 1;
+        }
+    }
+
+    .page-wrapper .page-header.type16.header-newskin .panel.wrapper .panel.header .main-nav {
+        right: 115px !important;
+    }
+}
