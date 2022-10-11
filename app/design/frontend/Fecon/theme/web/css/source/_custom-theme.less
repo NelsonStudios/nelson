@@ -15,6 +15,7 @@
     }
 
     /* cart page */
+
     .checkout-cart-index {
         .fieldset.coupon {
             display: block;
@@ -78,6 +79,94 @@
     .account {
         .page-title-wrapper {
             margin-top: 50px;
+        }
+    }
+
+    .customer-welcome {
+        .lib-dropdown(
+            @_toggle-selector: ~".action.switch",
+            @_options-selector: ~"ul",
+            @_dropdown-actions-padding: 0,
+            @_dropdown-list-item-padding: 0,
+            @_dropdown-toggle-icon-content: @icon-down,
+            @_dropdown-toggle-active-icon-content: @icon-up,
+            @_icon-font-text-hide: true,
+            @_icon-font-margin: 0 0 0 5px,
+            @_icon-font-size: 16px,
+            @_icon-font-line-height: 15px,
+            @_dropdown-list-border: 0,
+            @_dropdown-list-z-index: @customer-welcome__z-index
+        );
+
+        li:extend(.switcher li all) {
+            a {
+                .lib-link(
+                    @_link-color: @color-gray20,
+                    @_link-text-decoration: none,
+                    @_link-color-visited: @color-gray20,
+                    @_link-text-decoration-visited: none,
+                    @_link-color-hover: @color-gray20,
+                    @_link-text-decoration-hover: none,
+                    @_link-color-active: @color-gray20,
+                    @_link-text-decoration-active: none
+                );
+                display: block;
+                line-height: 1.4;
+                padding: 8px;
+            }
+        }
+
+        .customer-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            z-index: 999;
+
+            ul li {
+                display: block;
+            }
+        }
+
+        .action.switch {
+            .lib-button-reset();
+            vertical-align: top;
+        }
+
+        .header.links {
+            min-width: 175px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+            border-radius: 3px;
+            margin-top: 7px;
+            left: auto;
+            right: 0;
+
+            &:before {
+                left: auto;
+                right: 10px;
+            }
+
+            &:after {
+                left: auto;
+                right: 9px;
+                border-bottom-color: #ccc;
+            }
+        }
+
+        &.active {
+            .action.switch {
+                .lib-icon-font-symbol(
+                    @_icon-font-content: @icon-up,
+                    @_icon-font-position: after
+                );
+            }
+
+            .customer-menu {
+                display: block;
+            }
+        }
+
+        .greet {
+            display: none;
         }
     }
 }
