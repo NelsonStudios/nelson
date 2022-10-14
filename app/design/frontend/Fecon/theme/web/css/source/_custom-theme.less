@@ -37,6 +37,11 @@
     .minicart-items .product-item-name a {
         padding: 15px 0 !important;
     }
+
+    .sidebar .product-items .product-item-name a {
+        word-break: break-all;
+        white-space: unset;
+    }
 }
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
