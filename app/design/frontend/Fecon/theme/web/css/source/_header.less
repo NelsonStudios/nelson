@@ -87,147 +87,10 @@
 				li:last-child {
 					display: none;
 				}
-				.greet.welcome {
-					display: none;
-				}
-/*
-                li {
-                    color: @color-gray-lighten2;
-                    a, span {
-                        font-size: 14px;
-                        color: @color-nobel;
-                    }
-                }
-                li.customer-welcome {
-                    span {
-                        cursor: pointer;
-                    }
-                    .customer-menu {
-                        ul.header.links {
-                            border-top: 3px solid @fecon-theme-color;
-                            margin-top: 4px;
-                            display: flex;flex-direction: column;
-
-
-                            li {
-                              //dropdown sort order
-                              &:first-child {
-                                order: 1;
-                              }
-                              &:nth-child(2) {
-                                order: 2;
-                              }
-                              &:nth-child(3) {
-                                order: 4;
-                              }
-                              &:nth-child(4) {
-                                order: 3;
-                              }
-
-                              a {
-                                color: @color-black !important;
-                              }
-
-                              &.link.wishlist {
-                                  a {
-                                      span.counter.qty {
-                                          color: @fecon-theme-color;
-                                      }
-                                  }
-                              }
-
-                              &:last-child:not(.toplink) {
-                                  display: block!important;
-                              }
-                            }
-                        }
-                    }
-                }
-                li:last-child:not(.toplink) {
+                .greet.welcome {
                     display: none;
                 }
-*/
 			}
-
-
-/*
-			.magnifying-glass {
-                height: @height41;
-                border-left: 1px solid @color-gray-lighten2;
-                margin-top: -10px;
-                display: inline-block;
-                position: relative;
-                overflow: hidden;
-                float: right;
-                color: @color-gray-lighten2;
-                img {
-                    position: absolute;
-                    top: 2px;
-                    left: 5px;
-                    padding: 8px 4px 8px 8px ;
-                    color: @color-gray-darken9;
-                    cursor: pointer;
-                    transition: 0.24s;
-                }
-                img:hover {
-                    color: @color-blue-lighten1;
-                    cursor: pointer;
-                }
-                .block-search {
-                    .block-content {
-                        .minisearch {
-                            .actions {
-                                button.action.search {
-                                    display: inline-block;
-                                    margin-top: -4px;
-                                    margin-right: -146px;
-                                    background-image: url('../images/magnifying-glass-green.png');
-                                    background-color: transparent;
-                                    background-repeat: no-repeat;
-                                    border: none;
-                                    width: @width48;
-                                    cursor: pointer;
-                                    span {
-                                        display: none !important;
-                                    }
-                                    &:before {
-                                        content: none;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    max-width: @width49;
-                    margin-bottom:@zeroPx;
-                    margin-top:@zeroPx;
-                    margin-left:@zeroPx;
-                    input {
-                        height: @height41;
-                        border:none;
-                        border-radius: @zeroPx;
-                        background: transparent;
-                        padding: 8px @zeroPx 8px 34px;
-                        width: @zeroPx;
-                        display:block;
-                        box-sizing: border-box;
-                        font-size: 14px;
-                    }
-                    input:focus {
-                        background: @color-white;
-                        border-color: @color-gray-lighten1;
-                        outline: none;
-                        width:220px;
-                        padding: 12px 12px 12px 34px;
-                        border-color: @color-blue-lighten1;
-                    }
-                    input:focus + img {
-                        padding: 12px 4px 12px 8px ;
-                        color: @color-gray-lighten2;
-                        pointer-events: none;
-                    }
-                }
-            }
-*/
 		}
 	}
 
@@ -362,71 +225,6 @@
 	.mobile-nav {
 		display: none;
 	}
-    /* This is only to exclude from mobile sizes */
-/*
-    @media (min-width: 768px) {
-        .sections.nav-sections {
-            .section-items.nav-sections-items {
-                nav.navigation.sw-megamenu {
-                    padding: 0;
-                    ul {
-                        li {
-                            margin-right: 5rem;
-                            a, span {
-                              line-height: 4rem;
-                              font-size: 2rem;
-                              font-weight: 400;
-                              color: @color-white;
-                              line-height: 110px;
-                              height: 110px;
-                            }
-                            a:hover {
-                                background-color: @color-gray-darken4;
-                            }
-                            .submenu {
-                                background-color: @color-gray-darken4;
-                                .container {
-                                    .row {
-                                        .subchildmenu {
-                                            background-color: @color-gray-darken4;
-                                            li.ui-menu-item {
-                                                a {
-                                                    color: @color-white;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            &:hover {
-                                a {
-                                    background-color: @color-gray-darken4;
-                                }
-                            }
-                            &.ui-menu-item.level0:first-child {
-                                display: none;
-                            }
-                            &.parent {
-                                a {
-                                  line-height: 24px;
-                                  height: auto;
-                                    &:after {
-                                        content: '';
-                                        background: url('../images/down-chevron-white.png') no-repeat 49% 45%;
-                                        width: 24px;
-                                        height: 50px;
-                                        margin-top: -4px;
-                                        margin-left: 11px;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
 }
 
 .goog-te-menu-frame.skiptranslate{
@@ -494,7 +292,7 @@
 			.logo {
 				left: 30px;
 				img {
-					width: 200px;
+					width: 200px !important;
 				}
 			}
 			.minicart-wrapper {
