@@ -40,7 +40,37 @@
 
     .sidebar .product-items .product-item-name a {
         word-break: break-all;
-        white-space: unset;
+        white-space: unset !important;
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .account.page-layout-2columns-left {
+        .sidebar-main,
+        .sidebar-additional {
+            width: 22.3%;
+        }
+
+        .column.main {
+            width: 77.7%;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .account.page-layout-2columns-left {
+        .sidebar-main,
+        .sidebar-additional {
+            width: 33.3%;
+        }
+
+        .column.main {
+            width: 66.7%;
+        }
+    }
+
+    .sidebar .product-items .product-item:last-child {
+        display: flex;
     }
 }
 
