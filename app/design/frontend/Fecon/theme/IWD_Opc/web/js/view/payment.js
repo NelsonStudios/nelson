@@ -21,6 +21,7 @@ define(
         'mage/url',
         'IWD_Opc/js/model/shipping/shipping-information-validator',
         'Magento_Checkout/js/model/customer-email-validator',
+        'Fecon_SytelineIntegration/js/model/syteline-fields-validator',
         'mage/validation'
     ],
     function ($,
@@ -43,7 +44,8 @@ define(
               globalMessageList,
               urlBuilder,
               shippingValidator,
-              emailValidator) {
+              emailValidator,
+              sytelineValidator) {
         'use strict';
 
         /** Set payment methods to collection */
@@ -236,7 +238,7 @@ define(
                         shippingAddress.setShippingInformation().done(function () {
 			localStorage.setItem('custom_attributes',JSON.stringify(shippingAddress.source.shippingAddress));
 
-							
+
                             self.clickNativePlaceOrder();
                         }).fail(function () {
                             self.isPlaceOrderActionAllowed(true);
@@ -262,11 +264,13 @@ define(
             },
             requestQuote: function (data) {
                 var self = this;
+                var cookieDealerNumber = $('#dealer-number-cookie').val();
                 this.isPlaceOrderActionAllowed(false);
                 var data = {
-                    email: quote.guestEmail
+                    email: quote.guestEmail,
+                    dealerNumber: cookieDealerNumber
                 };
-                if (shippingValidator.validate() && emailValidator.validate()) {
+                if (shippingValidator.validate() && emailValidator.validate() && sytelineValidator.validate()) {
                     var shippingAddress = registry.get('checkout.steps.shipping-step.shippingAddress');
                         shippingAddress.setShippingInformation().done(function () {
                             localStorage.setItem('custom_attributes',JSON.stringify(shippingAddress.source.shippingAddress));
@@ -287,6 +291,8 @@ define(
                             self.isPlaceOrderActionAllowed(true);
                             fullScreenLoader.stopLoader();
                         });
+                } else{
+                    this.isPlaceOrderActionAllowed(true);
                 }
             }
         });
