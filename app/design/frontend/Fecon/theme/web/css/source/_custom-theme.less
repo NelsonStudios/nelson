@@ -70,10 +70,25 @@
     }
 }
 
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .account.page-layout-2columns-left {
+        .sidebar-main,
+        .sidebar-additional {
+            width: 22.3%;
+        }
+
+        .column.main {
+            width: 77.7%;
+        }
+    }
+}
+
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
     .account.page-layout-2columns-left {
         .sidebar-main,
         .sidebar-additional {
+            width: 20.3%;
+
             .actions-toolbar > .primary, .actions-toolbar > .secondary {
                 margin: 0 !important;
             }
@@ -82,6 +97,15 @@
                 max-width: 100%;
                 min-width: auto;
             }
+
+            .nav.items {
+                padding: 0;
+                list-style: none;
+            }
+        }
+
+        .column.main {
+            width: 79.7%;
         }
     }
 
