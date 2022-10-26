@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+	<group id="default">
+		<job name="core_shipment_syncshipment" instance="Core\Shipment\Cron\SyncShipment" method="execute">
+			<schedule>*/30 * * * *</schedule>
+		</job>
+	</group>
+</config>
