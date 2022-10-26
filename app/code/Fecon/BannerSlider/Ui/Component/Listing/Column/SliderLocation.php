@@ -3,7 +3,7 @@
 namespace Fecon\BannerSlider\Ui\Component\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
-use Mageplaza\BannerSlider\Model\Config\Source\Location;
+use Fecon\BannerSlider\Model\Config\Source\Location;
 
 /**
  * Class CommentContent

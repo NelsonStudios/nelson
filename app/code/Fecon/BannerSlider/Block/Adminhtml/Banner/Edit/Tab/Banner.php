@@ -186,7 +186,7 @@ class Banner extends \Mageplaza\BannerSlider\Block\Adminhtml\Banner\Edit\Tab\Ban
         );
 
         if (!$banner->getId()) {
-            $defaultImage = array_values($this->getImageUrls())[0];
+            $defaultImage = $this->getImageUrls() ? array_values($this->getImageUrls())[0] : '';
             $demotemplate = $fieldset->addField('default_template', 'select', [
                     'name'     => 'default_template',
                     'label'    => __('Demo template'),
