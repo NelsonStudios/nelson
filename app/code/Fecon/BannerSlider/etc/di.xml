@@ -1,4 +1,8 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Mageplaza\BannerSlider\Block\Adminhtml\Banner\Edit\Tab\Banner" type="Fecon\BannerSlider\Block\Adminhtml\Banner\Edit\Tab\Banner"/>
+    <preference for="Mageplaza\BannerSlider\Block\Adminhtml\Slider\Edit\Tab\Slider" type="Fecon\BannerSlider\Block\Adminhtml\Slider\Edit\Tab\Slider"/>
+    <preference for="Mageplaza\BannerSlider\Ui\Component\Listing\Column\SliderLocation" type="Fecon\BannerSlider\Ui\Component\Listing\Column\SliderLocation"/>
+    <preference for="Mageplaza\BannerSlider\Model\Config\Source\Location" type="Fecon\BannerSlider\Model\Config\Source\Location"/>
+    <preference for="Mageplaza\BannerSlider\Observer\AddBlock" type="Fecon\BannerSlider\Observer\AddBlock"/>
 </config>
