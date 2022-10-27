@@ -24,10 +24,78 @@
 .catalog-category-view .fecon-bannerslider-block-custom {
     margin-bottom: 10px;
 }
+.catalogsearch-result-index #banner-slider-carousel .banner-item.banner-slider .black-overlay,
+.catalog-product-view #banner-slider-carousel .banner-item.banner-slider .black-overlay,
+.catalog-category-view #banner-slider-carousel .banner-item.banner-slider .black-overlay {
+    display: none;
+}
+@media screen and (max-width:1024px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 250px;
+    }
+}
+@media screen and (max-width:910px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 230px;
+    }
+}
+@media screen and (max-width:840px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 200px;
+    }
+}
 @media screen and (max-width:768px){
     .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
     .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
     .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 180px;
+    }
+}
+@media screen and (max-width:650px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
         height: 150px;
+    }
+}
+@media screen and (max-width:560px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 130px;
+    }
+}
+@media screen and (max-width:460px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 105px;
+    }
+}
+@media screen and (max-width:400px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 90px;
+    }
+}
+@media screen and (max-width:350px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 85px;
+    }
+}
+@media screen and (max-width:325px){
+    .catalogsearch-result-index .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-product-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item,
+    .catalog-category-view .carousel-container #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item.active .banner-item.banner-slider .item{
+        height: 75px;
     }
 }
