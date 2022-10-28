@@ -19,7 +19,7 @@ if ($items = $block->getBannerCollection()): ?>
                     <div class="item" style="background:url(<?php echo $item->getImageUrl() ?>) center center no-repeat;background-size:cover;">
                         <div class="black-overlay">
                             <div class="container" style="position:relative">
-                                <img src="<?= $this->helper('\Magento\Cms\Helper\Wysiwyg\Images')->getBaseUrl() . "wysiwyg/homepage/slider/02-2.png" ?>" alt="" />
+                                <img src="<?= $item->getImageUrl() ? '' : $this->helper('\Magento\Cms\Helper\Wysiwyg\Images')->getBaseUrl() . "wysiwyg/homepage/slider/02-2.png" ?>" alt="" />
                                 <div class="content content-slide-2" style="">
                                     <p><span class="green-header"><?php echo $item->getTitle() ?></span></p>
                                     <?php if ($item->getSubtitle()): ?>
