@@ -650,7 +650,7 @@ body .page-wrapper main#maincontent {
 }
 
 body.catalog-category-view .page-wrapper main#maincontent {
-    padding: 0 15px !important;
+    padding: 8px 15px !important;
 }
 
 body.cms-home .page-wrapper main#maincontent {
