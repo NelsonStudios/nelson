@@ -648,8 +648,13 @@ body .page-wrapper main#maincontent {
     max-width: 1170px;
     margin: 0 auto;
 }
+
+body.catalog-category-view .page-wrapper main#maincontent {
+    padding: 8px 15px !important;
+}
+
 body.cms-home .page-wrapper main#maincontent {
-    padding: 0px 0px 0 !important;
+    padding: 0 !important;
     max-width: none;
     margin: 0 auto;
 }
