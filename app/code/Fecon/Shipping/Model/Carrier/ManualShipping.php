@@ -181,6 +181,7 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
         $configErrorMsg = $this->getConfigData('specificerrmsg');
         $defaultErrorMsg = __('The shipping module is not available.');
         $showMethod = $this->getConfigData('showmethod');
+        $totalWeight = 0;
 
         /** @var $item \Magento\Quote\Model\Quote\Item */
         foreach ($this->getAllItems($request) as $item) {
@@ -203,14 +204,12 @@ class ManualShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier imp
                 } elseif ($stockItemData->getIsQtyDecimal() && !$stockItemData->getIsDecimalDivided()) {
                     $weight = $weight * $item->getQty();
                 }
-
-                if ($doValidation && $weight < $minWeight) {
-                    $errorMsg = $configErrorMsg ?? $defaultErrorMsg;
-                    break;
-                }
+                $totalWeight += $weight;
             }
         }
-
+        if ($doValidation && $totalWeight < $minWeight) {
+            $errorMsg = $configErrorMsg ?? $defaultErrorMsg;
+        }
         if (!$errorMsg && !$request->getDestPostcode() && $this->isZipCodeRequired($request->getDestCountryId())) {
             $errorMsg = __('This shipping method is not available. Please specify the zip code.');
         }
