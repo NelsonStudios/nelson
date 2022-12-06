@@ -106,6 +106,29 @@
     body.catalog-category-view .page-wrapper main#maincontent {
         padding: 8px 15px !important;
     }
+
+    .catalog-category-view #banner-slider-carousel .banner-item.banner-slider .black-overlay {
+        display: block !important;
+        background: none !important;
+        height: 100%;
+        position: relative;
+
+        .container,
+        .content {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        a.btn.btn-default {
+            position: absolute;
+            right: 35px;
+            bottom: 20px;
+            font-size: 18px;
+            font-style: normal;
+            margin: 0;
+        }
+    }
 }
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
