@@ -649,7 +649,8 @@ body .page-wrapper main#maincontent {
     margin: 0 auto;
 }
 
-body.catalog-category-view .page-wrapper main#maincontent {
+body.catalog-category-view .page-wrapper main#maincontent,
+body.catalogsearch-result-index .page-wrapper main#maincontent {
     padding: 8px 15px !important;
 }
 
