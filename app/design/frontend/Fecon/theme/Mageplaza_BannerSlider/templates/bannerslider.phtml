@@ -30,7 +30,7 @@ if ($items = $block->getBannerCollection()): ?>
                                     <?php endif; ?>
                                     <?php if ($item->getCtaText()): ?>
                                     <a href="<?php echo $item->getCtaLink() ?>" class="btn btn-default btn-red-slider" <?php echo ($item->getCtaTarget() == 1) ? 'target="_blank"' : '' ?>>
-                                        <?php echo $item->getCtaText() ?>
+                                        <span><?php echo $item->getCtaText() ?></span>
                                     </a>
                                     <?php endif; ?>
                                 </div>
