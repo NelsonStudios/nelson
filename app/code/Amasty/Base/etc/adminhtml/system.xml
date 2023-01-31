@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!--
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
--->
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="amasty" translate="label" sortOrder="999999" class="amasty-tab ambase-tab-container">
@@ -13,7 +12,7 @@
         </tab>
         <section id="amasty_base" translate="label" type="text" sortOrder="-5000" showInDefault="1" showInWebsite="1"
                  showInStore="1">
-            <label><![CDATA[Extensions &amp; Notifications]]></label>
+            <label><![CDATA[Products &amp; Notifications]]></label>
             <tab>amasty</tab>
             <resource>Amasty_Base::config</resource>
             <group id="extensions" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="0"
@@ -58,6 +57,14 @@
                    showInStore="0">
                 <label>System Information</label>
                 <frontend_model>Amasty\Base\Block\Info</frontend_model>
+            </group>
+            <group id="system" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>System Settings</label>
+                <field id="cli_php_path" translate="label comment" type="note" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>CLI PHP Path</label>
+                    <comment>Current CLI PHP path of your Magento which is used by our extension when running the commands directly during the processing of PHP requests. To change it, please run bin/magento config:set amasty_base/system/cli_php_path %CLI_PHP_PATH% from the command line.</comment>
+                    <frontend_model>Amasty\Base\Block\Adminhtml\System\Config\CliPhpPath</frontend_model>
+                </field>
             </group>
         </section>
     </system>

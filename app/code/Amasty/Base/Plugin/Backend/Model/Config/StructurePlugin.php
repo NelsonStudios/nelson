@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Plugin\Backend\Model\Config;
 
@@ -26,26 +25,26 @@ class StructurePlugin
      */
     public const AMASTY_ADVERTISE = [
         'amasty_advertise' => [
-                'id' => 'amasty_base_advertise',
-                'type' => 'text',
-                'label' => 'Amasty Base Advertise',
-                'children' => [
-                    'label' => [
-                        'id' => 'label',
-                        'label' => '',
-                        'type' => 'label',
-                        'showInDefault' => '1',
-                        'showInWebsite' => '1',
-                        'showInStore' => '1',
-                        'comment' => '',
-                        'frontend_model' => Advertise::class,
-                        '_elementType' => 'field'
-                    ]
-                ],
-                'showInDefault' => '1',
-                'showInWebsite' => '1',
-                'showInStore' => '1'
-            ]
+            'id' => 'amasty_base_advertise',
+            'type' => 'text',
+            'label' => '',
+            'children' => [
+                [
+                    'id' => '',
+                    'label' => '',
+                    'type' => 'label',
+                    'showInDefault' => '1',
+                    'showInWebsite' => '1',
+                    'showInStore' => '1',
+                    'comment' => '',
+                    'frontend_model' => Advertise::class,
+                    '_elementType' => 'field'
+                ]
+            ],
+            'showInDefault' => '1',
+            'showInWebsite' => '1',
+            'showInStore' => '1'
+        ]
     ];
 
     /**
@@ -136,22 +135,15 @@ class StructurePlugin
     private function getSectionAdvertise($displayedAdvertise)
     {
         $advertiseSection = self::AMASTY_ADVERTISE;
-
-        if (isset($displayedAdvertise['text'])) {
-            $displayedAdvertise['text'] = $this->validateComment($displayedAdvertise['text']);
-        } else {
+        if (!isset($displayedAdvertise['text']) || !isset($displayedAdvertise['tab_name'])) {
             return [];
         }
+        $displayedAdvertise['text'] = $this->validateComment($displayedAdvertise['text']);
 
+        $advertiseSection['amasty_advertise']['label'] = __('Also recommended for your store');
         $advertiseSection['amasty_advertise']['data'] = $displayedAdvertise;
 
-        if (isset($displayedAdvertise['tab_name'])) {
-            $advertiseSection['amasty_advertise']['label'] = strip_tags($displayedAdvertise['tab_name']);
-
-            return $advertiseSection;
-        }
-
-        return [];
+        return $advertiseSection;
     }
 
     /**

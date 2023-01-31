@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Observer;
 
@@ -12,6 +11,7 @@ use Amasty\Base\Model\Feed\NewsProcessor;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Module\Manager;
 use Psr\Log\LoggerInterface;
 
 class PreDispatchAdminActionController implements ObserverInterface
@@ -31,14 +31,21 @@ class PreDispatchAdminActionController implements ObserverInterface
      */
     private $newsProcessor;
 
+    /**
+     * @var Manager
+     */
+    private $manager;
+
     public function __construct(
         NewsProcessor $newsProcessor,
         Session $backendAuthSession,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Manager $manager
     ) {
         $this->backendSession = $backendAuthSession;
         $this->logger = $logger;
         $this->newsProcessor = $newsProcessor;
+        $this->manager = $manager;
     }
 
     /**
@@ -46,7 +53,7 @@ class PreDispatchAdminActionController implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if ($this->backendSession->isLoggedIn()) {
+        if ($this->backendSession->isLoggedIn() && $this->manager->isEnabled('Magento_AdminNotification')) {
             try {
                 $this->newsProcessor->checkUpdate();
                 $this->newsProcessor->removeExpiredItems();

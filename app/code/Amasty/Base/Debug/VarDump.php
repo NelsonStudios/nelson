@@ -1,12 +1,14 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Debug;
+
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\RequestInterface;
 
 /**
  * For Remote Debug
@@ -140,7 +142,7 @@ class VarDump
     /**
      * @param mixed $var
      *
-     * @return AmastyDump|array|mixed
+     * @return array|mixed
      */
     public static function dump($var)
     {
@@ -156,6 +158,8 @@ class VarDump
                     return $var;
             }
         }
+
+        return null;
     }
 
     /**
@@ -165,9 +169,15 @@ class VarDump
      */
     public static function isAllowed()
     {
-        foreach (self::$addressPath as $path) {
-            if (!empty($_SERVER[$path]) && in_array($_SERVER[$path], self::$amastyIps, true)) {
-                return true;
+        $request = ObjectManager::getInstance()->get(RequestInterface::class);
+
+        if ($request) {
+            foreach (self::$addressPath as $path) {
+                if (!empty($request->getServer($path))
+                    && in_array($request->getServer($path), self::$amastyIps, true)
+                ) {
+                    return true;
+                }
             }
         }
 

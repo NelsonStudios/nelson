@@ -1,12 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Controller\Adminhtml\SysInfo;
 
@@ -17,22 +17,16 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Filesystem;
-use Magento\Framework\Filesystem\Directory\WriteFactory;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Download extends Action
 {
     public const FILE_NAME = 'system_information';
-    public const CONTENT_TYPE = 'application/octet-stream';
 
     /**
      * @var Filesystem
      */
     private $filesystem;
-
-    /**
-     * @var WriteFactory
-     */
-    private $writeFactory;
 
     /**
      * @var FileFactory
@@ -44,18 +38,23 @@ class Download extends Action
      */
     private $downloadCommand;
 
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
     public function __construct(
         Action\Context $context,
         Filesystem $filesystem,
-        WriteFactory $writeFactory,
         FileFactory $fileFactory,
-        DownloadCommand $downloadCommand
+        DownloadCommand $downloadCommand,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->filesystem = $filesystem;
-        $this->writeFactory = $writeFactory;
         $this->fileFactory = $fileFactory;
         $this->downloadCommand = $downloadCommand;
+        $this->storeManager = $storeManager;
     }
 
     public function execute()
@@ -68,14 +67,13 @@ class Download extends Action
             $tmpDir->writeFile($filePath, $xml->getContent());
 
             return $this->fileFactory->create(
-                sprintf('%s.%s', self::FILE_NAME, $xml->getExtension()),
+                sprintf('%s.%s', $this->getHost(), $xml->getExtension()),
                 [
                     'type' => 'filename',
                     'value' => $filePath,
                     'rm' => true
                 ],
-                DirectoryList::TMP,
-                self::CONTENT_TYPE
+                DirectoryList::TMP
             );
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
@@ -86,5 +84,11 @@ class Download extends Action
         $resultRedirect->setRefererUrl();
 
         return $resultRedirect;
+    }
+
+    private function getHost(): string
+    {
+        // phpcs:disable Magento2.Functions.DiscouragedFunction.Discouraged
+        return parse_url($this->storeManager->getStore()->getBaseUrl(), PHP_URL_HOST);
     }
 }

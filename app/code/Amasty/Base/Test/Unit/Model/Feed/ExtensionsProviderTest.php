@@ -1,38 +1,132 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
+declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Test\Unit\Model\Feed;
 
 use Amasty\Base\Model\Feed\ExtensionsProvider;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use Amasty\Base\Model\Feed\FeedTypes\Extensions;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtensionsProviderTest extends \PHPUnit\Framework\TestCase
+/**
+ * @covers \Amasty\Base\Model\Feed\ExtensionsProvider
+ */
+class ExtensionsProviderTest extends TestCase
 {
     /**
-     * @dataProvider getFeedModuleDataDataProvider
+     * @var Extensions|MockObject
      */
-    public function testGetFeedModuleData($modules, $expected)
+    private $extensionsFeedMock;
+
+    /**
+     * @var ExtensionsProvider
+     */
+    private $extensionsProvider;
+
+    protected function setUp(): void
     {
-        $objectManager = new ObjectManager($this);
-        $extensionsProvider = $objectManager->getObject(
-            ExtensionsProvider::class,
-            [
-                'modulesData' => $modules
-            ]
-        );
-        $this->assertEquals($expected, $extensionsProvider->getFeedModuleData('test1'));
+        $this->extensionsFeedMock = $this->createMock(Extensions::class);
+        $this->extensionsProvider = new ExtensionsProvider($this->extensionsFeedMock);
     }
 
-    public function getFeedModuleDataDataProvider()
+    /**
+     * @dataProvider getFeedModuleDataDataProvider
+     * @param array $modules
+     * @param array $expected
+     * @return void
+     */
+    public function testGetFeedModuleData(array $modules, array $expected): void
+    {
+        $this->extensionsFeedMock->expects($this->any())->method('execute')->willReturn($modules);
+
+        $this->assertEquals($expected, $this->extensionsProvider->getFeedModuleData('Amasty_Test1'));
+    }
+
+    public function getFeedModuleDataDataProvider(): array
     {
         return [
-            [[], []],
-            [['test1' => 'test1', 'test2' => 'test2'], 'test1']
+            'no feed data' => [[], []],
+            'get by key' => [
+                [
+                    'Amasty_Test1' => ['feed name 1' => ['name' => 'Test1']],
+                    'Amasty_Test2' => ['feed name 2' => ['name' => 'Test2']]
+                ],
+                ['name' => 'Test1']
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getAllSolutionsDataDataProvider
+     * @param array $modules
+     * @param array $expected
+     * @return void
+     */
+    public function testGetAllSolutionsData(array $modules, array $expected): void
+    {
+        $this->extensionsFeedMock->expects($this->any())->method('execute')->willReturn($modules);
+
+        $this->assertEquals($expected, $this->extensionsProvider->getAllSolutionsData());
+    }
+
+    public function getAllSolutionsDataDataProvider(): array
+    {
+        return [
+            'no feed data' => [[], []],
+            'no solutions in feed' => [
+                [
+                    'Amasty_Extension1' => ['feed name 1' => ['name' => 'Test1', 'is_solution' => '']],
+                    'Amasty_Extension2' => ['feed name 2' => ['name' => 'Test2', 'is_solution' => '']]
+                ],
+                []
+            ],
+            'solution with additional extensions' => [
+                [
+                    'Amasty_Solution' => [
+                        'solution feed name' => [
+                            'name' => 'Test1',
+                            'is_solution' => 'Yes',
+                            'additional_extensions' => 'Amasty_TestB,Amasty_TestA'
+                        ]
+                    ],
+                    'Amasty_Extension1' => ['feed name 1' => ['name' => 'Test1', 'is_solution' => '']]
+                ],
+                [
+                    'Amasty_Solution' => [
+                        'name' => 'Test1',
+                        'is_solution' => 'Yes',
+                        'additional_extensions' => [
+                            'Amasty_TestA',
+                            'Amasty_TestB'
+                        ]
+                    ]
+                ]
+            ],
+            'solution without extensions' => [
+                [
+                    'Amasty_Solution' => [
+                        'solution feed name' => [
+                            'name' => 'Test1',
+                            'is_solution' => 'Yes',
+                        ]
+                    ],
+                    'Amasty_Extension1' => ['feed name 1' => ['name' => 'Test1', 'is_solution' => '']]
+                ],
+                [
+                    'Amasty_Solution' => [
+                        'name' => 'Test1',
+                        'is_solution' => 'Yes',
+                        'additional_extensions' => []
+                    ]
+                ]
+            ]
         ];
     }
 }

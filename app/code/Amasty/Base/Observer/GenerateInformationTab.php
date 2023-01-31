@@ -1,16 +1,15 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Observer;
 
+use Amasty\Base\Model\AmastyMenu\Frontend\Processors\Links;
 use Amasty\Base\Model\Feed\ExtensionsProvider;
 use Amasty\Base\Model\ModuleInfoProvider;
-use Amasty\Base\Plugin\Backend\Model\Menu\Item;
 use Magento\Config\Model\Config\Structure;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Module\Manager;
@@ -121,7 +120,7 @@ class GenerateInformationTab implements ObserverInterface
     {
         $src = $this->assetRepo->getUrl('Amasty_Base::images/amasty_logo.svg');
         if ($this->moduleInfoProvider->isOriginMarketplace()) {
-            $href = Item::MAGENTO_MARKET_URL;
+            $href = Links::MAGENTO_MARKET_URL;
         } else {
             $href = 'https://amasty.com' . $this->getSeoParams() . 'amasty_logo_' . $this->getModuleCode();
         }
@@ -432,7 +431,7 @@ class GenerateInformationTab implements ObserverInterface
             }
         }
 
-        if (count($messages)) {
+        if (!empty($messages)) {
             $html = '<div class="amasty-conflicts-title">'
                 . __('Problems detected:')
                 . '</div>';

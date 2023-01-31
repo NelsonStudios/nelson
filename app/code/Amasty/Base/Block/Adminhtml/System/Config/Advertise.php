@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Block\Adminhtml\System\Config;
 
@@ -24,11 +23,11 @@ class Advertise extends Field
      */
     public function render(AbstractElement $element)
     {
-        $commentText = $element->getContainer()->getGroup()['data']['text'];
+        $advertiseData = $element->getContainer()->getGroup()['data'];
         $element->setValue(__('Not Installed'));
         $element->setHtmlId('amasty_not_instaled');
-        $element->setComment(__($commentText));
-        $element->setLabel(__('Status'));
+        $element->setComment($advertiseData['text']);
+        $element->setLabel(strip_tags($advertiseData['tab_name']));
 
         return parent::render($element);
     }

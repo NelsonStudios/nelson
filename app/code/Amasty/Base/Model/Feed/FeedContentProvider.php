@@ -1,15 +1,15 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Feed;
 
 use Amasty\Base\Model\Feed\Response\FeedResponseInterface;
 use Amasty\Base\Model\Feed\Response\FeedResponseInterfaceFactory;
+use Laminas\Http\Request;
 use Magento\Framework\HTTP\Adapter\Curl;
 use Magento\Framework\HTTP\Adapter\CurlFactory;
 use Magento\Store\Model\StoreManagerInterface;
@@ -22,7 +22,7 @@ class FeedContentProvider
     /**
      * Path to NEWS
      */
-    public const URN_NEWS = 'cdn.amasty.com/feed-news-segments.xml';//do not use https:// or http
+    public const URN_NEWS = 'feed.amasty.net/feed-news-segments.xml';//do not use https:// or http
 
     /**
      * Path to ADS
@@ -32,7 +32,7 @@ class FeedContentProvider
     /**
      * Path to EXTENSIONS
      */
-    public const URN_EXTENSIONS = 'cdn.amasty.com/feed-extensions-m2.xml';
+    public const URN_EXTENSIONS = 'feed.amasty.net/feed-extensions-m2.xml';
 
     /**
      * @var CurlFactory
@@ -85,7 +85,7 @@ class FeedContentProvider
         if (isset($options['modified_since'])) {
             $headers = ['If-Modified-Since: ' . $options['modified_since']];
         }
-        $curlObject->write(\Zend_Http_Client::GET, $url, '1.1', $headers);
+        $curlObject->write(Request::METHOD_GET, $url, '1.1', $headers);
         $result = $curlObject->read();
 
         /** @var FeedResponseInterface $feedResponse */

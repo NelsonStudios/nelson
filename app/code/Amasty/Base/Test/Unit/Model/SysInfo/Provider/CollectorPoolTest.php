@@ -1,11 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Test\Unit\Model\SysInfo\Provider;
 
@@ -26,6 +27,8 @@ class CollectorPoolTest extends TestCase
         $collectorMock = $this->createMock(CollectorInterface::class);
         $collectors = ['collectorGroup' => ['collectorName' => $collectorMock]];
         $this->model = new CollectorPool($collectors);
+
+        $this->assertIsObject($this->model);
     }
 
     public function testCheckProviderInstanceOnException(): void

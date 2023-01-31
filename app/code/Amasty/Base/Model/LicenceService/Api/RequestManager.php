@@ -1,11 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\LicenceService\Api;
 
@@ -53,7 +54,7 @@ class RequestManager
     {
         /** @var Curl $curl */
         $curl = $this->curlFactory->create();
-        $url = $this->urlBuilder->build('/api/v1/instance_client/registration');
+        $url = $this->urlBuilder->build('/api/v1/instance/registration');
         $postParams = json_encode(['domain' => $domain]);
 
         return $curl->request($url, $postParams);
@@ -69,7 +70,7 @@ class RequestManager
         /** @var Curl $curl */
         $curl = $this->curlFactory->create();
         $url = $this->urlBuilder->build(
-            '/api/v1/instance_client/'. $instanceInfo->getSystemInstanceKey() . '/collect',
+            '/api/v1/instance_client/'. $instanceInfo->getSystemInstanceKey() . '/collect'
         );
         $postParams = $this->simpleDataObjectConverter->convertKeysToCamelCase($instanceInfo->toArray());
         $postParams = json_encode($postParams);

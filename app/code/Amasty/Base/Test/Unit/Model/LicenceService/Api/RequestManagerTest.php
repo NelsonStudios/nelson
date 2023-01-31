@@ -1,11 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Test\Unit\Model\LicenceService\Api;
 
@@ -87,7 +88,7 @@ class RequestManagerTest extends TestCase
     private function registerInstanceInit(): array
     {
         $domain = 'https://amasty.com';
-        $path = '/api/v1/instance_client/registration';
+        $path = '/api/v1/instance/registration';
         $url = 'https://amasty-licence.com' . $path;
         $postParams = json_encode(['domain' => $domain]);
         $curlMock = $this->createPartialMock(Curl::class, ['request']);

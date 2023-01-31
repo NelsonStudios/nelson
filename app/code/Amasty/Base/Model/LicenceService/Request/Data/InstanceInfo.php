@@ -1,14 +1,16 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
 
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
+
 namespace Amasty\Base\Model\LicenceService\Request\Data;
 
+use Amasty\Base\Model\LicenceService\Request\Data\InstanceInfo\Platform;
 use Amasty\Base\Model\SimpleDataObject;
 use Magento\Framework\Api\ExtensibleDataInterface;
 
@@ -17,6 +19,7 @@ class InstanceInfo extends SimpleDataObject implements ExtensibleDataInterface
     public const SYSTEM_INSTANCE_KEY = 'system_instance_key';
     public const MODULES = 'modules';
     public const DOMAINS = 'domains';
+    public const PLATFORM = 'platform';
 
     /**
      * @param string|null $systemInstanceKey
@@ -67,5 +70,22 @@ class InstanceInfo extends SimpleDataObject implements ExtensibleDataInterface
     public function getDomains(): ?array
     {
         return $this->getData(self::DOMAINS);
+    }
+
+    /**
+     * @param \Amasty\Base\Model\LicenceService\Request\Data\InstanceInfo\Platform $platform
+     * @return $this
+     */
+    public function setPlatform(Platform $platform): self
+    {
+        return $this->setData(self::PLATFORM, $platform);
+    }
+
+    /**
+     * @return \Amasty\Base\Model\LicenceService\Request\Data\InstanceInfo\Platform
+     */
+    public function getPlatform(): Platform
+    {
+        return $this->getData(self::PLATFORM);
     }
 }

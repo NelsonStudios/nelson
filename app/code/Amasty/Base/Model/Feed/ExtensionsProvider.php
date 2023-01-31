@@ -1,10 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
+declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Feed;
 
@@ -29,7 +31,7 @@ class ExtensionsProvider
     /**
      * @return array
      */
-    public function getAllFeedExtensions()
+    public function getAllFeedExtensions(): array
     {
         if ($this->modulesData === null) {
             $this->modulesData = $this->extensionsFeed->execute();
@@ -43,7 +45,7 @@ class ExtensionsProvider
      *
      * @return array
      */
-    public function getFeedModuleData($moduleCode)
+    public function getFeedModuleData(string $moduleCode): array
     {
         $allModules = $this->getAllFeedExtensions();
         $moduleData = [];
@@ -57,5 +59,27 @@ class ExtensionsProvider
         }
 
         return $moduleData;
+    }
+
+    public function getAllSolutionsData(): array
+    {
+        $result = [];
+
+        foreach (array_keys($this->getAllFeedExtensions()) as $moduleCode) {
+            $moduleFeedData = $this->getFeedModuleData($moduleCode);
+            if (empty($moduleFeedData['is_solution']) || $moduleFeedData['is_solution'] == 'No') {
+                continue;
+            }
+            if (!empty($moduleFeedData['additional_extensions'])) {
+                $solutionSubModules = explode(',', $moduleFeedData['additional_extensions']);
+                sort($solutionSubModules);
+                $moduleFeedData['additional_extensions'] = $solutionSubModules;
+            } else {
+                $moduleFeedData['additional_extensions'] = [];
+            }
+            $result[$moduleCode] = $moduleFeedData;
+        }
+
+        return $result;
     }
 }

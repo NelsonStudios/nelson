@@ -1,17 +1,19 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Feed\FeedTypes;
 
 use Amasty\Base\Model\AdminNotification\Model\ResourceModel\Inbox\Collection\ExistsFactory;
 use Amasty\Base\Model\Config;
 use Amasty\Base\Model\Feed\FeedContentProvider;
+use Amasty\Base\Model\FlagsManager;
 use Amasty\Base\Model\ModuleInfoProvider;
 use Amasty\Base\Model\Parser;
 use Amasty\Base\Model\Source\NotificationType;
@@ -73,8 +75,14 @@ class News
      */
     private $moduleInfoProvider;
 
+    /**
+     * @var FlagsManager
+     */
+    private $flagsManager;
+
     public function __construct(
         Config $config,
+        FlagsManager $flagsManager,
         FeedContentProvider $feedContentProvider,
         Parser $parser,
         ProductMetadataInterface $productMetadata,
@@ -93,6 +101,7 @@ class News
         $this->escaper = $escaper;
         $this->dataObjectFactory = $dataObjectFactory;
         $this->moduleInfoProvider = $moduleInfoProvider;
+        $this->flagsManager = $flagsManager;
     }
 
     /**
@@ -114,7 +123,7 @@ class News
         $feedXml = $this->parser->parseXml($feedResponse->getContent());
 
         if (isset($feedXml->channel->item)) {
-            $installDate = $this->config->getFirstModuleRun();
+            $installDate = $this->flagsManager->getFirstModuleRun();
             foreach ($feedXml->channel->item as $item) {
                 if ((int)$item->version === 1 // for magento One
                     || ((string)$item->edition && (string)$item->edition !== $this->getCurrentEdition())

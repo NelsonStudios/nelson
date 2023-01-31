@@ -1,16 +1,18 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Utils\Http\Response;
 
 use Amasty\Base\Model\SimpleDataObject;
 use Amasty\Base\Model\SimpleDataObjectFactory;
+use Amasty\Base\Utils\DataConverter;
 use Amasty\Base\Utils\Http\Response\Entity\ConfigPool;
 use Amasty\Base\Utils\Http\Response\Entity\Converter;
 use Magento\Framework\Exception\NotFoundException;
@@ -32,23 +34,26 @@ class ResponseFactory
      */
     private $simpleDataObjectFactory;
 
+    /**
+     * @var DataConverter
+     */
+    private $dataConverter;
+
     public function __construct(
         Converter $converter,
         ConfigPool $configPool,
-        SimpleDataObjectFactory $simpleDataObjectFactory
+        SimpleDataObjectFactory $simpleDataObjectFactory,
+        DataConverter $dataConverter
     ) {
         $this->converter = $converter;
         $this->configPool = $configPool;
         $this->simpleDataObjectFactory = $simpleDataObjectFactory;
+        $this->dataConverter = $dataConverter;
     }
 
-    /**
-     * @param string $url
-     * @param mixed $response
-     * @return SimpleDataObject
-     */
-    public function create(string $url, $response): SimpleDataObject
+    public function create(string $url, array $response): SimpleDataObject
     {
+        $response = $this->dataConverter->convertArrayToSnakeCase($response);
         try {
             // phpcs:disable Magento2.Functions.DiscouragedFunction.Discouraged
             $path = parse_url($url, PHP_URL_PATH);

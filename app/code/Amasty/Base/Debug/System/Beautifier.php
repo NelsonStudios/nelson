@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Debug\System;
 
@@ -82,27 +81,29 @@ class Beautifier
     {
         switch (strtolower(gettype($var))) {
             case 'string':
-                return sprintf(Template::$arraySimpleString, htmlspecialchars($var));
+                $result = sprintf(Template::$arraySimpleString, htmlspecialchars($var));
                 break;
             case 'boolean':
-                return sprintf(Template::$arraySimpleVar, $var ? 'true' : 'false');
+                $result = sprintf(Template::$arraySimpleVar, $var ? 'true' : 'false');
                 break;
             case 'null':
-                return sprintf(Template::$arraySimpleVar, 'null');
+                $result = sprintf(Template::$arraySimpleVar, 'null');
                 break;
             case 'integer':
             case 'float':
             case 'double':
-                return sprintf(Template::$arraySimpleVar, htmlspecialchars($var));
+                $result = sprintf(Template::$arraySimpleVar, htmlspecialchars($var));
                 break;
             case 'resource':
             case 'resource (closed)':
-                return sprintf(Template::$arraySimpleVar, 'resource');
+                $result = sprintf(Template::$arraySimpleVar, 'resource');
                 break;
             default:
-                return sprintf(Template::$arraySimpleVar, 'Unknown variable type!');
+                $result = sprintf(Template::$arraySimpleVar, 'Unknown variable type!');
                 break;
         }
+
+        return $result;
     }
 
     /**
