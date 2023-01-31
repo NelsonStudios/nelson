@@ -1,3 +1,5 @@
+/* phpcs:ignoreFile */
+
 (function (exports) {'use strict';
   //shared pointer
   var i;

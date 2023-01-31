@@ -1,0 +1,23 @@
+{
+    "name": "amasty/adminactionslog",
+    "description": "Admin Actions Log by Amasty",
+    "require": {
+        "php": ">=7.3",
+        "amasty/base": ">=1.13.6",
+        "amasty/geoip": "*",
+        "d4h/finediff": "*"
+    },
+    "type": "magento2-module",
+    "version": "2.0.10",
+    "license": [
+        "Commercial"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Amasty\\AdminActionsLog\\": ""
+        }
+    }
+}

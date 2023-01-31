@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Config\Backend;
 
@@ -13,7 +12,7 @@ use Amasty\Base\Model\Source\NotificationType;
 class Unsubscribe extends \Magento\Framework\App\Config\Value implements
     \Magento\Framework\App\Config\Data\ProcessorInterface
 {
-    public const PATH_TO_FEED_IMAGES = 'https://amasty.com/frontend/base/default/images/amasty/notifeed/';
+    public const PATH_TO_FEED_IMAGES = 'https://feed.amasty.net/news/unsubscribe/';
 
     /**
      * @var \Amasty\Base\Model\AdminNotification\Messages

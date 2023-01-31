@@ -1,20 +1,20 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Controller\Adminhtml\Notification;
 
 use Amasty\Base\Model\Config;
 use Magento\Backend\App\Action;
+use Magento\Framework\Controller\Result\Redirect;
 
-class Frequency extends \Magento\Backend\App\Action
+class Frequency extends Action
 {
     /**
-     * @var \Amasty\Base\Model\Config
+     * @var Config
      */
     private $config;
 
@@ -25,7 +25,7 @@ class Frequency extends \Magento\Backend\App\Action
 
     public function __construct(
         Action\Context $context,
-        \Amasty\Base\Model\Config $config,
+        Config $config,
         \Amasty\Base\Model\Source\Frequency $frequency
     ) {
         parent::__construct($context);
@@ -34,7 +34,7 @@ class Frequency extends \Magento\Backend\App\Action
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
+     * @return Redirect
      */
     public function execute()
     {
@@ -56,9 +56,8 @@ class Frequency extends \Magento\Backend\App\Action
         }
 
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setRefererUrl();
 
-        return $resultRedirect;
+        return $resultRedirect->setRefererUrl();
     }
 
     protected function _isAllowed()
@@ -78,7 +77,7 @@ class Frequency extends \Magento\Backend\App\Action
                 $resultValue = $option['value'];
             } else {
                 if ($resultValue) {
-                    $this->config->changeFrequency($resultValue);
+                    $this->config->changeFrequency((int)$resultValue);
                 }
 
                 break;
@@ -103,7 +102,7 @@ class Frequency extends \Magento\Backend\App\Action
             }
 
             if ($resultValue && $option['value'] != $resultValue) {
-                $this->config->changeFrequency($option['value']);//save next option
+                $this->config->changeFrequency((int)$option['value']);//save next option
                 break;
             }
         }

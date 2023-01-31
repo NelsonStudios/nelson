@@ -1,18 +1,16 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Feed;
 
-use Amasty\Base\Model\AdminNotification\Model\ResourceModel\Inbox\Collection\Expired;
 use Amasty\Base\Model\AdminNotification\Model\ResourceModel\Inbox\Collection\ExpiredFactory;
 use Amasty\Base\Model\Config;
 use Amasty\Base\Model\Feed\FeedTypes\News;
-use Magento\AdminNotification\Model\Inbox;
+use Amasty\Base\Model\FlagsManager;
 use Magento\AdminNotification\Model\InboxFactory;
 
 class NewsProcessor
@@ -37,8 +35,14 @@ class NewsProcessor
      */
     private $newsFeed;
 
+    /**
+     * @var FlagsManager
+     */
+    private $flagsManager;
+
     public function __construct(
         Config $config,
+        FlagsManager $flagsManager,
         InboxFactory $inboxFactory,
         ExpiredFactory $expiredFactory,
         News $newsFeed
@@ -47,6 +51,7 @@ class NewsProcessor
         $this->inboxFactory = $inboxFactory;
         $this->expiredFactory = $expiredFactory;
         $this->newsFeed = $newsFeed;
+        $this->flagsManager = $flagsManager;
     }
 
     /**
@@ -54,16 +59,15 @@ class NewsProcessor
      */
     public function checkUpdate()
     {
-        if ($this->config->getFrequencyInSec() + $this->config->getLastUpdate() > time()) {
+        if ($this->config->getFrequencyInSec() + $this->flagsManager->getLastUpdate() > time()) {
             return;
         }
 
         if ($feedData = $this->newsFeed->execute()) {
-            /** @var Inbox $inbox */
             $inbox = $this->inboxFactory->create();
             $inbox->parse([$feedData]);
         }
-        $this->config->setLastUpdate();
+        $this->flagsManager->setLastUpdate();
     }
 
     /**
@@ -71,15 +75,14 @@ class NewsProcessor
      */
     public function removeExpiredItems()
     {
-        if ($this->config->getLastRemovement() + Config::REMOVE_EXPIRED_FREQUENCY > time()) {
+        if ($this->flagsManager->getLastRemoval() + Config::REMOVE_EXPIRED_FREQUENCY > time()) {
             return;
         }
 
-        /** @var Expired $collection */
         $collection = $this->expiredFactory->create();
         foreach ($collection as $model) {
             $model->setIsRemove(1)->save();
         }
-        $this->config->setLastRemovement();
+        $this->flagsManager->setLastRemoval();
     }
 }

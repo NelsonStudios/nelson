@@ -1,18 +1,19 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Block\Adminhtml\System\Config\InformationBlocks;
 
 use Amasty\Base\Block\Adminhtml\System\Config\Information;
+use Amasty\Base\Model\AmastyMenu\Frontend\Processors\Links;
 use Amasty\Base\Model\Feed\ExtensionsProvider;
 use Amasty\Base\Model\ModuleInfoProvider;
-use Amasty\Base\Plugin\Backend\Model\Menu\Item;
 use Magento\Config\Model\Config\Structure;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Asset\Repository;
@@ -107,7 +108,7 @@ class VersionInfo extends Template
                 $name = $this->getCurrentModuleFeedData()['name'];
                 $name = str_replace(' for Magento 2', '', $name);
             } else {
-                $name = __('Extension');
+                $name = (string)__('Extension');
             }
         }
 
@@ -119,7 +120,7 @@ class VersionInfo extends Template
         $moduleCode = $this->getElement()->getDataByPath('group/module_code');
 
         if ($this->moduleInfoProvider->isOriginMarketplace()) {
-            $href = Item::MAGENTO_MARKET_URL;
+            $href = Links::MAGENTO_MARKET_URL;
         } else {
             $href = 'https://amasty.com' . Information::SEO_PARAMS . 'amasty_logo_' . $moduleCode;
         }

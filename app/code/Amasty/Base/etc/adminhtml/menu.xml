@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!--
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
--->
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */-->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
@@ -24,7 +23,7 @@
              parent="MenuAmasty_Base::menu"
              resource="Amasty_Base::marketplace"/>
         <add id="Amasty_Base::extensions"
-             title="Modules &amp; Notifications"
+             title="Products &amp; Notifications"
              module="Amasty_Base"
              translate="title"
              sortOrder="9998"

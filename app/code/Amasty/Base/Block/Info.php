@@ -1,15 +1,15 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Block;
 
-use Amasty\Base\Model\ModuleInfoProvider;
+use Amasty\Base\Block\Adminhtml\System\Config\SysInfo\CacheInfo;
 use Amasty\Base\Block\Adminhtml\System\Config\SysInfo\DownloadButton;
+use Amasty\Base\Model\ModuleInfoProvider;
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Config\Block\System\Config\Form\Field;
@@ -17,14 +17,17 @@ use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory;
 use Magento\Framework\App\DeploymentConfig\Reader;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\State;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Phrase;
+use Magento\Framework\View\Element\BlockInterface;
 use Magento\Framework\View\Helper\Js;
 
 class Info extends Fieldset
 {
+    public const CRON_HELP_URL = 'https://amasty.com/knowledge-base/magento-cron.html';
+
     /**
      * @var CollectionFactory
      */
@@ -39,11 +42,6 @@ class Info extends Fieldset
      * @var ResourceConnection
      */
     private $resourceConnection;
-
-    /**
-     * @var ProductMetadataInterface
-     */
-    private $productMetadata;
 
     /**
      * @var Reader
@@ -68,7 +66,6 @@ class Info extends Fieldset
         DirectoryList $directoryList,
         Reader $reader,
         ResourceConnection $resourceConnection,
-        ProductMetadataInterface $productMetadata,
         ModuleInfoProvider $moduleInfoProvider,
         array $data = []
     ) {
@@ -76,35 +73,26 @@ class Info extends Fieldset
         $this->cronFactory = $cronFactory;
         $this->directoryList = $directoryList;
         $this->resourceConnection = $resourceConnection;
-        $this->productMetadata = $productMetadata;
         $this->reader = $reader;
         $this->moduleInfoProvider = $moduleInfoProvider;
     }
 
-    /**
-     * Render fieldset html
-     *
-     * @param AbstractElement $element
-     * @return string
-     */
-    public function render(AbstractElement $element)
+    public function render(AbstractElement $element): string
     {
-        $html = $this->_getHeaderHtml($element);
-
-        $html .= $this->getMagentoMode($element);
-        $html .= $this->getMagentoPathInfo($element);
-        $html .= $this->getOwnerInfo($element);
-        $html .= $this->getSystemTime($element);
-        $html .= $this->getCronInfo($element);
-        $html .= $this->getDownloadButtonHtml($element);
-
-        $html .= $this->_getFooterHtml($element);
-
-        return $html;
+        return $this->_getHeaderHtml($element)
+            . $this->getMagentoMode($element)
+            . $this->getMagentoPathInfo($element)
+            . $this->getOwnerInfo($element)
+            . $this->getDbTime($element)
+            . $this->getMagentoTime($element)
+            . $this->getCronInfo($element)
+            . $this->getCacheInfo($element)
+            . $this->getDownloadButtonHtml($element)
+            . $this->_getFooterHtml($element);
     }
 
     /**
-     * @return \Magento\Framework\View\Element\BlockInterface
+     * @return Field|BlockInterface
      */
     private function getFieldRenderer()
     {
@@ -117,27 +105,17 @@ class Info extends Fieldset
         return $this->fieldRenderer;
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     *
-     * @return string
-     */
-    private function getMagentoMode($fieldset)
+    private function getMagentoMode(AbstractElement $fieldset): string
     {
         $label = __('Magento Mode');
 
         $env = $this->reader->load();
-        $mode = isset($env[State::PARAM_MODE]) ? $env[State::PARAM_MODE] : '';
+        $mode = $env[State::PARAM_MODE] ?? '';
 
         return $this->getFieldHtml($fieldset, 'magento_mode', $label, ucfirst($mode));
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     *
-     * @return string
-     */
-    private function getMagentoPathInfo($fieldset)
+    private function getMagentoPathInfo(AbstractElement $fieldset): string
     {
         $label = __('Magento Path');
         $path = $this->directoryList->getRoot();
@@ -145,77 +123,72 @@ class Info extends Fieldset
         return $this->getFieldHtml($fieldset, 'magento_path', $label, $path);
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     *
-     * @return string
-     */
-    private function getOwnerInfo($fieldset)
+    private function getOwnerInfo(AbstractElement $fieldset): string
     {
-        $serverUser = __('Unknown');
-        if (function_exists('get_current_user')) {
-            $serverUser = get_current_user();
-        }
+        $serverUser = function_exists('get_current_user')
+            ? get_current_user()
+            : __('Unknown');
+
+        return $this->getFieldHtml($fieldset, 'magento_user', __('Server User'), $serverUser);
+    }
+
+    private function getDbTime(AbstractElement $fieldset): string
+    {
+        $time = $this->resourceConnection->getConnection()->fetchOne('select now()');
 
         return $this->getFieldHtml(
             $fieldset,
-            'magento_user',
-            __('Server User'),
-            $serverUser
+            'mysql_current_date_time',
+            __('Current Database Time'),
+            $time
         );
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     *
-     * @return string
-     */
-    private function getSystemTime($fieldset)
+    private function getMagentoTime(AbstractElement $fieldset): string
     {
-        if (version_compare($this->productMetadata->getVersion(), '2.2', '>=')) {
-            $time = $this->resourceConnection->getConnection()->fetchOne('select now()');
-        } else {
-            $time = $this->_localeDate->date()->format('H:i:s');
-        }
-        return $this->getFieldHtml($fieldset, 'mysql_current_date_time', __('Current Time'), $time);
+        return $this->getFieldHtml(
+            $fieldset,
+            'magento_current_date_time',
+            __('Current Magento Time'),
+            $this->getLocalizedTime()
+        );
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     *
-     * @return string
-     */
-    private function getCronInfo($fieldset)
+    private function getCronInfo(AbstractElement $fieldset): string
     {
         $crontabCollection = $this->cronFactory->create();
         $crontabCollection->setOrder('schedule_id')->setPageSize(5);
 
-        if ($crontabCollection->count() === 0) {
-            $value = '<div class="red">';
-            $value .= __('No cron jobs found') . '</div>';
-            if (!$this->moduleInfoProvider->isOriginMarketplace()) {
-                $value .=
-                    '<a target="_blank"
-                  href="https://support.amasty.com/index.php?/Knowledgebase/Article/View/72/24/magento-cron">' .
-                    __('Learn more') .
-                    '</a>';
-            }
-        } else {
-            $value = '<table>';
-            foreach ($crontabCollection as $crontabRow) {
-                $value .=
-                    '<tr>' .
-                    '<td>' . $crontabRow['job_code'] . '</td>' .
-                    '<td>' . $crontabRow['status'] . '</td>' .
-                    '<td>' . $crontabRow['created_at'] . '</td>' .
-                    '</tr>';
-            }
-            $value .= '</table>';
+        $value = '';
+        foreach ($crontabCollection as $crontabRow) {
+            $value .=
+                '<tr>' .
+                '<td>' . $crontabRow['job_code'] . '</td>' .
+                '<td>' . $crontabRow['status'] . '</td>' .
+                '<td>' . $crontabRow['created_at'] . ' (DB Time)<br>'
+                . $this->getLocalizedTime($crontabRow['created_at']) . '</td>'
+                . '</tr>';
         }
 
-        $label = __('Cron (Last 5)');
+        if ($value) {
+            $cronInfoHead =
+                '<thead>
+                    <tr>
+                        <th style="text-align: left">' . __('Job code') . '</th>
+                        <th style="text-align: left">' . __('Status') . '</th>
+                        <th style="text-align: left">' . __('Created At') . '</th>
+                    </tr>
+                </thead>
+                <tbody>';
+            $value = '<table>' . $cronInfoHead . $value . '</table>';
+        } else {
+            $value = '<div class="red">' . __('No cron jobs found') . '</div>';
+            if (!$this->moduleInfoProvider->isOriginMarketplace()) {
+                $value .= '<a target="_blank" href="' . self::CRON_HELP_URL . '">' . __('Learn more') . '</a>';
+            }
+        }
 
-        return $this->getFieldHtml($fieldset, 'cron_configuration', $label, $value);
+        return $this->getFieldHtml($fieldset, 'cron_configuration', __('Cron (Last 5)'), $value);
     }
 
     private function getDownloadButtonHtml(AbstractElement $fieldset): string
@@ -225,27 +198,40 @@ class Info extends Fieldset
         return $this->getFieldHtml(
             $fieldset,
             DownloadButton::ELEMENT_ID,
-            __('Extensions data'),
+            __('System Data'),
             $button->toHtml()
         );
     }
 
-    /**
-     * @param AbstractElement $fieldset
-     * @param string $fieldName
-     * @param string $label
-     * @param string $value
-     *
-     * @return string
-     */
-    protected function getFieldHtml($fieldset, $fieldName, $label = '', $value = '')
+    private function getCacheInfo(AbstractElement $fieldset): string
     {
+        $cacheInfoBlock = $this->getLayout()->createBlock(CacheInfo::class);
+
+        return $this->getFieldHtml(
+            $fieldset,
+            'cache_info',
+            __('Cache Info'),
+            $cacheInfoBlock->toHtml()
+        );
+    }
+
+    private function getLocalizedTime(?string $inputTime = null): string
+    {
+        return $this->_localeDate->date($inputTime)->format('Y-m-d H:i:s \U\T\CP');
+    }
+
+    protected function getFieldHtml(
+        AbstractElement $fieldset,
+        string $fieldName,
+        Phrase $label,
+        string $value = ''
+    ): string {
         $field = $fieldset->addField($fieldName, 'label', [
             'name'  => 'dummy',
             'label' => $label,
             'after_element_html' => $value,
         ])->setRenderer($this->getFieldRenderer());
 
-        return $field->toHtml();
+        return (string)$field->toHtml();
     }
 }

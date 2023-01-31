@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!--
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
--->
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */-->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\AdminNotification\Block\Grid\Renderer\Actions">
@@ -34,23 +33,26 @@
         <plugin name="Amasty_Base::fix-dependence" type="Amasty\Base\Plugin\Adminhtml\Block\Widget\Form\Element\Dependence"/>
     </type>
 
-    <type name="Magento\Backend\Block\Menu">
-        <plugin name="Amasty_Base:menu" type="Amasty\Base\Plugin\Backend\Block\Menu"/>
-    </type>
-
-    <type name="Magento\Backend\Model\Menu\Item">
-        <plugin name="Amasty_Base:correct-market-url" type="Amasty\Base\Plugin\Backend\Model\Menu\Item"/>
-    </type>
-
     <type name="Magento\Backend\Model\Menu\Builder">
         <plugin name="Amasty_Base::menu_builder" type="Amasty\Base\Plugin\Backend\Model\Menu\Builder"/>
     </type>
 
     <type name="Magento\Config\Model\Config\Structure">
         <plugin name="Amasty_Base:advertise" type="Amasty\Base\Plugin\Backend\Model\Config\StructurePlugin"/>
+        <plugin name="Amasty_Base:infoblock" type="Amasty\Base\Plugin\Backend\Model\Config\AddInformationBlockPlugin"/>
+    </type>
+    <type name="Magento\Config\Block\System\Config\Tabs">
+        <plugin name="Amasty_Base::build_amasty_tabs"
+                type="Amasty\Base\Plugin\Config\Block\System\Config\BuildAmastyTabsPlugin"/>
     </type>
 
-    <type name="Magento\Config\Model\Config\Structure">
-        <plugin name="Amasty_Base:infoblock" type="Amasty\Base\Plugin\Backend\Model\Config\AddInformationBlockPlugin"/>
+    <type name="Amasty\Base\Model\AmastyMenu\ActiveSolutionsProvider">
+        <arguments>
+            <argument name="solutionsVersions" xsi:type="array">
+                <item name="10" xsi:type="string">Lite</item>
+                <item name="20" xsi:type="string">Pro</item>
+                <item name="30" xsi:type="string">Premium</item>
+            </argument>
+        </arguments>
     </type>
 </config>

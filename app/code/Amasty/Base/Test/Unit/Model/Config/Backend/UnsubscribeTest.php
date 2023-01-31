@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Test\Unit\Model\Config\Backend;
 
@@ -38,7 +37,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $messageManager = $this->createMock(\Amasty\Base\Model\AdminNotification\Messages::class);
 
         $model->expects($this->any())->method('generateMessage')->willReturn(10);
-        $model->expects($this->any())->method('getOldValue')->willReturnOnConsecutiveCalls('test', null);
+        $model->expects($this->any())->method('getOldValue')->willReturnOnConsecutiveCalls('test', '');
         $messageManager->expects($this->once())->method('addMessage');
         $messageManager->expects($this->once())->method('clear');
 
@@ -75,12 +74,12 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ['test', ''],
             [
                 NotificationType::UNSUBSCRIBE_ALL,
-                '<img src="https://amasty.com/frontend/base/default/images/amasty/notifeed/unsubscribe_all.svg"/>'
+                '<img src="https://feed.amasty.net/news/unsubscribe/unsubscribe_all.svg"/>'
                 . '<span>You have successfully unsubscribed from All Notifications.</span>'
             ],
             [
                 NotificationType::GENERAL,
-                '<img src="https://amasty.com/frontend/base/default/images/amasty/notifeed/info.svg"/>'
+                '<img src="https://feed.amasty.net/news/unsubscribe/info.svg"/>'
                 . '<span>You have successfully unsubscribed from General Info.</span>'
             ],
         ];

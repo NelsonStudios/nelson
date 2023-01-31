@@ -1,11 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Test\Unit\Utils\Http\Url;
 
@@ -40,8 +41,8 @@ class UrlComparatorTest extends TestCase
     public function isEqualDataProvider(): array
     {
         return [
-            ['/api/v1/instance_client/registration', '/api/v1/instance_client/registration', '{}', true],
-            ['/api/v1/instance_client/registration', '/api/v1/instance_client/ping', '{}', false],
+            ['/api/v1/instance/registration', '/api/v1/instance/registration', '{}', true],
+            ['/api/v1/instance/registration', '/api/v1/instance_client/ping', '{}', false],
             ['/api/v1/instance_client/{}/collect', '/api/v1/instance_client/test/collect', '{}', true],
             ['/api/v1/instance_client/test/collect', '/api/v1/instance_client/test2/collect', '{}', false]
         ];

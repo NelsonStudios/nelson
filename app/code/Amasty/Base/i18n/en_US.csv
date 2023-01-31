@@ -1,5 +1,4 @@
 "Not Installed","Not Installed"
-Status,Status
 "Incompatibility with the %1. To avoid the conflicts we strongly recommend turning off the 3rd party mod via the following command: ""%2""","Incompatibility with the %1. To avoid the conflicts we strongly recommend turning off the 3rd party mod via the following command: ""%2"""
 Extension,Extension
 Download,Download
@@ -7,11 +6,16 @@ Download,Download
 "Magento Path","Magento Path"
 Unknown,Unknown
 "Server User","Server User"
-"Current Time","Current Time"
+"Current Database Time","Current Database Time"
+"Current Magento Time","Current Magento Time"
+"Job code","Job code"
+Status,Status
+"Created At","Created At"
 "No cron jobs found","No cron jobs found"
 "Learn more","Learn more"
 "Cron (Last 5)","Cron (Last 5)"
-"Extensions data","Extensions data"
+"System Data","System Data"
+"Cache Info","Cache Info"
 "There is no sample file for this entity.","There is no sample file for this entity."
 "Module Name is empty.","Module Name is empty."
 "An error occurred while changing the frequency.","An error occurred while changing the frequency."
@@ -23,6 +27,9 @@ Unknown,Unknown
 "No such Import Behavior.","No such Import Behavior."
 "Wrong Behavior Interface.","Wrong Behavior Interface."
 "Wrong Validator Interface.","Wrong Validator Interface."
+Configuration,Configuration
+"User Guide","User Guide"
+"Upgrade Your Plan","Upgrade Your Plan"
 "The PHP function exec is disabled. Please contact your system administrator or your hosting provider.","The PHP function exec is disabled. Please contact your system administrator or your hosting provider."
 "All Notifications","All Notifications"
 "You have successfully unsubscribed from %1.","You have successfully unsubscribed from %1."
@@ -39,6 +46,9 @@ Unknown,Unknown
 "Magento Tips & Tricks","Magento Tips & Tricks"
 "Unsubscribe from all","Unsubscribe from all"
 "Registration failed, please try again later.","Registration failed, please try again later."
+Active,Active
+Inactive,Inactive
+"Type: %1","Type: %1"
 "The ""%1"" group name isn't defined. Verify the executor and try again.","The ""%1"" group name isn't defined. Verify the executor and try again."
 " by "," by "
 "Update is available and recommended. See the <a target=""_blank"" href=""%1"">Change Log</a>","Update is available and recommended. See the <a target=""_blank"" href=""%1"">Change Log</a>"
@@ -48,8 +58,7 @@ Unknown,Unknown
 "Show less of these messages","Show less of these messages"
 "Show more of these messages","Show more of these messages"
 Unsubscribe,Unsubscribe
-Configuration,Configuration
-"User Guide","User Guide"
+"Also recommended for your store","Also recommended for your store"
 "Invalid request.","Invalid request."
 "Invalid Request.","Invalid Request."
 "All Store Views","All Store Views"
@@ -58,19 +67,28 @@ Configuration,Configuration
 "user guide","user guide"
 "to configure the extension properly.","to configure the extension properly."
 "Update is available and recommended. See the","Update is available and recommended. See the"
-"Installed Extensions","Installed Extensions"
-"Get Updates at Your Amasty.com Account","Get Updates at Your Amasty.com Account"
-"Get Updates at Your","Get Updates at Your"
-Amasty.com,Amasty.com
-Account,Account
+Solutions,Solutions
+Extensions,Extensions
+"Products & Notifications","Products & Notifications"
+"View Your Products","View Your Products"
+"Update to the Latest Versions","Update to the Latest Versions"
+"Upgrade to Advanced Packages","Upgrade to Advanced Packages"
+Products,Products
+Version,Version
+Actions,Actions
+"See What's New","See What's New"
+None,None
+"Get Updates","Get Updates"
 "How to Update?","How to Update?"
-"See what's new","See what's new"
-"Up-to-Date Amasty Extensions","Up-to-Date Amasty Extensions"
+"Close Current Menu List","Close Current Menu List"
+"Open ","Open "
+Search,Search
+"Sorry, no products were found.","Sorry, no products were found."
 "Amasty Extensions","Amasty Extensions"
 "Amasty Marketplace","Amasty Marketplace"
 Amasty,Amasty
-"Modules & Notifications","Modules & Notifications"
-"Extensions &amp; Notifications","Extensions &amp; Notifications"
+"Products &amp; Notifications","Products &amp; Notifications"
+"Installed Extensions","Installed Extensions"
 Notifications,Notifications
 "Update Frequency","Update Frequency"
 "I want to Receive Notifications about:","I want to Receive Notifications about:"
@@ -78,3 +96,6 @@ Notifications,Notifications
 Menu,Menu
 "Enable Amasty Menu Item","Enable Amasty Menu Item"
 "System Information","System Information"
+"System Settings","System Settings"
+"CLI PHP Path","CLI PHP Path"
+"Current CLI PHP path of your Magento which is used by our extension when running the commands directly during the processing of PHP requests. To change it, please run bin/magento config:set amasty_base/system/cli_php_path %CLI_PHP_PATH% from the command line.","Current CLI PHP path of your Magento which is used by our extension when running the commands directly during the processing of PHP requests. To change it, please run bin/magento config:set amasty_base/system/cli_php_path %CLI_PHP_PATH% from the command line."

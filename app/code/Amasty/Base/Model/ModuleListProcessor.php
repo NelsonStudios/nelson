@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model;
 
@@ -69,7 +68,7 @@ class ModuleListProcessor
             }
 
             try {
-                if (!is_array($module = $this->getModuleInfo($moduleName))) {
+                if (empty($module = $this->getModuleInfo($moduleName))) {
                     continue;
                 }
             } catch (\Exception $e) {
@@ -88,9 +87,9 @@ class ModuleListProcessor
 
     /**
      * @param string $moduleCode
-     * @return array|mixed|string
+     * @return array
      */
-    protected function getModuleInfo($moduleCode)
+    protected function getModuleInfo(string $moduleCode): array
     {
         $module = $this->moduleInfoProvider->getModuleInfo($moduleCode);
 
@@ -98,7 +97,7 @@ class ModuleListProcessor
             || !isset($module['version'])
             || !isset($module['description'])
         ) {
-            return '';
+            return [];
         }
 
         $currentVer = $module['version'];
@@ -114,11 +113,12 @@ class ModuleListProcessor
             $module['description'] = $this->replaceAmastyText($ext['name']);
             $module['url'] = !empty($ext['url']) ? $ext['url'] : '';
             $module['date'] = !empty($ext['date']) ? $ext['date'] : '';
+            $module['code'] = $moduleCode;
 
             return $module;
         }
 
-        return '';
+        return [];
     }
 
     /**

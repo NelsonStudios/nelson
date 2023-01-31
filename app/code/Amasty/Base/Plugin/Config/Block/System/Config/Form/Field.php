@@ -1,10 +1,9 @@
 <?php
 /**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
-
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Plugin\Config\Block\System\Config\Form;
 
@@ -34,7 +33,7 @@ class Field
         $html,
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (strpos($html, 'tooltip-content') !== false) {
+        if (strpos((string)$html, 'tooltip-content') !== false) {
             $html = $this->replaceString($html);
         }
 

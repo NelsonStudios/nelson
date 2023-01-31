@@ -1,11 +1,12 @@
 <?php
-/**
-* @author Amasty Team
-* @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
-* @package Amasty_Base
-*/
 
 declare(strict_types=1);
+
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package Magento 2 Base Package
+ */
 
 namespace Amasty\Base\Model\Feed\FeedTypes;
 
@@ -101,7 +102,10 @@ class Extensions
         if ($feedResponse->isNeedToUpdateCache()) {
             $feedXml = $this->parser->parseXml($feedResponse->getContent());
             if (isset($feedXml->channel->item)) {
-                $result = $this->prepareFeedData($feedXml);
+                $result = $this->prepareFeedData(
+                    $feedXml,
+                    $this->escaper->escapeHtml((string)$feedXml->channel->upgrade_url)
+                );
             }
             $this->saveCache($result);
             $this->setLastModified();
@@ -133,9 +137,11 @@ class Extensions
 
     /**
      * @param \SimpleXMLElement $feedXml
+     * @param string $upgradeUrl
+     *
      * @return array
      */
-    private function prepareFeedData(\SimpleXMLElement $feedXml): array
+    private function prepareFeedData(\SimpleXMLElement $feedXml, string $upgradeUrl = ''): array
     {
         $marketplaceOrigin = $this->moduleInfoProvider->isOriginMarketplace();
         $result = [];
@@ -159,13 +165,19 @@ class Extensions
 
             $dateString = !empty((string)$item->date) ? $this->convertDate((string)$item->date) : '';
 
+            $isSolution = $this->escaper->escapeHtml((string)$item->is_solution);
+            $canBeUpgraded = $this->escaper->escapeHtml((string)$item->can_be_upgraded) === '1';
             $result[$code][$title] = [
                 'name' => $title,
                 'url' => $this->escaper->escapeUrl((string)$productPageLink),
                 'version' => $this->escaper->escapeHtml((string)$item->version),
                 'conflictExtensions' => $this->escaper->escapeHtml((string)$item->conflictExtensions),
                 'guide' => $this->escaper->escapeUrl((string)$item->guide),
-                'date' => $this->escaper->escapeHtml($dateString)
+                'date' => $this->escaper->escapeHtml($dateString),
+                'is_solution' => $isSolution,
+                'solution_version' => $this->escaper->escapeHtml((string)$item->solution_version),
+                'upgrade_url' => ($isSolution && $canBeUpgraded && $upgradeUrl) ? $upgradeUrl : '',
+                'additional_extensions' => $this->escaper->escapeHtml((string)$item->additional_extensions)
             ];
         }
 
