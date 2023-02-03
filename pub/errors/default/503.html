@@ -25,9 +25,28 @@
             object-fit: cover;
         }
 
-        @media only screen and (max-width: 1024px) {
+        .img-mobile {
+            display: none;
+        }
+
+        .content-503 {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @media only screen and (max-width: 1200px) {
             .error-img {
                 object-fit: cover;
+            }
+
+            .img-desktop {
+                display: none;
+            }
+
+            .img-mobile {
+                display: block;
             }
         }
     </style>
@@ -35,7 +54,9 @@
 </head>
 <body>
 <div class="error-wrapper">
-    <img class="error-img" src="images/503/maintain.png" alt="fecon">
+    <img class="error-img img-mobile" src="images/503/maintain.png" alt="fecon">
+    <img class="error-img img-desktop" src="images/503/background.jpg" alt="fecon">
+    <img class="content-503 img-desktop" src="images/503/content.png" alt="fecon">
 </div>
 </body>
 </html>
