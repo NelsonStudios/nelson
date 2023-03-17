@@ -3912,13 +3912,13 @@ body > .onepage-cat.category-list {
     font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
-    border: 1px solid #ddd;
     position: relative;
     cursor: pointer;
     border-radius: 7px 7px 0 0;
     display: block;
     text-decoration: none;
     background-color: transparent;
+    border: none;
 }
 
 .block-category-list .block-content .item a, .sidebar > .block.filter .item a {
