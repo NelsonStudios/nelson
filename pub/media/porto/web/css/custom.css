@@ -92,7 +92,7 @@
 html, body {
     color: #222 !important;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay {
+#banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay {
     margin: 0 100px;
     background: transparent !important;
 }
@@ -113,7 +113,7 @@ html, body {
     font-weight: bold !important;
     font-size: 20px !important;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay {
+#banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay {
     margin: 0 auto !important;
     background: transparent !important;
     max-width: 1170px;
@@ -505,7 +505,7 @@ fieldset[disabled] .block-search .action.search {
     background-color: transparent !important;
     color: #fff !important;
 }
-.cms-index-index #banner-slider-carousel {
+ #banner-slider-carousel {
     height: 442px;
 }
 
@@ -659,7 +659,7 @@ body.cms-home .page-wrapper main#maincontent {
     max-width: none;
     margin: 0 auto;
 }
-body.cms-home #banner-slider-carousel .owl-carousel .owl-item {
+#banner-slider-carousel .owl-carousel .owl-item {
     min-height: 1px;
     border:0;
     border-radius:0;
@@ -897,7 +897,7 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
     }
 }
 
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
+#banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
     font-size: 60px;
     line-height: 70px;
     font-weight: bold;
@@ -905,11 +905,11 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
     color: #fff;
     text-transform: uppercase;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay
+#banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay
 .container .content .green-header span {
     color: #c10230;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer
+#banner-slider-carousel .owl-stage-outer
 .owl-stage .owl-item .item .black-overlay .container .content .white-header {
     font-size: 26px !important;
     line-height: 1.25;
@@ -1017,25 +1017,25 @@ body .page-wrapper main#maincontent .columns .column.main #layer-product-list .t
     transform: translateY(0%) !important;
     margin-top: -5px !important;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage
+    #banner-slider-carousel .owl-stage-outer .owl-stage
 .owl-item .item .black-overlay .container .content {
     position: unset !important;
-    transform: translateY(0%);
+    transform: translateY(0%) !important;
     padding-top: 18%;
     padding-bottom: 7%;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item
+ #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item
 .black-overlay .container .content .btn-red-slider{
     font-size: 18px;
     border-radius: 5px;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer
+ #banner-slider-carousel .owl-stage-outer
 .owl-stage .owl-item .item .black-overlay .container .content .big-gray-underline {
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
     border-bottom: 0 !important;
 }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container img{
+ #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container img{
     display: none;
 }
 }
@@ -3000,7 +3000,7 @@ body.boxed .page-wrapper {
 .owl-banner-carousel .content-17.type1 p{display:none}
 .owl-banner-carousel .content-17.type1 a{display:none}
 
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .big-gray-underline {
+ #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .big-gray-underline {
     margin-bottom: 0px !important;
     padding-bottom: 10px !important;
     border-bottom: 0 !important;
@@ -3912,23 +3912,15 @@ body > .onepage-cat.category-list {
     font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
-    border: 1px solid #ddd;
-    background-color: #f5f5f5;
     position: relative;
     cursor: pointer;
     border-radius: 7px 7px 0 0;
     display: block;
     text-decoration: none;
+    background-color: transparent;
+    border: none;
 }
-.block-category-list .block-content, .sidebar > .block.filter .options dd {
-    margin: 0;
-    padding: 10px 15px;
-    font-size: 13px;
-    border: 1px solid #ddd;
-    border-top: 0;
-    border-radius: 0 0 7px 7px;
-    background-color: #fbfbfb;
-}
+
 .block-category-list .block-content .item a, .sidebar > .block.filter .item a {
     color: #777;
 }
@@ -5437,11 +5429,10 @@ table .col {
 
 body .page-wrapper main#maincontent .columns .column.main #layer-product-list .products.wrapper .product-items li.product-item {
     padding: 0;
-    margin-left: -1px;
-    margin-bottom: -1px;
     margin: 0 auto 10px;
     width: 98%;
     max-width: 280px;
+    float: unset;
 }
 .product-items li.product-item .product-item-info .product-item-photo {
     min-height: inherit !important;
@@ -5734,9 +5725,13 @@ transform: skew(21deg) !important;
   #banner-slider-carousel {
   max-width: 1140px;
   margin: 30px auto 0 !important;
+      height: 100% !important;
   }
-.cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .banner-subtitle {
+ #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .banner-subtitle {
   font-family: 'SubstanceW00' !important;
+     font-size: 18px;
+     line-height: 1.625;
+     color: white;
 }
 a.home-teaser-red {
 background: #C10230;
@@ -6030,7 +6025,7 @@ max-width: 1140px !important;
     }
 }
 @media (max-width: 991.98px) {
-  .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content {
+   #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content {
 text-shadow: 0px 0px 5px #000;
 }
 }
@@ -6038,8 +6033,8 @@ text-shadow: 0px 0px 5px #000;
   #banner-slider-carousel {
   margin: 0px auto !important;
   }
-  .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
-font-size: 48px;
+    #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
+font-size: 48px !important;
 line-height: 1.3 !important;
 }
 }
@@ -6099,12 +6094,12 @@ background-color: #454546 !important;
     .sw-megamenu.navigation.side-megamenu li.level0:hover > a {
         border-top-color: #c10230 !important;
     }
-    .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container {
+     #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container {
         height: 442px !important;
         padding-left: 56% !important;
     }
 
-    .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container img {
+     #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container img {
         height: 600px !important;
     }
 
@@ -6124,11 +6119,11 @@ background-color: #454546 !important;
     .logo img {
     max-width: 188px !important;
     }
-    .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
+     #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .green-header {
     font-size: 36px !important;
     line-height: 1.3 !important;
     }
-    .cms-index-index #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .banner-subtitle {
+     #banner-slider-carousel .owl-stage-outer .owl-stage .owl-item .item .black-overlay .container .content .banner-subtitle {
     font-size: 16px !important;
     line-height: 1.3 !important;
     }
@@ -6136,7 +6131,7 @@ background-color: #454546 !important;
     max-width: 96% !important;
     margin: 30px auto 0 !important;
     }
-    .cms-index-index #banner-slider-carousel {
+    #banner-slider-carousel {
     height: 364px !important;
     }
     a.home-teaser-red {
